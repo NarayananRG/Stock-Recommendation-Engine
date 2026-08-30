@@ -1,0 +1,30 @@
+STAGE 2.2 VALIDATION
+----------------------------------------------------------------------------------------
+Point-in-time signal checks                  PASS  Frozen core + date window + parity
+Stage 2.1 signal parity                      PASS  generated=68081, reference=68081, mismatches=0
+Entry strictly after signal                  PASS
+No duplicate same-ticker positions           PASS
+No duplicate same-ticker orders              PASS
+Maximum positions respected                  PASS
+No WATCH trades in primary portfolio         PASS
+No negative quantity                         PASS
+Cash constraint respected                    PASS
+Stop below entry                             PASS
+T1 above entry                               PASS
+T2 above T1                                  PASS
+Daily equity reconciliation                  PASS
+Slippage charged once                        PASS
+Transaction costs reconciled                 PASS
+Runtime state invariants                     PASS
+----------------------------------------------------------------------------------------
+OVERALL VALIDATION: PASS
+
+This test uses the supplied/current ticker universe and is not a survivorship-bias-free historical index-constituent study.
+
+INFORMATIONAL DATA/RUNTIME DRIFT WARNING
+----------------------------------------------------------------------------------------
+Live regeneration differed on 8208 of the compared rows. The portfolio audit used the saved Stage 2.1 point-in-time signal log as its explicit canonical candidate source. See stage2_2_signal_parity_differences.csv.
+
+
+Runtime seconds: 300.298
+Test window: 2011-08-30 through 2026-08-28

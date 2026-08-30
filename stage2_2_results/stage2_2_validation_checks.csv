@@ -1,0 +1,17 @@
+Check,Status,Detail,Candidate Source,Survivorship Bias Warning
+Point-in-time signal checks,PASS,Frozen core + date window + parity,REFERENCE,This test uses the supplied/current ticker universe and is not a survivorship-bias-free historical index-constituent study.
+Stage 2.1 signal parity,PASS,"generated=68081, reference=68081, mismatches=0",REFERENCE,This test uses the supplied/current ticker universe and is not a survivorship-bias-free historical index-constituent study.
+Entry strictly after signal,PASS,,REFERENCE,This test uses the supplied/current ticker universe and is not a survivorship-bias-free historical index-constituent study.
+No duplicate same-ticker positions,PASS,,REFERENCE,This test uses the supplied/current ticker universe and is not a survivorship-bias-free historical index-constituent study.
+No duplicate same-ticker orders,PASS,,REFERENCE,This test uses the supplied/current ticker universe and is not a survivorship-bias-free historical index-constituent study.
+Maximum positions respected,PASS,,REFERENCE,This test uses the supplied/current ticker universe and is not a survivorship-bias-free historical index-constituent study.
+No WATCH trades in primary portfolio,PASS,,REFERENCE,This test uses the supplied/current ticker universe and is not a survivorship-bias-free historical index-constituent study.
+No negative quantity,PASS,,REFERENCE,This test uses the supplied/current ticker universe and is not a survivorship-bias-free historical index-constituent study.
+Cash constraint respected,PASS,,REFERENCE,This test uses the supplied/current ticker universe and is not a survivorship-bias-free historical index-constituent study.
+Stop below entry,PASS,,REFERENCE,This test uses the supplied/current ticker universe and is not a survivorship-bias-free historical index-constituent study.
+T1 above entry,PASS,,REFERENCE,This test uses the supplied/current ticker universe and is not a survivorship-bias-free historical index-constituent study.
+T2 above T1,PASS,,REFERENCE,This test uses the supplied/current ticker universe and is not a survivorship-bias-free historical index-constituent study.
+Daily equity reconciliation,PASS,,REFERENCE,This test uses the supplied/current ticker universe and is not a survivorship-bias-free historical index-constituent study.
+Slippage charged once,PASS,,REFERENCE,This test uses the supplied/current ticker universe and is not a survivorship-bias-free historical index-constituent study.
+Transaction costs reconciled,PASS,,REFERENCE,This test uses the supplied/current ticker universe and is not a survivorship-bias-free historical index-constituent study.
+Runtime state invariants,PASS,,REFERENCE,This test uses the supplied/current ticker universe and is not a survivorship-bias-free historical index-constituent study.
