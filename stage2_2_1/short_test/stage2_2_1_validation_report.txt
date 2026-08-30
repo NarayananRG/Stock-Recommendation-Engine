@@ -1,0 +1,33 @@
+STAGE 2.2.1 VALIDATION
+------------------------------------------------------------------------------------------------
+Frozen manifest and file hashes                  PASS
+Strategy and execution use same frozen dataset   PASS  loaded_files=3
+Stage 2.1 source unchanged during run            PASS  91d3d84760c4b2427d500f0bee0f2dc0ceeb7e4f2e31d51d17a64342777993d5
+Reference log integrity                          PASS  {"file_sha256": "af2611561199dee8ef8e443c1864b8a4d41dd5d6aec25379d738602762515dde", "rows": 68081, "missing_required_columns": [], "duplicate_ticker_date_rows": 0, "file_unchanged_during_load": true}
+Fresh regeneration vs saved reference            WARN  differences=150; reference is diagnostic only
+Point-in-time signal date window                 PASS
+Entries strictly after signal dates              PASS
+No WATCH trades in primary portfolios            PASS
+Positive executed quantities                     PASS
+Maximum concurrent positions                     PASS
+Cash never materially negative                   PASS
+Daily full-equity reconciliation                 PASS
+One equity row per variant/session               PASS
+No overlapping same-ticker positions             PASS
+No pending/open same-ticker overlap              PASS
+Stops below executed entry                       PASS
+Targets above executed entry                     PASS
+T2 strictly above T1                             PASS
+Pullback fills do not exceed buy limit           PASS
+Slippage charged once                            PASS
+Transaction costs and net PnL reconcile          PASS
+Runtime state invariants                         PASS
+Benchmark runtime completed                      PASS  5.336 seconds
+------------------------------------------------------------------------------------------------
+OVERALL VALIDATION: PASS WITH WARNINGS
+
+This test uses the supplied/current ticker universe and is not a survivorship-bias-free historical index-constituent study.
+
+Experiment ID: S221_20240101_20241231_a01db364b4cf
+Runtime seconds: 5.336
+Test window: 2024-01-01 through 2024-12-31
