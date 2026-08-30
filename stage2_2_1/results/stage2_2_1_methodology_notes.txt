@@ -1,0 +1,12 @@
+STAGE 2.2.1 METHODOLOGY NOTES
+========================================================================
+This test uses the supplied/current ticker universe and is not a survivorship-bias-free historical index-constituent study.
+
+All strategy and execution inputs are read from the same SHA-256-verified frozen OHLC snapshot.
+Candidate signals are freshly regenerated through the unchanged Stage 2.1 FrozenStrategy.
+The saved Stage 2.1 signal log is read-only and used only for integrity and parity diagnostics.
+Primary entries are BUY and STRONG BUY only. Ten independent portfolios test T1/T2 over 10/20/30/45/63 sessions.
+Pullback fills are buy-limit orders and never execute above the planned Entry High.
+An intraday pullback entry-bar target-only touch is not credited; stop collisions are conservative.
+Daily risk measures use total portfolio equity including cash and open positions. Sharpe/Sortino use a 6% annual risk-free rate; an RF=0 Sharpe is also reported.
+The NIFTY comparison uses the frozen ^NSEI price index and excludes dividends.
