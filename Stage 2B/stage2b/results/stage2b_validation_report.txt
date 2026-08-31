@@ -1,0 +1,46 @@
+ENGINEERING STATUS: PASS
+PASS: STAGE21_CODE_HASH
+PASS: STAGE221_CODE_HASH
+PASS: STAGE222_FINAL_CODE_HASH
+PASS: DATA_CONTENT_HASH
+PASS: STRATEGY_HASH
+PASS: EXECUTION_BASELINE_HASH
+PASS: permanent baseline hashes
+PASS: Stage 2B hash portability
+PASS: stop never loosens
+PASS: target never extends
+PASS: close decision effective next session only
+PASS: SuperTrend trailing
+PASS: swing-low trailing
+PASS: break-even trigger
+PASS: partial T1 quantity
+PASS: qty=1 partial edge case
+PASS: partial exit cost accounting
+PASS: stop/T1 same-bar ambiguity
+PASS: T1/T2 same-bar ambiguity
+PASS: gap stop
+PASS: scheduled next-open exit
+PASS: trend deterioration
+PASS: resistance tightening
+PASS: 63-day max exit
+PASS: Signal ID direct lineage
+PASS: one position/ticker
+PASS: max five positions
+PASS: cash reconciliation
+PASS: no leverage
+PASS: calibration censoring
+PASS: calibration date strictly before trade
+PASS: calibration hierarchical backoff
+PASS: Beta-smoothed probability math
+PASS: expected-time quantile math
+PASS: dynamic exposure uses prior session
+PASS: no averaging down
+PASS: entry rules isolated
+PASS: missing Signal ID
+PASS: duplicate Trade ID
+PASS: max five positions
+PASS: negative quantity
+PASS: stop monotonic
+PASS: target monotonic
+PASS: after-close next session
+PASS: calibration strictly prior
