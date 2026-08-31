@@ -1,0 +1,54 @@
+STAGE 2.2.2 VALIDATION
+----------------------------------------------------------------------------------------------------------------
+Exact frozen Stage 2.1 source hash                         PASS  91d3d84760c4b2427d500f0bee0f2dc0ceeb7e4f2e31d51d17a64342777993d5
+Stage 2.1 source unchanged during run                      PASS  91d3d84760c4b2427d500f0bee0f2dc0ceeb7e4f2e31d51d17a64342777993d5
+Exact accepted Stage 2.2.1 helper hash                     PASS  8e6514353cc32a5b8bed1212df0c12d76de11d0624e4931fda4028f0be3ed31f
+Stage 2.2.1 source unchanged during run                    PASS  8e6514353cc32a5b8bed1212df0c12d76de11d0624e4931fda4028f0be3ed31f
+Stage 2.2.2 source unchanged during run                    PASS  63345c591b46c656b204236d147993cb283d57fdbccd0246b7cef281d7968730
+Frozen manifest verified before run                        PASS
+Frozen manifest verified after run                         PASS
+Exact frozen manifest ticker set                           PASS
+Reference signal log integrity                             PASS
+Fresh Stage 2.1 regeneration vs historical reference       WARN  severity=WARN; generated=68081; reference=68081; exact=57390; rows_with_any_difference=10691; float_only=2475; signal_label_mismatches=343; buy_nonbuy_membership_changes=13; missing_or_extra=0
+Point-in-time prefix invariance                            PASS
+Strategy rules changed                                     PASS  NO
+Execution behavior changed                                 PASS  NO
+Stage 2B implemented                                       PASS  NO
+Weekly holiday-short limitation                            WARN  Conservative one-session delay; no future candle used
+Candidate Signal IDs present                               PASS
+Candidate Signal IDs deterministic                         PASS
+Signal ID collision check                                  PASS
+Order Signal IDs carried                                   PASS
+Trade Signal IDs carried                                   PASS
+Entries strictly after signal close                        PASS
+Primary portfolios exclude WATCH                           PASS
+Positive quantities                                        PASS
+Stops below executed entry                                 PASS
+Targets above executed entry                               PASS
+T2 strictly above T1                                       PASS
+Independent entry formula                                  PASS
+Independent exit formula                                   PASS
+Independent entry cost formula                             PASS
+Independent exit cost formula                              PASS
+Independent gross formula                                  PASS
+Independent slippage formula                               PASS
+Independent net formula                                    PASS
+Pullback buy-limit ceiling                                 PASS
+Daily equity cash plus positions                           PASS
+Cash never negative                                        PASS
+No leverage                                                PASS
+Maximum five open positions                                PASS
+One daily equity row per variant/date                      PASS
+Runtime state invariants                                   PASS
+Friction 1.0x uses official 5+5 BPS                        PASS
+Constant exposure benchmark labeled ex-post                PASS
+Dynamic exposure benchmark uses prior session              PASS
+Exact parity vs accepted Stage 2.2.2 at 1.0x               PASS
+----------------------------------------------------------------------------------------------------------------
+PASS/WARN/FAIL: 42/2/0
+OVERALL VALIDATION: PASS WITH WARNINGS
+STRATEGY RULES CHANGED: NO
+EXECUTION BEHAVIOR CHANGED: NO
+STAGE 2B IMPLEMENTED: NO
+
+This test uses the supplied/current ticker universe and is not a survivorship-bias-free historical index-constituent study.
