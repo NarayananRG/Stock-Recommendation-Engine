@@ -1,0 +1,22 @@
+Self-Test,Status
+Stage 2.1 exact hash,PASS
+Stage 2.2.1 dependency hash,PASS
+Deterministic Signal ID,PASS
+No Signal ID collisions,PASS
+Portable hashing across paths,PASS
+Missing frozen manifest fails,PASS
+Explicit snapshot creation works,PASS
+Existing frozen manifest cannot be silently overwritten,PASS
+Split-file reconstruction integrity,PASS
+Pullback buy-limit ceiling,PASS
+Breakout next-session entry,PASS
+Stop-first collision,PASS
+Entry-bar target ambiguity,PASS
+Slippage formula,PASS
+Transaction-cost formula,PASS
+Net-PnL reconciliation,PASS
+Max-position limit,PASS
+Cash/non-leverage invariant,PASS
+Exposure benchmark math,PASS
+Constant-exposure benchmark labeling,PASS
+Dynamic exposure uses prior-session value,PASS
