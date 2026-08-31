@@ -1,0 +1,13 @@
+{
+  "completed_utc": "2026-08-30T14:33:22.636073+00:00",
+  "data_content_hash": "2b6a2bb93fcc6c3aa80d2115a002b8cba370f61442edb592ffc9bc95eaa02e35",
+  "stage21_code_hash": "91d3d84760c4b2427d500f0bee0f2dc0ceeb7e4f2e31d51d17a64342777993d5",
+  "stage222_code_hash": "80b9ba6e412486dd19390ad2c74c84b20a56afdec0c0a0938fff0f6a213badfb",
+  "status": "PASS",
+  "test_end": "2024-12-31",
+  "test_start": "2024-01-01",
+  "tickers": [
+    "TCS.NS",
+    "INFY.NS"
+  ]
+}

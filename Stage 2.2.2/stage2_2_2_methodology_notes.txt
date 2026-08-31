@@ -1,0 +1,5 @@
+Candidate Research Scope: T1 / Max 63 Sessions / Independent Opportunity Simulation / Capacity-Free.
+Primary portfolio results are ten independent T1/T2 x 10/20/30/45/63-day portfolios.
+Stage 2.1 strategy thresholds and rules are unchanged. Friction scenarios are mechanical sensitivity only.
+Exposure-matched benchmarks are diagnostic controls and do not establish causality.
+This test uses the supplied/current ticker universe and is not a survivorship-bias-free historical index-constituent study.
