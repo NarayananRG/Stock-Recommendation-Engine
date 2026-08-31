@@ -1,0 +1,11 @@
+{
+  "packages": {
+    "numpy": "2.3.5",
+    "pandas": "3.0.1",
+    "yfinance": "1.7.0"
+  },
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.12.13",
+  "python_implementation": "CPython",
+  "timezone": "Asia/Calcutta"
+}
