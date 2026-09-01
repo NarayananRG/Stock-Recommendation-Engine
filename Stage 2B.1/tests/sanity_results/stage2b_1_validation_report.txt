@@ -1,0 +1,177 @@
+ENGINEERING STATUS: PASS
+PASS: [HASH_GATE] STAGE21_CODE_HASH
+PASS: [HASH_GATE] STAGE221_CODE_HASH
+PASS: [HASH_GATE] STAGE222_FINAL_CODE_HASH
+PASS: [HASH_GATE] DATA_CONTENT_HASH
+PASS: [HASH_GATE] STRATEGY_HASH
+PASS: [HASH_GATE] EXECUTION_BASELINE_HASH
+PASS: [HASH_GATE_ACCEPTED_STAGE2B] accepted Stage 2B source: stage2b/Stock_Alert_Stage2B_Dynamic_Management.py
+PASS: [HASH_GATE_ACCEPTED_STAGE2B] accepted Stage 2B source: config/stage2b_policy_config.json
+PASS: [HASH_GATE_ACCEPTED_STAGE2B] accepted Stage 2B source: stage2b/policies.py
+PASS: [HASH_GATE_ACCEPTED_STAGE2B] accepted Stage 2B source: stage2b/calibration.py
+PASS: [HASH_GATE_ACCEPTED_STAGE2B] accepted Stage 2B source: stage2b/validation.py
+PASS: [HASH_GATE] manifest canonical hash
+PASS: [HASH_GATE] file exists: ^NSEI
+PASS: [HASH_GATE] file SHA-256: ^NSEI
+PASS: [INTEGRATION] columns: ^NSEI
+PASS: [INTEGRATION] duplicate dates: ^NSEI
+PASS: [INTEGRATION] date bounds: ^NSEI
+PASS: [HASH_GATE] file exists: TCS.NS
+PASS: [HASH_GATE] file SHA-256: TCS.NS
+PASS: [INTEGRATION] columns: TCS.NS
+PASS: [INTEGRATION] duplicate dates: TCS.NS
+PASS: [INTEGRATION] date bounds: TCS.NS
+PASS: [HASH_GATE] file exists: INFY.NS
+PASS: [HASH_GATE] file SHA-256: INFY.NS
+PASS: [INTEGRATION] columns: INFY.NS
+PASS: [INTEGRATION] duplicate dates: INFY.NS
+PASS: [INTEGRATION] date bounds: INFY.NS
+PASS: [HASH_GATE] file exists: HCLTECH.NS
+PASS: [HASH_GATE] file SHA-256: HCLTECH.NS
+PASS: [INTEGRATION] columns: HCLTECH.NS
+PASS: [INTEGRATION] duplicate dates: HCLTECH.NS
+PASS: [INTEGRATION] date bounds: HCLTECH.NS
+PASS: [HASH_GATE] file exists: WIPRO.NS
+PASS: [HASH_GATE] file SHA-256: WIPRO.NS
+PASS: [INTEGRATION] columns: WIPRO.NS
+PASS: [INTEGRATION] duplicate dates: WIPRO.NS
+PASS: [INTEGRATION] date bounds: WIPRO.NS
+PASS: [HASH_GATE] file exists: ICICIBANK.NS
+PASS: [HASH_GATE] file SHA-256: ICICIBANK.NS
+PASS: [INTEGRATION] columns: ICICIBANK.NS
+PASS: [INTEGRATION] duplicate dates: ICICIBANK.NS
+PASS: [INTEGRATION] date bounds: ICICIBANK.NS
+PASS: [HASH_GATE] file exists: HDFCBANK.NS
+PASS: [HASH_GATE] file SHA-256: HDFCBANK.NS
+PASS: [INTEGRATION] columns: HDFCBANK.NS
+PASS: [INTEGRATION] duplicate dates: HDFCBANK.NS
+PASS: [INTEGRATION] date bounds: HDFCBANK.NS
+PASS: [HASH_GATE] file exists: SBIN.NS
+PASS: [HASH_GATE] file SHA-256: SBIN.NS
+PASS: [INTEGRATION] columns: SBIN.NS
+PASS: [INTEGRATION] duplicate dates: SBIN.NS
+PASS: [INTEGRATION] date bounds: SBIN.NS
+PASS: [HASH_GATE] file exists: AXISBANK.NS
+PASS: [HASH_GATE] file SHA-256: AXISBANK.NS
+PASS: [INTEGRATION] columns: AXISBANK.NS
+PASS: [INTEGRATION] duplicate dates: AXISBANK.NS
+PASS: [INTEGRATION] date bounds: AXISBANK.NS
+PASS: [HASH_GATE] file exists: BEL.NS
+PASS: [HASH_GATE] file SHA-256: BEL.NS
+PASS: [INTEGRATION] columns: BEL.NS
+PASS: [INTEGRATION] duplicate dates: BEL.NS
+PASS: [INTEGRATION] date bounds: BEL.NS
+PASS: [HASH_GATE] file exists: HAL.NS
+PASS: [HASH_GATE] file SHA-256: HAL.NS
+PASS: [INTEGRATION] columns: HAL.NS
+PASS: [INTEGRATION] duplicate dates: HAL.NS
+PASS: [INTEGRATION] date bounds: HAL.NS
+PASS: [HASH_GATE] file exists: LT.NS
+PASS: [HASH_GATE] file SHA-256: LT.NS
+PASS: [INTEGRATION] columns: LT.NS
+PASS: [INTEGRATION] duplicate dates: LT.NS
+PASS: [INTEGRATION] date bounds: LT.NS
+PASS: [HASH_GATE] file exists: ITC.NS
+PASS: [HASH_GATE] file SHA-256: ITC.NS
+PASS: [INTEGRATION] columns: ITC.NS
+PASS: [INTEGRATION] duplicate dates: ITC.NS
+PASS: [INTEGRATION] date bounds: ITC.NS
+PASS: [HASH_GATE] file exists: TITAN.NS
+PASS: [HASH_GATE] file SHA-256: TITAN.NS
+PASS: [INTEGRATION] columns: TITAN.NS
+PASS: [INTEGRATION] duplicate dates: TITAN.NS
+PASS: [INTEGRATION] date bounds: TITAN.NS
+PASS: [HASH_GATE] file exists: HINDUNILVR.NS
+PASS: [HASH_GATE] file SHA-256: HINDUNILVR.NS
+PASS: [INTEGRATION] columns: HINDUNILVR.NS
+PASS: [INTEGRATION] duplicate dates: HINDUNILVR.NS
+PASS: [INTEGRATION] date bounds: HINDUNILVR.NS
+PASS: [HASH_GATE] file exists: M&M.NS
+PASS: [HASH_GATE] file SHA-256: M&M.NS
+PASS: [INTEGRATION] columns: M&M.NS
+PASS: [INTEGRATION] duplicate dates: M&M.NS
+PASS: [INTEGRATION] date bounds: M&M.NS
+PASS: [HASH_GATE] file exists: MARUTI.NS
+PASS: [HASH_GATE] file SHA-256: MARUTI.NS
+PASS: [INTEGRATION] columns: MARUTI.NS
+PASS: [INTEGRATION] duplicate dates: MARUTI.NS
+PASS: [INTEGRATION] date bounds: MARUTI.NS
+PASS: [HASH_GATE] file exists: TMPV.NS
+PASS: [HASH_GATE] file SHA-256: TMPV.NS
+PASS: [INTEGRATION] columns: TMPV.NS
+PASS: [INTEGRATION] duplicate dates: TMPV.NS
+PASS: [INTEGRATION] date bounds: TMPV.NS
+PASS: [HASH_GATE] file exists: TMCV.NS
+PASS: [HASH_GATE] file SHA-256: TMCV.NS
+PASS: [INTEGRATION] columns: TMCV.NS
+PASS: [INTEGRATION] duplicate dates: TMCV.NS
+PASS: [INTEGRATION] date bounds: TMCV.NS
+PASS: [HASH_GATE] file exists: SUNPHARMA.NS
+PASS: [HASH_GATE] file SHA-256: SUNPHARMA.NS
+PASS: [INTEGRATION] columns: SUNPHARMA.NS
+PASS: [INTEGRATION] duplicate dates: SUNPHARMA.NS
+PASS: [INTEGRATION] date bounds: SUNPHARMA.NS
+PASS: [HASH_GATE] file exists: CIPLA.NS
+PASS: [HASH_GATE] file SHA-256: CIPLA.NS
+PASS: [INTEGRATION] columns: CIPLA.NS
+PASS: [INTEGRATION] duplicate dates: CIPLA.NS
+PASS: [INTEGRATION] date bounds: CIPLA.NS
+PASS: [HASH_GATE] exact frozen ticker set
+PASS: [UNIT] stop never loosens
+PASS: [UNIT] target never extends
+PASS: [UNIT] completed-close decision effective next session
+PASS: [UNIT] SuperTrend trailing
+PASS: [UNIT] swing-low trailing candidate evaluated
+PASS: [UNIT] configured break-even trigger
+PASS: [UNIT] configured partial T1 quantity
+PASS: [UNIT] quantity-one partial edge case
+PASS: [UNIT] partial leg accounting identity
+PASS: [UNIT] trend deterioration schedule
+PASS: [UNIT] resistance target tightening
+PASS: [UNIT] accepted D6 stale rule semantics
+PASS: [UNIT] Beta-smoothed probability math
+PASS: [UNIT] expected-time quantile math
+PASS: [UNIT] configured maximum holding period
+PASS: [UNIT] swing-low feature contract
+PASS: [FULL_RUN_INVARIANT] all trades have Signal ID
+PASS: [FULL_RUN_INVARIANT] Trade ID unique
+PASS: [FULL_RUN_INVARIANT] Exit Leg ID unique
+PASS: [FULL_RUN_INVARIANT] exit-leg quantities reconcile
+PASS: [FULL_RUN_INVARIANT] leg PnL accounting identity
+PASS: [FULL_RUN_INVARIANT] trade PnL equals leg sum
+PASS: [FULL_RUN_INVARIANT] stops never decrease
+PASS: [FULL_RUN_INVARIANT] targets never extend
+PASS: [FULL_RUN_INVARIANT] after-close actions are D+1 only
+PASS: [FULL_RUN_INVARIANT] calibration data strictly precedes entry
+PASS: [FULL_RUN_INVARIANT] positive leg quantities
+PASS: [FULL_RUN_INVARIANT] maximum five open positions
+PASS: [FULL_RUN_INVARIANT] daily accounting identity: D1_TRAIL_ONLY
+PASS: [FULL_RUN_INVARIANT] no negative cash: D1_TRAIL_ONLY
+PASS: [FULL_RUN_INVARIANT] daily accounting identity: D2_BREAK_EVEN_TRAIL
+PASS: [FULL_RUN_INVARIANT] no negative cash: D2_BREAK_EVEN_TRAIL
+PASS: [FULL_RUN_INVARIANT] daily accounting identity: D3_PARTIAL_T1_TRAIL
+PASS: [FULL_RUN_INVARIANT] no negative cash: D3_PARTIAL_T1_TRAIL
+PASS: [FULL_RUN_INVARIANT] daily accounting identity: D4_TREND_PROTECT
+PASS: [FULL_RUN_INVARIANT] no negative cash: D4_TREND_PROTECT
+PASS: [FULL_RUN_INVARIANT] daily accounting identity: D5_RESISTANCE_TIGHTEN
+PASS: [FULL_RUN_INVARIANT] no negative cash: D5_RESISTANCE_TIGHTEN
+PASS: [FULL_RUN_INVARIANT] daily accounting identity: D6_HYBRID_DYNAMIC
+PASS: [FULL_RUN_INVARIANT] no negative cash: D6_HYBRID_DYNAMIC
+PASS: [INTEGRATION] daily logs contain entry and past-only current regime
+PASS: [INTEGRATION] benchmark never uses a future NIFTY row
+PASS: [INTEGRATION] paired-entry shadow covers every static entry and D1-D6 policy
+PASS: [INTEGRATION] shadow exits match realistic engine on shared entries
+PASS: [INTEGRATION] calibration predictions are strictly past-only
+PASS: [HASH_GATE] Stage 2B.1 package unchanged during run
+PASS: [HASH_GATE] frozen data unchanged during run
+PASS: [HASH_GATE_POST_RUN] STAGE21_CODE_HASH
+PASS: [HASH_GATE_POST_RUN] STAGE221_CODE_HASH
+PASS: [HASH_GATE_POST_RUN] STAGE222_FINAL_CODE_HASH
+PASS: [HASH_GATE_POST_RUN] DATA_CONTENT_HASH
+PASS: [HASH_GATE_POST_RUN] STRATEGY_HASH
+PASS: [HASH_GATE_POST_RUN] EXECUTION_BASELINE_HASH
+PASS: [HASH_GATE_ACCEPTED_STAGE2B_POST_RUN] accepted Stage 2B source: stage2b/Stock_Alert_Stage2B_Dynamic_Management.py
+PASS: [HASH_GATE_ACCEPTED_STAGE2B_POST_RUN] accepted Stage 2B source: config/stage2b_policy_config.json
+PASS: [HASH_GATE_ACCEPTED_STAGE2B_POST_RUN] accepted Stage 2B source: stage2b/policies.py
+PASS: [HASH_GATE_ACCEPTED_STAGE2B_POST_RUN] accepted Stage 2B source: stage2b/calibration.py
+PASS: [HASH_GATE_ACCEPTED_STAGE2B_POST_RUN] accepted Stage 2B source: stage2b/validation.py

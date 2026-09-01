@@ -1,0 +1,6 @@
+Type,Check,Status,Evidence
+INTEGRATION,daily logs contain entry and past-only current regime,PASS,0
+INTEGRATION,benchmark never uses a future NIFTY row,PASS,0
+INTEGRATION,paired-entry shadow covers every static entry and D1-D6 policy,PASS,24 / 24
+INTEGRATION,shadow exits match realistic engine on shared entries,PASS,0 differences across 24 shared entries
+INTEGRATION,calibration predictions are strictly past-only,PASS,0
