@@ -1,0 +1,17 @@
+Type,Check,Status,Evidence
+UNIT,stop never loosens,PASS,101.0 >= 95.0
+UNIT,target never extends,PASS,120.0 <= 120.0
+UNIT,completed-close decision effective next session,PASS,2025-01-03 00:00:00
+UNIT,SuperTrend trailing,PASS,101.0
+UNIT,swing-low trailing candidate evaluated,PASS,101.0
+UNIT,configured break-even trigger,PASS,101.0
+UNIT,configured partial T1 quantity,PASS,2
+UNIT,quantity-one partial edge case,PASS,0
+UNIT,partial leg accounting identity,PASS,29.370007499999986
+UNIT,trend deterioration schedule,PASS,EXIT_DAILY_TREND_DETERIORATION
+UNIT,resistance target tightening,PASS,110.0
+UNIT,accepted D6 stale rule semantics,PASS,EXIT_STALE_TRADE
+UNIT,Beta-smoothed probability math,PASS,0.5714285714285714
+UNIT,expected-time quantile math,PASS,3.25
+UNIT,configured maximum holding period,PASS,63
+UNIT,swing-low feature contract,PASS,10
