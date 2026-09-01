@@ -1,0 +1,39 @@
+{
+  "hash_algorithm": "SHA-256",
+  "normalization": "POSIX repository-relative paths; rows sorted by path",
+  "sources": [
+    {
+      "relative_path": "stage2b/calibration.py",
+      "sha256": "eb1f0546b30c9cb22e865360e3f1f9f0e8c3ff668fdc11cf51a83df350529b49"
+    },
+    {
+      "relative_path": "stage2b/diagnostics.py",
+      "sha256": "5c213e2b8dbae3e9fd76072b921a24a5d2b456074d4880ae85ee319759f32511"
+    },
+    {
+      "relative_path": "stage2b/hashing.py",
+      "sha256": "94600f186b2e3023267e69ff4acfb217cf64320cd6629b6d651fb4044ba350c2"
+    },
+    {
+      "relative_path": "stage2b/policies.py",
+      "sha256": "387db0262eee23e5a9e3887da858ff5bbfd7b8a28e4783e141d2d34edc83dd94"
+    },
+    {
+      "relative_path": "stage2b/Stock_Alert_Stage2B_1_Dynamic_Management.py",
+      "sha256": "35c787f8ab47122a3f61b668c13923865b5b86ebf08faeb0dafaf1bcb054de83"
+    },
+    {
+      "relative_path": "stage2b/validation.py",
+      "sha256": "cc511040dce5a2264d36dfc3489842c3264a54d72ff465a84f4e353cbd34f4a9"
+    }
+  ],
+  "package_hash": "9bba171b9917b9d125d2487e4afa53f6cc047e0a5ccbe3055ebb3e84363d854e",
+  "individual_source_hashes": {
+    "stage2b/calibration.py": "eb1f0546b30c9cb22e865360e3f1f9f0e8c3ff668fdc11cf51a83df350529b49",
+    "stage2b/diagnostics.py": "5c213e2b8dbae3e9fd76072b921a24a5d2b456074d4880ae85ee319759f32511",
+    "stage2b/hashing.py": "94600f186b2e3023267e69ff4acfb217cf64320cd6629b6d651fb4044ba350c2",
+    "stage2b/policies.py": "387db0262eee23e5a9e3887da858ff5bbfd7b8a28e4783e141d2d34edc83dd94",
+    "stage2b/Stock_Alert_Stage2B_1_Dynamic_Management.py": "35c787f8ab47122a3f61b668c13923865b5b86ebf08faeb0dafaf1bcb054de83",
+    "stage2b/validation.py": "cc511040dce5a2264d36dfc3489842c3264a54d72ff465a84f4e353cbd34f4a9"
+  }
+}

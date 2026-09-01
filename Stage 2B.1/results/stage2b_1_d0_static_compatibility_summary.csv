@@ -1,0 +1,5 @@
+Artifact,Difference Count,Status
+D0 candidate replay integrity,0,PASS
+D0 static order execution,0,PASS
+D0 static trade execution,0,PASS
+D0 static equity accounting,0,PASS

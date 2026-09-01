@@ -1,0 +1,12 @@
+Artifact,Difference Count,Status
+candidate selection,0,PASS
+orders and entries,0,PASS
+trades and final exits,0,PASS
+"exit legs, costs and PnL",0,PASS
+stop and target management,0,PASS
+equity D1_TRAIL_ONLY,0,PASS
+equity D2_BREAK_EVEN_TRAIL,0,PASS
+equity D3_PARTIAL_T1_TRAIL,0,PASS
+equity D4_TREND_PROTECT,0,PASS
+equity D5_RESISTANCE_TIGHTEN,0,PASS
+equity D6_HYBRID_DYNAMIC,0,PASS
