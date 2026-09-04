@@ -1,0 +1,8 @@
+Area,Old Stage 3 Behavior,Stage 3.1 Behavior,Reason,Changes Numeric Outcome?,Expected Rows Affected,Actual Rows Affected,Acceptance Status
+INCOMPLETE_ENTRY_WINDOW,Any future bar made a non-fill appear resolved,Full setup-specific window required unless an earlier fill resolves the order,NOT OBSERVED must not mean FAILED,YES,Data-end partial non-fills,1,PASS
+NOT_APPLICABLE_VS_CENSORED,Non-entered and non-D1-cohort rows were mixed with censoring,"Applicability, status, and data-end censoring are target-specific",Censoring denominators must include applicable rows only,METADATA ONLY,"Non-entered, invalid-risk, and non-D1 rows",3242,PASS
+RAW_DATE_FEATURE_ROLE,At least one source date was FEATURE_ALLOWED,All raw calendar/source dates are excluded from ML,Audit dates are not predictive inputs,NO,NIFTY source-date registry rows,2,PASS
+DATASET_SPECIFIC_FEATURE_REGISTRY,Registry key was Feature Name only,Registry key is Dataset + Feature Name,Same name can have different as-of semantics,NO,Shared feature names,98,PASS
+FORWARD_HORIZON_NAMING,Entry-inclusive counting was implicit,Canonical ENTRY_INCLUSIVE names plus exact legacy aliases,Remove one-session ambiguity without changing values,NO,10 canonical columns,10,PASS
+CONDITIONAL_TIME_TO_TARGET,Time-to-target condition was implicit,Registry declares conditional regression on target success,Avoid treating non-hits as missing regression labels,NO,2 labels,2,PASS
+VALIDATION_VIOLATION_REPORTING,Some reports used row counts as actual violations,Each availability check reports explicit violation counts,Validation totals now mean violations,NO,All label availability checks,22,PASS
