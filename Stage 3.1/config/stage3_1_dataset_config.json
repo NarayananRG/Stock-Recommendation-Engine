@@ -1,0 +1,99 @@
+{
+  "stage": "3.1",
+  "schema_version": "STAGE3_1_SCHEMA_V1",
+  "dataset_schema_versions": {
+    "signal_state": "STAGE3_1_SIGNAL_STATE_V1",
+    "trade_opportunity": "STAGE3_1_TRADE_OPPORTUNITY_V1",
+    "d1_position_day": "STAGE3_1_D1_POSITION_DAY_V1"
+  },
+  "baseline_tag": "stage2b.1-dynamic-research-baseline",
+  "baseline_commit": "c9cc9f4fcaf2fe81128365be09515fbf9fa67c28",
+  "source_experiment_id": "S2B1_20160101_20260828_a681f1f8a9d9",
+  "stage3_reference_branch": "stage3-point-in-time-dataset",
+  "stage3_reference_commit": "70951a5a05727a605bb579973da6216fb9887e44",
+  "stage3_reference_experiment": "S3_20110830_20260828_bb15e0fa65d2",
+  "stage3_reference_code_package_hash": "1c06cb7e1345b10ea8b2db65aea02d54468c0da7b816bf48575f169fa8f2a23a",
+  "stage3_reference_schema_hash": "2165f7083fce198f60941080a794f4136e522012bd3ac79120d255a14a6332e8",
+  "stage3_reference_datasets": {
+    "signal_state": {
+      "rows": 68081,
+      "content_hash": "672fd6774e680657849a8186e8f2b6f6b1fc900177df1a46bc2dbb671e77f029"
+    },
+    "trade_opportunity": {
+      "rows": 13544,
+      "content_hash": "50cc88c93d4f5624d500335adf96c323429313375225506d14b26f5d312795cf"
+    },
+    "d1_position_day": {
+      "rows": 4350,
+      "content_hash": "f01a685d82a65261e81e0ab77f7ceca6f5f8f7d93c9267fc8f345f2fbc7b2b39"
+    }
+  },
+  "expected_hashes": {
+    "STAGE2B1_PACKAGE_HASH": "9bba171b9917b9d125d2487e4afa53f6cc047e0a5ccbe3055ebb3e84363d854e",
+    "STAGE21_CODE_HASH": "91d3d84760c4b2427d500f0bee0f2dc0ceeb7e4f2e31d51d17a64342777993d5",
+    "STAGE221_CODE_HASH": "8e6514353cc32a5b8bed1212df0c12d76de11d0624e4931fda4028f0be3ed31f",
+    "STAGE222_FINAL_CODE_HASH": "63345c591b46c656b204236d147993cb283d57fdbccd0246b7cef281d7968730",
+    "STRATEGY_HASH": "e62dc4e75c056a216cc4bdaa589a95f9553ce40e37aa6690974759b7975ad23c",
+    "EXECUTION_BASELINE_HASH": "9434b39d2d7bbd8203a4674b4acdebfecf898afbc08cf7bc144729ec4b326c2b",
+    "DATA_CONTENT_HASH": "2b6a2bb93fcc6c3aa80d2115a002b8cba370f61442edb592ffc9bc95eaa02e35"
+  },
+  "source_paths": {
+    "stage3_root": "Stage 3",
+    "stage3_results": "Stage 3/results",
+    "stage3_identity": "Stage 3/results/stage3_experiment_identity.json",
+    "stage3_source_manifest": "Stage 3/results/stage3_source_manifest.json",
+    "stage3_dataset_manifest": "Stage 3/results/stage3_dataset_manifest.json",
+    "stage3_signal_state": "Stage 3/results/stage3_signal_state_dataset.csv.gz",
+    "stage3_trade_opportunity": "Stage 3/results/stage3_trade_opportunity_dataset.csv.gz",
+    "stage3_d1_position_day": "Stage 3/results/stage3_d1_position_day_dataset.csv.gz",
+    "stage3_feature_registry": "Stage 3/results/stage3_feature_registry.csv",
+    "stage3_label_registry": "Stage 3/results/stage3_label_registry.csv",
+    "stage3_ml_column_registry": "Stage 3/results/stage3_ml_column_registry.csv",
+    "stage3_point_in_time_audit": "Stage 3/results/stage3_point_in_time_audit.csv",
+    "stage3_candidate_outcome_parity_summary": "Stage 3/results/stage3_candidate_outcome_parity_summary.csv",
+    "stage3_candidate_outcome_parity_differences": "Stage 3/results/stage3_candidate_outcome_parity_differences.csv",
+    "stage3_d1_shadow_parity_summary": "Stage 3/results/stage3_d1_shadow_parity_summary.csv",
+    "stage3_d1_shadow_parity_differences": "Stage 3/results/stage3_d1_shadow_parity_differences.csv",
+    "frozen_data": "Stage 2.2.2 Final/stage2_2_1/data/frozen"
+  },
+  "test_start": "2011-08-30",
+  "test_end": "2026-08-28",
+  "development_end": "2015-12-31",
+  "forward_horizons": [10, 20, 30, 45, 63],
+  "position_day_horizons": [5, 10, 20],
+  "pullback_entry_window": 5,
+  "breakout_entry_window": 1,
+  "max_hold_sessions": 63,
+  "audit_tickers": ["TCS.NS", "INFY.NS", "HDFCBANK.NS", "LT.NS", "TITAN.NS", "HAL.NS"],
+  "audit_eras": [
+    ["2012-01-01", "2015-12-31"],
+    ["2016-01-01", "2020-12-31"],
+    ["2021-01-01", "2023-12-31"],
+    ["2024-01-01", "2026-12-31"]
+  ],
+  "evaluation_years": [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026],
+  "date_feature_whitelist": [],
+  "canonical_content": {
+    "column_order": "artifact order",
+    "dates": "YYYY-MM-DD",
+    "floats": "%.12g",
+    "nan": "<NA>",
+    "encoding": "UTF-8",
+    "line_ending": "LF",
+    "gzip_mtime": 0
+  },
+  "known_limitations": [
+    "current-universe survivorship bias",
+    "historical pseudo-OOS is not prospective unseen data",
+    "daily OHLC cannot establish intraday sequence",
+    "entry-day intraday-limit ambiguity",
+    "exit-day ambiguity",
+    "holiday-short weekly delay",
+    "generic basis-point cost model",
+    "sector/index membership is not historically point-in-time",
+    "D1 evidence remains historically weak",
+    "recent 2024-2026 performance remains weak",
+    "Stage 2B.1 empirical confidence was historically overconfident",
+    "no ML model has been validated"
+  ]
+}
