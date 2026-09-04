@@ -41,11 +41,11 @@ def stage3_reference_gate(repo_root: Path, config: Mapping[str, Any]) -> pd.Data
     frozen = ["Stage 2.2.2 Final", "Stage 2B", "Stage 2B.1"]
     frozen_diff = subprocess.run(["git", "diff", "--quiet", config["baseline_tag"], "--", *frozen], cwd=repo_root).returncode
     rows.append(_row("IMMUTABLE_REFERENCE", "Frozen dependency folders unchanged", frozen_diff == 0, "NO DIFFERENCE", "NO DIFFERENCE" if frozen_diff == 0 else "DIFFERENCE"))
-    pre_hotfix = resolve(f"{config['stage3_1_pre_hotfix_reference_commit']}^{{commit}}")
+    pre_hotfix = resolve(f"{config['stage3_1_pre_metadata_fix_reference_commit']}^{{commit}}")
     rows.append(_row(
-        "IMMUTABLE_REFERENCE", "Stage 3.1 pre-hotfix reference commit exists",
-        pre_hotfix == config["stage3_1_pre_hotfix_reference_commit"],
-        config["stage3_1_pre_hotfix_reference_commit"], pre_hotfix,
+        "IMMUTABLE_REFERENCE", "Stage 3.1 pre-metadata-fix reference commit exists",
+        pre_hotfix == config["stage3_1_pre_metadata_fix_reference_commit"],
+        config["stage3_1_pre_metadata_fix_reference_commit"], pre_hotfix,
     ))
     branch_ref = f"refs/remotes/origin/{config['stage3_reference_branch']}"
     branch_commit = resolve(branch_ref)
@@ -173,6 +173,8 @@ def integration_checks(
     time_to_target_audit: pd.DataFrame,
     feature_metadata_audit: pd.DataFrame,
     feature_value_parity_summary: pd.DataFrame,
+    label_parity_summary: pd.DataFrame,
+    registry_metadata_changes: pd.DataFrame,
     config: Mapping[str, Any],
 ) -> pd.DataFrame:
     rows: list[dict[str, Any]] = []
@@ -230,7 +232,26 @@ def integration_checks(
     metadata_failures = int(feature_metadata_audit["Status"].ne("PASS").sum())
     add("Feature metadata semantic audit", metadata_failures == 0, 0, metadata_failures)
     feature_value_differences = int(feature_value_parity_summary["Difference Count"].sum())
-    add("Pre-hotfix feature-value parity", feature_value_differences == 0, 0, feature_value_differences)
+    add("Pre-metadata-fix feature-value parity", feature_value_differences == 0, 0, feature_value_differences)
+    label_differences = int(label_parity_summary["Difference Count"].sum())
+    add("Pre-metadata-fix label parity", label_differences == 0, 0, label_differences)
+    expected_registry_rows = {
+        ("d1_position_day", "Stop Distance R"),
+        ("d1_position_day", "T1 Distance R"),
+        ("d1_position_day", "T2 Distance R"),
+    }
+    actual_registry_rows = set(map(tuple, registry_metadata_changes[["Dataset", "Feature Name"]].to_numpy()))
+    registry_delta_ok = (
+        actual_registry_rows == expected_registry_rows
+        and registry_metadata_changes["Status"].eq("PASS").all()
+    )
+    add(
+        "Registry metadata delta limited to three distance features",
+        registry_delta_ok,
+        "3 expected rows",
+        f"{len(actual_registry_rows)} rows",
+        "|".join(f"{dataset}::{feature}" for dataset, feature in sorted(actual_registry_rows)),
+    )
     for summary in parity_summaries:
         if summary.empty:
             continue

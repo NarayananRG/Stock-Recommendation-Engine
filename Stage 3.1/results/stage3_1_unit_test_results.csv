@@ -1,74 +1,90 @@
 Test Number,Test,Status,Detail,Runtime Milliseconds
-1,immutable tag resolution,PASS,assertion satisfied,46.834
-2,Stage 2B.1 package hash,PASS,assertion satisfied,3.998
-3,frozen data hashes,PASS,assertion satisfied,0.852
-4,Signal ID uniqueness,PASS,assertion satisfied,14.495
+1,immutable tag resolution,PASS,assertion satisfied,51.635
+2,Stage 2B.1 package hash,PASS,assertion satisfied,2.375
+3,frozen data hashes,PASS,assertion satisfied,0.513
+4,Signal ID uniqueness,PASS,assertion satisfied,8.84
 5,Stage 3.1 Row ID determinism,PASS,assertion satisfied,0.008
-6,signal source parity,PASS,assertion satisfied,0.201
-7,valid opportunity eligibility,PASS,assertion satisfied,0.193
-8,no fake levels,PASS,assertion satisfied,0.933
-9,pullback fill,PASS,assertion satisfied,1.388
-10,breakout fill,PASS,assertion satisfied,1.395
-11,buy-limit ceiling,PASS,assertion satisfied,3.696
-12,entry-day ambiguity flag,PASS,assertion satisfied,0.251
-13,stop/T1 same-bar conservative semantics,PASS,assertion satisfied,1.643
-14,stop/T2 same-bar conservative semantics,PASS,assertion satisfied,1.506
-15,T1 label,PASS,assertion satisfied,1.843
-16,T2 label,PASS,assertion satisfied,1.79
-17,target time,PASS,assertion satisfied,1.401
-18,forward return 10,PASS,assertion satisfied,0.121
-19,forward return 63,PASS,assertion satisfied,0.092
-20,MFE calculation,PASS,assertion satisfied,1.439
-21,MAE calculation,PASS,assertion satisfied,1.335
-22,conservative entry-day MFE,PASS,assertion satisfied,0.426
-23,censored late-history row,PASS,assertion satisfied,0.398
-24,label-available date,PASS,assertion satisfied,18.592
-25,fold-training cutoff,PASS,assertion satisfied,0.185
-26,no future row in training,PASS,assertion satisfied,1.373
+6,signal source parity,PASS,assertion satisfied,0.167
+7,valid opportunity eligibility,PASS,assertion satisfied,0.123
+8,no fake levels,PASS,assertion satisfied,0.669
+9,pullback fill,PASS,assertion satisfied,0.795
+10,breakout fill,PASS,assertion satisfied,0.697
+11,buy-limit ceiling,PASS,assertion satisfied,2.019
+12,entry-day ambiguity flag,PASS,assertion satisfied,0.15
+13,stop/T1 same-bar conservative semantics,PASS,assertion satisfied,0.789
+14,stop/T2 same-bar conservative semantics,PASS,assertion satisfied,1.125
+15,T1 label,PASS,assertion satisfied,1.157
+16,T2 label,PASS,assertion satisfied,1.029
+17,target time,PASS,assertion satisfied,0.801
+18,forward return 10,PASS,assertion satisfied,0.081
+19,forward return 63,PASS,assertion satisfied,0.058
+20,MFE calculation,PASS,assertion satisfied,0.764
+21,MAE calculation,PASS,assertion satisfied,0.742
+22,conservative entry-day MFE,PASS,assertion satisfied,0.266
+23,censored late-history row,PASS,assertion satisfied,0.233
+24,label-available date,PASS,assertion satisfied,11.6
+25,fold-training cutoff,PASS,assertion satisfied,0.124
+26,no future row in training,PASS,assertion satisfied,0.828
 27,no target column in feature allow-list,PASS,assertion satisfied,0.002
-28,no global imputation,PASS,assertion satisfied,11.423
-29,current vs entry regime,PASS,assertion satisfied,0.04
-30,D1 shadow parity,PASS,assertion satisfied,1.144
-31,position-day future-label separation,PASS,assertion satisfied,0.706
-32,package hash portability,PASS,assertion satisfied,0.1
-33,dataset content hash determinism,PASS,assertion satisfied,0.005
-34,no future NIFTY fill,PASS,assertion satisfied,32.869
-35,prefix-invariance audit,PASS,assertion satisfied,0.276
-36,pullback no future session => entry data-end censored,PASS,assertion satisfied,6.676
-37,pullback 1 of 5 sessions/no fill => censored,PASS,assertion satisfied,5.784
-38,pullback 2 of 5 sessions/no fill => censored,PASS,assertion satisfied,5.927
-39,pullback 3 of 5 sessions/no fill => censored,PASS,assertion satisfied,5.889
-40,pullback 4 of 5 sessions/no fill => censored,PASS,assertion satisfied,6.072
-41,pullback 5 of 5 sessions/no fill => genuine non-fill,PASS,assertion satisfied,12.223
-42,"incomplete window but early fill => valid fill, not censored",PASS,assertion satisfied,12.478
-43,"nonfilled opportunity => T1 NOT_APPLICABLE, not censored",PASS,assertion satisfied,1.482
-44,invalid-risk fill => T1 NOT_APPLICABLE,PASS,assertion satisfied,0.802
-45,filled unresolved late row => true DATA_END_CENSORED,PASS,assertion satisfied,0.96
-46,D1 non-primary opportunity => D1 NOT_APPLICABLE,PASS,assertion satisfied,2.287
-47,applicable D1 end-of-data trajectory => true censoring,PASS,assertion satisfied,0.427
-48,raw date fields cannot be FEATURE_ALLOWED,PASS,assertion satisfied,2.881
-49,NIFTY Feature Source Date explicitly not FEATURE_ALLOWED,PASS,assertion satisfied,0.512
-50,feature registry composite key uniqueness,PASS,assertion satisfied,0.593
-51,same feature name can have distinct dataset semantics,PASS,assertion satisfied,0.765
-52,ML registry equals feature registry per dataset,PASS,assertion satisfied,0.003
-53,entry-inclusive forward alias exact equality,PASS,assertion satisfied,1.067
-54,time-to-target marked conditional,PASS,assertion satisfied,0.635
-55,"validation report uses violation count, not row count",PASS,assertion satisfied,0.012
-56,not-applicable rows never receive manufactured target values,PASS,assertion satisfied,2.799
-57,censored rows never receive manufactured final labels,PASS,assertion satisfied,2.319
-58,complete Stage 3 stable cohort numerical parity,PASS,assertion satisfied,0.151
-59,incomplete-window differences only in documented rows,PASS,assertion satisfied,2.501
-60,walk-forward training requires AVAILABLE and APPLICABLE,PASS,assertion satisfied,0.273
-61,TIME_TO_T1 success is applicable and available,PASS,assertion satisfied,17.872
-62,TIME_TO_T1 definitive failure is not applicable,PASS,assertion satisfied,15.72
-63,TIME_TO_T1 unresolved target is applicable and censored,PASS,assertion satisfied,59.54
-64,TIME_TO_T2 semantic partition,PASS,assertion satisfied,184.08
-65,no TIME_TO applicability/status contradiction,PASS,assertion satisfied,2.219
-66,D1 ADX metadata uses management-close semantics,PASS,assertion satisfied,3.552
-67,D1 Entry Technical Score metadata is entry-frozen,PASS,assertion satisfied,3.394
-68,synthetic applicable D1 data-end censor,PASS,assertion satisfied,62.036
-69,synthetic non-primary D1 not applicable,PASS,assertion satisfied,64.857
-70,Stage 3 current directory equals exact reference commit,PASS,assertion satisfied,49.381
-71,Stage 3 reference branch resolves to expected commit,PASS,assertion satisfied,44.794
-72,time-to-target category partition arithmetic,PASS,assertion satisfied,2.405
-73,final feature values retain pre-hotfix parity,PASS,assertion satisfied,1.707
+28,no global imputation,PASS,assertion satisfied,6.821
+29,current vs entry regime,PASS,assertion satisfied,0.039
+30,D1 shadow parity,PASS,assertion satisfied,0.833
+31,position-day future-label separation,PASS,assertion satisfied,0.525
+32,package hash portability,PASS,assertion satisfied,0.062
+33,dataset content hash determinism,PASS,assertion satisfied,0.004
+34,no future NIFTY fill,PASS,assertion satisfied,19.019
+35,prefix-invariance audit,PASS,assertion satisfied,0.168
+36,pullback no future session => entry data-end censored,PASS,assertion satisfied,3.976
+37,pullback 1 of 5 sessions/no fill => censored,PASS,assertion satisfied,3.426
+38,pullback 2 of 5 sessions/no fill => censored,PASS,assertion satisfied,3.491
+39,pullback 3 of 5 sessions/no fill => censored,PASS,assertion satisfied,3.434
+40,pullback 4 of 5 sessions/no fill => censored,PASS,assertion satisfied,3.501
+41,pullback 5 of 5 sessions/no fill => genuine non-fill,PASS,assertion satisfied,6.567
+42,"incomplete window but early fill => valid fill, not censored",PASS,assertion satisfied,6.827
+43,"nonfilled opportunity => T1 NOT_APPLICABLE, not censored",PASS,assertion satisfied,0.915
+44,invalid-risk fill => T1 NOT_APPLICABLE,PASS,assertion satisfied,0.444
+45,filled unresolved late row => true DATA_END_CENSORED,PASS,assertion satisfied,0.56
+46,D1 non-primary opportunity => D1 NOT_APPLICABLE,PASS,assertion satisfied,1.284
+47,applicable D1 end-of-data trajectory => true censoring,PASS,assertion satisfied,0.243
+48,raw date fields cannot be FEATURE_ALLOWED,PASS,assertion satisfied,1.653
+49,NIFTY Feature Source Date explicitly not FEATURE_ALLOWED,PASS,assertion satisfied,0.319
+50,feature registry composite key uniqueness,PASS,assertion satisfied,0.39
+51,same feature name can have distinct dataset semantics,PASS,assertion satisfied,0.523
+52,ML registry equals feature registry per dataset,PASS,assertion satisfied,0.002
+53,entry-inclusive forward alias exact equality,PASS,assertion satisfied,0.642
+54,time-to-target marked conditional,PASS,assertion satisfied,0.449
+55,"validation report uses violation count, not row count",PASS,assertion satisfied,0.008
+56,not-applicable rows never receive manufactured target values,PASS,assertion satisfied,1.574
+57,censored rows never receive manufactured final labels,PASS,assertion satisfied,1.301
+58,complete Stage 3 stable cohort numerical parity,PASS,assertion satisfied,0.106
+59,incomplete-window differences only in documented rows,PASS,assertion satisfied,1.54
+60,walk-forward training requires AVAILABLE and APPLICABLE,PASS,assertion satisfied,0.164
+61,TIME_TO_T1 success is applicable and available,PASS,assertion satisfied,11.687
+62,TIME_TO_T1 definitive failure is not applicable,PASS,assertion satisfied,10.514
+63,TIME_TO_T1 unresolved target is applicable and censored,PASS,assertion satisfied,36.212
+64,TIME_TO_T2 semantic partition,PASS,assertion satisfied,134.946
+65,no TIME_TO applicability/status contradiction,PASS,assertion satisfied,1.248
+66,D1 ADX metadata uses management-close semantics,PASS,assertion satisfied,2.337
+67,D1 Entry Technical Score metadata is entry-frozen,PASS,assertion satisfied,1.977
+68,synthetic applicable D1 data-end censor,PASS,assertion satisfied,37.175
+69,synthetic non-primary D1 not applicable,PASS,assertion satisfied,38.267
+70,Stage 3 current directory equals exact reference commit,PASS,assertion satisfied,49.868
+71,Stage 3 reference branch resolves to expected commit,PASS,assertion satisfied,42.985
+72,time-to-target category partition arithmetic,PASS,assertion satisfied,1.478
+73,final feature values retain pre-hotfix parity,PASS,assertion satisfied,1.335
+74,D1 Stop Distance R is current management state,PASS,assertion satisfied,1.556
+75,D1 Stop Distance R uses management-close as-of,PASS,assertion satisfied,1.304
+76,D1 T1 Distance R is current management state,PASS,assertion satisfied,1.27
+77,D1 T1 Distance R uses management-close as-of,PASS,assertion satisfied,1.273
+78,D1 T2 Distance R is current management state,PASS,assertion satisfied,1.391
+79,D1 T2 Distance R uses management-close as-of,PASS,assertion satisfied,1.305
+80,Stop Distance R description identifies current stop and management state,PASS,assertion satisfied,1.279
+81,T1 Distance R description identifies current close and Original T1,PASS,assertion satisfied,1.283
+82,T2 Distance R description identifies current close and Original T2,PASS,assertion satisfied,1.264
+83,Original T1 remains entry frozen,PASS,assertion satisfied,1.401
+84,Original T2 remains entry frozen,PASS,assertion satisfied,1.381
+85,Initial Stop remains entry frozen,PASS,assertion satisfied,1.281
+86,Current Stop remains current management state,PASS,assertion satisfied,1.287
+87,final feature-value parity against metadata-fix reference,PASS,assertion satisfied,1.024
+88,final label parity against metadata-fix reference,PASS,assertion satisfied,0.917
+89,registry delta is exactly the three distance metadata rows,PASS,assertion satisfied,1.414

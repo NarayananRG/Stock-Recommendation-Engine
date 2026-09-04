@@ -1,7 +1,7 @@
 Type,Check,Status,Expected,Actual,Detail
 IMMUTABLE_REFERENCE,Stage 2B.1 frozen tag commit,PASS,c9cc9f4fcaf2fe81128365be09515fbf9fa67c28,c9cc9f4fcaf2fe81128365be09515fbf9fa67c28,
 IMMUTABLE_REFERENCE,Frozen dependency folders unchanged,PASS,NO DIFFERENCE,NO DIFFERENCE,
-IMMUTABLE_REFERENCE,Stage 3.1 pre-hotfix reference commit exists,PASS,fc2d45888a8c80fdf724accb676e6748c1abcf08,fc2d45888a8c80fdf724accb676e6748c1abcf08,
+IMMUTABLE_REFERENCE,Stage 3.1 pre-metadata-fix reference commit exists,PASS,515606610f408218b3454e36e11dc262d60ebb8a,515606610f408218b3454e36e11dc262d60ebb8a,
 IMMUTABLE_REFERENCE,Stage 3 reference branch commit,PASS,70951a5a05727a605bb579973da6216fb9887e44,70951a5a05727a605bb579973da6216fb9887e44,refs/remotes/origin/stage3-point-in-time-dataset
 IMMUTABLE_REFERENCE,Stage 3 working directory equals exact reference commit,PASS,NO DIFFERENCE,NO DIFFERENCE,70951a5a05727a605bb579973da6216fb9887e44
 IMMUTABLE_REFERENCE,Stage 3 git tree hash at current HEAD,PASS,f8d6385e64f7a03e0e18af895ae89883ad5792e5,f8d6385e64f7a03e0e18af895ae89883ad5792e5,

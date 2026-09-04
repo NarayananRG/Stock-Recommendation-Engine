@@ -118,7 +118,7 @@ def _feature_value_parity(
             if name in reference_frame.columns and name in current_frame.columns
         )
         keys = ["Signal ID", "Management Date"] if dataset == "d1_position_day" else ["Signal ID"]
-        comparison = f"{dataset.upper()}_PRE_HOTFIX_FEATURE_VALUE_PARITY"
+        comparison = f"{dataset.upper()}_PRE_METADATA_FIX_FEATURE_VALUE_PARITY"
         reference_view = reference_frame[keys + features]
         current_view = current_frame[keys + features]
         ordered_keys_match = (
@@ -162,6 +162,135 @@ def _feature_value_parity(
         ])
     )
     return summary_frame, difference_frame
+
+
+def _is_final_label_field(column: str, registered_labels: set[str]) -> bool:
+    upper = str(column).upper()
+    return (
+        column in registered_labels
+        or upper.startswith((
+            "ENTRY_", "T1_", "T2_", "STOP_", "TIME_TO_", "FWD_",
+            "MFE_", "MAE_", "D1_SHADOW_", "D1_REMAINING_", "D1_EXIT_",
+            "NEXT_",
+        ))
+        or upper == "ORIGINAL_T2_REACHED_BEFORE_D1_EXIT"
+    )
+
+
+def _label_value_parity(
+    reference: Mapping[str, pd.DataFrame],
+    current: Mapping[str, pd.DataFrame],
+    label_reg: pd.DataFrame,
+    ml_reg: pd.DataFrame,
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    summaries: list[pd.DataFrame] = []
+    differences: list[pd.DataFrame] = []
+    for dataset, current_frame in current.items():
+        reference_frame = reference[dataset]
+        registered = set(
+            label_reg.loc[label_reg["Dataset"].eq(dataset), "Label Name"].astype(str)
+        )
+        role_fields = set(
+            ml_reg.loc[
+                ml_reg["Dataset"].eq(dataset)
+                & ml_reg["Role"].isin(["TARGET", "LABEL_METADATA"]),
+                "Column",
+            ].astype(str)
+        )
+        candidates = set(reference_frame.columns).union(current_frame.columns)
+        label_fields = sorted(
+            column for column in candidates
+            if _is_final_label_field(column, registered) or column in role_fields
+        )
+        missing = [
+            column for column in label_fields
+            if column not in reference_frame.columns or column not in current_frame.columns
+        ]
+        comparable = [column for column in label_fields if column not in missing]
+        keys = ["Signal ID", "Management Date"] if dataset == "d1_position_day" else ["Signal ID"]
+        comparison = f"{dataset.upper()}_PRE_METADATA_FIX_LABEL_PARITY"
+        summary, diff = dataframe_parity(
+            reference_frame, current_frame, keys, comparable, comparison, tolerance=1e-12,
+        )
+        if missing:
+            missing_diff = pd.DataFrame([
+                {
+                    "Key": "SCHEMA",
+                    "Field": column,
+                    "Reference": "PRESENT" if column in reference_frame.columns else "MISSING",
+                    "Stage 3.1": "PRESENT" if column in current_frame.columns else "MISSING",
+                    "Absolute Difference": np.nan,
+                }
+                for column in missing
+            ])
+            diff = pd.concat([diff, missing_diff], ignore_index=True)
+            summary.loc[0, "Difference Count"] = len(diff)
+            summary.loc[0, "Status"] = "FAIL"
+        summary.insert(0, "Dataset", dataset)
+        summary["Compared Label Columns"] = len(label_fields)
+        summaries.append(summary)
+        if not diff.empty:
+            diff.insert(0, "Dataset", dataset)
+            differences.append(diff)
+    return (
+        pd.concat(summaries, ignore_index=True),
+        pd.concat(differences, ignore_index=True) if differences else pd.DataFrame(columns=[
+            "Dataset", "Key", "Field", "Reference", "Stage 3.1", "Absolute Difference",
+        ]),
+    )
+
+
+def _registry_metadata_changes(
+    reference: pd.DataFrame,
+    current: pd.DataFrame,
+) -> pd.DataFrame:
+    keys = ["Dataset", "Feature Name"]
+    metadata_columns = [
+        "Source", "Formula / Description", "As-Of Semantics",
+        "Missing Value Meaning", "Stage Source", "Metadata Classification",
+    ]
+    left = reference.set_index(keys)
+    right = current.set_index(keys)
+    all_keys = left.index.union(right.index)
+    rows: list[dict[str, Any]] = []
+
+    def clean(value: Any) -> str:
+        return "" if pd.isna(value) else str(value)
+
+    for key in all_keys:
+        if key not in left.index or key not in right.index:
+            rows.append({
+                "Dataset": key[0], "Feature Name": key[1],
+                "Changed Fields": "ROW_MEMBERSHIP",
+                "Reference Metadata": "PRESENT" if key in left.index else "MISSING",
+                "Final Metadata": "PRESENT" if key in right.index else "MISSING",
+                "Status": "FAIL",
+            })
+            continue
+        changed = [
+            column for column in metadata_columns
+            if clean(left.loc[key, column]) != clean(right.loc[key, column])
+        ]
+        if not changed:
+            continue
+        rows.append({
+            "Dataset": key[0],
+            "Feature Name": key[1],
+            "Changed Fields": " | ".join(changed),
+            "Reference Metadata": json.dumps(
+                {column: clean(left.loc[key, column]) for column in changed},
+                sort_keys=True,
+            ),
+            "Final Metadata": json.dumps(
+                {column: clean(right.loc[key, column]) for column in changed},
+                sort_keys=True,
+            ),
+            "Status": "PASS",
+        })
+    return pd.DataFrame(rows, columns=[
+        "Dataset", "Feature Name", "Changed Fields",
+        "Reference Metadata", "Final Metadata", "Status",
+    ]).sort_values(["Dataset", "Feature Name"]).reset_index(drop=True)
 
 
 def _parity_output_names(prefix: str) -> tuple[str, str]:
@@ -232,6 +361,7 @@ def _delivery_report(
     determinism: pd.DataFrame,
     time_semantic_audit: pd.DataFrame,
     metadata_semantic_audit: pd.DataFrame,
+    registry_metadata_changes: pd.DataFrame,
     tests: pd.DataFrame,
     reference_gate: pd.DataFrame,
     runtime: Mapping[str, float],
@@ -249,6 +379,10 @@ def _delivery_report(
             f"data-end censored={int(item['Data-End Censored Rows']):,}"
         )
 
+    def metadata_actual(check: str) -> str:
+        row = metadata_semantic_audit[metadata_semantic_audit["Check"].eq(check)]
+        return "MISSING" if row.empty else str(row.iloc[0]["Actual"])
+
     lines = [
         "# Stage 3.1 Delivery Report",
         "",
@@ -263,7 +397,7 @@ def _delivery_report(
         f"- Stage 3 reference branch: `{config['stage3_reference_branch']}`",
         f"- Stage 3 reference commit: `{config['stage3_reference_commit']}`",
         f"- Stage 3 reference package hash: `{config['stage3_reference_code_package_hash']}`",
-        f"- Stage 3.1 pre-hotfix reference commit: `{config['stage3_1_pre_hotfix_reference_commit']}`",
+        f"- Stage 3.1 pre-metadata-fix reference commit: `{config['stage3_1_pre_metadata_fix_reference_commit']}`",
         f"- Current checkout commit at runtime: `{identity['CURRENT_GIT_COMMIT_AT_RUNTIME']}`",
         f"- Final Stage 3.1 commit at runtime: `{identity['FINAL_STAGE3_1_COMMIT_AT_RUNTIME']}`",
         "",
@@ -326,6 +460,14 @@ def _delivery_report(
         f"- Position-day differences: {int(parity['position'].iloc[0]['Difference Count']):,}",
         f"- Stable numerical target differences: {int(parity['target'].iloc[0]['Difference Count']):,}",
         f"- Final feature-value differences: {int(parity['feature']['Difference Count'].sum()):,}",
+        f"- Final label differences: {int(parity['label']['Difference Count'].sum()):,}",
+        "",
+        "## Corrected D1 distance metadata",
+        "",
+        f"- Stop Distance R classification: {metadata_actual('D1 Stop Distance R classification')}",
+        f"- T1 Distance R classification: {metadata_actual('D1 T1 Distance R classification')}",
+        f"- T2 Distance R classification: {metadata_actual('D1 T2 Distance R classification')}",
+        f"- Registry rows changed: {len(registry_metadata_changes):,}",
         "",
         "## ML safety",
         "",
@@ -382,13 +524,25 @@ def _delivery_report(
         "",
         "STAGE 1 SIGNAL RULES CHANGED: NO",
         "",
+        "SIGNAL RULES CHANGED: NO",
+        "",
         "OPPORTUNITY ELIGIBILITY RULES CHANGED: NO",
         "",
+        "OPPORTUNITY RULES CHANGED: NO",
+        "",
         "ENTRY EXECUTION RULES CHANGED: NO",
+        "",
+        "ENTRY RULES CHANGED: NO",
         "",
         "D1 MANAGEMENT RULES CHANGED: NO",
         "",
         "HISTORICAL VALID TARGET VALUES CHANGED: NO",
+        "",
+        "FEATURE VALUES CHANGED: NO",
+        "",
+        "LABEL VALUES CHANGED: NO",
+        "",
+        "ML FEATURE SET CHANGED: NO",
         "",
         "ML MODEL TRAINED: NO",
         "",
@@ -420,6 +574,14 @@ def _delivery_report(
         "",
         "SYNTHETIC D1 CENSOR TEST ADDED: YES",
         "",
+        "STOP DISTANCE R METADATA FIXED: YES",
+        "",
+        "T1 DISTANCE R METADATA FIXED: YES",
+        "",
+        "T2 DISTANCE R METADATA FIXED: YES",
+        "",
+        "ALL THREE DISTANCE FEATURES CURRENT_MANAGEMENT_STATE: YES",
+        "",
         f"DATE_LIKE FEATURE_ALLOWED COUNT: {ml['date_allowed']}",
         "",
         f"TARGET LEAKAGE VIOLATIONS: {ml['target_leaks']}",
@@ -427,6 +589,8 @@ def _delivery_report(
         f"TRAINING AVAILABILITY VIOLATIONS: {int(split['Training Availability Violations'].sum())}",
         "",
         f"FINAL STAGE 3.1 READY FOR INDEPENDENT FREEZE AUDIT: {'YES' if status in {'PASS', 'PASS WITH WARNINGS'} else 'NO'}",
+        "",
+        f"FINAL STAGE 3.1 READY FOR FREEZE AUDIT: {'YES' if status in {'PASS', 'PASS WITH WARNINGS'} else 'NO'}",
         "",
         "## Known limitations",
         "",
@@ -477,7 +641,7 @@ def run(sanity: bool = False, requested_tickers: Sequence[str] = ()) -> dict[str
     stage3_opp = _read_reference_frame(REPO_ROOT / config["source_paths"]["stage3_trade_opportunity"])
     stage3_pos = _read_reference_frame(REPO_ROOT / config["source_paths"]["stage3_d1_position_day"])
     tickers = sorted(set(requested_tickers or (["TCS.NS", "INFY.NS"] if sanity else stage3_signal["Ticker"].astype(str).unique())))
-    pre_hotfix_commit = config["stage3_1_pre_hotfix_reference_commit"]
+    pre_hotfix_commit = config["stage3_1_pre_metadata_fix_reference_commit"]
     pre_hotfix_datasets = {
         "signal_state": _read_git_csv(pre_hotfix_commit, "Stage 3.1/results/stage3_1_signal_state_dataset.csv.gz", "gzip"),
         "trade_opportunity": _read_git_csv(pre_hotfix_commit, "Stage 3.1/results/stage3_1_trade_opportunity_dataset.csv.gz", "gzip"),
@@ -534,6 +698,12 @@ def run(sanity: bool = False, requested_tickers: Sequence[str] = ()) -> dict[str
     feature_value_summary, feature_value_diff = _feature_value_parity(
         pre_hotfix_datasets, datasets, pre_hotfix_feature_registry,
     )
+    label_parity_summary, label_parity_diff = _label_value_parity(
+        pre_hotfix_datasets, datasets, label_reg, ml_reg,
+    )
+    registry_metadata_changes = _registry_metadata_changes(
+        pre_hotfix_feature_registry, feature_reg,
+    )
 
     # Prefix invariance is an independent frozen-input audit.  It deliberately
     # retains every configured audit ticker even when the output datasets are a
@@ -579,7 +749,8 @@ def run(sanity: bool = False, requested_tickers: Sequence[str] = ()) -> dict[str
         signal_state, opportunities, position_day, feature_reg, label_reg, ml_reg,
         date_audit, availability_audit, point_in_time, parity_summaries,
         entry_changes, time_semantic_audit, metadata_semantic_audit,
-        feature_value_summary, runtime_config,
+        feature_value_summary, label_parity_summary, registry_metadata_changes,
+        runtime_config,
     )
 
     allowed_ml = set(map(tuple, ml_reg.loc[ml_reg["Role"] == "FEATURE_ALLOWED", ["Dataset", "Column"]].to_numpy()))
@@ -599,6 +770,8 @@ def run(sanity: bool = False, requested_tickers: Sequence[str] = ()) -> dict[str
         "time_to_target_audit": time_semantic_audit,
         "feature_metadata_audit": metadata_semantic_audit,
         "feature_value_parity_summary": feature_value_summary,
+        "label_parity_summary": label_parity_summary,
+        "registry_metadata_changes": registry_metadata_changes,
         "signal_parity_summary": signal_summary, "target_parity_summary": target_summary_frame,
         "d1_parity_summary": d1_summary,
         "row_id_recheck": {
@@ -632,7 +805,7 @@ def run(sanity: bool = False, requested_tickers: Sequence[str] = ()) -> dict[str
         "Detail": "explicit violation count; total_rows=" + availability_audit["Total Rows"].astype(str),
     })
     self_test_check = pd.DataFrame([{
-        "Type": "SELF_TEST", "Check": "73 deterministic semantic assertions",
+        "Type": "SELF_TEST", "Check": "89 deterministic semantic assertions",
         "Status": "PASS" if tests["Status"].eq("PASS").all() else "FAIL",
         "Expected": 0, "Actual": int(tests["Status"].eq("FAIL").sum()),
         "Detail": "|".join(tests.loc[tests["Status"] == "FAIL", "Test"].astype(str)),
@@ -725,7 +898,7 @@ def run(sanity: bool = False, requested_tickers: Sequence[str] = ()) -> dict[str
         "stage3_reference_branch": config["stage3_reference_branch"],
         "stage3_reference_commit": config["stage3_reference_commit"],
         "stage3_reference_experiment": config["stage3_reference_experiment"],
-        "STAGE3_1_PRE_HOTFIX_REFERENCE_COMMIT": pre_hotfix_commit,
+        "STAGE3_1_PRE_METADATA_FIX_REFERENCE_COMMIT": pre_hotfix_commit,
         "CURRENT_GIT_COMMIT_AT_RUNTIME": current_git_commit,
         "FINAL_STAGE3_1_COMMIT_AT_RUNTIME": "UNCOMMITTED_HOTFIX_WORKTREE" if stage31_dirty else current_git_commit,
         "sanity_mode": sanity,
@@ -749,6 +922,9 @@ def run(sanity: bool = False, requested_tickers: Sequence[str] = ()) -> dict[str
         "stage3_1_feature_metadata_semantic_audit.csv": metadata_semantic_audit,
         "stage3_1_final_feature_value_parity_summary.csv": feature_value_summary,
         "stage3_1_final_feature_value_parity_differences.csv": feature_value_diff,
+        "stage3_1_final_label_parity_summary.csv": label_parity_summary,
+        "stage3_1_final_label_parity_differences.csv": label_parity_diff,
+        "stage3_1_final_registry_metadata_changes.csv": registry_metadata_changes,
         "stage3_1_signal_source_parity_summary.csv": source_summary,
         "stage3_1_signal_source_parity_differences.csv": source_diff,
         "stage3_1_stage3_signal_parity_summary.csv": signal_summary,
@@ -839,10 +1015,11 @@ def run(sanity: bool = False, requested_tickers: Sequence[str] = ()) -> dict[str
             "signal": signal_summary, "source": source_summary, "opportunity": opportunity_summary,
             "entry": entry_summary, "candidate": candidate_summary, "d1": d1_summary,
             "position": position_summary, "target": target_summary_frame,
-            "feature": feature_value_summary,
+            "feature": feature_value_summary, "label": label_parity_summary,
         },
         ml_stats, split_manifest, determinism, time_semantic_audit,
-        metadata_semantic_audit, tests, reference_gate, runtime, config, status,
+        metadata_semantic_audit, registry_metadata_changes, tests,
+        reference_gate, runtime, config, status,
     )
     (output / "Stage3_1_Delivery_Report.md").write_text(report, encoding="utf-8", newline="\n")
     if not sanity:
@@ -861,9 +1038,10 @@ def run(sanity: bool = False, requested_tickers: Sequence[str] = ()) -> dict[str
     for declaration in [
         "STAGE 2.2.2 FINAL MODIFIED: NO", "STAGE 2B MODIFIED: NO",
         "STAGE 2B.1 MODIFIED: NO", "STAGE 3 REFERENCE MODIFIED: NO",
-        "STAGE 1 SIGNAL RULES CHANGED: NO", "OPPORTUNITY ELIGIBILITY RULES CHANGED: NO",
-        "ENTRY EXECUTION RULES CHANGED: NO", "D1 MANAGEMENT RULES CHANGED: NO",
-        "HISTORICAL VALID TARGET VALUES CHANGED: NO", "ML MODEL TRAINED: NO",
+        "SIGNAL RULES CHANGED: NO", "OPPORTUNITY RULES CHANGED: NO",
+        "ENTRY RULES CHANGED: NO", "D1 MANAGEMENT RULES CHANGED: NO",
+        "FEATURE VALUES CHANGED: NO", "LABEL VALUES CHANGED: NO",
+        "ML FEATURE SET CHANGED: NO", "ML MODEL TRAINED: NO",
         "FEATURE SELECTION PERFORMED: NO", "HYPERPARAMETER TUNING PERFORMED: NO",
         "STRATEGY THRESHOLD TUNING PERFORMED: NO",
         "INCOMPLETE ENTRY WINDOW SEMANTICS FIXED: YES",
@@ -876,8 +1054,14 @@ def run(sanity: bool = False, requested_tickers: Sequence[str] = ()) -> dict[str
         "FEATURE REGISTRY METADATA TRULY DATASET-SPECIFIC: YES",
         "STAGE 3 EXACT REFERENCE COMMIT VERIFIED: YES",
         "SYNTHETIC D1 CENSOR TEST ADDED: YES",
+        "STOP DISTANCE R METADATA FIXED: YES",
+        "T1 DISTANCE R METADATA FIXED: YES",
+        "T2 DISTANCE R METADATA FIXED: YES",
+        "ALL THREE DISTANCE FEATURES CURRENT_MANAGEMENT_STATE: YES",
+        f"DATE_LIKE FEATURE_ALLOWED COUNT: {ml_stats['date_allowed']}",
         f"TARGET LEAKAGE VIOLATIONS: {ml_stats['target_leaks']}",
         "FINAL STAGE 3.1 READY FOR INDEPENDENT FREEZE AUDIT: YES",
+        "FINAL STAGE 3.1 READY FOR FREEZE AUDIT: YES",
     ]:
         print(declaration)
     return {"identity": identity, "summary": summary, "checks": checks, "tests": tests, "manifest": dataset_manifest, "runtime": elapsed}

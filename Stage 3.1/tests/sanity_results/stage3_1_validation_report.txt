@@ -2,7 +2,7 @@ STAGE 3.1 VALIDATION REPORT
 ========================================================================
 [PASS] IMMUTABLE_REFERENCE :: Stage 2B.1 frozen tag commit :: expected=c9cc9f4fcaf2fe81128365be09515fbf9fa67c28 :: actual=c9cc9f4fcaf2fe81128365be09515fbf9fa67c28 ::
 [PASS] IMMUTABLE_REFERENCE :: Frozen dependency folders unchanged :: expected=NO DIFFERENCE :: actual=NO DIFFERENCE ::
-[PASS] IMMUTABLE_REFERENCE :: Stage 3.1 pre-hotfix reference commit exists :: expected=fc2d45888a8c80fdf724accb676e6748c1abcf08 :: actual=fc2d45888a8c80fdf724accb676e6748c1abcf08 ::
+[PASS] IMMUTABLE_REFERENCE :: Stage 3.1 pre-metadata-fix reference commit exists :: expected=515606610f408218b3454e36e11dc262d60ebb8a :: actual=515606610f408218b3454e36e11dc262d60ebb8a ::
 [PASS] IMMUTABLE_REFERENCE :: Stage 3 reference branch commit :: expected=70951a5a05727a605bb579973da6216fb9887e44 :: actual=70951a5a05727a605bb579973da6216fb9887e44 :: refs/remotes/origin/stage3-point-in-time-dataset
 [PASS] IMMUTABLE_REFERENCE :: Stage 3 working directory equals exact reference commit :: expected=NO DIFFERENCE :: actual=NO DIFFERENCE :: 70951a5a05727a605bb579973da6216fb9887e44
 [PASS] IMMUTABLE_REFERENCE :: Stage 3 git tree hash at current HEAD :: expected=f8d6385e64f7a03e0e18af895ae89883ad5792e5 :: actual=f8d6385e64f7a03e0e18af895ae89883ad5792e5 ::
@@ -39,7 +39,9 @@ STAGE 3.1 VALIDATION REPORT
 [PASS] INTEGRATION :: Entry semantic changes only incomplete windows :: expected=ONLY INCOMPLETE WINDOW :: actual= ::
 [PASS] INTEGRATION :: Time-to-target applicability and partitions :: expected=0 :: actual=0 ::
 [PASS] INTEGRATION :: Feature metadata semantic audit :: expected=0 :: actual=0 ::
-[PASS] INTEGRATION :: Pre-hotfix feature-value parity :: expected=0 :: actual=0 ::
+[PASS] INTEGRATION :: Pre-metadata-fix feature-value parity :: expected=0 :: actual=0 ::
+[PASS] INTEGRATION :: Pre-metadata-fix label parity :: expected=0 :: actual=0 ::
+[PASS] INTEGRATION :: Registry metadata delta limited to three distance features :: expected=3 expected rows :: actual=3 rows :: d1_position_day::Stop Distance R|d1_position_day::T1 Distance R|d1_position_day::T2 Distance R
 [PASS] INTEGRATION :: STAGE3_SIGNAL_PARITY :: expected=PASS :: actual=PASS :: differences=0
 [PASS] INTEGRATION :: FROZEN_SIGNAL_SOURCE_PARITY :: expected=PASS :: actual=PASS :: differences=0
 [PASS] INTEGRATION :: STAGE3_OPPORTUNITY_MEMBERSHIP_PARITY :: expected=PASS :: actual=PASS :: differences=0
@@ -68,5 +70,5 @@ STAGE 3.1 VALIDATION REPORT
 [PASS] LABEL_AVAILABILITY :: d1_position_day::NEXT_20_SESSION_RETURN :: expected=0 :: actual=0 :: explicit violation count; total_rows=523
 [PASS] LABEL_AVAILABILITY :: d1_position_day::NEXT_20_SESSION_MFE :: expected=0 :: actual=0 :: explicit violation count; total_rows=523
 [PASS] LABEL_AVAILABILITY :: d1_position_day::NEXT_20_SESSION_MAE :: expected=0 :: actual=0 :: explicit violation count; total_rows=523
-[PASS] SELF_TEST :: 73 deterministic semantic assertions :: expected=0 :: actual=0 ::
+[PASS] SELF_TEST :: 89 deterministic semantic assertions :: expected=0 :: actual=0 ::
 [PASS] IMMUTABLE_REFERENCE :: Stage 3 directory hash unchanged during execution :: expected=1da5268be23ddb41819a56f99bfde99a8d85c8344337fbf542668db5d1bff620 :: actual=1da5268be23ddb41819a56f99bfde99a8d85c8344337fbf542668db5d1bff620 ::

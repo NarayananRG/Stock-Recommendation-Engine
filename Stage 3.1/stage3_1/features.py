@@ -27,8 +27,22 @@ TARGET_EXACT = {
 ENTRY_FROZEN_POSITION_FEATURES = {
     "Entry Market Regime", "Entry Technical Score", "Entry Actionability Score",
     "Executed Entry", "Initial Stop", "Original T1", "Original T2",
-    "Original Signal", "Setup", "Stop Distance R", "T1 Distance R",
-    "T2 Distance R",
+    "Original Signal", "Setup",
+}
+
+CURRENT_MANAGEMENT_DESCRIPTIONS = {
+    "Stop Distance R": (
+        "Distance from current management-session Close to Current Stop, "
+        "normalized by initial per-share risk."
+    ),
+    "T1 Distance R": (
+        "Distance from current management-session Close to Original T1, "
+        "normalized by initial per-share risk."
+    ),
+    "T2 Distance R": (
+        "Distance from current management-session Close to Original T2, "
+        "normalized by initial per-share risk."
+    ),
 }
 
 ENTRY_FROZEN_AS_OF = (
@@ -107,8 +121,9 @@ def feature_registry(
                 else:
                     classification = "CURRENT_MANAGEMENT_STATE"
                     source["Source"] = "Stage 3 position-day dataset: current D1 management state"
-                    source["Formula / Description"] = (
-                        f"{feature_name} is the current D1 management-state value known at the completed management-session close."
+                    source["Formula / Description"] = CURRENT_MANAGEMENT_DESCRIPTIONS.get(
+                        feature_name,
+                        f"{feature_name} is the current D1 management-state value known at the completed management-session close.",
                     )
                     source["As-Of Semantics"] = MANAGEMENT_CLOSE_AS_OF
                     source["Missing Value Meaning"] = (
@@ -184,6 +199,25 @@ def feature_metadata_semantic_audit(
     add("D1 Entry Technical Score entry-frozen as-of", entry_score_asof == ENTRY_FROZEN_AS_OF, ENTRY_FROZEN_AS_OF, entry_score_asof)
     original_t1_class = value("d1_position_day", "Original T1", "Metadata Classification")
     add("D1 Original T1 classification", original_t1_class == "ENTRY_FROZEN_STATE", "ENTRY_FROZEN_STATE", original_t1_class)
+    for feature in ("Stop Distance R", "T1 Distance R", "T2 Distance R"):
+        classification = value("d1_position_day", feature, "Metadata Classification")
+        add(
+            f"D1 {feature} classification",
+            classification == "CURRENT_MANAGEMENT_STATE",
+            "CURRENT_MANAGEMENT_STATE",
+            classification,
+        )
+        as_of = value("d1_position_day", feature, "As-Of Semantics")
+        add(
+            f"D1 {feature} as-of",
+            as_of == MANAGEMENT_CLOSE_AS_OF,
+            MANAGEMENT_CLOSE_AS_OF,
+            as_of,
+        )
+    current_stop_class = value("d1_position_day", "Current Stop", "Metadata Classification")
+    add("D1 Current Stop classification", current_stop_class == "CURRENT_MANAGEMENT_STATE", "CURRENT_MANAGEMENT_STATE", current_stop_class)
+    original_t2_class = value("d1_position_day", "Original T2", "Metadata Classification")
+    add("D1 Original T2 classification", original_t2_class == "ENTRY_FROZEN_STATE", "ENTRY_FROZEN_STATE", original_t2_class)
     signal_adx_asof = value("signal_state", "ADX", "As-Of Semantics")
     add("Signal-state ADX signal-close as-of", signal_adx_asof == SIGNAL_CLOSE_AS_OF, SIGNAL_CLOSE_AS_OF, signal_adx_asof)
     signal_adx_description = value("signal_state", "ADX", "Formula / Description")

@@ -219,13 +219,29 @@ def run_tests(context: Mapping[str, Any]) -> pd.DataFrame:
         (71, "Stage 3 reference branch resolves to expected commit", lambda: _assert(subprocess.check_output(["git", "rev-parse", "--verify", f"refs/remotes/origin/{config['stage3_reference_branch']}"], cwd=repo_root, text=True).strip() == config["stage3_reference_commit"], "Stage 3 reference branch mismatch")),
         (72, "time-to-target category partition arithmetic", lambda: _assert((context["time_to_target_audit"]["Partition Violations"] == 0).all(), context["time_to_target_audit"].to_string(index=False))),
         (73, "final feature values retain pre-hotfix parity", lambda: _assert(context["feature_value_parity_summary"]["Status"].eq("PASS").all() and context["feature_value_parity_summary"]["Difference Count"].sum() == 0, context["feature_value_parity_summary"].to_string(index=False))),
+        (74, "D1 Stop Distance R is current management state", lambda: _assert(feature_row("d1_position_day", "Stop Distance R")["Metadata Classification"] == "CURRENT_MANAGEMENT_STATE", feature_row("d1_position_day", "Stop Distance R").to_string())),
+        (75, "D1 Stop Distance R uses management-close as-of", lambda: _assert(feature_row("d1_position_day", "Stop Distance R")["As-Of Semantics"] == "COMPLETED MANAGEMENT SESSION CLOSE", feature_row("d1_position_day", "Stop Distance R").to_string())),
+        (76, "D1 T1 Distance R is current management state", lambda: _assert(feature_row("d1_position_day", "T1 Distance R")["Metadata Classification"] == "CURRENT_MANAGEMENT_STATE", feature_row("d1_position_day", "T1 Distance R").to_string())),
+        (77, "D1 T1 Distance R uses management-close as-of", lambda: _assert(feature_row("d1_position_day", "T1 Distance R")["As-Of Semantics"] == "COMPLETED MANAGEMENT SESSION CLOSE", feature_row("d1_position_day", "T1 Distance R").to_string())),
+        (78, "D1 T2 Distance R is current management state", lambda: _assert(feature_row("d1_position_day", "T2 Distance R")["Metadata Classification"] == "CURRENT_MANAGEMENT_STATE", feature_row("d1_position_day", "T2 Distance R").to_string())),
+        (79, "D1 T2 Distance R uses management-close as-of", lambda: _assert(feature_row("d1_position_day", "T2 Distance R")["As-Of Semantics"] == "COMPLETED MANAGEMENT SESSION CLOSE", feature_row("d1_position_day", "T2 Distance R").to_string())),
+        (80, "Stop Distance R description identifies current stop and management state", lambda: _assert((lambda text: "current stop" in text and "current management-session" in text)(str(feature_row("d1_position_day", "Stop Distance R")["Formula / Description"]).lower()), feature_row("d1_position_day", "Stop Distance R").to_string())),
+        (81, "T1 Distance R description identifies current close and Original T1", lambda: _assert((lambda text: "current management-session close" in text and "original t1" in text)(str(feature_row("d1_position_day", "T1 Distance R")["Formula / Description"]).lower()), feature_row("d1_position_day", "T1 Distance R").to_string())),
+        (82, "T2 Distance R description identifies current close and Original T2", lambda: _assert((lambda text: "current management-session close" in text and "original t2" in text)(str(feature_row("d1_position_day", "T2 Distance R")["Formula / Description"]).lower()), feature_row("d1_position_day", "T2 Distance R").to_string())),
+        (83, "Original T1 remains entry frozen", lambda: _assert(feature_row("d1_position_day", "Original T1")["Metadata Classification"] == "ENTRY_FROZEN_STATE", feature_row("d1_position_day", "Original T1").to_string())),
+        (84, "Original T2 remains entry frozen", lambda: _assert(feature_row("d1_position_day", "Original T2")["Metadata Classification"] == "ENTRY_FROZEN_STATE", feature_row("d1_position_day", "Original T2").to_string())),
+        (85, "Initial Stop remains entry frozen", lambda: _assert(feature_row("d1_position_day", "Initial Stop")["Metadata Classification"] == "ENTRY_FROZEN_STATE", feature_row("d1_position_day", "Initial Stop").to_string())),
+        (86, "Current Stop remains current management state", lambda: _assert(feature_row("d1_position_day", "Current Stop")["Metadata Classification"] == "CURRENT_MANAGEMENT_STATE", feature_row("d1_position_day", "Current Stop").to_string())),
+        (87, "final feature-value parity against metadata-fix reference", lambda: _assert(context["feature_value_parity_summary"]["Status"].eq("PASS").all() and context["feature_value_parity_summary"]["Difference Count"].sum() == 0, context["feature_value_parity_summary"].to_string(index=False))),
+        (88, "final label parity against metadata-fix reference", lambda: _assert(context["label_parity_summary"]["Status"].eq("PASS").all() and context["label_parity_summary"]["Difference Count"].sum() == 0, context["label_parity_summary"].to_string(index=False))),
+        (89, "registry delta is exactly the three distance metadata rows", lambda: _assert(set(map(tuple, context["registry_metadata_changes"][["Dataset", "Feature Name"]].to_numpy())) == {("d1_position_day", "Stop Distance R"), ("d1_position_day", "T1 Distance R"), ("d1_position_day", "T2 Distance R")} and context["registry_metadata_changes"]["Status"].eq("PASS").all(), context["registry_metadata_changes"].to_string(index=False))),
     ])
 
     for number, name, assertion in tests:
         record(number, name, assertion)
     result = pd.DataFrame(records)
-    if len(result) != 73 or list(result["Test Number"]) != list(range(1, 74)):
-        raise AssertionError("Stage 3.1 suite must contain exactly 73 ordered tests")
+    if len(result) != 89 or list(result["Test Number"]) != list(range(1, 90)):
+        raise AssertionError("Stage 3.1 suite must contain exactly 89 ordered tests")
     return result
 
 
