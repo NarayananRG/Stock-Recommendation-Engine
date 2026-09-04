@@ -11,12 +11,15 @@ Stage 3.1 hardens dataset semantics only. It does not train a model or change tr
 - Stage 3 reference branch: `stage3-point-in-time-dataset`
 - Stage 3 reference commit: `70951a5a05727a605bb579973da6216fb9887e44`
 - Stage 3 reference package hash: `1c06cb7e1345b10ea8b2db65aea02d54468c0da7b816bf48575f169fa8f2a23a`
+- Stage 3.1 pre-hotfix reference commit: `fc2d45888a8c80fdf724accb676e6748c1abcf08`
+- Current checkout commit at runtime: `fc2d45888a8c80fdf724accb676e6748c1abcf08`
+- Final Stage 3.1 commit at runtime: `UNCOMMITTED_HOTFIX_WORKTREE`
 
 ## Identity
 
-- Stage 3.1 Experiment ID: `S3_1_20110830_20260828_6480f9a2ad30`
-- Stage 3.1 code package hash: `094747e51a46db0af0392250a5aeaf7ff9b45bb0fa932b47ab3fcc44221e9bae`
-- Config hash: `fec3cb02a0254d1d16f6fdcbf2eab9d15412d226b9ff2a0dba813e84705de9fe`
+- Stage 3.1 Experiment ID: `S3_1_20110830_20260828_c5f0a101a427`
+- Stage 3.1 code package hash: `f694086c2a1a3526465271f5820afde15cd603c4c292ab9bc5e5fc7f1ef4d260`
+- Config hash: `6e8e9acd0c2299f7b0529a8240b272483a7394037a87bbadca53d2a1018cad8f`
 - Schema hash: `7e6fb19e0618c70c9ea04300b2825bf674ac14322ab24eb1c958145781a6d2c4`
 
 ## Datasets
@@ -36,6 +39,14 @@ Stage 3.1 hardens dataset semantics only. It does not train a model or change tr
 
 - T1: applicable=10,302, available=10,261, not applicable=3,242, data-end censored=41
 - T2: applicable=10,302, available=10,256, not applicable=3,242, data-end censored=46
+
+## Conditional time-to-target semantics
+
+- TIME_TO_T1_SESSIONS: available=5,662, not applicable=7,841, data-end censored=41, applicable=5,703, partition violations=0, status=PASS
+- TIME_TO_T2_SESSIONS: available=3,382, not applicable=10,116, data-end censored=46, applicable=3,428, partition violations=0, status=PASS
+
+## Other censoring and applicability
+
 - FWD 10: applicable=10,302, available=10,288, not applicable=3,242, data-end censored=14
 - FWD 20: applicable=10,302, available=10,255, not applicable=3,242, data-end censored=47
 - FWD 30: applicable=10,302, available=10,244, not applicable=3,242, data-end censored=58
@@ -53,6 +64,8 @@ Stage 3.1 hardens dataset semantics only. It does not train a model or change tr
 - Candidate outcome differences: 0
 - D1 shadow differences: 0
 - Position-day differences: 0
+- Stable numerical target differences: 0
+- Final feature-value differences: 0
 
 ## ML safety
 
@@ -61,6 +74,14 @@ Stage 3.1 hardens dataset semantics only. It does not train a model or change tr
 - Target leakage violations: 0
 - Unregistered feature violations: 0
 - Registry inconsistencies: 0
+- Feature metadata semantic violations: 0
+
+## Reference safety
+
+- Stage 3 reference gate failures: 0
+- Stage 3 branch commit check: PASS
+- Stage 3 exact-commit directory check: PASS
+- Stage 3 artifact/hash gates: PASS
 
 ## Walk forward
 
@@ -68,22 +89,32 @@ Stage 3.1 hardens dataset semantics only. It does not train a model or change tr
 - Evaluation years: 11
 - Training availability violations: 0
 
+## Tests
+
+- Total tests: 73
+- PASS: 73
+- FAIL: 0
+
 ## Determinism
 
 - First-run/previous hashes available: YES
 - Repeated-run hash differences: 0
-- signal_state::content_hash: first=`e2e7b32856928312be99f65bfcc67f736bbab33e1962a6fb9b7a921447b76ac0`, second=`e2e7b32856928312be99f65bfcc67f736bbab33e1962a6fb9b7a921447b76ac0`, status=PASS
-- signal_state::artifact_hash: first=`381c1978de997771b027ea2fa19c260e4c6f0fdaf3d68f27bb6f5512aa79b6dd`, second=`381c1978de997771b027ea2fa19c260e4c6f0fdaf3d68f27bb6f5512aa79b6dd`, status=PASS
-- trade_opportunity::content_hash: first=`537bd452f72a4dea8c1056ae558bc15e6895e8513277124a8a1dbc30c8c5a591`, second=`537bd452f72a4dea8c1056ae558bc15e6895e8513277124a8a1dbc30c8c5a591`, status=PASS
-- trade_opportunity::artifact_hash: first=`13a590284ee7adb6c5290899198814fda1e1b88df0cae880e2689bab8782b32e`, second=`13a590284ee7adb6c5290899198814fda1e1b88df0cae880e2689bab8782b32e`, status=PASS
-- d1_position_day::content_hash: first=`c3be50f0345d487a9b4e76f6894a443fc47a481baaf2b0c3f2f4b042560fdf07`, second=`c3be50f0345d487a9b4e76f6894a443fc47a481baaf2b0c3f2f4b042560fdf07`, status=PASS
-- d1_position_day::artifact_hash: first=`40057b0f46d1c33d795c465dcc7ffc289e24bedee9140f2657d0e9f7a74ab855`, second=`40057b0f46d1c33d795c465dcc7ffc289e24bedee9140f2657d0e9f7a74ab855`, status=PASS
+- EXPERIMENT_ID: first=`S3_1_20110830_20260828_c5f0a101a427`, second=`S3_1_20110830_20260828_c5f0a101a427`, status=PASS
+- STAGE3_1_CODE_PACKAGE_HASH: first=`f694086c2a1a3526465271f5820afde15cd603c4c292ab9bc5e5fc7f1ef4d260`, second=`f694086c2a1a3526465271f5820afde15cd603c4c292ab9bc5e5fc7f1ef4d260`, status=PASS
+- STAGE3_1_CONFIG_HASH: first=`6e8e9acd0c2299f7b0529a8240b272483a7394037a87bbadca53d2a1018cad8f`, second=`6e8e9acd0c2299f7b0529a8240b272483a7394037a87bbadca53d2a1018cad8f`, status=PASS
+- STAGE3_1_SCHEMA_HASH: first=`7e6fb19e0618c70c9ea04300b2825bf674ac14322ab24eb1c958145781a6d2c4`, second=`7e6fb19e0618c70c9ea04300b2825bf674ac14322ab24eb1c958145781a6d2c4`, status=PASS
+- signal_state::content_hash: first=`ba090d37ab4a487574e6c4c8e507ba569dca75800defe5c172a8d12e9d23eb61`, second=`ba090d37ab4a487574e6c4c8e507ba569dca75800defe5c172a8d12e9d23eb61`, status=PASS
+- signal_state::artifact_hash: first=`7cea6d886b8e60b09d738cb87fc2a6ddc9b21130860bb25137c3acef88ed46df`, second=`7cea6d886b8e60b09d738cb87fc2a6ddc9b21130860bb25137c3acef88ed46df`, status=PASS
+- trade_opportunity::content_hash: first=`2ac0b34cf7aac28537f5f163df5bddb6f921c355f79cbebb8a295a9002135986`, second=`2ac0b34cf7aac28537f5f163df5bddb6f921c355f79cbebb8a295a9002135986`, status=PASS
+- trade_opportunity::artifact_hash: first=`ad9de8f16bf2991edf194c7abecc631e00e6b3ce7c3c9b19de6e1cfb6f7b22c2`, second=`ad9de8f16bf2991edf194c7abecc631e00e6b3ce7c3c9b19de6e1cfb6f7b22c2`, status=PASS
+- d1_position_day::content_hash: first=`7874ff8ab1fc7827198ef5969d407d94173721f96d541ecf43df0018e4a05523`, second=`7874ff8ab1fc7827198ef5969d407d94173721f96d541ecf43df0018e4a05523`, status=PASS
+- d1_position_day::artifact_hash: first=`e4ea660e22f6a4847494d406081de399602edea1ffa86ce2df98df45a2e32690`, second=`e4ea660e22f6a4847494d406081de399602edea1ffa86ce2df98df45a2e32690`, status=PASS
 
 ## Runtime
 
-- Sanity runtime: 23.29 seconds
-- Official runtime: 148.43 seconds
-- Deterministic rerun runtime: 148.79 seconds
+- Sanity runtime: 30.54 seconds
+- Official runtime: 184.32 seconds
+- Deterministic rerun runtime: 188.34 seconds
 
 ## Scope declarations
 
@@ -99,7 +130,11 @@ STAGE 1 SIGNAL RULES CHANGED: NO
 
 OPPORTUNITY ELIGIBILITY RULES CHANGED: NO
 
+ENTRY EXECUTION RULES CHANGED: NO
+
 D1 MANAGEMENT RULES CHANGED: NO
+
+HISTORICAL VALID TARGET VALUES CHANGED: NO
 
 ML MODEL TRAINED: NO
 
@@ -123,7 +158,21 @@ TIME-TO-TARGET CONDITIONAL SEMANTICS EXPLICIT: YES
 
 WALK-FORWARD LABEL AVAILABILITY ENFORCED: YES
 
-ML READY FOR INDEPENDENT AUDIT: YES
+TIME_TO_TARGET APPLICABILITY FIXED: YES
+
+FEATURE REGISTRY METADATA TRULY DATASET-SPECIFIC: YES
+
+STAGE 3 EXACT REFERENCE COMMIT VERIFIED: YES
+
+SYNTHETIC D1 CENSOR TEST ADDED: YES
+
+DATE_LIKE FEATURE_ALLOWED COUNT: 0
+
+TARGET LEAKAGE VIOLATIONS: 0
+
+TRAINING AVAILABILITY VIOLATIONS: 0
+
+FINAL STAGE 3.1 READY FOR INDEPENDENT FREEZE AUDIT: YES
 
 ## Known limitations
 

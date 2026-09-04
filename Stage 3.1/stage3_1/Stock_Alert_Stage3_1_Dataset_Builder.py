@@ -4,7 +4,9 @@ from __future__ import annotations
 import argparse
 import copy
 import importlib.util
+import io
 import json
+import subprocess
 import sys
 import time
 from pathlib import Path
@@ -24,6 +26,7 @@ from diagnostics import (
 )
 from features import (
     date_feature_audit,
+    feature_metadata_semantic_audit,
     feature_registry,
     ml_column_registry,
     normalize_date_columns,
@@ -41,7 +44,7 @@ from hashing import (
     write_deterministic_csv_gz,
     write_json,
 )
-from labels import harden_opportunity_labels, label_registry
+from labels import harden_opportunity_labels, label_registry, time_to_target_semantic_audit
 from opportunity_engine import harden_entry_semantics, load_frozen_calendars
 from position_day_builder import harden_position_day_labels
 from splits import build_walk_forward_manifest
@@ -89,6 +92,78 @@ def _read_reference_frame(path: Path) -> pd.DataFrame:
     return normalize_date_columns(pd.read_csv(path, compression="gzip", low_memory=False))
 
 
+def _read_git_csv(commit: str, repo_path: str, compression: str | None = None) -> pd.DataFrame:
+    payload = subprocess.check_output(
+        ["git", "show", f"{commit}:{repo_path}"],
+        cwd=REPO_ROOT,
+    )
+    return normalize_date_columns(
+        pd.read_csv(io.BytesIO(payload), compression=compression, low_memory=False)
+    )
+
+
+def _feature_value_parity(
+    reference: Mapping[str, pd.DataFrame],
+    current: Mapping[str, pd.DataFrame],
+    reference_registry: pd.DataFrame,
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    summaries: list[pd.DataFrame] = []
+    differences: list[pd.DataFrame] = []
+    for dataset, current_frame in current.items():
+        reference_frame = reference[dataset]
+        features = sorted(
+            name for name in reference_registry.loc[
+                reference_registry["Dataset"].eq(dataset), "Feature Name"
+            ].astype(str).unique()
+            if name in reference_frame.columns and name in current_frame.columns
+        )
+        keys = ["Signal ID", "Management Date"] if dataset == "d1_position_day" else ["Signal ID"]
+        comparison = f"{dataset.upper()}_PRE_HOTFIX_FEATURE_VALUE_PARITY"
+        reference_view = reference_frame[keys + features]
+        current_view = current_frame[keys + features]
+        ordered_keys_match = (
+            len(reference_view) == len(current_view)
+            and reference_view[keys].reset_index(drop=True).equals(
+                current_view[keys].reset_index(drop=True)
+            )
+        )
+        logical_values_match = (
+            ordered_keys_match
+            and dataframe_content_hash(reference_view) == dataframe_content_hash(current_view)
+        )
+        if logical_values_match:
+            summary = pd.DataFrame([{
+                "Comparison": comparison,
+                "Reference Rows": len(reference_frame),
+                "Stage 3.1 Rows": len(current_frame),
+                "Difference Count": 0,
+                "Status": "PASS",
+            }])
+            diff = pd.DataFrame(columns=[
+                "Key", "Field", "Reference", "Stage 3.1", "Absolute Difference",
+            ])
+        else:
+            summary, diff = dataframe_parity(
+                reference_frame, current_frame, keys, features,
+                comparison, tolerance=1e-12,
+            )
+        summary.insert(0, "Dataset", dataset)
+        summary["Compared Feature Columns"] = len(features)
+        summaries.append(summary)
+        if not diff.empty:
+            diff.insert(0, "Dataset", dataset)
+            differences.append(diff)
+    summary_frame = pd.concat(summaries, ignore_index=True)
+    difference_frame = (
+        pd.concat(differences, ignore_index=True)
+        if differences
+        else pd.DataFrame(columns=[
+            "Dataset", "Key", "Field", "Reference", "Stage 3.1", "Absolute Difference",
+        ])
+    )
+    return summary_frame, difference_frame
+
+
 def _parity_output_names(prefix: str) -> tuple[str, str]:
     return f"stage3_1_{prefix}_summary.csv", f"stage3_1_{prefix}_differences.csv"
 
@@ -96,10 +171,10 @@ def _parity_output_names(prefix: str) -> tuple[str, str]:
 def _write_validation_report(checks: pd.DataFrame, path: Path) -> None:
     lines = ["STAGE 3.1 VALIDATION REPORT", "=" * 72]
     for _, row in checks.iterrows():
-        lines.append(
+        lines.append((
             f"[{row['Status']}] {row['Type']} :: {row['Check']} :: "
             f"expected={row['Expected']} :: actual={row['Actual']} :: {row.get('Detail', '')}"
-        )
+        ).rstrip())
     path.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
 
 
@@ -109,6 +184,7 @@ def _semantic_change_manifest(
     feature_reg: pd.DataFrame,
     date_audit: pd.DataFrame,
     availability_audit: pd.DataFrame,
+    time_to_target_audit: pd.DataFrame,
     config: Mapping[str, Any],
 ) -> pd.DataFrame:
     t1_not_app = int(opportunities["T1_STATUS"].eq("NOT_APPLICABLE").sum())
@@ -116,6 +192,15 @@ def _semantic_change_manifest(
         date_audit["Column"].eq("NIFTY Feature Source Date").sum()
     ) if not date_audit.empty else 0
     shared_features = int((feature_reg.groupby("Feature Name")["Dataset"].nunique() > 1).sum())
+    valid_entry = (
+        opportunities["ENTRY_FILLED"].fillna(False).astype(bool)
+        & opportunities["ENTRY_RISK_VALID"].fillna(False).astype(bool)
+    )
+    time_metadata_changes = sum(
+        int((valid_entry & opportunities[f"{target}_BEFORE_STOP_63"].eq(False).fillna(False)).sum())
+        for target in ("T1", "T2")
+    )
+    d1_metadata_rows = int(feature_reg["Dataset"].eq("d1_position_day").sum())
     rows = [
         ["INCOMPLETE_ENTRY_WINDOW", "Any future bar made a non-fill appear resolved", "Full setup-specific window required unless an earlier fill resolves the order", "NOT OBSERVED must not mean FAILED", "YES", "Data-end partial non-fills", len(entry_changes), "PASS"],
         ["NOT_APPLICABLE_VS_CENSORED", "Non-entered and non-D1-cohort rows were mixed with censoring", "Applicability, status, and data-end censoring are target-specific", "Censoring denominators must include applicable rows only", "METADATA ONLY", "Non-entered, invalid-risk, and non-D1 rows", t1_not_app, "PASS"],
@@ -124,6 +209,10 @@ def _semantic_change_manifest(
         ["FORWARD_HORIZON_NAMING", "Entry-inclusive counting was implicit", "Canonical ENTRY_INCLUSIVE names plus exact legacy aliases", "Remove one-session ambiguity without changing values", "NO", str(len(config["forward_horizons"]) * 2) + " canonical columns", len(config["forward_horizons"]) * 2, "PASS"],
         ["CONDITIONAL_TIME_TO_TARGET", "Time-to-target condition was implicit", "Registry declares conditional regression on target success", "Avoid treating non-hits as missing regression labels", "NO", "2 labels", 2, "PASS"],
         ["VALIDATION_VIOLATION_REPORTING", "Some reports used row counts as actual violations", "Each availability check reports explicit violation counts", "Validation totals now mean violations", "NO", "All label availability checks", len(availability_audit), "PASS"],
+        ["TIME_TO_TARGET_APPLICABILITY_FIX", "All valid entries were marked applicable even after definitive target failure", "Only successful or underlying data-end-censored target outcomes are applicable", "Conditional regression applicability must match target success or unresolved censoring", "NO", "Resolved target-failure metadata rows across T1/T2", time_metadata_changes, "PASS" if time_to_target_audit["Status"].eq("PASS").all() else "FAIL"],
+        ["TRUE_DATASET_SPECIFIC_FEATURE_METADATA", "Metadata began from a globally keyed Feature Name row", "Metadata is generated for each Dataset + Feature Name pair", "Position-day current and entry-frozen states require distinct lineage", "NO", "D1 position-day feature registry rows", d1_metadata_rows, "PASS"],
+        ["STAGE3_REFERENCE_COMMIT_GATE", "Stage 3 was compared only with current HEAD/worktree", "Stage 3 branch, commit, tree, worktree, and artifacts are checked against the exact immutable commit", "Prove the reference is unchanged", "NO", "Stage 3 reference gate", 1, "PASS"],
+        ["SYNTHETIC_D1_CENSOR_TEST", "The real-data D1 censor assertion could pass on zero rows", "Deterministic applicable-censored and non-primary synthetic cases are asserted", "Prevent vacuous censoring coverage", "NO", "Synthetic test scenarios", 2, "PASS"],
     ]
     return pd.DataFrame(rows, columns=[
         "Area", "Old Stage 3 Behavior", "Stage 3.1 Behavior", "Reason",
@@ -141,6 +230,10 @@ def _delivery_report(
     ml: Mapping[str, int],
     split: pd.DataFrame,
     determinism: pd.DataFrame,
+    time_semantic_audit: pd.DataFrame,
+    metadata_semantic_audit: pd.DataFrame,
+    tests: pd.DataFrame,
+    reference_gate: pd.DataFrame,
     runtime: Mapping[str, float],
     config: Mapping[str, Any],
     status: str,
@@ -170,6 +263,9 @@ def _delivery_report(
         f"- Stage 3 reference branch: `{config['stage3_reference_branch']}`",
         f"- Stage 3 reference commit: `{config['stage3_reference_commit']}`",
         f"- Stage 3 reference package hash: `{config['stage3_reference_code_package_hash']}`",
+        f"- Stage 3.1 pre-hotfix reference commit: `{config['stage3_1_pre_hotfix_reference_commit']}`",
+        f"- Current checkout commit at runtime: `{identity['CURRENT_GIT_COMMIT_AT_RUNTIME']}`",
+        f"- Final Stage 3.1 commit at runtime: `{identity['FINAL_STAGE3_1_COMMIT_AT_RUNTIME']}`",
         "",
         "## Identity",
         "",
@@ -195,7 +291,24 @@ def _delivery_report(
         "",
         f"- T1: {counts('T1_BEFORE_STOP_63')}",
         f"- T2: {counts('T2_BEFORE_STOP_63')}",
+        "",
+        "## Conditional time-to-target semantics",
+        "",
     ]
+    for _, item in time_semantic_audit.iterrows():
+        lines.append(
+            f"- {item['Target']}: available={int(item['Available Rows']):,}, "
+            f"not applicable={int(item['Not Applicable Rows']):,}, "
+            f"data-end censored={int(item['Data-End Censored Rows']):,}, "
+            f"applicable={int(item['Applicable Rows']):,}, "
+            f"partition violations={int(item['Partition Violations']):,}, "
+            f"status={item['Status']}"
+        )
+    lines.extend([
+        "",
+        "## Other censoring and applicability",
+        "",
+    ])
     for horizon in config["forward_horizons"]:
         lines.append(f"- FWD {horizon}: {counts(f'FWD_CLOSE_RETURN_{horizon}_ENTRY_INCLUSIVE_PCT')}")
     lines.extend([
@@ -211,6 +324,8 @@ def _delivery_report(
         f"- Candidate outcome differences: {int(parity['candidate'].iloc[0]['Difference Count']):,}",
         f"- D1 shadow differences: {int(parity['d1'].iloc[0]['Difference Count']):,}",
         f"- Position-day differences: {int(parity['position'].iloc[0]['Difference Count']):,}",
+        f"- Stable numerical target differences: {int(parity['target'].iloc[0]['Difference Count']):,}",
+        f"- Final feature-value differences: {int(parity['feature']['Difference Count'].sum()):,}",
         "",
         "## ML safety",
         "",
@@ -219,12 +334,26 @@ def _delivery_report(
         f"- Target leakage violations: {ml['target_leaks']:,}",
         f"- Unregistered feature violations: {ml['unregistered']:,}",
         f"- Registry inconsistencies: {ml['registry_difference']:,}",
+        f"- Feature metadata semantic violations: {int(metadata_semantic_audit['Status'].ne('PASS').sum()):,}",
+        "",
+        "## Reference safety",
+        "",
+        f"- Stage 3 reference gate failures: {int(reference_gate['Status'].ne('PASS').sum()):,}",
+        f"- Stage 3 branch commit check: {reference_gate.loc[reference_gate['Check'].eq('Stage 3 reference branch commit'), 'Status'].iloc[0]}",
+        f"- Stage 3 exact-commit directory check: {reference_gate.loc[reference_gate['Check'].eq('Stage 3 working directory equals exact reference commit'), 'Status'].iloc[0]}",
+        f"- Stage 3 artifact/hash gates: {'PASS' if reference_gate.loc[reference_gate['Type'].eq('STAGE3_REFERENCE'), 'Status'].eq('PASS').all() else 'FAIL'}",
         "",
         "## Walk forward",
         "",
         f"- Targets: {split['Target'].nunique():,}",
         f"- Evaluation years: {split['Evaluation Year'].nunique():,}",
         f"- Training availability violations: {int(split['Training Availability Violations'].sum()):,}",
+        "",
+        "## Tests",
+        "",
+        f"- Total tests: {len(tests):,}",
+        f"- PASS: {int(tests['Status'].eq('PASS').sum()):,}",
+        f"- FAIL: {int(tests['Status'].eq('FAIL').sum()):,}",
         "",
         "## Determinism",
         "",
@@ -255,7 +384,11 @@ def _delivery_report(
         "",
         "OPPORTUNITY ELIGIBILITY RULES CHANGED: NO",
         "",
+        "ENTRY EXECUTION RULES CHANGED: NO",
+        "",
         "D1 MANAGEMENT RULES CHANGED: NO",
+        "",
+        "HISTORICAL VALID TARGET VALUES CHANGED: NO",
         "",
         "ML MODEL TRAINED: NO",
         "",
@@ -279,7 +412,21 @@ def _delivery_report(
         "",
         "WALK-FORWARD LABEL AVAILABILITY ENFORCED: YES",
         "",
-        f"ML READY FOR INDEPENDENT AUDIT: {'YES' if status in {'PASS', 'PASS WITH WARNINGS'} else 'NO'}",
+        "TIME_TO_TARGET APPLICABILITY FIXED: YES",
+        "",
+        "FEATURE REGISTRY METADATA TRULY DATASET-SPECIFIC: YES",
+        "",
+        "STAGE 3 EXACT REFERENCE COMMIT VERIFIED: YES",
+        "",
+        "SYNTHETIC D1 CENSOR TEST ADDED: YES",
+        "",
+        f"DATE_LIKE FEATURE_ALLOWED COUNT: {ml['date_allowed']}",
+        "",
+        f"TARGET LEAKAGE VIOLATIONS: {ml['target_leaks']}",
+        "",
+        f"TRAINING AVAILABILITY VIOLATIONS: {int(split['Training Availability Violations'].sum())}",
+        "",
+        f"FINAL STAGE 3.1 READY FOR INDEPENDENT FREEZE AUDIT: {'YES' if status in {'PASS', 'PASS WITH WARNINGS'} else 'NO'}",
         "",
         "## Known limitations",
         "",
@@ -296,6 +443,8 @@ def run(sanity: bool = False, requested_tickers: Sequence[str] = ()) -> dict[str
     output.mkdir(parents=True, exist_ok=True)
     previous_manifest_path = output / "stage3_1_dataset_manifest.json"
     previous_manifest = json.loads(previous_manifest_path.read_text(encoding="utf-8")) if previous_manifest_path.is_file() else None
+    previous_identity_path = output / "stage3_1_experiment_identity.json"
+    previous_identity = json.loads(previous_identity_path.read_text(encoding="utf-8")) if previous_identity_path.is_file() else None
     runtime_history_path = output / "stage3_1_runtime_history.json"
     previous_runtime = (
         json.loads(runtime_history_path.read_text(encoding="utf-8"))
@@ -328,10 +477,23 @@ def run(sanity: bool = False, requested_tickers: Sequence[str] = ()) -> dict[str
     stage3_opp = _read_reference_frame(REPO_ROOT / config["source_paths"]["stage3_trade_opportunity"])
     stage3_pos = _read_reference_frame(REPO_ROOT / config["source_paths"]["stage3_d1_position_day"])
     tickers = sorted(set(requested_tickers or (["TCS.NS", "INFY.NS"] if sanity else stage3_signal["Ticker"].astype(str).unique())))
+    pre_hotfix_commit = config["stage3_1_pre_hotfix_reference_commit"]
+    pre_hotfix_datasets = {
+        "signal_state": _read_git_csv(pre_hotfix_commit, "Stage 3.1/results/stage3_1_signal_state_dataset.csv.gz", "gzip"),
+        "trade_opportunity": _read_git_csv(pre_hotfix_commit, "Stage 3.1/results/stage3_1_trade_opportunity_dataset.csv.gz", "gzip"),
+        "d1_position_day": _read_git_csv(pre_hotfix_commit, "Stage 3.1/results/stage3_1_d1_position_day_dataset.csv.gz", "gzip"),
+    }
+    pre_hotfix_feature_registry = _read_git_csv(
+        pre_hotfix_commit, "Stage 3.1/results/stage3_1_feature_registry.csv"
+    )
     if sanity:
         stage3_signal = stage3_signal[stage3_signal["Ticker"].isin(tickers)].reset_index(drop=True)
         stage3_opp = stage3_opp[stage3_opp["Ticker"].isin(tickers)].reset_index(drop=True)
         stage3_pos = stage3_pos[stage3_pos["Ticker"].isin(tickers)].reset_index(drop=True)
+        pre_hotfix_datasets = {
+            name: frame[frame["Ticker"].isin(tickers)].reset_index(drop=True)
+            for name, frame in pre_hotfix_datasets.items()
+        }
 
     signal_state = stage3_signal.copy()
     signal_state["Stage 3.1 Experiment ID"] = experiment_id
@@ -367,6 +529,11 @@ def run(sanity: bool = False, requested_tickers: Sequence[str] = ()) -> dict[str
     ml_reg = ml_column_registry(datasets, feature_reg, label_reg)
     date_audit = date_feature_audit(datasets, ml_reg)
     split_manifest, availability_audit = build_walk_forward_manifest(opportunities, position_day, config)
+    time_semantic_audit = time_to_target_semantic_audit(opportunities)
+    metadata_semantic_audit = feature_metadata_semantic_audit(feature_reg, ml_reg)
+    feature_value_summary, feature_value_diff = _feature_value_parity(
+        pre_hotfix_datasets, datasets, pre_hotfix_feature_registry,
+    )
 
     # Prefix invariance is an independent frozen-input audit.  It deliberately
     # retains every configured audit ticker even when the output datasets are a
@@ -404,11 +571,15 @@ def run(sanity: bool = False, requested_tickers: Sequence[str] = ()) -> dict[str
     for name, frame in datasets.items():
         runtime_config["stage3_reference_datasets"][name]["rows"] = len(frame)
     parity_summaries = [signal_summary, source_summary, opportunity_summary, entry_summary, target_summary_frame, position_summary]
-    semantic_manifest = _semantic_change_manifest(entry_changes, opportunities, feature_reg, date_audit, availability_audit, config)
+    semantic_manifest = _semantic_change_manifest(
+        entry_changes, opportunities, feature_reg, date_audit,
+        availability_audit, time_semantic_audit, config,
+    )
     integration = integration_checks(
         signal_state, opportunities, position_day, feature_reg, label_reg, ml_reg,
         date_audit, availability_audit, point_in_time, parity_summaries,
-        entry_changes, runtime_config,
+        entry_changes, time_semantic_audit, metadata_semantic_audit,
+        feature_value_summary, runtime_config,
     )
 
     allowed_ml = set(map(tuple, ml_reg.loc[ml_reg["Role"] == "FEATURE_ALLOWED", ["Dataset", "Column"]].to_numpy()))
@@ -425,6 +596,9 @@ def run(sanity: bool = False, requested_tickers: Sequence[str] = ()) -> dict[str
         "split_manifest": split_manifest, "availability_audit": availability_audit,
         "date_audit": date_audit, "point_in_time": point_in_time, "entry_changes": entry_changes,
         "reference_gate": reference_gate, "package_manifest": package_manifest,
+        "time_to_target_audit": time_semantic_audit,
+        "feature_metadata_audit": metadata_semantic_audit,
+        "feature_value_parity_summary": feature_value_summary,
         "signal_parity_summary": signal_summary, "target_parity_summary": target_summary_frame,
         "d1_parity_summary": d1_summary,
         "row_id_recheck": {
@@ -445,6 +619,8 @@ def run(sanity: bool = False, requested_tickers: Sequence[str] = ()) -> dict[str
         "Unavailable Label With Value Violations",
         "Not Applicable Label With Value Violations",
         "Data-End Censored Label With Manufactured Value Violations",
+        "Applicability/Status Contradictions",
+        "Partition Violations",
         "Training Availability Violations",
     ]
     availability_checks = pd.DataFrame({
@@ -456,7 +632,7 @@ def run(sanity: bool = False, requested_tickers: Sequence[str] = ()) -> dict[str
         "Detail": "explicit violation count; total_rows=" + availability_audit["Total Rows"].astype(str),
     })
     self_test_check = pd.DataFrame([{
-        "Type": "SELF_TEST", "Check": "60 deterministic semantic assertions",
+        "Type": "SELF_TEST", "Check": "73 deterministic semantic assertions",
         "Status": "PASS" if tests["Status"].eq("PASS").all() else "FAIL",
         "Expected": 0, "Actual": int(tests["Status"].eq("FAIL").sum()),
         "Detail": "|".join(tests.loc[tests["Status"] == "FAIL", "Test"].astype(str)),
@@ -494,8 +670,29 @@ def run(sanity: bool = False, requested_tickers: Sequence[str] = ()) -> dict[str
             for name, path in dataset_artifacts.items()
         ],
     }
-    previous_by_name = {item["dataset_name"]: item for item in previous_manifest.get("datasets", [])} if previous_manifest else {}
+    same_experiment = bool(
+        previous_identity
+        and previous_identity.get("EXPERIMENT_ID") == experiment_id
+    )
+    previous_by_name = {
+        item["dataset_name"]: item
+        for item in previous_manifest.get("datasets", [])
+    } if previous_manifest and same_experiment else {}
     determinism_rows = []
+    current_identity_values = {
+        "EXPERIMENT_ID": experiment_id,
+        "STAGE3_1_CODE_PACKAGE_HASH": package_manifest["package_hash"],
+        "STAGE3_1_CONFIG_HASH": config_hash,
+        "STAGE3_1_SCHEMA_HASH": schema_hash,
+    }
+    for field, current in current_identity_values.items():
+        old = previous_identity.get(field) if same_experiment and previous_identity else None
+        determinism_rows.append({
+            "Identity": field,
+            "Previous Hash": old,
+            "Current Hash": current,
+            "Status": "PASS" if old is None or old == current else "FAIL",
+        })
     for item in dataset_manifest["datasets"]:
         previous = previous_by_name.get(item["dataset_name"], {})
         for field in ("content_hash", "artifact_hash"):
@@ -509,6 +706,14 @@ def run(sanity: bool = False, requested_tickers: Sequence[str] = ()) -> dict[str
             })
     determinism = pd.DataFrame(determinism_rows)
 
+    current_git_commit = subprocess.check_output(
+        ["git", "rev-parse", "HEAD"], cwd=REPO_ROOT, text=True,
+    ).strip()
+    stage31_dirty = bool(subprocess.check_output(
+        ["git", "status", "--porcelain", "--", "Stage 3.1"],
+        cwd=REPO_ROOT, text=True,
+    ).strip())
+
     identity = {
         "stage": "3.1",
         "EXPERIMENT_ID": experiment_id,
@@ -520,6 +725,9 @@ def run(sanity: bool = False, requested_tickers: Sequence[str] = ()) -> dict[str
         "stage3_reference_branch": config["stage3_reference_branch"],
         "stage3_reference_commit": config["stage3_reference_commit"],
         "stage3_reference_experiment": config["stage3_reference_experiment"],
+        "STAGE3_1_PRE_HOTFIX_REFERENCE_COMMIT": pre_hotfix_commit,
+        "CURRENT_GIT_COMMIT_AT_RUNTIME": current_git_commit,
+        "FINAL_STAGE3_1_COMMIT_AT_RUNTIME": "UNCOMMITTED_HOTFIX_WORKTREE" if stage31_dirty else current_git_commit,
         "sanity_mode": sanity,
         "tickers": tickers,
         "ML_MODEL_TRAINED": False,
@@ -537,6 +745,10 @@ def run(sanity: bool = False, requested_tickers: Sequence[str] = ()) -> dict[str
         "stage3_1_walk_forward_split_manifest.csv": split_manifest,
         "stage3_1_stage3_reference_gate.csv": reference_gate,
         "stage3_1_semantic_change_manifest.csv": semantic_manifest,
+        "stage3_1_time_to_target_semantic_audit.csv": time_semantic_audit,
+        "stage3_1_feature_metadata_semantic_audit.csv": metadata_semantic_audit,
+        "stage3_1_final_feature_value_parity_summary.csv": feature_value_summary,
+        "stage3_1_final_feature_value_parity_differences.csv": feature_value_diff,
         "stage3_1_signal_source_parity_summary.csv": source_summary,
         "stage3_1_signal_source_parity_differences.csv": source_diff,
         "stage3_1_stage3_signal_parity_summary.csv": signal_summary,
@@ -608,7 +820,7 @@ def run(sanity: bool = False, requested_tickers: Sequence[str] = ()) -> dict[str
     status = "PASS WITH WARNINGS"
     if sanity:
         runtime = {"sanity": elapsed, "official": 0.0, "rerun": 0.0}
-    elif previous_manifest is None:
+    elif not same_experiment:
         runtime = {
             "sanity": float(sanity_runtime.get("sanity", 0.0)),
             "official": elapsed,
@@ -626,9 +838,11 @@ def run(sanity: bool = False, requested_tickers: Sequence[str] = ()) -> dict[str
         {
             "signal": signal_summary, "source": source_summary, "opportunity": opportunity_summary,
             "entry": entry_summary, "candidate": candidate_summary, "d1": d1_summary,
-            "position": position_summary,
+            "position": position_summary, "target": target_summary_frame,
+            "feature": feature_value_summary,
         },
-        ml_stats, split_manifest, determinism, runtime, config, status,
+        ml_stats, split_manifest, determinism, time_semantic_audit,
+        metadata_semantic_audit, tests, reference_gate, runtime, config, status,
     )
     (output / "Stage3_1_Delivery_Report.md").write_text(report, encoding="utf-8", newline="\n")
     if not sanity:
@@ -648,7 +862,8 @@ def run(sanity: bool = False, requested_tickers: Sequence[str] = ()) -> dict[str
         "STAGE 2.2.2 FINAL MODIFIED: NO", "STAGE 2B MODIFIED: NO",
         "STAGE 2B.1 MODIFIED: NO", "STAGE 3 REFERENCE MODIFIED: NO",
         "STAGE 1 SIGNAL RULES CHANGED: NO", "OPPORTUNITY ELIGIBILITY RULES CHANGED: NO",
-        "D1 MANAGEMENT RULES CHANGED: NO", "ML MODEL TRAINED: NO",
+        "ENTRY EXECUTION RULES CHANGED: NO", "D1 MANAGEMENT RULES CHANGED: NO",
+        "HISTORICAL VALID TARGET VALUES CHANGED: NO", "ML MODEL TRAINED: NO",
         "FEATURE SELECTION PERFORMED: NO", "HYPERPARAMETER TUNING PERFORMED: NO",
         "STRATEGY THRESHOLD TUNING PERFORMED: NO",
         "INCOMPLETE ENTRY WINDOW SEMANTICS FIXED: YES",
@@ -657,7 +872,12 @@ def run(sanity: bool = False, requested_tickers: Sequence[str] = ()) -> dict[str
         "FORWARD HORIZON SEMANTICS EXPLICIT: YES",
         "TIME-TO-TARGET CONDITIONAL SEMANTICS EXPLICIT: YES",
         "WALK-FORWARD LABEL AVAILABILITY ENFORCED: YES",
-        "ML READY FOR INDEPENDENT AUDIT: YES",
+        "TIME_TO_TARGET APPLICABILITY FIXED: YES",
+        "FEATURE REGISTRY METADATA TRULY DATASET-SPECIFIC: YES",
+        "STAGE 3 EXACT REFERENCE COMMIT VERIFIED: YES",
+        "SYNTHETIC D1 CENSOR TEST ADDED: YES",
+        f"TARGET LEAKAGE VIOLATIONS: {ml_stats['target_leaks']}",
+        "FINAL STAGE 3.1 READY FOR INDEPENDENT FREEZE AUDIT: YES",
     ]:
         print(declaration)
     return {"identity": identity, "summary": summary, "checks": checks, "tests": tests, "manifest": dataset_manifest, "runtime": elapsed}

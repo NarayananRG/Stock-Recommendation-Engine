@@ -76,6 +76,15 @@ def build_walk_forward_manifest(
         unavailable_with_value = ~is_available & target_present
         not_applicable_with_value = not_applicable & target_present
         censored_with_value = data_end & target_present
+        applicability_status_contradiction = (
+            (applicable & not_applicable)
+            | (~applicable & (is_available | data_end))
+        )
+        partition_violations = int(
+            len(frame) != int(is_available.sum() + not_applicable.sum() + data_end.sum())
+        ) + int(
+            int(applicable.sum()) != int(is_available.sum() + data_end.sum())
+        )
         audit_rows.append({
             "Dataset": spec["dataset"],
             "Target": spec["target"],
@@ -88,10 +97,13 @@ def build_walk_forward_manifest(
             "Unavailable Label With Value Violations": int(unavailable_with_value.sum()),
             "Not Applicable Label With Value Violations": int(not_applicable_with_value.sum()),
             "Data-End Censored Label With Manufactured Value Violations": int(censored_with_value.sum()),
+            "Applicability/Status Contradictions": int(applicability_status_contradiction.sum()),
+            "Partition Violations": partition_violations,
             "Training Availability Violations": 0,
             "Status": "PASS" if not any([
                 before_asof.any(), unavailable_with_value.any(),
                 not_applicable_with_value.any(), censored_with_value.any(),
+                applicability_status_contradiction.any(), partition_violations,
             ]) else "FAIL",
         })
 

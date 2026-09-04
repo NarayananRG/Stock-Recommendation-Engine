@@ -15,9 +15,16 @@ evaluate an ML model.
 - Forward-return labels have canonical, entry-inclusive horizon names. Legacy
   names remain documented aliases for reproducibility.
 - Time-to-target values are populated only when their corresponding target is
-  reached.
-- Feature eligibility is registered per dataset. Raw date/provenance columns are
+  reached. Definitive failures are `NOT_APPLICABLE`; unresolved underlying
+  outcomes remain applicable but `DATA_END_CENSORED`.
+- Feature eligibility and metadata are generated per `Dataset + Feature Name`.
+  Position-day current-management fields and frozen entry-state fields have
+  distinct lineage and as-of descriptions. Raw date/provenance columns are
   retained for audit use but cannot be ML features.
+- The immutable Stage 3 gate resolves the remote reference branch and compares
+  the working directory and Git tree with exact commit `70951a5a...`.
+- Synthetic tests cover both an applicable D1 data-end-censored trajectory and
+  a non-primary D1 `NOT_APPLICABLE` trajectory.
 - Walk-forward split validation reports target-specific violation counts rather
   than only a global pass/fail result.
 
@@ -37,7 +44,7 @@ Python environment if needed, then run the two-ticker sanity workflow first:
 python "Stage 3.1/stage3_1/Stock_Alert_Stage3_1_Dataset_Builder.py" --sanity --tickers TCS.NS INFY.NS
 ```
 
-Proceed only when every validation gate and all 60 assertion-based tests pass:
+Proceed only when every validation gate and all 73 assertion-based tests pass:
 
 ```powershell
 python "Stage 3.1/stage3_1/Stock_Alert_Stage3_1_Dataset_Builder.py"
@@ -48,9 +55,15 @@ the official artifacts.
 
 ## Output layout
 
-- `output/sanity/` — temporary two-ticker artifacts and validation reports.
-- `output/official/` — full Stage 3.1 datasets, registries, diagnostics, manifests,
+- `tests/sanity_results/` — two-ticker artifacts and validation reports.
+- `results/` — full Stage 3.1 datasets, registries, diagnostics, manifests,
   parity audits, and validation reports.
+- `results/stage3_1_time_to_target_semantic_audit.csv` — conditional-target
+  partitions and contradiction checks.
+- `results/stage3_1_feature_metadata_semantic_audit.csv` — dataset-specific
+  feature-lineage checks.
+- `results/stage3_1_final_feature_value_parity_*.csv` — exact pre-hotfix
+  feature-value comparison.
 - `Stage3_1_Delivery_Report.md` — generated acceptance summary and declarations.
 
 The datasets are research artifacts, not live-trading instructions. Dataset

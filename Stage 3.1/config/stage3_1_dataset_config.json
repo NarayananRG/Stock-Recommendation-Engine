@@ -14,6 +14,7 @@
   "stage3_reference_experiment": "S3_20110830_20260828_bb15e0fa65d2",
   "stage3_reference_code_package_hash": "1c06cb7e1345b10ea8b2db65aea02d54468c0da7b816bf48575f169fa8f2a23a",
   "stage3_reference_schema_hash": "2165f7083fce198f60941080a794f4136e522012bd3ac79120d255a14a6332e8",
+  "stage3_1_pre_hotfix_reference_commit": "fc2d45888a8c80fdf724accb676e6748c1abcf08",
   "stage3_reference_datasets": {
     "signal_state": {
       "rows": 68081,

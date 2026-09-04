@@ -1,0 +1,10 @@
+Check,Status,Expected,Actual
+D1 ADX management-close as-of,PASS,COMPLETED MANAGEMENT SESSION CLOSE,COMPLETED MANAGEMENT SESSION CLOSE
+D1 Daily ST current-management description,PASS,CURRENT D1 MANAGEMENT STATE,Stage 3 position-day dataset: current D1 management state | Daily ST is the current D1 management-state value known at the completed management-session close.
+D1 Current Market Regime classification,PASS,CURRENT_MANAGEMENT_STATE,CURRENT_MANAGEMENT_STATE
+D1 Entry Technical Score entry-frozen as-of,PASS,KNOWN SINCE ENTRY; RETAINED AS FROZEN ENTRY STATE THROUGH MANAGEMENT DATE,KNOWN SINCE ENTRY; RETAINED AS FROZEN ENTRY STATE THROUGH MANAGEMENT DATE
+D1 Original T1 classification,PASS,ENTRY_FROZEN_STATE,ENTRY_FROZEN_STATE
+Signal-state ADX signal-close as-of,PASS,SIGNAL SESSION CLOSE,SIGNAL SESSION CLOSE
+Same feature may have dataset-specific descriptions,PASS,DIFFERENT,DIFFERENT
+Feature registry Dataset + Feature Name unique,PASS,0,0
+Feature registry equals ML registry per dataset,PASS,0 symmetric differences,0

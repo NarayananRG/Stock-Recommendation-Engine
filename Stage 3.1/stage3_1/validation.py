@@ -26,13 +26,50 @@ def _row(check_type: str, check: str, passed: bool, expected: Any, actual: Any, 
 def stage3_reference_gate(repo_root: Path, config: Mapping[str, Any]) -> pd.DataFrame:
     paths = config["source_paths"]
     rows: list[dict[str, Any]] = []
+
+    def resolve(ref: str) -> str:
+        completed = subprocess.run(
+            ["git", "rev-parse", "--verify", ref],
+            cwd=repo_root,
+            text=True,
+            capture_output=True,
+        )
+        return completed.stdout.strip() if completed.returncode == 0 else "MISSING"
+
     tag = subprocess.check_output(["git", "rev-list", "-n", "1", config["baseline_tag"]], cwd=repo_root, text=True).strip()
     rows.append(_row("IMMUTABLE_REFERENCE", "Stage 2B.1 frozen tag commit", tag == config["baseline_commit"], config["baseline_commit"], tag))
     frozen = ["Stage 2.2.2 Final", "Stage 2B", "Stage 2B.1"]
     frozen_diff = subprocess.run(["git", "diff", "--quiet", config["baseline_tag"], "--", *frozen], cwd=repo_root).returncode
     rows.append(_row("IMMUTABLE_REFERENCE", "Frozen dependency folders unchanged", frozen_diff == 0, "NO DIFFERENCE", "NO DIFFERENCE" if frozen_diff == 0 else "DIFFERENCE"))
-    stage3_diff = subprocess.run(["git", "diff", "--quiet", "HEAD", "--", "Stage 3"], cwd=repo_root).returncode
-    rows.append(_row("IMMUTABLE_REFERENCE", "Stage 3 worktree unchanged from branch base", stage3_diff == 0, "NO DIFFERENCE", "NO DIFFERENCE" if stage3_diff == 0 else "DIFFERENCE"))
+    pre_hotfix = resolve(f"{config['stage3_1_pre_hotfix_reference_commit']}^{{commit}}")
+    rows.append(_row(
+        "IMMUTABLE_REFERENCE", "Stage 3.1 pre-hotfix reference commit exists",
+        pre_hotfix == config["stage3_1_pre_hotfix_reference_commit"],
+        config["stage3_1_pre_hotfix_reference_commit"], pre_hotfix,
+    ))
+    branch_ref = f"refs/remotes/origin/{config['stage3_reference_branch']}"
+    branch_commit = resolve(branch_ref)
+    rows.append(_row(
+        "IMMUTABLE_REFERENCE", "Stage 3 reference branch commit",
+        branch_commit == config["stage3_reference_commit"],
+        config["stage3_reference_commit"], branch_commit, branch_ref,
+    ))
+    stage3_diff = subprocess.run(
+        ["git", "diff", "--quiet", config["stage3_reference_commit"], "--", "Stage 3"],
+        cwd=repo_root,
+    ).returncode
+    rows.append(_row(
+        "IMMUTABLE_REFERENCE", "Stage 3 working directory equals exact reference commit",
+        stage3_diff == 0, "NO DIFFERENCE", "NO DIFFERENCE" if stage3_diff == 0 else "DIFFERENCE",
+        config["stage3_reference_commit"],
+    ))
+    reference_tree = resolve(f"{config['stage3_reference_commit']}:Stage 3")
+    current_tree = resolve("HEAD:Stage 3")
+    rows.append(_row(
+        "IMMUTABLE_REFERENCE", "Stage 3 git tree hash at current HEAD",
+        current_tree == reference_tree and reference_tree != "MISSING",
+        reference_tree, current_tree,
+    ))
 
     identity = json.loads((repo_root / paths["stage3_identity"]).read_text(encoding="utf-8"))
     rows.append(_row("STAGE3_REFERENCE", "Stage 3 experiment", identity.get("experiment_id") == config["stage3_reference_experiment"], config["stage3_reference_experiment"], identity.get("experiment_id")))
@@ -133,6 +170,9 @@ def integration_checks(
     point_in_time: pd.DataFrame,
     parity_summaries: Sequence[pd.DataFrame],
     semantic_changes: pd.DataFrame,
+    time_to_target_audit: pd.DataFrame,
+    feature_metadata_audit: pd.DataFrame,
+    feature_value_parity_summary: pd.DataFrame,
     config: Mapping[str, Any],
 ) -> pd.DataFrame:
     rows: list[dict[str, Any]] = []
@@ -185,6 +225,12 @@ def integration_checks(
     present_tickers = set(point_in_time["Ticker"].astype(str)) if "Ticker" in point_in_time else set()
     add("Required prefix-audit tickers present", required_tickers.issubset(present_tickers), "|".join(sorted(required_tickers)), "|".join(sorted(present_tickers)))
     add("Entry semantic changes only incomplete windows", semantic_changes.empty or semantic_changes["Reason"].isin(["NO_FUTURE_SESSION", "INCOMPLETE_ENTRY_WINDOW"]).all(), "ONLY INCOMPLETE WINDOW", "|".join(sorted(set(semantic_changes.get("Reason", [])))))
+    time_failures = int(time_to_target_audit["Status"].ne("PASS").sum())
+    add("Time-to-target applicability and partitions", time_failures == 0, 0, time_failures)
+    metadata_failures = int(feature_metadata_audit["Status"].ne("PASS").sum())
+    add("Feature metadata semantic audit", metadata_failures == 0, 0, metadata_failures)
+    feature_value_differences = int(feature_value_parity_summary["Difference Count"].sum())
+    add("Pre-hotfix feature-value parity", feature_value_differences == 0, 0, feature_value_differences)
     for summary in parity_summaries:
         if summary.empty:
             continue

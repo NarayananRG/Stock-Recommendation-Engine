@@ -1,0 +1,3 @@
+Target,Total Rows,Applicable Rows,Available Rows,Not Applicable Rows,Data-End Censored Rows,Applicability/Status Contradictions,Partition Violations,Available Semantics Violations,Not Applicable Semantics Violations,Data-End Censored Semantics Violations,Status
+TIME_TO_T1_SESSIONS,13544,5703,5662,7841,41,0,0,0,0,0,PASS
+TIME_TO_T2_SESSIONS,13544,3428,3382,10116,46,0,0,0,0,0,PASS

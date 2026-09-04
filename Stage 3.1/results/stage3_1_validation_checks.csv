@@ -1,7 +1,10 @@
 Type,Check,Status,Expected,Actual,Detail
 IMMUTABLE_REFERENCE,Stage 2B.1 frozen tag commit,PASS,c9cc9f4fcaf2fe81128365be09515fbf9fa67c28,c9cc9f4fcaf2fe81128365be09515fbf9fa67c28,
 IMMUTABLE_REFERENCE,Frozen dependency folders unchanged,PASS,NO DIFFERENCE,NO DIFFERENCE,
-IMMUTABLE_REFERENCE,Stage 3 worktree unchanged from branch base,PASS,NO DIFFERENCE,NO DIFFERENCE,
+IMMUTABLE_REFERENCE,Stage 3.1 pre-hotfix reference commit exists,PASS,fc2d45888a8c80fdf724accb676e6748c1abcf08,fc2d45888a8c80fdf724accb676e6748c1abcf08,
+IMMUTABLE_REFERENCE,Stage 3 reference branch commit,PASS,70951a5a05727a605bb579973da6216fb9887e44,70951a5a05727a605bb579973da6216fb9887e44,refs/remotes/origin/stage3-point-in-time-dataset
+IMMUTABLE_REFERENCE,Stage 3 working directory equals exact reference commit,PASS,NO DIFFERENCE,NO DIFFERENCE,70951a5a05727a605bb579973da6216fb9887e44
+IMMUTABLE_REFERENCE,Stage 3 git tree hash at current HEAD,PASS,f8d6385e64f7a03e0e18af895ae89883ad5792e5,f8d6385e64f7a03e0e18af895ae89883ad5792e5,
 STAGE3_REFERENCE,Stage 3 experiment,PASS,S3_20110830_20260828_bb15e0fa65d2,S3_20110830_20260828_bb15e0fa65d2,
 STAGE3_REFERENCE,Stage 3 code package hash,PASS,1c06cb7e1345b10ea8b2db65aea02d54468c0da7b816bf48575f169fa8f2a23a,1c06cb7e1345b10ea8b2db65aea02d54468c0da7b816bf48575f169fa8f2a23a,
 STAGE3_REFERENCE,Stage 3 schema hash,PASS,2165f7083fce198f60941080a794f4136e522012bd3ac79120d255a14a6332e8,2165f7083fce198f60941080a794f4136e522012bd3ac79120d255a14a6332e8,
@@ -33,6 +36,9 @@ INTEGRATION,Walk-forward training availability violations,PASS,0,0,
 INTEGRATION,Point-in-time prefix audit,PASS,0,0,
 INTEGRATION,Required prefix-audit tickers present,PASS,HAL.NS|HDFCBANK.NS|INFY.NS|LT.NS|TCS.NS|TITAN.NS,HAL.NS|HDFCBANK.NS|INFY.NS|LT.NS|TCS.NS|TITAN.NS,
 INTEGRATION,Entry semantic changes only incomplete windows,PASS,ONLY INCOMPLETE WINDOW,INCOMPLETE_ENTRY_WINDOW,
+INTEGRATION,Time-to-target applicability and partitions,PASS,0,0,
+INTEGRATION,Feature metadata semantic audit,PASS,0,0,
+INTEGRATION,Pre-hotfix feature-value parity,PASS,0,0,
 INTEGRATION,STAGE3_SIGNAL_PARITY,PASS,PASS,PASS,differences=0
 INTEGRATION,FROZEN_SIGNAL_SOURCE_PARITY,PASS,PASS,PASS,differences=0
 INTEGRATION,STAGE3_OPPORTUNITY_MEMBERSHIP_PARITY,PASS,PASS,PASS,differences=0
@@ -61,5 +67,5 @@ LABEL_AVAILABILITY,d1_position_day::NEXT_10_SESSION_MAE,PASS,0,0,explicit violat
 LABEL_AVAILABILITY,d1_position_day::NEXT_20_SESSION_RETURN,PASS,0,0,explicit violation count; total_rows=4350
 LABEL_AVAILABILITY,d1_position_day::NEXT_20_SESSION_MFE,PASS,0,0,explicit violation count; total_rows=4350
 LABEL_AVAILABILITY,d1_position_day::NEXT_20_SESSION_MAE,PASS,0,0,explicit violation count; total_rows=4350
-SELF_TEST,60 deterministic semantic assertions,PASS,0,0,
-IMMUTABLE_REFERENCE,Stage 3 directory hash unchanged during execution,PASS,0b8957ac07bf4911b2854a767949272c9636e4c60b9d7a2c534cf5a7c213670b,0b8957ac07bf4911b2854a767949272c9636e4c60b9d7a2c534cf5a7c213670b,
+SELF_TEST,73 deterministic semantic assertions,PASS,0,0,
+IMMUTABLE_REFERENCE,Stage 3 directory hash unchanged during execution,PASS,1da5268be23ddb41819a56f99bfde99a8d85c8344337fbf542668db5d1bff620,1da5268be23ddb41819a56f99bfde99a8d85c8344337fbf542668db5d1bff620,

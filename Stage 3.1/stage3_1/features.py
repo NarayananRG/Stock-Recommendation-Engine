@@ -24,6 +24,19 @@ TARGET_EXACT = {
     "D1_FINAL_EXIT_REASON", "ORIGINAL_T2_REACHED_BEFORE_D1_EXIT",
 }
 
+ENTRY_FROZEN_POSITION_FEATURES = {
+    "Entry Market Regime", "Entry Technical Score", "Entry Actionability Score",
+    "Executed Entry", "Initial Stop", "Original T1", "Original T2",
+    "Original Signal", "Setup", "Stop Distance R", "T1 Distance R",
+    "T2 Distance R",
+}
+
+ENTRY_FROZEN_AS_OF = (
+    "KNOWN SINCE ENTRY; RETAINED AS FROZEN ENTRY STATE THROUGH MANAGEMENT DATE"
+)
+MANAGEMENT_CLOSE_AS_OF = "COMPLETED MANAGEMENT SESSION CLOSE"
+SIGNAL_CLOSE_AS_OF = "SIGNAL SESSION CLOSE"
+
 
 def is_date_like(column: str, series: pd.Series) -> bool:
     name = str(column)
@@ -63,20 +76,50 @@ def feature_registry(
     datasets: Mapping[str, pd.DataFrame],
     stage3_registry: pd.DataFrame,
 ) -> pd.DataFrame:
-    base = stage3_registry.drop_duplicates("Feature Name").set_index("Feature Name", drop=False)
+    source_rows: dict[str, list[dict[str, Any]]] = {}
+    for record in stage3_registry.to_dict("records"):
+        source_rows.setdefault(str(record["Feature Name"]), []).append(record)
     rows: list[dict[str, Any]] = []
     for dataset, frame in datasets.items():
-        for feature_name, source_row in base.iterrows():
-            if feature_name not in frame.columns:
-                continue
-            source = source_row.to_dict()
+        for feature_name in sorted(set(frame.columns).intersection(source_rows)):
+            candidates = source_rows[feature_name]
+            preferred_as_of = MANAGEMENT_CLOSE_AS_OF if dataset == "d1_position_day" else SIGNAL_CLOSE_AS_OF
+            preferred = [row for row in candidates if str(row.get("As-Of Semantics", "")) == preferred_as_of]
+            source = dict((preferred or candidates)[0])
             date_like = is_date_like(feature_name, frame[feature_name])
             allowed = bool(source.get("ML Allowed", False)) and not date_like
-            semantics = (
-                "COMPLETED MANAGEMENT SESSION CLOSE"
-                if dataset == "d1_position_day"
-                else "SIGNAL SESSION CLOSE"
-            )
+            classification = ""
+            if dataset == "d1_position_day":
+                if feature_name in ENTRY_FROZEN_POSITION_FEATURES:
+                    classification = "ENTRY_FROZEN_STATE"
+                    source["Source"] = "Stage 3 position-day dataset: frozen entry-time state"
+                    source["Formula / Description"] = (
+                        f"{feature_name} is an entry-time frozen value retained unchanged through each management date."
+                    )
+                    source["As-Of Semantics"] = ENTRY_FROZEN_AS_OF
+                    source["Missing Value Meaning"] = (
+                        "The source entry-time value was unavailable when the position was opened."
+                    )
+                    source["Known Ambiguity"] = ""
+                    source["Stage Source"] = (
+                        "Stage 2B.1 D1_TRAIL_ONLY entry snapshot / Stage 3 position-day dataset"
+                    )
+                else:
+                    classification = "CURRENT_MANAGEMENT_STATE"
+                    source["Source"] = "Stage 3 position-day dataset: current D1 management state"
+                    source["Formula / Description"] = (
+                        f"{feature_name} is the current D1 management-state value known at the completed management-session close."
+                    )
+                    source["As-Of Semantics"] = MANAGEMENT_CLOSE_AS_OF
+                    source["Missing Value Meaning"] = (
+                        "Required frozen point-in-time inputs or lookback history were unavailable for the completed management session."
+                    )
+                    source["Known Ambiguity"] = ""
+                    source["Stage Source"] = (
+                        "Stage 2B.1 D1_TRAIL_ONLY / frozen point-in-time inputs / Stage 3 position-day state"
+                    )
+            else:
+                source["As-Of Semantics"] = SIGNAL_CLOSE_AS_OF
             if date_like:
                 reason = "RAW CALENDAR OR SOURCE-LINEAGE DATE; AUDIT METADATA ONLY"
             else:
@@ -89,19 +132,70 @@ def feature_registry(
                     "Data Type": str(frame[feature_name].dtype),
                     "Source": source.get("Source", ""),
                     "Formula / Description": source.get("Formula / Description", ""),
-                    "As-Of Semantics": semantics,
+                    "As-Of Semantics": source.get("As-Of Semantics", ""),
                     "Point-In-Time Safe": bool(source.get("Point-In-Time Safe", False)),
                     "ML Allowed": allowed,
                     "Reason if ML Disallowed": reason,
                     "Missing Value Meaning": source.get("Missing Value Meaning", ""),
                     "Known Ambiguity": source.get("Known Ambiguity", ""),
                     "Stage Source": source.get("Stage Source", ""),
+                    "Metadata Classification": classification,
                 }
             )
     result = pd.DataFrame(rows)
     if result.duplicated(["Dataset", "Feature Name"]).any():
         raise RuntimeError("Feature registry composite key is not unique")
     return result.sort_values(["Dataset", "Feature Name"]).reset_index(drop=True)
+
+
+def feature_metadata_semantic_audit(
+    registry: pd.DataFrame,
+    ml_registry: pd.DataFrame,
+) -> pd.DataFrame:
+    rows: list[dict[str, Any]] = []
+
+    def value(dataset: str, feature: str, column: str) -> str:
+        match = registry[
+            registry["Dataset"].eq(dataset)
+            & registry["Feature Name"].eq(feature)
+        ]
+        if len(match) != 1:
+            return "MISSING_OR_DUPLICATED"
+        return str(match.iloc[0][column])
+
+    def add(check: str, passed: bool, expected: str, actual: Any) -> None:
+        rows.append({
+            "Check": check,
+            "Status": "PASS" if bool(passed) else "FAIL",
+            "Expected": expected,
+            "Actual": actual,
+        })
+
+    d1_adx_asof = value("d1_position_day", "ADX", "As-Of Semantics")
+    add("D1 ADX management-close as-of", d1_adx_asof == MANAGEMENT_CLOSE_AS_OF, MANAGEMENT_CLOSE_AS_OF, d1_adx_asof)
+    d1_daily_source = " | ".join([
+        value("d1_position_day", "Daily ST", "Source"),
+        value("d1_position_day", "Daily ST", "Formula / Description"),
+    ])
+    add("D1 Daily ST current-management description", "current d1 management" in d1_daily_source.lower(), "CURRENT D1 MANAGEMENT STATE", d1_daily_source)
+    d1_regime_class = value("d1_position_day", "Current Market Regime", "Metadata Classification")
+    add("D1 Current Market Regime classification", d1_regime_class == "CURRENT_MANAGEMENT_STATE", "CURRENT_MANAGEMENT_STATE", d1_regime_class)
+    entry_score_asof = value("d1_position_day", "Entry Technical Score", "As-Of Semantics")
+    add("D1 Entry Technical Score entry-frozen as-of", entry_score_asof == ENTRY_FROZEN_AS_OF, ENTRY_FROZEN_AS_OF, entry_score_asof)
+    original_t1_class = value("d1_position_day", "Original T1", "Metadata Classification")
+    add("D1 Original T1 classification", original_t1_class == "ENTRY_FROZEN_STATE", "ENTRY_FROZEN_STATE", original_t1_class)
+    signal_adx_asof = value("signal_state", "ADX", "As-Of Semantics")
+    add("Signal-state ADX signal-close as-of", signal_adx_asof == SIGNAL_CLOSE_AS_OF, SIGNAL_CLOSE_AS_OF, signal_adx_asof)
+    signal_adx_description = value("signal_state", "ADX", "Formula / Description")
+    d1_adx_description = value("d1_position_day", "ADX", "Formula / Description")
+    add("Same feature may have dataset-specific descriptions", signal_adx_description != d1_adx_description, "DIFFERENT", "DIFFERENT" if signal_adx_description != d1_adx_description else "SAME")
+    duplicate_count = int(registry.duplicated(["Dataset", "Feature Name"]).sum())
+    add("Feature registry Dataset + Feature Name unique", duplicate_count == 0, "0", duplicate_count)
+    allowed_features = set(map(tuple, registry.loc[registry["ML Allowed"].fillna(False).astype(bool), ["Dataset", "Feature Name"]].to_numpy()))
+    allowed_ml = set(map(tuple, ml_registry.loc[ml_registry["Role"].eq("FEATURE_ALLOWED"), ["Dataset", "Column"]].to_numpy()))
+    difference_count = len(allowed_features.symmetric_difference(allowed_ml))
+    add("Feature registry equals ML registry per dataset", difference_count == 0, "0 symmetric differences", difference_count)
+    return pd.DataFrame(rows)
 
 
 def _is_label_metadata(column: str) -> bool:

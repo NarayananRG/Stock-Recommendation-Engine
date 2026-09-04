@@ -86,6 +86,47 @@ def run_tests(context: Mapping[str, Any]) -> pd.DataFrame:
         row = context[name].iloc[0]
         _assert(row["Status"] == "PASS" and int(row["Difference Count"]) == 0, str(row.to_dict()))
 
+    def feature_row(dataset: str, feature: str) -> pd.Series:
+        match = feature_reg[
+            feature_reg["Dataset"].eq(dataset)
+            & feature_reg["Feature Name"].eq(feature)
+        ]
+        _assert(len(match) == 1, f"feature metadata rows={len(match)} for {dataset}::{feature}")
+        return match.iloc[0]
+
+    def synthetic_d1(cohort: str, censored: bool) -> pd.Series:
+        from labels import harden_opportunity_labels
+        source = opp.iloc[[0]].copy()
+        source["Dataset Cohort"] = cohort
+        source["ENTRY_FILLED"] = True
+        source["ENTRY_RISK_VALID"] = True
+        source["D1_SHADOW_CENSORED"] = censored
+        for column in [
+            "D1_SHADOW_EXIT_DATE", "D1_SHADOW_EXIT_REASON", "D1_SHADOW_BARS_HELD",
+            "D1_SHADOW_NOMINAL_EXIT", "D1_SHADOW_EXECUTED_EXIT",
+            "D1_SHADOW_STOP_REVISION_COUNT", "D1_SHADOW_NET_R",
+            "D1_SHADOW_NET_RETURN_PCT", "D1_SHADOW_LABEL_AVAILABLE_DATE",
+        ]:
+            if column in source:
+                source[column] = 1
+        return harden_opportunity_labels(source, config).iloc[0]
+
+    def synthetic_time(target: str, outcome: str) -> pd.Series:
+        from labels import harden_opportunity_labels
+        source = opp.iloc[[0]].copy()
+        source["ENTRY_FILLED"] = True
+        source["ENTRY_RISK_VALID"] = True
+        source[f"{target}_CENSORED"] = outcome == "CENSORED"
+        outcome_value = True if outcome == "SUCCESS" else False if outcome == "FAILURE" else pd.NA
+        source[f"{target}_BEFORE_STOP_63"] = pd.Series(
+            [outcome_value], index=source.index, dtype="boolean"
+        )
+        source[f"TIME_TO_{target}_SESSIONS"] = 3 if outcome == "SUCCESS" else 99
+        source[f"{target}_LABEL_AVAILABLE_DATE"] = (
+            pd.Timestamp("2020-01-10") if outcome == "SUCCESS" else pd.NaT
+        )
+        return harden_opportunity_labels(source, config).iloc[0]
+
     tests: list[tuple[int, str, Callable[[], None]]] = [
         (1, "immutable tag resolution", lambda: _assert(subprocess.check_output(["git", "rev-list", "-n", "1", config["baseline_tag"]], cwd=repo_root, text=True).strip() == config["baseline_commit"], "tag mismatch")),
         (2, "Stage 2B.1 package hash", lambda: _assert((context["reference_gate"]["Status"] == "PASS").all(), context["reference_gate"].to_string(index=False))),
@@ -165,13 +206,26 @@ def run_tests(context: Mapping[str, Any]) -> pd.DataFrame:
         (58, "complete Stage 3 stable cohort numerical parity", lambda: parity("target_parity_summary")),
         (59, "incomplete-window differences only in documented rows", lambda: _assert(entry_changes.empty or entry_changes["Reason"].isin(["NO_FUTURE_SESSION", "INCOMPLETE_ENTRY_WINDOW"]).all(), entry_changes.to_string(index=False))),
         (60, "walk-forward training requires AVAILABLE and APPLICABLE", lambda: _assert((split["Training Availability Violations"] == 0).all() and (split["Training Rows"] == split["Training Label Available Rows"]).all(), "invalid training rows")),
+        (61, "TIME_TO_T1 success is applicable and available", lambda: _assert((lambda rows: len(rows) > 0 and rows["TIME_TO_T1_APPLICABLE"].fillna(False).all() and rows["TIME_TO_T1_STATUS"].eq("AVAILABLE").all() and ~rows["TIME_TO_T1_DATA_END_CENSORED"].fillna(False).any() and rows["TIME_TO_T1_UNAVAILABLE_REASON"].eq("NONE").all() and rows["TIME_TO_T1_SESSIONS"].notna().all() and rows["TIME_TO_T1_AVAILABLE_DATE"].notna().all())(opp[opp["T1_BEFORE_STOP_63"].eq(True)]), "T1 success semantics")),
+        (62, "TIME_TO_T1 definitive failure is not applicable", lambda: _assert((lambda rows: len(rows) > 0 and ~rows["TIME_TO_T1_APPLICABLE"].fillna(False).any() and rows["TIME_TO_T1_STATUS"].eq("NOT_APPLICABLE").all() and ~rows["TIME_TO_T1_DATA_END_CENSORED"].fillna(False).any() and rows["TIME_TO_T1_UNAVAILABLE_REASON"].eq("TARGET_NOT_REACHED").all() and rows["TIME_TO_T1_SESSIONS"].isna().all() and rows["TIME_TO_T1_AVAILABLE_DATE"].isna().all())(opp[opp["ENTRY_FILLED"].eq(True) & opp["ENTRY_RISK_VALID"].fillna(False) & opp["T1_BEFORE_STOP_63"].eq(False)]), "T1 failure semantics")),
+        (63, "TIME_TO_T1 unresolved target is applicable and censored", lambda: _assert((lambda row: row["TIME_TO_T1_APPLICABLE"] == True and row["TIME_TO_T1_STATUS"] == "DATA_END_CENSORED" and row["TIME_TO_T1_DATA_END_CENSORED"] == True and row["TIME_TO_T1_UNAVAILABLE_REASON"] == "UNDERLYING_TARGET_UNRESOLVED_AT_DATA_END" and pd.isna(row["TIME_TO_T1_SESSIONS"]) and pd.isna(row["TIME_TO_T1_AVAILABLE_DATE"]))(synthetic_time("T1", "CENSORED")), "T1 censor semantics")),
+        (64, "TIME_TO_T2 semantic partition", lambda: _assert((lambda success, failed, censored: success["TIME_TO_T2_APPLICABLE"] == True and success["TIME_TO_T2_STATUS"] == "AVAILABLE" and failed["TIME_TO_T2_APPLICABLE"] == False and failed["TIME_TO_T2_STATUS"] == "NOT_APPLICABLE" and censored["TIME_TO_T2_APPLICABLE"] == True and censored["TIME_TO_T2_STATUS"] == "DATA_END_CENSORED")(synthetic_time("T2", "SUCCESS"), synthetic_time("T2", "FAILURE"), synthetic_time("T2", "CENSORED")), "T2 partition semantics")),
+        (65, "no TIME_TO applicability/status contradiction", lambda: _assert((context["time_to_target_audit"]["Applicability/Status Contradictions"] == 0).all(), context["time_to_target_audit"].to_string(index=False))),
+        (66, "D1 ADX metadata uses management-close semantics", lambda: _assert(feature_row("d1_position_day", "ADX")["As-Of Semantics"] == "COMPLETED MANAGEMENT SESSION CLOSE" and feature_row("d1_position_day", "ADX")["Metadata Classification"] == "CURRENT_MANAGEMENT_STATE", feature_row("d1_position_day", "ADX").to_string())),
+        (67, "D1 Entry Technical Score metadata is entry-frozen", lambda: _assert(feature_row("d1_position_day", "Entry Technical Score")["As-Of Semantics"] == "KNOWN SINCE ENTRY; RETAINED AS FROZEN ENTRY STATE THROUGH MANAGEMENT DATE" and feature_row("d1_position_day", "Entry Technical Score")["Metadata Classification"] == "ENTRY_FROZEN_STATE", feature_row("d1_position_day", "Entry Technical Score").to_string())),
+        (68, "synthetic applicable D1 data-end censor", lambda: _assert((lambda row: row["D1_SHADOW_APPLICABLE"] == True and row["D1_SHADOW_STATUS"] == "DATA_END_CENSORED" and row["D1_SHADOW_DATA_END_CENSORED"] == True and row["D1_SHADOW_UNAVAILABLE_REASON"] == "D1_TRAJECTORY_UNRESOLVED_AT_DATA_END" and pd.isna(row["D1_SHADOW_NET_R"]) and pd.isna(row["D1_SHADOW_EXIT_REASON"]))(synthetic_d1("BASELINE_PRIMARY", True)), "synthetic D1 censor semantics")),
+        (69, "synthetic non-primary D1 not applicable", lambda: _assert((lambda row: row["D1_SHADOW_APPLICABLE"] == False and row["D1_SHADOW_STATUS"] == "NOT_APPLICABLE" and row["D1_SHADOW_DATA_END_CENSORED"] == False)(synthetic_d1("RESEARCH_EXTENDED", True)), "synthetic non-primary D1 semantics")),
+        (70, "Stage 3 current directory equals exact reference commit", lambda: _assert(subprocess.run(["git", "diff", "--quiet", config["stage3_reference_commit"], "--", "Stage 3"], cwd=repo_root).returncode == 0, "Stage 3 differs from exact reference commit")),
+        (71, "Stage 3 reference branch resolves to expected commit", lambda: _assert(subprocess.check_output(["git", "rev-parse", "--verify", f"refs/remotes/origin/{config['stage3_reference_branch']}"], cwd=repo_root, text=True).strip() == config["stage3_reference_commit"], "Stage 3 reference branch mismatch")),
+        (72, "time-to-target category partition arithmetic", lambda: _assert((context["time_to_target_audit"]["Partition Violations"] == 0).all(), context["time_to_target_audit"].to_string(index=False))),
+        (73, "final feature values retain pre-hotfix parity", lambda: _assert(context["feature_value_parity_summary"]["Status"].eq("PASS").all() and context["feature_value_parity_summary"]["Difference Count"].sum() == 0, context["feature_value_parity_summary"].to_string(index=False))),
     ])
 
     for number, name, assertion in tests:
         record(number, name, assertion)
     result = pd.DataFrame(records)
-    if len(result) != 60 or list(result["Test Number"]) != list(range(1, 61)):
-        raise AssertionError("Stage 3.1 suite must contain exactly 60 ordered tests")
+    if len(result) != 73 or list(result["Test Number"]) != list(range(1, 74)):
+        raise AssertionError("Stage 3.1 suite must contain exactly 73 ordered tests")
     return result
 
 

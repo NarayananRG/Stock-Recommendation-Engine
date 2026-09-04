@@ -51,13 +51,16 @@ def harden_opportunity_labels(frame: pd.DataFrame, config: Mapping[str, Any]) ->
         result.loc[data_end, f"{target}_LABEL_OUTCOME"] = "DATA_END_CENSORED"
 
         success = result[f"{target}_BEFORE_STOP_63"].eq(True).fillna(False)
-        time_applicable = applicable
-        time_data_end = data_end
+        underlying_censored = result[f"{target}_DATA_END_CENSORED"].fillna(False).astype(bool)
+        if (success & underlying_censored).any():
+            raise RuntimeError(f"{target} cannot be both successful and data-end censored")
+        time_applicable = success | underlying_censored
+        time_data_end = underlying_censored
         time_status = pd.Series("NOT_APPLICABLE", index=result.index, dtype="string")
         time_status.loc[success] = "AVAILABLE"
         time_status.loc[time_data_end] = "DATA_END_CENSORED"
         time_reason = pd.Series("TARGET_NOT_REACHED", index=result.index, dtype="string")
-        time_reason.loc[~applicable] = invalid_reason.loc[~applicable]
+        time_reason.loc[~valid_entry] = invalid_reason.loc[~valid_entry]
         time_reason.loc[success] = "NONE"
         time_reason.loc[time_data_end] = "UNDERLYING_TARGET_UNRESOLVED_AT_DATA_END"
         result[f"TIME_TO_{target}_APPLICABLE"] = time_applicable.astype("boolean")
@@ -126,13 +129,75 @@ def harden_opportunity_labels(frame: pd.DataFrame, config: Mapping[str, Any]) ->
         "D1_SHADOW_STOP_REVISION_COUNT", "D1_SHADOW_NET_R",
         "D1_SHADOW_NET_RETURN_PCT", "D1_SHADOW_LABEL_AVAILABLE_DATE",
     ]
-    result.loc[~d1_applicable, [column for column in d1_values if column in result]] = pd.NA
+    result.loc[~d1_applicable | d1_data_end, [column for column in d1_values if column in result]] = pd.NA
 
     result["CENSORED"] = (
         result["T1_DATA_END_CENSORED"].fillna(False)
         | result["T2_DATA_END_CENSORED"].fillna(False)
     ).astype("boolean")
     return result
+
+
+def time_to_target_semantic_audit(frame: pd.DataFrame) -> pd.DataFrame:
+    rows: list[dict[str, Any]] = []
+    valid_entry = _valid_entry_mask(frame)
+    for target in ("T1", "T2"):
+        prefix = f"TIME_TO_{target}"
+        applicable = frame[f"{prefix}_APPLICABLE"].fillna(False).astype(bool)
+        status = frame[f"{prefix}_STATUS"].astype("string")
+        available = status.eq("AVAILABLE").fillna(False)
+        not_applicable = status.eq("NOT_APPLICABLE").fillna(False)
+        data_end = status.eq("DATA_END_CENSORED").fillna(False)
+        success = frame[f"{target}_BEFORE_STOP_63"].eq(True).fillna(False)
+        underlying_censored = frame[f"{target}_DATA_END_CENSORED"].fillna(False).astype(bool)
+        value_present = frame[f"{prefix}_SESSIONS"].notna()
+        available_date_present = frame[f"{prefix}_AVAILABLE_DATE"].notna()
+        reason = frame[f"{prefix}_UNAVAILABLE_REASON"].astype("string")
+
+        contradictions = (
+            (applicable & not_applicable)
+            | (~applicable & (available | data_end))
+        )
+        partition_violations = int(
+            len(frame) != int(available.sum() + not_applicable.sum() + data_end.sum())
+        ) + int(
+            int(applicable.sum()) != int(available.sum() + data_end.sum())
+        )
+        available_violations = available & (
+            ~success | ~applicable | ~value_present | ~available_date_present
+            | ~reason.eq("NONE").fillna(False)
+        )
+        definitive_failure = valid_entry & frame[f"{target}_BEFORE_STOP_63"].eq(False).fillna(False)
+        not_applicable_violations = definitive_failure & (
+            applicable | ~not_applicable | value_present | available_date_present
+            | ~reason.eq("TARGET_NOT_REACHED").fillna(False)
+        )
+        data_end_violations = underlying_censored & (
+            ~applicable | ~data_end | value_present | available_date_present
+            | ~reason.eq("UNDERLYING_TARGET_UNRESOLVED_AT_DATA_END").fillna(False)
+        )
+        violation_total = int(
+            contradictions.sum()
+            + partition_violations
+            + available_violations.sum()
+            + not_applicable_violations.sum()
+            + data_end_violations.sum()
+        )
+        rows.append({
+            "Target": f"TIME_TO_{target}_SESSIONS",
+            "Total Rows": len(frame),
+            "Applicable Rows": int(applicable.sum()),
+            "Available Rows": int(available.sum()),
+            "Not Applicable Rows": int(not_applicable.sum()),
+            "Data-End Censored Rows": int(data_end.sum()),
+            "Applicability/Status Contradictions": int(contradictions.sum()),
+            "Partition Violations": partition_violations,
+            "Available Semantics Violations": int(available_violations.sum()),
+            "Not Applicable Semantics Violations": int(not_applicable_violations.sum()),
+            "Data-End Censored Semantics Violations": int(data_end_violations.sum()),
+            "Status": "PASS" if violation_total == 0 else "FAIL",
+        })
+    return pd.DataFrame(rows)
 
 
 def label_registry(config: Mapping[str, Any]) -> pd.DataFrame:
@@ -171,9 +236,10 @@ def label_registry(config: Mapping[str, Any]) -> pd.DataFrame:
             f"{target}_LABEL_AVAILABLE_DATE", f"{target}_STATUS", f"{target}_DATA_END_CENSORED",
             f"{target}_UNAVAILABLE_REASON", "CONSERVATIVE_STOP_FIRST", "ENTRY_INCLUSIVE_SESSION_COUNT")
         add("trade_opportunity", f"TIME_TO_{target}_SESSIONS", "TARGET_TIME",
-            f"Sessions to {target}; defined only when {target} succeeds",
+            f"Sessions to {target}; the numeric regression target is defined only for successful target hits. "
+            "Underlying unresolved outcomes are censored and definitive target failures are NOT_APPLICABLE.",
             "CONDITIONAL_REGRESSION", f"{target}_BEFORE_STOP_63 == TRUE",
-            "ENTRY_FILLED == TRUE AND ENTRY_RISK_VALID == TRUE",
+            f"{target}_BEFORE_STOP_63 == TRUE OR {target}_DATA_END_CENSORED == TRUE",
             f"TIME_TO_{target}_AVAILABLE_DATE", f"TIME_TO_{target}_STATUS",
             f"TIME_TO_{target}_DATA_END_CENSORED", f"TIME_TO_{target}_UNAVAILABLE_REASON",
             "CONSERVATIVE_STOP_FIRST", "ENTRY_INCLUSIVE_SESSION_COUNT")

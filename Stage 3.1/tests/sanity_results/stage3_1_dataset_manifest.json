@@ -12,10 +12,10 @@
   "datasets": [
     {
       "artifact": "stage3_1_signal_state_dataset.csv.gz",
-      "artifact_hash": "6e6be0ee52a2f9a2e0ac7a0df71776006e28748fb610b9ca959f8cce03296d62",
-      "artifact_size_bytes": 3207137,
+      "artifact_hash": "58eccae40efcee9aba345e0af80877909ede9ad1fe551a36bade6d7b22bc6c7d",
+      "artifact_size_bytes": 3207160,
       "column_count": 133,
-      "content_hash": "32fe10d823791c0b5f80c5c2d558f81e0ad1172233fb6098ee2833f6c9d476e0",
+      "content_hash": "93e30ee312f13c219573aeffd6df713452f4d4c12dbfceabfa6c1e4b9784f132",
       "dataset_name": "signal_state",
       "row_count": 7356,
       "schema": [
@@ -555,10 +555,10 @@
     },
     {
       "artifact": "stage3_1_trade_opportunity_dataset.csv.gz",
-      "artifact_hash": "1066e2bd4ffa3e43ddf749849b9ac79cf41cdbbe1b8e99bde26730b189f852d4",
-      "artifact_size_bytes": 1176323,
+      "artifact_hash": "0bdea9f80fe51310c5505cc62146ef7ccb1e898a59a8fab9961dbfa58d3f609e",
+      "artifact_size_bytes": 1176301,
       "column_count": 296,
-      "content_hash": "4203b5727b54ccbd53255e5ded97c5a24bbbc27c1a95f7705e9743d9f5cb93c8",
+      "content_hash": "cdba644620a58f4b3a3dca207715da1a709735fb212de8cccf8f9b89d1d5bee4",
       "dataset_name": "trade_opportunity",
       "row_count": 1519,
       "schema": [
@@ -1750,10 +1750,10 @@
     },
     {
       "artifact": "stage3_1_d1_position_day_dataset.csv.gz",
-      "artifact_hash": "1c8003d59f1563efcd9a9c826e83ed3ffeefa2166fe606df40af0ccb28ad9cc0",
-      "artifact_size_bytes": 173723,
+      "artifact_hash": "e818d4e95e05afb603caee39bc13e83ba9d82c05c372dcffec9c55f511ba5b98",
+      "artifact_size_bytes": 173718,
       "column_count": 107,
-      "content_hash": "8492fcebcea3df31767b0407322c83abbf17fd64b5f8588869ce21a1e32c5727",
+      "content_hash": "3fe2312817f151a58a904c938c706f548b3dec3075847a968980bf94f02bc7d3",
       "dataset_name": "d1_position_day",
       "row_count": 523,
       "schema": [

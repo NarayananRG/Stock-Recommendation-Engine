@@ -102,8 +102,19 @@ def censoring_summary(
             available = status.eq("AVAILABLE").fillna(False)
             not_applicable = status.eq("NOT_APPLICABLE").fillna(False)
         data_end = status.eq("DATA_END_CENSORED").fillna(False)
-        applicable = ~not_applicable
+        applicability_column = status_column.removesuffix("_STATUS") + "_APPLICABLE"
+        applicable = (
+            frame[applicability_column].fillna(False).astype(bool)
+            if applicability_column in frame
+            else ~not_applicable
+        )
         applicable_count = int(applicable.sum())
+        contradiction_count = int(((applicable & not_applicable) | (~applicable & (available | data_end))).sum())
+        partition_violations = int(
+            len(frame) != int(available.sum() + not_applicable.sum() + data_end.sum())
+        ) + int(
+            applicable_count != int(available.sum() + data_end.sum())
+        )
         rows.append({
             "Dataset": dataset,
             "Target": target,
@@ -112,6 +123,8 @@ def censoring_summary(
             "Available Rows": int(available.sum()),
             "Not Applicable Rows": int(not_applicable.sum()),
             "Data-End Censored Rows": int(data_end.sum()),
+            "Applicability/Status Contradictions": contradiction_count,
+            "Partition Violations": partition_violations,
             "Censoring Rate Among Applicable %": float(data_end.sum() / applicable_count * 100.0) if applicable_count else np.nan,
             "Availability Rate Among Applicable %": float(available.sum() / applicable_count * 100.0) if applicable_count else np.nan,
         })
