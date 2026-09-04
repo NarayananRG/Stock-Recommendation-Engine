@@ -1,0 +1,106 @@
+PASS: [IMMUTABLE_BASELINE] frozen git tag resolution | expected=c9cc9f4fcaf2fe81128365be09515fbf9fa67c28 | actual=c9cc9f4fcaf2fe81128365be09515fbf9fa67c28 | 
+PASS: [IMMUTABLE_BASELINE] frozen dependency tree equals tag | expected=NO DIFFERENCE | actual=NO DIFFERENCE | 
+PASS: [IMMUTABLE_BASELINE] Stage 2B.1 experiment ID | expected=S2B1_20160101_20260828_a681f1f8a9d9 | actual=S2B1_20160101_20260828_a681f1f8a9d9 | 
+PASS: [HASH_GATE] Stage 2B.1 source package hash | expected=9bba171b9917b9d125d2487e4afa53f6cc047e0a5ccbe3055ebb3e84363d854e | actual=9bba171b9917b9d125d2487e4afa53f6cc047e0a5ccbe3055ebb3e84363d854e | {"stage2b/Stock_Alert_Stage2B_1_Dynamic_Management.py": "lf_normalized", "stage2b/calibration.py": "lf_normalized", "stage2b/diagnostics.py": "lf_normalized", "stage2b/hashing.py": "lf_normalized", "stage2b/policies.py": "lf_normalized", "stage2b/validation.py": "lf_normalized"}
+PASS: [HASH_GATE] STAGE21_CODE_HASH | expected=91d3d84760c4b2427d500f0bee0f2dc0ceeb7e4f2e31d51d17a64342777993d5 | actual=91d3d84760c4b2427d500f0bee0f2dc0ceeb7e4f2e31d51d17a64342777993d5 | line_endings=raw
+PASS: [HASH_GATE] STAGE221_CODE_HASH | expected=8e6514353cc32a5b8bed1212df0c12d76de11d0624e4931fda4028f0be3ed31f | actual=8e6514353cc32a5b8bed1212df0c12d76de11d0624e4931fda4028f0be3ed31f | line_endings=lf_normalized
+PASS: [HASH_GATE] STAGE222_FINAL_CODE_HASH | expected=63345c591b46c656b204236d147993cb283d57fdbccd0246b7cef281d7968730 | actual=63345c591b46c656b204236d147993cb283d57fdbccd0246b7cef281d7968730 | line_endings=lf_normalized
+PASS: [HASH_GATE] STRATEGY_HASH | expected=e62dc4e75c056a216cc4bdaa589a95f9553ce40e37aa6690974759b7975ad23c | actual=e62dc4e75c056a216cc4bdaa589a95f9553ce40e37aa6690974759b7975ad23c | 
+PASS: [HASH_GATE] EXECUTION_BASELINE_HASH | expected=9434b39d2d7bbd8203a4674b4acdebfecf898afbc08cf7bc144729ec4b326c2b | actual=9434b39d2d7bbd8203a4674b4acdebfecf898afbc08cf7bc144729ec4b326c2b | 
+PASS: [FROZEN_DATA] file hash AXISBANK.NS | expected=090844e8bb50f4afdf4e230928d1fb05bde1736d19ce94b359e1c47337ed64b7 | actual=090844e8bb50f4afdf4e230928d1fb05bde1736d19ce94b359e1c47337ed64b7 | 
+PASS: [FROZEN_DATA] file hash BEL.NS | expected=a2e8e0aa064c5da8f20d5286d82aae7e98e9a6161ea11977a3bbbd14da17e309 | actual=a2e8e0aa064c5da8f20d5286d82aae7e98e9a6161ea11977a3bbbd14da17e309 | 
+PASS: [FROZEN_DATA] file hash CIPLA.NS | expected=e318e91c77ab253593d70215c9c93e6c6aaac1a1d77922f5835f6d56495d07d1 | actual=e318e91c77ab253593d70215c9c93e6c6aaac1a1d77922f5835f6d56495d07d1 | 
+PASS: [FROZEN_DATA] file hash HAL.NS | expected=3e225b9cb4b9fe9dd883e6ad4a65bf4c71cf0c527250c80c37b508018db45171 | actual=3e225b9cb4b9fe9dd883e6ad4a65bf4c71cf0c527250c80c37b508018db45171 | 
+PASS: [FROZEN_DATA] file hash HCLTECH.NS | expected=2d0b90c7c8540cf5cf6d40ee227c03266ac1b560bcfb716ba48f1459f93826fd | actual=2d0b90c7c8540cf5cf6d40ee227c03266ac1b560bcfb716ba48f1459f93826fd | 
+PASS: [FROZEN_DATA] file hash HDFCBANK.NS | expected=4ae41bfa54abf452bcd994cedaa156c75aa47febd56392c03a409931f84d025b | actual=4ae41bfa54abf452bcd994cedaa156c75aa47febd56392c03a409931f84d025b | 
+PASS: [FROZEN_DATA] file hash HINDUNILVR.NS | expected=377213df8eeb3ee84a44bc4cb7e19d8eef4943b3df3734021a2a5a887165a5f0 | actual=377213df8eeb3ee84a44bc4cb7e19d8eef4943b3df3734021a2a5a887165a5f0 | 
+PASS: [FROZEN_DATA] file hash ICICIBANK.NS | expected=c53cfbf3ff3da08ed5244f91fdf7c2330a2d90a586188eb8d6d5d40869e965a7 | actual=c53cfbf3ff3da08ed5244f91fdf7c2330a2d90a586188eb8d6d5d40869e965a7 | 
+PASS: [FROZEN_DATA] file hash INFY.NS | expected=65dcde2ec4e107df2f8cd0d2ed9fb64df3f5cd0186ef6f9cfe7f7cb2d8a79a9b | actual=65dcde2ec4e107df2f8cd0d2ed9fb64df3f5cd0186ef6f9cfe7f7cb2d8a79a9b | 
+PASS: [FROZEN_DATA] file hash ITC.NS | expected=7738c50af7ba94bd362bcc692d956484c7a1fb1e04abe404936330afd5cf15d6 | actual=7738c50af7ba94bd362bcc692d956484c7a1fb1e04abe404936330afd5cf15d6 | 
+PASS: [FROZEN_DATA] file hash LT.NS | expected=cb03261e2bf5258f6ae63d411b20883a4a1514ed7edb82fd2d2e1a9936f69939 | actual=cb03261e2bf5258f6ae63d411b20883a4a1514ed7edb82fd2d2e1a9936f69939 | 
+PASS: [FROZEN_DATA] file hash M&M.NS | expected=365621ce527c8bb4786389ad1aba46543c52de34979c52e260994af6c10d572d | actual=365621ce527c8bb4786389ad1aba46543c52de34979c52e260994af6c10d572d | 
+PASS: [FROZEN_DATA] file hash MARUTI.NS | expected=1c9a59fe13dbf251fb17fa2bd7b26cb90e897f5e8f667d211851770b325a7e2e | actual=1c9a59fe13dbf251fb17fa2bd7b26cb90e897f5e8f667d211851770b325a7e2e | 
+PASS: [FROZEN_DATA] file hash SBIN.NS | expected=ff8160bcac79f608e0e3e34c33086654ba85e8e1f1629f22b9cd493e6062344a | actual=ff8160bcac79f608e0e3e34c33086654ba85e8e1f1629f22b9cd493e6062344a | 
+PASS: [FROZEN_DATA] file hash SUNPHARMA.NS | expected=7a5d87ee9a6b4436fc2ff6ece9fc8d1ee915313d26b50904c521354448cfc30f | actual=7a5d87ee9a6b4436fc2ff6ece9fc8d1ee915313d26b50904c521354448cfc30f | 
+PASS: [FROZEN_DATA] file hash TCS.NS | expected=e8267ea13abc34ba48997f9eab55a76672485acc0188967cf14ee1ee65487e43 | actual=e8267ea13abc34ba48997f9eab55a76672485acc0188967cf14ee1ee65487e43 | 
+PASS: [FROZEN_DATA] file hash TITAN.NS | expected=8f3850a6fb086f1ce4c488e0d0a438d8c35741cd44a53b2cabd22755aba77a4f | actual=8f3850a6fb086f1ce4c488e0d0a438d8c35741cd44a53b2cabd22755aba77a4f | 
+PASS: [FROZEN_DATA] file hash TMCV.NS | expected=df00d781465aed785d3327859f3a096f99a2025a988305038282637ad3341d02 | actual=df00d781465aed785d3327859f3a096f99a2025a988305038282637ad3341d02 | 
+PASS: [FROZEN_DATA] file hash TMPV.NS | expected=3bc3a68b7a66811621dd7f45de975d62f90f896fa624de5fe1cdd55196437e79 | actual=3bc3a68b7a66811621dd7f45de975d62f90f896fa624de5fe1cdd55196437e79 | 
+PASS: [FROZEN_DATA] file hash WIPRO.NS | expected=58aeb1143d275e1fc446581e95f4b194795fde197af1c5a91f17bb7706f00beb | actual=58aeb1143d275e1fc446581e95f4b194795fde197af1c5a91f17bb7706f00beb | 
+PASS: [FROZEN_DATA] file hash ^NSEI | expected=f65ba87fe2f04233a8e569ced545838553eeb3b5568fcfaeaab9a4fecb0b6fe0 | actual=f65ba87fe2f04233a8e569ced545838553eeb3b5568fcfaeaab9a4fecb0b6fe0 | 
+PASS: [HASH_GATE] DATA_CONTENT_HASH | expected=2b6a2bb93fcc6c3aa80d2115a002b8cba370f61442edb592ffc9bc95eaa02e35 | actual=2b6a2bb93fcc6c3aa80d2115a002b8cba370f61442edb592ffc9bc95eaa02e35 | 
+PASS: [SOURCE_ARTIFACT] accepted candidate artifact reconstructed hash | expected=f503450e4e45711caa4a81a38d485531b765b62bd70d1e968139dbd2c55f3df6 | actual=f503450e4e45711caa4a81a38d485531b765b62bd70d1e968139dbd2c55f3df6 | parts=4
+PASS: [INTEGRATION] Signal ID unique | expected=7356 | actual=7356 | 
+PASS: [INTEGRATION] Signal Stage 3 Row ID unique | expected=7356 | actual=7356 | 
+PASS: [INTEGRATION] Opportunity Stage 3 Row ID unique | expected=1519 | actual=1519 | 
+PASS: [INTEGRATION] Position-day Stage 3 Row ID unique | expected=523 | actual=523 | 
+PASS: [INTEGRATION] No fake levels in eligible opportunities | expected=ALL PRESENT | actual=0 | 
+PASS: [INTEGRATION] Excluded signals absent from opportunities | expected=0 | actual=0 | 
+PASS: [INTEGRATION] Source parity | expected=PASS | actual=PASS | 
+PASS: [INTEGRATION] Candidate outcome parity | expected=PASS | actual=PASS | 
+PASS: [INTEGRATION] D1 shadow parity | expected=PASS | actual=PASS | 
+PASS: [INTEGRATION] Point-in-time prefix invariance | expected=0 FAIL | actual=0 | 
+PASS: [INTEGRATION] Signal market source is not future | expected=source<=asof | actual=0 | 
+PASS: [INTEGRATION] Position market source is not future | expected=source<=asof | actual=0 | 
+PASS: [INTEGRATION] No target column in feature allow-list | expected=0 | actual=0 | 
+PASS: [INTEGRATION] Feature registry consumed by ML registry | expected=0 | actual=0 | 
+PASS: [INTEGRATION] No unregistered feature in ML allow-list | expected=0 | actual=0 | 
+PASS: [INTEGRATION] Censored target rows are not manufactured failures | expected=0 target-specific labels | actual=0 | 
+PASS: [INTEGRATION] No global imputation marker | expected=NO IMPUTATION | actual=NO IMPUTATION | 
+PASS: [INTEGRATION] Current and entry regimes retained | expected=BOTH | actual=BOTH | 
+PASS: [LABEL_AVAILABILITY] ENTRY_FILLED | expected=0 violations | actual=1519 | 
+PASS: [LABEL_AVAILABILITY] T1_BEFORE_STOP_63 | expected=0 violations | actual=1519 | 
+PASS: [LABEL_AVAILABILITY] T2_BEFORE_STOP_63 | expected=0 violations | actual=1519 | 
+PASS: [LABEL_AVAILABILITY] TIME_TO_T1_SESSIONS | expected=0 violations | actual=1519 | 
+PASS: [LABEL_AVAILABILITY] TIME_TO_T2_SESSIONS | expected=0 violations | actual=1519 | 
+PASS: [LABEL_AVAILABILITY] D1_SHADOW_NET_R | expected=0 violations | actual=1519 | 
+PASS: [LABEL_AVAILABILITY] D1_EXIT_NEXT_SESSION | expected=0 violations | actual=523 | 
+PASS: [LABEL_AVAILABILITY] D1_REMAINING_NET_R | expected=0 violations | actual=523 | 
+PASS: [LABEL_AVAILABILITY] FWD_CLOSE_RETURN_10_PCT | expected=0 violations | actual=1519 | 
+PASS: [LABEL_AVAILABILITY] FWD_CLOSE_RETURN_20_PCT | expected=0 violations | actual=1519 | 
+PASS: [LABEL_AVAILABILITY] FWD_CLOSE_RETURN_30_PCT | expected=0 violations | actual=1519 | 
+PASS: [LABEL_AVAILABILITY] FWD_CLOSE_RETURN_45_PCT | expected=0 violations | actual=1519 | 
+PASS: [LABEL_AVAILABILITY] FWD_CLOSE_RETURN_63_PCT | expected=0 violations | actual=1519 | 
+PASS: [LABEL_AVAILABILITY] NEXT_5_SESSION_RETURN | expected=0 violations | actual=523 | 
+PASS: [LABEL_AVAILABILITY] NEXT_5_SESSION_MFE | expected=0 violations | actual=523 | 
+PASS: [LABEL_AVAILABILITY] NEXT_5_SESSION_MAE | expected=0 violations | actual=523 | 
+PASS: [LABEL_AVAILABILITY] NEXT_10_SESSION_RETURN | expected=0 violations | actual=523 | 
+PASS: [LABEL_AVAILABILITY] NEXT_10_SESSION_MFE | expected=0 violations | actual=523 | 
+PASS: [LABEL_AVAILABILITY] NEXT_10_SESSION_MAE | expected=0 violations | actual=523 | 
+PASS: [LABEL_AVAILABILITY] NEXT_20_SESSION_RETURN | expected=0 violations | actual=523 | 
+PASS: [LABEL_AVAILABILITY] NEXT_20_SESSION_MFE | expected=0 violations | actual=523 | 
+PASS: [LABEL_AVAILABILITY] NEXT_20_SESSION_MAE | expected=0 violations | actual=523 | 
+PASS: [HASH_GATE_POST_RUN] frozen git tag resolution | expected=c9cc9f4fcaf2fe81128365be09515fbf9fa67c28 | actual=c9cc9f4fcaf2fe81128365be09515fbf9fa67c28 | 
+PASS: [HASH_GATE_POST_RUN] frozen dependency tree equals tag | expected=NO DIFFERENCE | actual=NO DIFFERENCE | 
+PASS: [HASH_GATE_POST_RUN] Stage 2B.1 experiment ID | expected=S2B1_20160101_20260828_a681f1f8a9d9 | actual=S2B1_20160101_20260828_a681f1f8a9d9 | 
+PASS: [HASH_GATE_POST_RUN] Stage 2B.1 source package hash | expected=9bba171b9917b9d125d2487e4afa53f6cc047e0a5ccbe3055ebb3e84363d854e | actual=9bba171b9917b9d125d2487e4afa53f6cc047e0a5ccbe3055ebb3e84363d854e | {"stage2b/Stock_Alert_Stage2B_1_Dynamic_Management.py": "lf_normalized", "stage2b/calibration.py": "lf_normalized", "stage2b/diagnostics.py": "lf_normalized", "stage2b/hashing.py": "lf_normalized", "stage2b/policies.py": "lf_normalized", "stage2b/validation.py": "lf_normalized"}
+PASS: [HASH_GATE_POST_RUN] STAGE21_CODE_HASH | expected=91d3d84760c4b2427d500f0bee0f2dc0ceeb7e4f2e31d51d17a64342777993d5 | actual=91d3d84760c4b2427d500f0bee0f2dc0ceeb7e4f2e31d51d17a64342777993d5 | line_endings=raw
+PASS: [HASH_GATE_POST_RUN] STAGE221_CODE_HASH | expected=8e6514353cc32a5b8bed1212df0c12d76de11d0624e4931fda4028f0be3ed31f | actual=8e6514353cc32a5b8bed1212df0c12d76de11d0624e4931fda4028f0be3ed31f | line_endings=lf_normalized
+PASS: [HASH_GATE_POST_RUN] STAGE222_FINAL_CODE_HASH | expected=63345c591b46c656b204236d147993cb283d57fdbccd0246b7cef281d7968730 | actual=63345c591b46c656b204236d147993cb283d57fdbccd0246b7cef281d7968730 | line_endings=lf_normalized
+PASS: [HASH_GATE_POST_RUN] STRATEGY_HASH | expected=e62dc4e75c056a216cc4bdaa589a95f9553ce40e37aa6690974759b7975ad23c | actual=e62dc4e75c056a216cc4bdaa589a95f9553ce40e37aa6690974759b7975ad23c | 
+PASS: [HASH_GATE_POST_RUN] EXECUTION_BASELINE_HASH | expected=9434b39d2d7bbd8203a4674b4acdebfecf898afbc08cf7bc144729ec4b326c2b | actual=9434b39d2d7bbd8203a4674b4acdebfecf898afbc08cf7bc144729ec4b326c2b | 
+PASS: [HASH_GATE_POST_RUN] file hash AXISBANK.NS | expected=090844e8bb50f4afdf4e230928d1fb05bde1736d19ce94b359e1c47337ed64b7 | actual=090844e8bb50f4afdf4e230928d1fb05bde1736d19ce94b359e1c47337ed64b7 | 
+PASS: [HASH_GATE_POST_RUN] file hash BEL.NS | expected=a2e8e0aa064c5da8f20d5286d82aae7e98e9a6161ea11977a3bbbd14da17e309 | actual=a2e8e0aa064c5da8f20d5286d82aae7e98e9a6161ea11977a3bbbd14da17e309 | 
+PASS: [HASH_GATE_POST_RUN] file hash CIPLA.NS | expected=e318e91c77ab253593d70215c9c93e6c6aaac1a1d77922f5835f6d56495d07d1 | actual=e318e91c77ab253593d70215c9c93e6c6aaac1a1d77922f5835f6d56495d07d1 | 
+PASS: [HASH_GATE_POST_RUN] file hash HAL.NS | expected=3e225b9cb4b9fe9dd883e6ad4a65bf4c71cf0c527250c80c37b508018db45171 | actual=3e225b9cb4b9fe9dd883e6ad4a65bf4c71cf0c527250c80c37b508018db45171 | 
+PASS: [HASH_GATE_POST_RUN] file hash HCLTECH.NS | expected=2d0b90c7c8540cf5cf6d40ee227c03266ac1b560bcfb716ba48f1459f93826fd | actual=2d0b90c7c8540cf5cf6d40ee227c03266ac1b560bcfb716ba48f1459f93826fd | 
+PASS: [HASH_GATE_POST_RUN] file hash HDFCBANK.NS | expected=4ae41bfa54abf452bcd994cedaa156c75aa47febd56392c03a409931f84d025b | actual=4ae41bfa54abf452bcd994cedaa156c75aa47febd56392c03a409931f84d025b | 
+PASS: [HASH_GATE_POST_RUN] file hash HINDUNILVR.NS | expected=377213df8eeb3ee84a44bc4cb7e19d8eef4943b3df3734021a2a5a887165a5f0 | actual=377213df8eeb3ee84a44bc4cb7e19d8eef4943b3df3734021a2a5a887165a5f0 | 
+PASS: [HASH_GATE_POST_RUN] file hash ICICIBANK.NS | expected=c53cfbf3ff3da08ed5244f91fdf7c2330a2d90a586188eb8d6d5d40869e965a7 | actual=c53cfbf3ff3da08ed5244f91fdf7c2330a2d90a586188eb8d6d5d40869e965a7 | 
+PASS: [HASH_GATE_POST_RUN] file hash INFY.NS | expected=65dcde2ec4e107df2f8cd0d2ed9fb64df3f5cd0186ef6f9cfe7f7cb2d8a79a9b | actual=65dcde2ec4e107df2f8cd0d2ed9fb64df3f5cd0186ef6f9cfe7f7cb2d8a79a9b | 
+PASS: [HASH_GATE_POST_RUN] file hash ITC.NS | expected=7738c50af7ba94bd362bcc692d956484c7a1fb1e04abe404936330afd5cf15d6 | actual=7738c50af7ba94bd362bcc692d956484c7a1fb1e04abe404936330afd5cf15d6 | 
+PASS: [HASH_GATE_POST_RUN] file hash LT.NS | expected=cb03261e2bf5258f6ae63d411b20883a4a1514ed7edb82fd2d2e1a9936f69939 | actual=cb03261e2bf5258f6ae63d411b20883a4a1514ed7edb82fd2d2e1a9936f69939 | 
+PASS: [HASH_GATE_POST_RUN] file hash M&M.NS | expected=365621ce527c8bb4786389ad1aba46543c52de34979c52e260994af6c10d572d | actual=365621ce527c8bb4786389ad1aba46543c52de34979c52e260994af6c10d572d | 
+PASS: [HASH_GATE_POST_RUN] file hash MARUTI.NS | expected=1c9a59fe13dbf251fb17fa2bd7b26cb90e897f5e8f667d211851770b325a7e2e | actual=1c9a59fe13dbf251fb17fa2bd7b26cb90e897f5e8f667d211851770b325a7e2e | 
+PASS: [HASH_GATE_POST_RUN] file hash SBIN.NS | expected=ff8160bcac79f608e0e3e34c33086654ba85e8e1f1629f22b9cd493e6062344a | actual=ff8160bcac79f608e0e3e34c33086654ba85e8e1f1629f22b9cd493e6062344a | 
+PASS: [HASH_GATE_POST_RUN] file hash SUNPHARMA.NS | expected=7a5d87ee9a6b4436fc2ff6ece9fc8d1ee915313d26b50904c521354448cfc30f | actual=7a5d87ee9a6b4436fc2ff6ece9fc8d1ee915313d26b50904c521354448cfc30f | 
+PASS: [HASH_GATE_POST_RUN] file hash TCS.NS | expected=e8267ea13abc34ba48997f9eab55a76672485acc0188967cf14ee1ee65487e43 | actual=e8267ea13abc34ba48997f9eab55a76672485acc0188967cf14ee1ee65487e43 | 
+PASS: [HASH_GATE_POST_RUN] file hash TITAN.NS | expected=8f3850a6fb086f1ce4c488e0d0a438d8c35741cd44a53b2cabd22755aba77a4f | actual=8f3850a6fb086f1ce4c488e0d0a438d8c35741cd44a53b2cabd22755aba77a4f | 
+PASS: [HASH_GATE_POST_RUN] file hash TMCV.NS | expected=df00d781465aed785d3327859f3a096f99a2025a988305038282637ad3341d02 | actual=df00d781465aed785d3327859f3a096f99a2025a988305038282637ad3341d02 | 
+PASS: [HASH_GATE_POST_RUN] file hash TMPV.NS | expected=3bc3a68b7a66811621dd7f45de975d62f90f896fa624de5fe1cdd55196437e79 | actual=3bc3a68b7a66811621dd7f45de975d62f90f896fa624de5fe1cdd55196437e79 | 
+PASS: [HASH_GATE_POST_RUN] file hash WIPRO.NS | expected=58aeb1143d275e1fc446581e95f4b194795fde197af1c5a91f17bb7706f00beb | actual=58aeb1143d275e1fc446581e95f4b194795fde197af1c5a91f17bb7706f00beb | 
+PASS: [HASH_GATE_POST_RUN] file hash ^NSEI | expected=f65ba87fe2f04233a8e569ced545838553eeb3b5568fcfaeaab9a4fecb0b6fe0 | actual=f65ba87fe2f04233a8e569ced545838553eeb3b5568fcfaeaab9a4fecb0b6fe0 | 
+PASS: [HASH_GATE_POST_RUN] DATA_CONTENT_HASH | expected=2b6a2bb93fcc6c3aa80d2115a002b8cba370f61442edb592ffc9bc95eaa02e35 | actual=2b6a2bb93fcc6c3aa80d2115a002b8cba370f61442edb592ffc9bc95eaa02e35 | 
+PASS: [HASH_GATE_POST_RUN] accepted candidate artifact reconstructed hash | expected=f503450e4e45711caa4a81a38d485531b765b62bd70d1e968139dbd2c55f3df6 | actual=f503450e4e45711caa4a81a38d485531b765b62bd70d1e968139dbd2c55f3df6 | parts=4
+PASS: [HASH_GATE_POST_RUN] Stage 3 source package unchanged during execution | expected=1c06cb7e1345b10ea8b2db65aea02d54468c0da7b816bf48575f169fa8f2a23a | actual=1c06cb7e1345b10ea8b2db65aea02d54468c0da7b816bf48575f169fa8f2a23a | 
+PASS: [SELF_TESTS] all deterministic Stage 3 self-tests | expected=35 | actual=35 | 

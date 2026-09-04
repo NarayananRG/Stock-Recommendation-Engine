@@ -1,0 +1,3 @@
+Setup,Rows,Filled Opportunities,Non-Filled Opportunities,Entry Censored,Fill Rate %,T1 Positive,T1 Negative,T1 Censored,T1 Hit Rate %,T2 Positive,T2 Negative,T2 Censored,T2 Hit Rate %,Entry-Day Ambiguity Rate %,Same-Bar Ambiguity Rate %
+BREAKOUT,137,100,37,0,72.9927007299,33,66,38,33.3333333333,14,85,38,14.1414141414,0,0
+PULLBACK,1382,1047,335,0,75.7597684515,600,442,340,57.5815738964,407,635,340,39.0595009597,53.1114327062,0

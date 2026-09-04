@@ -1,0 +1,23 @@
+Target,Dataset,Rows,Available Labels,Censored Rows,Availability Before As-Of Violations,Censored Rows With Manufactured Label,Status
+ENTRY_FILLED,trade_opportunity,1519,1519,0,0,0,PASS
+T1_BEFORE_STOP_63,trade_opportunity,1519,1141,378,0,0,PASS
+T2_BEFORE_STOP_63,trade_opportunity,1519,1141,378,0,0,PASS
+TIME_TO_T1_SESSIONS,trade_opportunity,1519,1141,378,0,0,PASS
+TIME_TO_T2_SESSIONS,trade_opportunity,1519,1141,378,0,0,PASS
+D1_SHADOW_NET_R,trade_opportunity,1519,105,1414,0,0,PASS
+D1_EXIT_NEXT_SESSION,d1_position_day,523,523,0,0,0,PASS
+D1_REMAINING_NET_R,d1_position_day,523,523,0,0,0,PASS
+FWD_CLOSE_RETURN_10_PCT,trade_opportunity,1519,1141,378,0,0,PASS
+FWD_CLOSE_RETURN_20_PCT,trade_opportunity,1519,1141,378,0,0,PASS
+FWD_CLOSE_RETURN_30_PCT,trade_opportunity,1519,1141,378,0,0,PASS
+FWD_CLOSE_RETURN_45_PCT,trade_opportunity,1519,1141,378,0,0,PASS
+FWD_CLOSE_RETURN_63_PCT,trade_opportunity,1519,1141,378,0,0,PASS
+NEXT_5_SESSION_RETURN,d1_position_day,523,523,0,0,0,PASS
+NEXT_5_SESSION_MFE,d1_position_day,523,523,0,0,0,PASS
+NEXT_5_SESSION_MAE,d1_position_day,523,523,0,0,0,PASS
+NEXT_10_SESSION_RETURN,d1_position_day,523,523,0,0,0,PASS
+NEXT_10_SESSION_MFE,d1_position_day,523,523,0,0,0,PASS
+NEXT_10_SESSION_MAE,d1_position_day,523,523,0,0,0,PASS
+NEXT_20_SESSION_RETURN,d1_position_day,523,523,0,0,0,PASS
+NEXT_20_SESSION_MFE,d1_position_day,523,523,0,0,0,PASS
+NEXT_20_SESSION_MAE,d1_position_day,523,523,0,0,0,PASS

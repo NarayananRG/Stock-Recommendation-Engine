@@ -1,0 +1,43 @@
+{
+  "hash_algorithm": "SHA-256",
+  "normalization": "POSIX stage-relative paths; rows sorted by path; exact file bytes",
+  "package_hash": "1c06cb7e1345b10ea8b2db65aea02d54468c0da7b816bf48575f169fa8f2a23a",
+  "sources": [
+    {
+      "relative_path": "stage3/diagnostics.py",
+      "sha256": "3bfa2b2db550bfa9ce974b16d0cae80ba0a107a93a4b02e4a92fc83e094e6484"
+    },
+    {
+      "relative_path": "stage3/features.py",
+      "sha256": "d059529a3d729042b624bf19ff3d8ff4ff9beca514150dee93b971b912819f42"
+    },
+    {
+      "relative_path": "stage3/hashing.py",
+      "sha256": "6080f9a87e869f0aa5e2c36a248b5376e3b461f8f3def8e462fe4bb4ed1d4a45"
+    },
+    {
+      "relative_path": "stage3/labels.py",
+      "sha256": "16e50955879ce7ca9f897656fa376d9cc163a5a192cd5a24699fec741b69587c"
+    },
+    {
+      "relative_path": "stage3/opportunity_engine.py",
+      "sha256": "654089bcf2045ce72c6bfa0d3c83fbd9a1de93a1cc314498e955054ecb156887"
+    },
+    {
+      "relative_path": "stage3/position_day_builder.py",
+      "sha256": "45f3453dd20335fe3047de6d6d1c552aa435f018b5c58968e14cb13d865a2b65"
+    },
+    {
+      "relative_path": "stage3/splits.py",
+      "sha256": "fa4f2d43dc6644c108d7008151fdb03208d4a4fb484f3b153484793ec2468012"
+    },
+    {
+      "relative_path": "stage3/Stock_Alert_Stage3_Dataset_Builder.py",
+      "sha256": "30ba9bddeb7c6ac23837121c2457a5b8a27e4753e1a181ccec151b25d85f0c45"
+    },
+    {
+      "relative_path": "stage3/validation.py",
+      "sha256": "10e53071850cb9b2af94cd4ec6a11af94e88857e12e12439cd1dfe70ea8c0268"
+    }
+  ]
+}
