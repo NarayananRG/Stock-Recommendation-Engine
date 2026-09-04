@@ -1,0 +1,6 @@
+Market Regime,Rows,Filled Opportunities,Observed Non-Fills,Incomplete Entry-Window Censored,Invalid-Risk Fills,T1 Applicable,T1 Available,T1 Positive,T1 Negative,T1 Data-End Censored,T2 Applicable,T2 Available,T2 Positive,T2 Negative,T2 Data-End Censored,Fill Rate Among Resolved %
+BEAR,101,81,20,0,3,78,78,40,38,0,78,78,17,61,0,80.198019802
+BULL,235,187,48,0,1,186,186,114,72,0,186,186,76,110,0,79.5744680851
+NEUTRAL,260,214,46,0,1,213,213,89,124,0,213,213,54,159,0,82.3076923077
+STRONG BEAR,68,48,20,0,0,48,48,21,27,0,48,48,8,40,0,70.5882352941
+STRONG BULL,855,617,238,0,1,616,616,369,247,0,616,616,266,350,0,72.1637426901

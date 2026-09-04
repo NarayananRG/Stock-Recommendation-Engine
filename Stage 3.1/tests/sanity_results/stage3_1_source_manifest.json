@@ -1,0 +1,65 @@
+{
+  "package_hash": "094747e51a46db0af0392250a5aeaf7ff9b45bb0fa932b47ab3fcc44221e9bae",
+  "sources": [
+    {
+      "bytes": 4831,
+      "relative_path": "config/stage3_1_dataset_config.json",
+      "sha256": "30fd39aef558e4a7b4531842b58f8d39732cec7c0a113dac7b257eba02850d8e"
+    },
+    {
+      "bytes": 34266,
+      "relative_path": "stage3_1/Stock_Alert_Stage3_1_Dataset_Builder.py",
+      "sha256": "bb479f29b25cb1113a5424540f9c2fdbcb4e8cc86f3f53eea28cd462a2eb7a0b"
+    },
+    {
+      "bytes": 75,
+      "relative_path": "stage3_1/__init__.py",
+      "sha256": "44a70dd939aecb0094ff1d62d02403e668f824bace9f03148a46b4485982bbb0"
+    },
+    {
+      "bytes": 9400,
+      "relative_path": "stage3_1/diagnostics.py",
+      "sha256": "511725b28106698c89b2cbafbe6b9da375af53f9679de3b3f194bd1a9092d18a"
+    },
+    {
+      "bytes": 7314,
+      "relative_path": "stage3_1/features.py",
+      "sha256": "3082981d02c5ff34b1b9a6c95c85a35904c55e1a8cf33b5d653440600eb50c0f"
+    },
+    {
+      "bytes": 4886,
+      "relative_path": "stage3_1/hashing.py",
+      "sha256": "068c877fee7becfaa73406ac86a4957f2b70c0922e91c3e69e6aa43f011163d4"
+    },
+    {
+      "bytes": 13503,
+      "relative_path": "stage3_1/labels.py",
+      "sha256": "bc5299c1ca50ac9a41bc0fac0984d477249b0e8a33b99db9e472bdeba5647e15"
+    },
+    {
+      "bytes": 5487,
+      "relative_path": "stage3_1/opportunity_engine.py",
+      "sha256": "866ff7a5b63f4c479a6a93d8fd9e38e4819a5c161e66685a20f98b2b06171a60"
+    },
+    {
+      "bytes": 1910,
+      "relative_path": "stage3_1/position_day_builder.py",
+      "sha256": "8ad5cc121c7932fc853e59e19acd7b9172673765dfb661a18dbef9a226c336f8"
+    },
+    {
+      "bytes": 8071,
+      "relative_path": "stage3_1/splits.py",
+      "sha256": "ea30a7256fecda741b96a835a7b317fff6d98edbbbc4aa6e9968407406d73523"
+    },
+    {
+      "bytes": 12965,
+      "relative_path": "stage3_1/validation.py",
+      "sha256": "bdbc43b6f05479abef4292b3ccb565daf30bdb4fc4de00335836f01875d8f4d5"
+    },
+    {
+      "bytes": 16196,
+      "relative_path": "tests/run_stage3_1_tests.py",
+      "sha256": "5216864f3d24832789706e4f78931c9c1fc8bb75c3fc5f9fbf389c090a705d72"
+    }
+  ]
+}

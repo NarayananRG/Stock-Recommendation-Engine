@@ -1,0 +1,65 @@
+Type,Check,Status,Expected,Actual,Detail
+IMMUTABLE_REFERENCE,Stage 2B.1 frozen tag commit,PASS,c9cc9f4fcaf2fe81128365be09515fbf9fa67c28,c9cc9f4fcaf2fe81128365be09515fbf9fa67c28,
+IMMUTABLE_REFERENCE,Frozen dependency folders unchanged,PASS,NO DIFFERENCE,NO DIFFERENCE,
+IMMUTABLE_REFERENCE,Stage 3 worktree unchanged from branch base,PASS,NO DIFFERENCE,NO DIFFERENCE,
+STAGE3_REFERENCE,Stage 3 experiment,PASS,S3_20110830_20260828_bb15e0fa65d2,S3_20110830_20260828_bb15e0fa65d2,
+STAGE3_REFERENCE,Stage 3 code package hash,PASS,1c06cb7e1345b10ea8b2db65aea02d54468c0da7b816bf48575f169fa8f2a23a,1c06cb7e1345b10ea8b2db65aea02d54468c0da7b816bf48575f169fa8f2a23a,
+STAGE3_REFERENCE,Stage 3 schema hash,PASS,2165f7083fce198f60941080a794f4136e522012bd3ac79120d255a14a6332e8,2165f7083fce198f60941080a794f4136e522012bd3ac79120d255a14a6332e8,
+STAGE3_REFERENCE,signal_state row count,PASS,68081,68081,
+STAGE3_REFERENCE,signal_state logical content hash,PASS,672fd6774e680657849a8186e8f2b6f6b1fc900177df1a46bc2dbb671e77f029,672fd6774e680657849a8186e8f2b6f6b1fc900177df1a46bc2dbb671e77f029,
+STAGE3_REFERENCE,signal_state artifact hash,PASS,7fda3223b650de51708faa965bb607be8140bc6d50e5cb13fd877f01c0c32049,7fda3223b650de51708faa965bb607be8140bc6d50e5cb13fd877f01c0c32049,
+STAGE3_REFERENCE,trade_opportunity row count,PASS,13544,13544,
+STAGE3_REFERENCE,trade_opportunity logical content hash,PASS,50cc88c93d4f5624d500335adf96c323429313375225506d14b26f5d312795cf,50cc88c93d4f5624d500335adf96c323429313375225506d14b26f5d312795cf,
+STAGE3_REFERENCE,trade_opportunity artifact hash,PASS,abfd428823c0d384b03eaa81132871fe9936cdf4ffbcb7696a060e461ac56f0b,abfd428823c0d384b03eaa81132871fe9936cdf4ffbcb7696a060e461ac56f0b,
+STAGE3_REFERENCE,d1_position_day row count,PASS,4350,4350,
+STAGE3_REFERENCE,d1_position_day logical content hash,PASS,f01a685d82a65261e81e0ab77f7ceca6f5f8f7d93c9267fc8f345f2fbc7b2b39,f01a685d82a65261e81e0ab77f7ceca6f5f8f7d93c9267fc8f345f2fbc7b2b39,
+STAGE3_REFERENCE,d1_position_day artifact hash,PASS,b4847daf5486b45c35aa242a71121d083978f65e595c57036c9bf3ed11fcfef7,b4847daf5486b45c35aa242a71121d083978f65e595c57036c9bf3ed11fcfef7,
+INTEGRATION,Signal row count,PASS,7356,7356,
+INTEGRATION,Opportunity row count,PASS,1519,1519,
+INTEGRATION,D1 position-day row count,PASS,523,523,
+INTEGRATION,Signal IDs unique,PASS,7356,7356,
+INTEGRATION,Opportunity IDs unique,PASS,1519,1519,
+INTEGRATION,Feature registry composite key unique,PASS,0,0,
+INTEGRATION,ML registry equals feature registry per dataset,PASS,0 symmetric differences,0,
+INTEGRATION,DATE_LIKE_FEATURE_ALLOWED_COUNT,PASS,0,0,
+INTEGRATION,NIFTY Feature Source Date not FEATURE_ALLOWED,PASS,0,0,
+INTEGRATION,No target or future field FEATURE_ALLOWED,PASS,0,0,
+INTEGRATION,No incomplete window labeled non-fill,PASS,0,0,
+INTEGRATION,ENTRY_CENSORED is exact data-end alias,PASS,0,0,
+INTEGRATION,NOT_APPLICABLE distinct from DATA_END_CENSORED,PASS,0,0,
+INTEGRATION,D1 non-applicable rows are not censored,PASS,0,0,
+INTEGRATION,Label availability checks report zero violations,PASS,0,0,
+INTEGRATION,Walk-forward training availability violations,PASS,0,0,
+INTEGRATION,Point-in-time prefix audit,PASS,0,0,
+INTEGRATION,Required prefix-audit tickers present,PASS,HAL.NS|HDFCBANK.NS|INFY.NS|LT.NS|TCS.NS|TITAN.NS,HAL.NS|HDFCBANK.NS|INFY.NS|LT.NS|TCS.NS|TITAN.NS,
+INTEGRATION,Entry semantic changes only incomplete windows,PASS,ONLY INCOMPLETE WINDOW,,
+INTEGRATION,STAGE3_SIGNAL_PARITY,PASS,PASS,PASS,differences=0
+INTEGRATION,FROZEN_SIGNAL_SOURCE_PARITY,PASS,PASS,PASS,differences=0
+INTEGRATION,STAGE3_OPPORTUNITY_MEMBERSHIP_PARITY,PASS,PASS,PASS,differences=0
+INTEGRATION,COMPLETE_WINDOW_OR_FILLED_ENTRY_PARITY,PASS,PASS,PASS,differences=0
+INTEGRATION,STAGE3_STABLE_TARGET_NUMERICAL_PARITY,PASS,PASS,PASS,differences=0
+INTEGRATION,D1_POSITION_DAY_CURRENT_STATE_PARITY,PASS,PASS,PASS,differences=0
+LABEL_AVAILABILITY,trade_opportunity::ENTRY_FILLED,PASS,0,0,explicit violation count; total_rows=1519
+LABEL_AVAILABILITY,trade_opportunity::T1_BEFORE_STOP_63,PASS,0,0,explicit violation count; total_rows=1519
+LABEL_AVAILABILITY,trade_opportunity::T2_BEFORE_STOP_63,PASS,0,0,explicit violation count; total_rows=1519
+LABEL_AVAILABILITY,trade_opportunity::TIME_TO_T1_SESSIONS,PASS,0,0,explicit violation count; total_rows=1519
+LABEL_AVAILABILITY,trade_opportunity::TIME_TO_T2_SESSIONS,PASS,0,0,explicit violation count; total_rows=1519
+LABEL_AVAILABILITY,trade_opportunity::D1_SHADOW_NET_R,PASS,0,0,explicit violation count; total_rows=1519
+LABEL_AVAILABILITY,d1_position_day::D1_EXIT_NEXT_SESSION,PASS,0,0,explicit violation count; total_rows=523
+LABEL_AVAILABILITY,d1_position_day::D1_REMAINING_NET_R,PASS,0,0,explicit violation count; total_rows=523
+LABEL_AVAILABILITY,trade_opportunity::FWD_CLOSE_RETURN_10_ENTRY_INCLUSIVE_PCT,PASS,0,0,explicit violation count; total_rows=1519
+LABEL_AVAILABILITY,trade_opportunity::FWD_CLOSE_RETURN_20_ENTRY_INCLUSIVE_PCT,PASS,0,0,explicit violation count; total_rows=1519
+LABEL_AVAILABILITY,trade_opportunity::FWD_CLOSE_RETURN_30_ENTRY_INCLUSIVE_PCT,PASS,0,0,explicit violation count; total_rows=1519
+LABEL_AVAILABILITY,trade_opportunity::FWD_CLOSE_RETURN_45_ENTRY_INCLUSIVE_PCT,PASS,0,0,explicit violation count; total_rows=1519
+LABEL_AVAILABILITY,trade_opportunity::FWD_CLOSE_RETURN_63_ENTRY_INCLUSIVE_PCT,PASS,0,0,explicit violation count; total_rows=1519
+LABEL_AVAILABILITY,d1_position_day::NEXT_5_SESSION_RETURN,PASS,0,0,explicit violation count; total_rows=523
+LABEL_AVAILABILITY,d1_position_day::NEXT_5_SESSION_MFE,PASS,0,0,explicit violation count; total_rows=523
+LABEL_AVAILABILITY,d1_position_day::NEXT_5_SESSION_MAE,PASS,0,0,explicit violation count; total_rows=523
+LABEL_AVAILABILITY,d1_position_day::NEXT_10_SESSION_RETURN,PASS,0,0,explicit violation count; total_rows=523
+LABEL_AVAILABILITY,d1_position_day::NEXT_10_SESSION_MFE,PASS,0,0,explicit violation count; total_rows=523
+LABEL_AVAILABILITY,d1_position_day::NEXT_10_SESSION_MAE,PASS,0,0,explicit violation count; total_rows=523
+LABEL_AVAILABILITY,d1_position_day::NEXT_20_SESSION_RETURN,PASS,0,0,explicit violation count; total_rows=523
+LABEL_AVAILABILITY,d1_position_day::NEXT_20_SESSION_MFE,PASS,0,0,explicit violation count; total_rows=523
+LABEL_AVAILABILITY,d1_position_day::NEXT_20_SESSION_MAE,PASS,0,0,explicit violation count; total_rows=523
+SELF_TEST,60 deterministic semantic assertions,PASS,0,0,
+IMMUTABLE_REFERENCE,Stage 3 directory hash unchanged during execution,PASS,0b8957ac07bf4911b2854a767949272c9636e4c60b9d7a2c534cf5a7c213670b,0b8957ac07bf4911b2854a767949272c9636e4c60b9d7a2c534cf5a7c213670b,

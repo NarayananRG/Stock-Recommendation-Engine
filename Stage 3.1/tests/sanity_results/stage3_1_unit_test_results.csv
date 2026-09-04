@@ -1,0 +1,61 @@
+Test Number,Test,Status,Detail,Runtime Milliseconds
+1,immutable tag resolution,PASS,assertion satisfied,77.264
+2,Stage 2B.1 package hash,PASS,assertion satisfied,4.269
+3,frozen data hashes,PASS,assertion satisfied,0.831
+4,Signal ID uniqueness,PASS,assertion satisfied,2.259
+5,Stage 3.1 Row ID determinism,PASS,assertion satisfied,0.008
+6,signal source parity,PASS,assertion satisfied,0.214
+7,valid opportunity eligibility,PASS,assertion satisfied,0.199
+8,no fake levels,PASS,assertion satisfied,1.202
+9,pullback fill,PASS,assertion satisfied,0.673
+10,breakout fill,PASS,assertion satisfied,0.529
+11,buy-limit ceiling,PASS,assertion satisfied,1.834
+12,entry-day ambiguity flag,PASS,assertion satisfied,0.256
+13,stop/T1 same-bar conservative semantics,PASS,assertion satisfied,0.388
+14,stop/T2 same-bar conservative semantics,PASS,assertion satisfied,0.355
+15,T1 label,PASS,assertion satisfied,0.635
+16,T2 label,PASS,assertion satisfied,1.05
+17,target time,PASS,assertion satisfied,1.619
+18,forward return 10,PASS,assertion satisfied,0.112
+19,forward return 63,PASS,assertion satisfied,0.079
+20,MFE calculation,PASS,assertion satisfied,0.648
+21,MAE calculation,PASS,assertion satisfied,0.559
+22,conservative entry-day MFE,PASS,assertion satisfied,0.265
+23,censored late-history row,PASS,assertion satisfied,0.351
+24,label-available date,PASS,assertion satisfied,5.002
+25,fold-training cutoff,PASS,assertion satisfied,0.201
+26,no future row in training,PASS,assertion satisfied,1.485
+27,no target column in feature allow-list,PASS,assertion satisfied,0.003
+28,no global imputation,PASS,assertion satisfied,11.938
+29,current vs entry regime,PASS,assertion satisfied,0.055
+30,D1 shadow parity,PASS,assertion satisfied,1.316
+31,position-day future-label separation,PASS,assertion satisfied,0.839
+32,package hash portability,PASS,assertion satisfied,0.1
+33,dataset content hash determinism,PASS,assertion satisfied,0.006
+34,no future NIFTY fill,PASS,assertion satisfied,18.227
+35,prefix-invariance audit,PASS,assertion satisfied,0.293
+36,pullback no future session => entry data-end censored,PASS,assertion satisfied,7.091
+37,pullback 1 of 5 sessions/no fill => censored,PASS,assertion satisfied,6.378
+38,pullback 2 of 5 sessions/no fill => censored,PASS,assertion satisfied,5.922
+39,pullback 3 of 5 sessions/no fill => censored,PASS,assertion satisfied,6.029
+40,pullback 4 of 5 sessions/no fill => censored,PASS,assertion satisfied,7.64
+41,pullback 5 of 5 sessions/no fill => genuine non-fill,PASS,assertion satisfied,12.557
+42,"incomplete window but early fill => valid fill, not censored",PASS,assertion satisfied,12.551
+43,"nonfilled opportunity => T1 NOT_APPLICABLE, not censored",PASS,assertion satisfied,1.121
+44,invalid-risk fill => T1 NOT_APPLICABLE,PASS,assertion satisfied,0.904
+45,filled unresolved late row => true DATA_END_CENSORED,PASS,assertion satisfied,1.572
+46,D1 non-primary opportunity => D1 NOT_APPLICABLE,PASS,assertion satisfied,1.085
+47,applicable D1 end-of-data trajectory => true censoring,PASS,assertion satisfied,0.491
+48,raw date fields cannot be FEATURE_ALLOWED,PASS,assertion satisfied,2.755
+49,NIFTY Feature Source Date explicitly not FEATURE_ALLOWED,PASS,assertion satisfied,0.527
+50,feature registry composite key uniqueness,PASS,assertion satisfied,0.627
+51,same feature name can have distinct dataset semantics,PASS,assertion satisfied,1.415
+52,ML registry equals feature registry per dataset,PASS,assertion satisfied,0.004
+53,entry-inclusive forward alias exact equality,PASS,assertion satisfied,0.963
+54,time-to-target marked conditional,PASS,assertion satisfied,0.657
+55,"validation report uses violation count, not row count",PASS,assertion satisfied,0.012
+56,not-applicable rows never receive manufactured target values,PASS,assertion satisfied,1.191
+57,censored rows never receive manufactured final labels,PASS,assertion satisfied,0.941
+58,complete Stage 3 stable cohort numerical parity,PASS,assertion satisfied,0.165
+59,incomplete-window differences only in documented rows,PASS,assertion satisfied,0.556
+60,walk-forward training requires AVAILABLE and APPLICABLE,PASS,assertion satisfied,0.287

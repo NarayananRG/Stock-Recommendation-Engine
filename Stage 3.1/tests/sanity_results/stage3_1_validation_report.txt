@@ -1,0 +1,66 @@
+STAGE 3.1 VALIDATION REPORT
+========================================================================
+[PASS] IMMUTABLE_REFERENCE :: Stage 2B.1 frozen tag commit :: expected=c9cc9f4fcaf2fe81128365be09515fbf9fa67c28 :: actual=c9cc9f4fcaf2fe81128365be09515fbf9fa67c28 :: 
+[PASS] IMMUTABLE_REFERENCE :: Frozen dependency folders unchanged :: expected=NO DIFFERENCE :: actual=NO DIFFERENCE :: 
+[PASS] IMMUTABLE_REFERENCE :: Stage 3 worktree unchanged from branch base :: expected=NO DIFFERENCE :: actual=NO DIFFERENCE :: 
+[PASS] STAGE3_REFERENCE :: Stage 3 experiment :: expected=S3_20110830_20260828_bb15e0fa65d2 :: actual=S3_20110830_20260828_bb15e0fa65d2 :: 
+[PASS] STAGE3_REFERENCE :: Stage 3 code package hash :: expected=1c06cb7e1345b10ea8b2db65aea02d54468c0da7b816bf48575f169fa8f2a23a :: actual=1c06cb7e1345b10ea8b2db65aea02d54468c0da7b816bf48575f169fa8f2a23a :: 
+[PASS] STAGE3_REFERENCE :: Stage 3 schema hash :: expected=2165f7083fce198f60941080a794f4136e522012bd3ac79120d255a14a6332e8 :: actual=2165f7083fce198f60941080a794f4136e522012bd3ac79120d255a14a6332e8 :: 
+[PASS] STAGE3_REFERENCE :: signal_state row count :: expected=68081 :: actual=68081 :: 
+[PASS] STAGE3_REFERENCE :: signal_state logical content hash :: expected=672fd6774e680657849a8186e8f2b6f6b1fc900177df1a46bc2dbb671e77f029 :: actual=672fd6774e680657849a8186e8f2b6f6b1fc900177df1a46bc2dbb671e77f029 :: 
+[PASS] STAGE3_REFERENCE :: signal_state artifact hash :: expected=7fda3223b650de51708faa965bb607be8140bc6d50e5cb13fd877f01c0c32049 :: actual=7fda3223b650de51708faa965bb607be8140bc6d50e5cb13fd877f01c0c32049 :: 
+[PASS] STAGE3_REFERENCE :: trade_opportunity row count :: expected=13544 :: actual=13544 :: 
+[PASS] STAGE3_REFERENCE :: trade_opportunity logical content hash :: expected=50cc88c93d4f5624d500335adf96c323429313375225506d14b26f5d312795cf :: actual=50cc88c93d4f5624d500335adf96c323429313375225506d14b26f5d312795cf :: 
+[PASS] STAGE3_REFERENCE :: trade_opportunity artifact hash :: expected=abfd428823c0d384b03eaa81132871fe9936cdf4ffbcb7696a060e461ac56f0b :: actual=abfd428823c0d384b03eaa81132871fe9936cdf4ffbcb7696a060e461ac56f0b :: 
+[PASS] STAGE3_REFERENCE :: d1_position_day row count :: expected=4350 :: actual=4350 :: 
+[PASS] STAGE3_REFERENCE :: d1_position_day logical content hash :: expected=f01a685d82a65261e81e0ab77f7ceca6f5f8f7d93c9267fc8f345f2fbc7b2b39 :: actual=f01a685d82a65261e81e0ab77f7ceca6f5f8f7d93c9267fc8f345f2fbc7b2b39 :: 
+[PASS] STAGE3_REFERENCE :: d1_position_day artifact hash :: expected=b4847daf5486b45c35aa242a71121d083978f65e595c57036c9bf3ed11fcfef7 :: actual=b4847daf5486b45c35aa242a71121d083978f65e595c57036c9bf3ed11fcfef7 :: 
+[PASS] INTEGRATION :: Signal row count :: expected=7356 :: actual=7356 :: 
+[PASS] INTEGRATION :: Opportunity row count :: expected=1519 :: actual=1519 :: 
+[PASS] INTEGRATION :: D1 position-day row count :: expected=523 :: actual=523 :: 
+[PASS] INTEGRATION :: Signal IDs unique :: expected=7356 :: actual=7356 :: 
+[PASS] INTEGRATION :: Opportunity IDs unique :: expected=1519 :: actual=1519 :: 
+[PASS] INTEGRATION :: Feature registry composite key unique :: expected=0 :: actual=0 :: 
+[PASS] INTEGRATION :: ML registry equals feature registry per dataset :: expected=0 symmetric differences :: actual=0 :: 
+[PASS] INTEGRATION :: DATE_LIKE_FEATURE_ALLOWED_COUNT :: expected=0 :: actual=0 :: 
+[PASS] INTEGRATION :: NIFTY Feature Source Date not FEATURE_ALLOWED :: expected=0 :: actual=0 :: 
+[PASS] INTEGRATION :: No target or future field FEATURE_ALLOWED :: expected=0 :: actual=0 :: 
+[PASS] INTEGRATION :: No incomplete window labeled non-fill :: expected=0 :: actual=0 :: 
+[PASS] INTEGRATION :: ENTRY_CENSORED is exact data-end alias :: expected=0 :: actual=0 :: 
+[PASS] INTEGRATION :: NOT_APPLICABLE distinct from DATA_END_CENSORED :: expected=0 :: actual=0 :: 
+[PASS] INTEGRATION :: D1 non-applicable rows are not censored :: expected=0 :: actual=0 :: 
+[PASS] INTEGRATION :: Label availability checks report zero violations :: expected=0 :: actual=0 :: 
+[PASS] INTEGRATION :: Walk-forward training availability violations :: expected=0 :: actual=0 :: 
+[PASS] INTEGRATION :: Point-in-time prefix audit :: expected=0 :: actual=0 :: 
+[PASS] INTEGRATION :: Required prefix-audit tickers present :: expected=HAL.NS|HDFCBANK.NS|INFY.NS|LT.NS|TCS.NS|TITAN.NS :: actual=HAL.NS|HDFCBANK.NS|INFY.NS|LT.NS|TCS.NS|TITAN.NS :: 
+[PASS] INTEGRATION :: Entry semantic changes only incomplete windows :: expected=ONLY INCOMPLETE WINDOW :: actual= :: 
+[PASS] INTEGRATION :: STAGE3_SIGNAL_PARITY :: expected=PASS :: actual=PASS :: differences=0
+[PASS] INTEGRATION :: FROZEN_SIGNAL_SOURCE_PARITY :: expected=PASS :: actual=PASS :: differences=0
+[PASS] INTEGRATION :: STAGE3_OPPORTUNITY_MEMBERSHIP_PARITY :: expected=PASS :: actual=PASS :: differences=0
+[PASS] INTEGRATION :: COMPLETE_WINDOW_OR_FILLED_ENTRY_PARITY :: expected=PASS :: actual=PASS :: differences=0
+[PASS] INTEGRATION :: STAGE3_STABLE_TARGET_NUMERICAL_PARITY :: expected=PASS :: actual=PASS :: differences=0
+[PASS] INTEGRATION :: D1_POSITION_DAY_CURRENT_STATE_PARITY :: expected=PASS :: actual=PASS :: differences=0
+[PASS] LABEL_AVAILABILITY :: trade_opportunity::ENTRY_FILLED :: expected=0 :: actual=0 :: explicit violation count; total_rows=1519
+[PASS] LABEL_AVAILABILITY :: trade_opportunity::T1_BEFORE_STOP_63 :: expected=0 :: actual=0 :: explicit violation count; total_rows=1519
+[PASS] LABEL_AVAILABILITY :: trade_opportunity::T2_BEFORE_STOP_63 :: expected=0 :: actual=0 :: explicit violation count; total_rows=1519
+[PASS] LABEL_AVAILABILITY :: trade_opportunity::TIME_TO_T1_SESSIONS :: expected=0 :: actual=0 :: explicit violation count; total_rows=1519
+[PASS] LABEL_AVAILABILITY :: trade_opportunity::TIME_TO_T2_SESSIONS :: expected=0 :: actual=0 :: explicit violation count; total_rows=1519
+[PASS] LABEL_AVAILABILITY :: trade_opportunity::D1_SHADOW_NET_R :: expected=0 :: actual=0 :: explicit violation count; total_rows=1519
+[PASS] LABEL_AVAILABILITY :: d1_position_day::D1_EXIT_NEXT_SESSION :: expected=0 :: actual=0 :: explicit violation count; total_rows=523
+[PASS] LABEL_AVAILABILITY :: d1_position_day::D1_REMAINING_NET_R :: expected=0 :: actual=0 :: explicit violation count; total_rows=523
+[PASS] LABEL_AVAILABILITY :: trade_opportunity::FWD_CLOSE_RETURN_10_ENTRY_INCLUSIVE_PCT :: expected=0 :: actual=0 :: explicit violation count; total_rows=1519
+[PASS] LABEL_AVAILABILITY :: trade_opportunity::FWD_CLOSE_RETURN_20_ENTRY_INCLUSIVE_PCT :: expected=0 :: actual=0 :: explicit violation count; total_rows=1519
+[PASS] LABEL_AVAILABILITY :: trade_opportunity::FWD_CLOSE_RETURN_30_ENTRY_INCLUSIVE_PCT :: expected=0 :: actual=0 :: explicit violation count; total_rows=1519
+[PASS] LABEL_AVAILABILITY :: trade_opportunity::FWD_CLOSE_RETURN_45_ENTRY_INCLUSIVE_PCT :: expected=0 :: actual=0 :: explicit violation count; total_rows=1519
+[PASS] LABEL_AVAILABILITY :: trade_opportunity::FWD_CLOSE_RETURN_63_ENTRY_INCLUSIVE_PCT :: expected=0 :: actual=0 :: explicit violation count; total_rows=1519
+[PASS] LABEL_AVAILABILITY :: d1_position_day::NEXT_5_SESSION_RETURN :: expected=0 :: actual=0 :: explicit violation count; total_rows=523
+[PASS] LABEL_AVAILABILITY :: d1_position_day::NEXT_5_SESSION_MFE :: expected=0 :: actual=0 :: explicit violation count; total_rows=523
+[PASS] LABEL_AVAILABILITY :: d1_position_day::NEXT_5_SESSION_MAE :: expected=0 :: actual=0 :: explicit violation count; total_rows=523
+[PASS] LABEL_AVAILABILITY :: d1_position_day::NEXT_10_SESSION_RETURN :: expected=0 :: actual=0 :: explicit violation count; total_rows=523
+[PASS] LABEL_AVAILABILITY :: d1_position_day::NEXT_10_SESSION_MFE :: expected=0 :: actual=0 :: explicit violation count; total_rows=523
+[PASS] LABEL_AVAILABILITY :: d1_position_day::NEXT_10_SESSION_MAE :: expected=0 :: actual=0 :: explicit violation count; total_rows=523
+[PASS] LABEL_AVAILABILITY :: d1_position_day::NEXT_20_SESSION_RETURN :: expected=0 :: actual=0 :: explicit violation count; total_rows=523
+[PASS] LABEL_AVAILABILITY :: d1_position_day::NEXT_20_SESSION_MFE :: expected=0 :: actual=0 :: explicit violation count; total_rows=523
+[PASS] LABEL_AVAILABILITY :: d1_position_day::NEXT_20_SESSION_MAE :: expected=0 :: actual=0 :: explicit violation count; total_rows=523
+[PASS] SELF_TEST :: 60 deterministic semantic assertions :: expected=0 :: actual=0 :: 
+[PASS] IMMUTABLE_REFERENCE :: Stage 3 directory hash unchanged during execution :: expected=0b8957ac07bf4911b2854a767949272c9636e4c60b9d7a2c534cf5a7c213670b :: actual=0b8957ac07bf4911b2854a767949272c9636e4c60b9d7a2c534cf5a7c213670b :: 

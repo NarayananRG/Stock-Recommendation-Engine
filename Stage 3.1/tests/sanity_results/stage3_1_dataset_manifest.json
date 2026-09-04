@@ -1,0 +1,2191 @@
+{
+  "STAGE3_1_SCHEMA_HASH": "7e6fb19e0618c70c9ea04300b2825bf674ac14322ab24eb1c958145781a6d2c4",
+  "canonical_content": {
+    "column_order": "artifact order",
+    "dates": "YYYY-MM-DD",
+    "encoding": "UTF-8",
+    "floats": "%.12g",
+    "gzip_mtime": 0,
+    "line_ending": "LF",
+    "nan": "<NA>"
+  },
+  "datasets": [
+    {
+      "artifact": "stage3_1_signal_state_dataset.csv.gz",
+      "artifact_hash": "6e6be0ee52a2f9a2e0ac7a0df71776006e28748fb610b9ca959f8cce03296d62",
+      "artifact_size_bytes": 3207137,
+      "column_count": 133,
+      "content_hash": "32fe10d823791c0b5f80c5c2d558f81e0ad1172233fb6098ee2833f6c9d476e0",
+      "dataset_name": "signal_state",
+      "row_count": 7356,
+      "schema": [
+        {
+          "column": "Experiment ID",
+          "dtype": "str"
+        },
+        {
+          "column": "STRATEGY_HASH",
+          "dtype": "str"
+        },
+        {
+          "column": "EXECUTION_HASH",
+          "dtype": "str"
+        },
+        {
+          "column": "STAGE21_CODE_HASH",
+          "dtype": "str"
+        },
+        {
+          "column": "STAGE222_CODE_HASH",
+          "dtype": "str"
+        },
+        {
+          "column": "DATA_CONTENT_HASH",
+          "dtype": "str"
+        },
+        {
+          "column": "MANIFEST_DOCUMENT_HASH",
+          "dtype": "str"
+        },
+        {
+          "column": "Survivorship Bias Warning",
+          "dtype": "str"
+        },
+        {
+          "column": "Ticker",
+          "dtype": "str"
+        },
+        {
+          "column": "Signal Date",
+          "dtype": "datetime64[us]"
+        },
+        {
+          "column": "Signal",
+          "dtype": "str"
+        },
+        {
+          "column": "Setup",
+          "dtype": "str"
+        },
+        {
+          "column": "Trade Quality",
+          "dtype": "str"
+        },
+        {
+          "column": "Technical Score",
+          "dtype": "int64"
+        },
+        {
+          "column": "Actionability Score",
+          "dtype": "int64"
+        },
+        {
+          "column": "Market Regime",
+          "dtype": "str"
+        },
+        {
+          "column": "Market Score",
+          "dtype": "int64"
+        },
+        {
+          "column": "Price",
+          "dtype": "float64"
+        },
+        {
+          "column": "Entry Low",
+          "dtype": "float64"
+        },
+        {
+          "column": "Entry High",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stop Loss",
+          "dtype": "float64"
+        },
+        {
+          "column": "Target 1",
+          "dtype": "float64"
+        },
+        {
+          "column": "Target 2",
+          "dtype": "float64"
+        },
+        {
+          "column": "R:R T1",
+          "dtype": "float64"
+        },
+        {
+          "column": "R:R T2",
+          "dtype": "float64"
+        },
+        {
+          "column": "Daily RSI",
+          "dtype": "float64"
+        },
+        {
+          "column": "Weekly RSI",
+          "dtype": "float64"
+        },
+        {
+          "column": "ADX",
+          "dtype": "float64"
+        },
+        {
+          "column": "Daily ST",
+          "dtype": "str"
+        },
+        {
+          "column": "Weekly ST",
+          "dtype": "str"
+        },
+        {
+          "column": "20 DMA",
+          "dtype": "float64"
+        },
+        {
+          "column": "50 DMA",
+          "dtype": "float64"
+        },
+        {
+          "column": "200 DMA",
+          "dtype": "float64"
+        },
+        {
+          "column": "Volume Ratio",
+          "dtype": "float64"
+        },
+        {
+          "column": "RS 20D",
+          "dtype": "float64"
+        },
+        {
+          "column": "RS 60D",
+          "dtype": "float64"
+        },
+        {
+          "column": "RS 120D",
+          "dtype": "float64"
+        },
+        {
+          "column": "Distance 20DMA %",
+          "dtype": "float64"
+        },
+        {
+          "column": "Distance 50DMA %",
+          "dtype": "float64"
+        },
+        {
+          "column": "Trend Structure",
+          "dtype": "str"
+        },
+        {
+          "column": "Overextended",
+          "dtype": "bool"
+        },
+        {
+          "column": "Support Type",
+          "dtype": "str"
+        },
+        {
+          "column": "Support",
+          "dtype": "float64"
+        },
+        {
+          "column": "Resistance 1",
+          "dtype": "float64"
+        },
+        {
+          "column": "Resistance 2",
+          "dtype": "float64"
+        },
+        {
+          "column": "Signal ID",
+          "dtype": "str"
+        },
+        {
+          "column": "Candidate Status",
+          "dtype": "str"
+        },
+        {
+          "column": "Candidate Entry Date",
+          "dtype": "datetime64[us]"
+        },
+        {
+          "column": "Candidate Exit Date",
+          "dtype": "datetime64[us]"
+        },
+        {
+          "column": "Candidate Entry Method",
+          "dtype": "str"
+        },
+        {
+          "column": "Candidate Exit Reason",
+          "dtype": "str"
+        },
+        {
+          "column": "Candidate Nominal Entry",
+          "dtype": "float64"
+        },
+        {
+          "column": "Candidate Executed Entry",
+          "dtype": "float64"
+        },
+        {
+          "column": "Candidate Nominal Exit",
+          "dtype": "float64"
+        },
+        {
+          "column": "Candidate Executed Exit",
+          "dtype": "float64"
+        },
+        {
+          "column": "Candidate Net PnL",
+          "dtype": "float64"
+        },
+        {
+          "column": "Candidate Net Return %",
+          "dtype": "float64"
+        },
+        {
+          "column": "Candidate R Multiple",
+          "dtype": "float64"
+        },
+        {
+          "column": "Candidate Result",
+          "dtype": "str"
+        },
+        {
+          "column": "Candidate Bars Held",
+          "dtype": "float64"
+        },
+        {
+          "column": "Candidate Entry-Bar Ambiguity",
+          "dtype": "object"
+        },
+        {
+          "column": "Candidate Research Scope",
+          "dtype": "str"
+        },
+        {
+          "column": "Original Signal",
+          "dtype": "str"
+        },
+        {
+          "column": "Feature As-Of Date",
+          "dtype": "datetime64[us]"
+        },
+        {
+          "column": "Earliest Trading Action Date Rule",
+          "dtype": "str"
+        },
+        {
+          "column": "Dataset Cohort",
+          "dtype": "str"
+        },
+        {
+          "column": "Source Experiment ID",
+          "dtype": "str"
+        },
+        {
+          "column": "Stage 3 Experiment ID",
+          "dtype": "str"
+        },
+        {
+          "column": "STAGE3_ROW_ID",
+          "dtype": "str"
+        },
+        {
+          "column": "Stock Open",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock High",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock Low",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock Close",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock Volume",
+          "dtype": "int64"
+        },
+        {
+          "column": "Stock SMA20",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock SMA50",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock SMA200",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock ATR",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock ATR %",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock Daily ST",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock Daily ST Direction",
+          "dtype": "int64"
+        },
+        {
+          "column": "Stock Weekly ST",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock Weekly ST Direction",
+          "dtype": "int64"
+        },
+        {
+          "column": "Stock Average Volume 20",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock Return 1D %",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock Return 5D %",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock Return 10D %",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock Return 20D %",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock Return 60D %",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock Realized Volatility 10D %",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock Realized Volatility 20D %",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock Range / ATR",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock Same-Day Gap %",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock Relative Volume 5D",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock Relative Volume 20D",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock Swing Low 10",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock Recent High 20",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock Breakout High 20",
+          "dtype": "float64"
+        },
+        {
+          "column": "RS20 Cross-Sectional Percentile",
+          "dtype": "float64"
+        },
+        {
+          "column": "RS60 Cross-Sectional Percentile",
+          "dtype": "float64"
+        },
+        {
+          "column": "RS120 Cross-Sectional Percentile",
+          "dtype": "float64"
+        },
+        {
+          "column": "NIFTY Feature Source Date",
+          "dtype": "datetime64[us]"
+        },
+        {
+          "column": "NIFTY Close",
+          "dtype": "float64"
+        },
+        {
+          "column": "NIFTY SMA20",
+          "dtype": "float64"
+        },
+        {
+          "column": "NIFTY SMA50",
+          "dtype": "float64"
+        },
+        {
+          "column": "NIFTY SMA200",
+          "dtype": "float64"
+        },
+        {
+          "column": "NIFTY Daily RSI",
+          "dtype": "float64"
+        },
+        {
+          "column": "NIFTY Weekly RSI",
+          "dtype": "float64"
+        },
+        {
+          "column": "NIFTY ADX",
+          "dtype": "float64"
+        },
+        {
+          "column": "NIFTY Daily ST Direction",
+          "dtype": "int64"
+        },
+        {
+          "column": "NIFTY Weekly ST Direction",
+          "dtype": "int64"
+        },
+        {
+          "column": "NIFTY Regime",
+          "dtype": "str"
+        },
+        {
+          "column": "NIFTY Market Score",
+          "dtype": "int64"
+        },
+        {
+          "column": "NIFTY ATR %",
+          "dtype": "float64"
+        },
+        {
+          "column": "NIFTY Daily ST",
+          "dtype": "float64"
+        },
+        {
+          "column": "NIFTY Weekly ST",
+          "dtype": "float64"
+        },
+        {
+          "column": "NIFTY Distance SMA20 %",
+          "dtype": "float64"
+        },
+        {
+          "column": "NIFTY Distance SMA50 %",
+          "dtype": "float64"
+        },
+        {
+          "column": "NIFTY Distance SMA200 %",
+          "dtype": "float64"
+        },
+        {
+          "column": "NIFTY Return 5D %",
+          "dtype": "float64"
+        },
+        {
+          "column": "NIFTY Return 20D %",
+          "dtype": "float64"
+        },
+        {
+          "column": "NIFTY Return 60D %",
+          "dtype": "float64"
+        },
+        {
+          "column": "NIFTY Rolling Volatility 20D %",
+          "dtype": "float64"
+        },
+        {
+          "column": "NIFTY Drawdown From 252D High %",
+          "dtype": "float64"
+        },
+        {
+          "column": "Distance To Support %",
+          "dtype": "float64"
+        },
+        {
+          "column": "Distance To T1 %",
+          "dtype": "float64"
+        },
+        {
+          "column": "Distance To T2 %",
+          "dtype": "float64"
+        },
+        {
+          "column": "Initial Risk %",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stop Distance ATR",
+          "dtype": "float64"
+        },
+        {
+          "column": "T1 Distance ATR",
+          "dtype": "float64"
+        },
+        {
+          "column": "T2 Distance ATR",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stage 3.1 Experiment ID",
+          "dtype": "str"
+        },
+        {
+          "column": "STAGE3_1_ROW_ID",
+          "dtype": "str"
+        }
+      ]
+    },
+    {
+      "artifact": "stage3_1_trade_opportunity_dataset.csv.gz",
+      "artifact_hash": "1066e2bd4ffa3e43ddf749849b9ac79cf41cdbbe1b8e99bde26730b189f852d4",
+      "artifact_size_bytes": 1176323,
+      "column_count": 296,
+      "content_hash": "4203b5727b54ccbd53255e5ded97c5a24bbbc27c1a95f7705e9743d9f5cb93c8",
+      "dataset_name": "trade_opportunity",
+      "row_count": 1519,
+      "schema": [
+        {
+          "column": "Experiment ID",
+          "dtype": "str"
+        },
+        {
+          "column": "STRATEGY_HASH",
+          "dtype": "str"
+        },
+        {
+          "column": "EXECUTION_HASH",
+          "dtype": "str"
+        },
+        {
+          "column": "STAGE21_CODE_HASH",
+          "dtype": "str"
+        },
+        {
+          "column": "STAGE222_CODE_HASH",
+          "dtype": "str"
+        },
+        {
+          "column": "DATA_CONTENT_HASH",
+          "dtype": "str"
+        },
+        {
+          "column": "MANIFEST_DOCUMENT_HASH",
+          "dtype": "str"
+        },
+        {
+          "column": "Survivorship Bias Warning",
+          "dtype": "str"
+        },
+        {
+          "column": "Ticker",
+          "dtype": "str"
+        },
+        {
+          "column": "Signal Date",
+          "dtype": "datetime64[us]"
+        },
+        {
+          "column": "Signal",
+          "dtype": "str"
+        },
+        {
+          "column": "Setup",
+          "dtype": "str"
+        },
+        {
+          "column": "Trade Quality",
+          "dtype": "str"
+        },
+        {
+          "column": "Technical Score",
+          "dtype": "int64"
+        },
+        {
+          "column": "Actionability Score",
+          "dtype": "int64"
+        },
+        {
+          "column": "Market Regime",
+          "dtype": "str"
+        },
+        {
+          "column": "Market Score",
+          "dtype": "int64"
+        },
+        {
+          "column": "Price",
+          "dtype": "float64"
+        },
+        {
+          "column": "Entry Low",
+          "dtype": "float64"
+        },
+        {
+          "column": "Entry High",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stop Loss",
+          "dtype": "float64"
+        },
+        {
+          "column": "Target 1",
+          "dtype": "float64"
+        },
+        {
+          "column": "Target 2",
+          "dtype": "float64"
+        },
+        {
+          "column": "R:R T1",
+          "dtype": "float64"
+        },
+        {
+          "column": "R:R T2",
+          "dtype": "float64"
+        },
+        {
+          "column": "Daily RSI",
+          "dtype": "float64"
+        },
+        {
+          "column": "Weekly RSI",
+          "dtype": "float64"
+        },
+        {
+          "column": "ADX",
+          "dtype": "float64"
+        },
+        {
+          "column": "Daily ST",
+          "dtype": "str"
+        },
+        {
+          "column": "Weekly ST",
+          "dtype": "str"
+        },
+        {
+          "column": "20 DMA",
+          "dtype": "float64"
+        },
+        {
+          "column": "50 DMA",
+          "dtype": "float64"
+        },
+        {
+          "column": "200 DMA",
+          "dtype": "float64"
+        },
+        {
+          "column": "Volume Ratio",
+          "dtype": "float64"
+        },
+        {
+          "column": "RS 20D",
+          "dtype": "float64"
+        },
+        {
+          "column": "RS 60D",
+          "dtype": "float64"
+        },
+        {
+          "column": "RS 120D",
+          "dtype": "float64"
+        },
+        {
+          "column": "Distance 20DMA %",
+          "dtype": "float64"
+        },
+        {
+          "column": "Distance 50DMA %",
+          "dtype": "float64"
+        },
+        {
+          "column": "Trend Structure",
+          "dtype": "str"
+        },
+        {
+          "column": "Overextended",
+          "dtype": "bool"
+        },
+        {
+          "column": "Support Type",
+          "dtype": "str"
+        },
+        {
+          "column": "Support",
+          "dtype": "float64"
+        },
+        {
+          "column": "Resistance 1",
+          "dtype": "float64"
+        },
+        {
+          "column": "Resistance 2",
+          "dtype": "float64"
+        },
+        {
+          "column": "Signal ID",
+          "dtype": "str"
+        },
+        {
+          "column": "Candidate Status",
+          "dtype": "str"
+        },
+        {
+          "column": "Candidate Entry Date",
+          "dtype": "datetime64[us]"
+        },
+        {
+          "column": "Candidate Exit Date",
+          "dtype": "datetime64[us]"
+        },
+        {
+          "column": "Candidate Entry Method",
+          "dtype": "str"
+        },
+        {
+          "column": "Candidate Exit Reason",
+          "dtype": "str"
+        },
+        {
+          "column": "Candidate Nominal Entry",
+          "dtype": "float64"
+        },
+        {
+          "column": "Candidate Executed Entry",
+          "dtype": "float64"
+        },
+        {
+          "column": "Candidate Nominal Exit",
+          "dtype": "float64"
+        },
+        {
+          "column": "Candidate Executed Exit",
+          "dtype": "float64"
+        },
+        {
+          "column": "Candidate Net PnL",
+          "dtype": "float64"
+        },
+        {
+          "column": "Candidate Net Return %",
+          "dtype": "float64"
+        },
+        {
+          "column": "Candidate R Multiple",
+          "dtype": "float64"
+        },
+        {
+          "column": "Candidate Result",
+          "dtype": "str"
+        },
+        {
+          "column": "Candidate Bars Held",
+          "dtype": "float64"
+        },
+        {
+          "column": "Candidate Entry-Bar Ambiguity",
+          "dtype": "object"
+        },
+        {
+          "column": "Candidate Research Scope",
+          "dtype": "str"
+        },
+        {
+          "column": "Original Signal",
+          "dtype": "str"
+        },
+        {
+          "column": "Feature As-Of Date",
+          "dtype": "datetime64[us]"
+        },
+        {
+          "column": "Earliest Trading Action Date Rule",
+          "dtype": "str"
+        },
+        {
+          "column": "Dataset Cohort",
+          "dtype": "str"
+        },
+        {
+          "column": "Source Experiment ID",
+          "dtype": "str"
+        },
+        {
+          "column": "Stage 3 Experiment ID",
+          "dtype": "str"
+        },
+        {
+          "column": "STAGE3_ROW_ID",
+          "dtype": "str"
+        },
+        {
+          "column": "Stock Open",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock High",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock Low",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock Close",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock Volume",
+          "dtype": "int64"
+        },
+        {
+          "column": "Stock SMA20",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock SMA50",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock SMA200",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock ATR",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock ATR %",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock Daily ST",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock Daily ST Direction",
+          "dtype": "int64"
+        },
+        {
+          "column": "Stock Weekly ST",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock Weekly ST Direction",
+          "dtype": "int64"
+        },
+        {
+          "column": "Stock Average Volume 20",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock Return 1D %",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock Return 5D %",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock Return 10D %",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock Return 20D %",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock Return 60D %",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock Realized Volatility 10D %",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock Realized Volatility 20D %",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock Range / ATR",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock Same-Day Gap %",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock Relative Volume 5D",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock Relative Volume 20D",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock Swing Low 10",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock Recent High 20",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stock Breakout High 20",
+          "dtype": "float64"
+        },
+        {
+          "column": "RS20 Cross-Sectional Percentile",
+          "dtype": "float64"
+        },
+        {
+          "column": "RS60 Cross-Sectional Percentile",
+          "dtype": "float64"
+        },
+        {
+          "column": "RS120 Cross-Sectional Percentile",
+          "dtype": "float64"
+        },
+        {
+          "column": "NIFTY Feature Source Date",
+          "dtype": "datetime64[us]"
+        },
+        {
+          "column": "NIFTY Close",
+          "dtype": "float64"
+        },
+        {
+          "column": "NIFTY SMA20",
+          "dtype": "float64"
+        },
+        {
+          "column": "NIFTY SMA50",
+          "dtype": "float64"
+        },
+        {
+          "column": "NIFTY SMA200",
+          "dtype": "float64"
+        },
+        {
+          "column": "NIFTY Daily RSI",
+          "dtype": "float64"
+        },
+        {
+          "column": "NIFTY Weekly RSI",
+          "dtype": "float64"
+        },
+        {
+          "column": "NIFTY ADX",
+          "dtype": "float64"
+        },
+        {
+          "column": "NIFTY Daily ST Direction",
+          "dtype": "int64"
+        },
+        {
+          "column": "NIFTY Weekly ST Direction",
+          "dtype": "int64"
+        },
+        {
+          "column": "NIFTY Regime",
+          "dtype": "str"
+        },
+        {
+          "column": "NIFTY Market Score",
+          "dtype": "int64"
+        },
+        {
+          "column": "NIFTY ATR %",
+          "dtype": "float64"
+        },
+        {
+          "column": "NIFTY Daily ST",
+          "dtype": "float64"
+        },
+        {
+          "column": "NIFTY Weekly ST",
+          "dtype": "float64"
+        },
+        {
+          "column": "NIFTY Distance SMA20 %",
+          "dtype": "float64"
+        },
+        {
+          "column": "NIFTY Distance SMA50 %",
+          "dtype": "float64"
+        },
+        {
+          "column": "NIFTY Distance SMA200 %",
+          "dtype": "float64"
+        },
+        {
+          "column": "NIFTY Return 5D %",
+          "dtype": "float64"
+        },
+        {
+          "column": "NIFTY Return 20D %",
+          "dtype": "float64"
+        },
+        {
+          "column": "NIFTY Return 60D %",
+          "dtype": "float64"
+        },
+        {
+          "column": "NIFTY Rolling Volatility 20D %",
+          "dtype": "float64"
+        },
+        {
+          "column": "NIFTY Drawdown From 252D High %",
+          "dtype": "float64"
+        },
+        {
+          "column": "Distance To Support %",
+          "dtype": "float64"
+        },
+        {
+          "column": "Distance To T1 %",
+          "dtype": "float64"
+        },
+        {
+          "column": "Distance To T2 %",
+          "dtype": "float64"
+        },
+        {
+          "column": "Initial Risk %",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stop Distance ATR",
+          "dtype": "float64"
+        },
+        {
+          "column": "T1 Distance ATR",
+          "dtype": "float64"
+        },
+        {
+          "column": "T2 Distance ATR",
+          "dtype": "float64"
+        },
+        {
+          "column": "Opportunity Eligible",
+          "dtype": "bool"
+        },
+        {
+          "column": "Opportunity Eligibility Reason",
+          "dtype": "str"
+        },
+        {
+          "column": "ENTRY_FILLED",
+          "dtype": "boolean"
+        },
+        {
+          "column": "ENTRY_DATE",
+          "dtype": "datetime64[us]"
+        },
+        {
+          "column": "ENTRY_LABEL_AVAILABLE_DATE",
+          "dtype": "datetime64[us]"
+        },
+        {
+          "column": "ENTRY_CENSORED",
+          "dtype": "boolean"
+        },
+        {
+          "column": "ENTRY_SESSIONS_TO_FILL",
+          "dtype": "float64"
+        },
+        {
+          "column": "NOMINAL_ENTRY",
+          "dtype": "float64"
+        },
+        {
+          "column": "EXECUTED_ENTRY",
+          "dtype": "float64"
+        },
+        {
+          "column": "ENTRY_METHOD",
+          "dtype": "str"
+        },
+        {
+          "column": "ENTRY_INTRADAY_LIMIT",
+          "dtype": "bool"
+        },
+        {
+          "column": "ENTRY_DAY_SEQUENCE_AMBIGUOUS",
+          "dtype": "bool"
+        },
+        {
+          "column": "ENTRY_RISK_VALID",
+          "dtype": "bool"
+        },
+        {
+          "column": "INITIAL_RISK_PER_SHARE",
+          "dtype": "float64"
+        },
+        {
+          "column": "ENTRY_STATUS",
+          "dtype": "string"
+        },
+        {
+          "column": "LABEL_SEMANTICS",
+          "dtype": "str"
+        },
+        {
+          "column": "OUTCOME_SEQUENCE_AMBIGUOUS",
+          "dtype": "bool"
+        },
+        {
+          "column": "CENSORED",
+          "dtype": "boolean"
+        },
+        {
+          "column": "STOP_SESSIONS",
+          "dtype": "float64"
+        },
+        {
+          "column": "TARGET_TIME_LABEL_AVAILABLE_DATE",
+          "dtype": "datetime64[us]"
+        },
+        {
+          "column": "T1_BEFORE_STOP_63",
+          "dtype": "object"
+        },
+        {
+          "column": "STOP_BEFORE_T1_63",
+          "dtype": "object"
+        },
+        {
+          "column": "T1_SESSIONS",
+          "dtype": "float64"
+        },
+        {
+          "column": "T1_RESOLUTION_DATE",
+          "dtype": "datetime64[us]"
+        },
+        {
+          "column": "T1_LABEL_AVAILABLE_DATE",
+          "dtype": "datetime64[us]"
+        },
+        {
+          "column": "T1_CENSORED",
+          "dtype": "boolean"
+        },
+        {
+          "column": "T1_LABEL_OUTCOME",
+          "dtype": "str"
+        },
+        {
+          "column": "T2_BEFORE_STOP_63",
+          "dtype": "object"
+        },
+        {
+          "column": "STOP_BEFORE_T2_63",
+          "dtype": "object"
+        },
+        {
+          "column": "T2_SESSIONS",
+          "dtype": "float64"
+        },
+        {
+          "column": "T2_RESOLUTION_DATE",
+          "dtype": "datetime64[us]"
+        },
+        {
+          "column": "T2_LABEL_AVAILABLE_DATE",
+          "dtype": "datetime64[us]"
+        },
+        {
+          "column": "T2_CENSORED",
+          "dtype": "boolean"
+        },
+        {
+          "column": "T2_LABEL_OUTCOME",
+          "dtype": "str"
+        },
+        {
+          "column": "FWD_CLOSE_RETURN_10_PCT",
+          "dtype": "float64"
+        },
+        {
+          "column": "FWD_CLOSE_RETURN_10_R",
+          "dtype": "float64"
+        },
+        {
+          "column": "FWD_10_AVAILABLE_DATE",
+          "dtype": "datetime64[us]"
+        },
+        {
+          "column": "FWD_10_CENSORED",
+          "dtype": "boolean"
+        },
+        {
+          "column": "MFE_R_10_FULL_BAR_DIAGNOSTIC",
+          "dtype": "float64"
+        },
+        {
+          "column": "MAE_R_10_FULL_BAR_DIAGNOSTIC",
+          "dtype": "float64"
+        },
+        {
+          "column": "MFE_R_10_CONSERVATIVE",
+          "dtype": "float64"
+        },
+        {
+          "column": "MAE_R_10_CONSERVATIVE",
+          "dtype": "float64"
+        },
+        {
+          "column": "MFE_PCT_10_CONSERVATIVE",
+          "dtype": "float64"
+        },
+        {
+          "column": "MAE_PCT_10_CONSERVATIVE",
+          "dtype": "float64"
+        },
+        {
+          "column": "FWD_CLOSE_RETURN_20_PCT",
+          "dtype": "float64"
+        },
+        {
+          "column": "FWD_CLOSE_RETURN_20_R",
+          "dtype": "float64"
+        },
+        {
+          "column": "FWD_20_AVAILABLE_DATE",
+          "dtype": "datetime64[us]"
+        },
+        {
+          "column": "FWD_20_CENSORED",
+          "dtype": "boolean"
+        },
+        {
+          "column": "MFE_R_20_FULL_BAR_DIAGNOSTIC",
+          "dtype": "float64"
+        },
+        {
+          "column": "MAE_R_20_FULL_BAR_DIAGNOSTIC",
+          "dtype": "float64"
+        },
+        {
+          "column": "MFE_R_20_CONSERVATIVE",
+          "dtype": "float64"
+        },
+        {
+          "column": "MAE_R_20_CONSERVATIVE",
+          "dtype": "float64"
+        },
+        {
+          "column": "MFE_PCT_20_CONSERVATIVE",
+          "dtype": "float64"
+        },
+        {
+          "column": "MAE_PCT_20_CONSERVATIVE",
+          "dtype": "float64"
+        },
+        {
+          "column": "FWD_CLOSE_RETURN_30_PCT",
+          "dtype": "float64"
+        },
+        {
+          "column": "FWD_CLOSE_RETURN_30_R",
+          "dtype": "float64"
+        },
+        {
+          "column": "FWD_30_AVAILABLE_DATE",
+          "dtype": "datetime64[us]"
+        },
+        {
+          "column": "FWD_30_CENSORED",
+          "dtype": "boolean"
+        },
+        {
+          "column": "MFE_R_30_FULL_BAR_DIAGNOSTIC",
+          "dtype": "float64"
+        },
+        {
+          "column": "MAE_R_30_FULL_BAR_DIAGNOSTIC",
+          "dtype": "float64"
+        },
+        {
+          "column": "MFE_R_30_CONSERVATIVE",
+          "dtype": "float64"
+        },
+        {
+          "column": "MAE_R_30_CONSERVATIVE",
+          "dtype": "float64"
+        },
+        {
+          "column": "MFE_PCT_30_CONSERVATIVE",
+          "dtype": "float64"
+        },
+        {
+          "column": "MAE_PCT_30_CONSERVATIVE",
+          "dtype": "float64"
+        },
+        {
+          "column": "FWD_CLOSE_RETURN_45_PCT",
+          "dtype": "float64"
+        },
+        {
+          "column": "FWD_CLOSE_RETURN_45_R",
+          "dtype": "float64"
+        },
+        {
+          "column": "FWD_45_AVAILABLE_DATE",
+          "dtype": "datetime64[us]"
+        },
+        {
+          "column": "FWD_45_CENSORED",
+          "dtype": "boolean"
+        },
+        {
+          "column": "MFE_R_45_FULL_BAR_DIAGNOSTIC",
+          "dtype": "float64"
+        },
+        {
+          "column": "MAE_R_45_FULL_BAR_DIAGNOSTIC",
+          "dtype": "float64"
+        },
+        {
+          "column": "MFE_R_45_CONSERVATIVE",
+          "dtype": "float64"
+        },
+        {
+          "column": "MAE_R_45_CONSERVATIVE",
+          "dtype": "float64"
+        },
+        {
+          "column": "MFE_PCT_45_CONSERVATIVE",
+          "dtype": "float64"
+        },
+        {
+          "column": "MAE_PCT_45_CONSERVATIVE",
+          "dtype": "float64"
+        },
+        {
+          "column": "FWD_CLOSE_RETURN_63_PCT",
+          "dtype": "float64"
+        },
+        {
+          "column": "FWD_CLOSE_RETURN_63_R",
+          "dtype": "float64"
+        },
+        {
+          "column": "FWD_63_AVAILABLE_DATE",
+          "dtype": "datetime64[us]"
+        },
+        {
+          "column": "FWD_63_CENSORED",
+          "dtype": "boolean"
+        },
+        {
+          "column": "MFE_R_63_FULL_BAR_DIAGNOSTIC",
+          "dtype": "float64"
+        },
+        {
+          "column": "MAE_R_63_FULL_BAR_DIAGNOSTIC",
+          "dtype": "float64"
+        },
+        {
+          "column": "MFE_R_63_CONSERVATIVE",
+          "dtype": "float64"
+        },
+        {
+          "column": "MAE_R_63_CONSERVATIVE",
+          "dtype": "float64"
+        },
+        {
+          "column": "MFE_PCT_63_CONSERVATIVE",
+          "dtype": "float64"
+        },
+        {
+          "column": "MAE_PCT_63_CONSERVATIVE",
+          "dtype": "float64"
+        },
+        {
+          "column": "TIME_TO_T1_SESSIONS",
+          "dtype": "float64"
+        },
+        {
+          "column": "TIME_TO_T2_SESSIONS",
+          "dtype": "float64"
+        },
+        {
+          "column": "BASELINE_COMPAT_T1_EXIT_DATE",
+          "dtype": "datetime64[us]"
+        },
+        {
+          "column": "BASELINE_COMPAT_T1_EXIT_REASON",
+          "dtype": "str"
+        },
+        {
+          "column": "BASELINE_COMPAT_T1_BARS_HELD",
+          "dtype": "float64"
+        },
+        {
+          "column": "BASELINE_COMPAT_T1_NOMINAL_EXIT",
+          "dtype": "float64"
+        },
+        {
+          "column": "BASELINE_COMPAT_T1_EXECUTED_EXIT",
+          "dtype": "float64"
+        },
+        {
+          "column": "BASELINE_COMPAT_T1_NET_R",
+          "dtype": "float64"
+        },
+        {
+          "column": "BASELINE_COMPAT_ENTRY_BAR_AMBIGUITY",
+          "dtype": "object"
+        },
+        {
+          "column": "D1_SHADOW_EXIT_DATE",
+          "dtype": "datetime64[us]"
+        },
+        {
+          "column": "D1_SHADOW_EXIT_REASON",
+          "dtype": "str"
+        },
+        {
+          "column": "D1_SHADOW_BARS_HELD",
+          "dtype": "float64"
+        },
+        {
+          "column": "D1_SHADOW_NOMINAL_EXIT",
+          "dtype": "float64"
+        },
+        {
+          "column": "D1_SHADOW_EXECUTED_EXIT",
+          "dtype": "float64"
+        },
+        {
+          "column": "D1_SHADOW_STOP_REVISION_COUNT",
+          "dtype": "float64"
+        },
+        {
+          "column": "D1_SHADOW_NET_R",
+          "dtype": "float64"
+        },
+        {
+          "column": "D1_SHADOW_NET_RETURN_PCT",
+          "dtype": "float64"
+        },
+        {
+          "column": "D1_SHADOW_LABEL_AVAILABLE_DATE",
+          "dtype": "datetime64[us]"
+        },
+        {
+          "column": "D1_SHADOW_CENSORED",
+          "dtype": "boolean"
+        },
+        {
+          "column": "D1_SHADOW_LABEL_TYPE",
+          "dtype": "str"
+        },
+        {
+          "column": "D1_SHADOW_OUTCOME_SEQUENCE_AMBIGUOUS",
+          "dtype": "object"
+        },
+        {
+          "column": "ENTRY_WINDOW_REQUIRED_SESSIONS",
+          "dtype": "Int64"
+        },
+        {
+          "column": "ENTRY_WINDOW_OBSERVED_SESSIONS",
+          "dtype": "Int64"
+        },
+        {
+          "column": "ENTRY_WINDOW_COMPLETE",
+          "dtype": "boolean"
+        },
+        {
+          "column": "ENTRY_APPLICABLE",
+          "dtype": "boolean"
+        },
+        {
+          "column": "ENTRY_DATA_END_CENSORED",
+          "dtype": "boolean"
+        },
+        {
+          "column": "ENTRY_UNAVAILABLE_REASON",
+          "dtype": "string"
+        },
+        {
+          "column": "T1_APPLICABLE",
+          "dtype": "boolean"
+        },
+        {
+          "column": "T1_STATUS",
+          "dtype": "string"
+        },
+        {
+          "column": "T1_DATA_END_CENSORED",
+          "dtype": "boolean"
+        },
+        {
+          "column": "T1_UNAVAILABLE_REASON",
+          "dtype": "string"
+        },
+        {
+          "column": "TIME_TO_T1_APPLICABLE",
+          "dtype": "boolean"
+        },
+        {
+          "column": "TIME_TO_T1_STATUS",
+          "dtype": "string"
+        },
+        {
+          "column": "TIME_TO_T1_DATA_END_CENSORED",
+          "dtype": "boolean"
+        },
+        {
+          "column": "TIME_TO_T1_UNAVAILABLE_REASON",
+          "dtype": "string"
+        },
+        {
+          "column": "TIME_TO_T1_AVAILABLE_DATE",
+          "dtype": "datetime64[us]"
+        },
+        {
+          "column": "T2_APPLICABLE",
+          "dtype": "boolean"
+        },
+        {
+          "column": "T2_STATUS",
+          "dtype": "string"
+        },
+        {
+          "column": "T2_DATA_END_CENSORED",
+          "dtype": "boolean"
+        },
+        {
+          "column": "T2_UNAVAILABLE_REASON",
+          "dtype": "string"
+        },
+        {
+          "column": "TIME_TO_T2_APPLICABLE",
+          "dtype": "boolean"
+        },
+        {
+          "column": "TIME_TO_T2_STATUS",
+          "dtype": "string"
+        },
+        {
+          "column": "TIME_TO_T2_DATA_END_CENSORED",
+          "dtype": "boolean"
+        },
+        {
+          "column": "TIME_TO_T2_UNAVAILABLE_REASON",
+          "dtype": "string"
+        },
+        {
+          "column": "TIME_TO_T2_AVAILABLE_DATE",
+          "dtype": "datetime64[us]"
+        },
+        {
+          "column": "FWD_10_APPLICABLE",
+          "dtype": "boolean"
+        },
+        {
+          "column": "FWD_10_STATUS",
+          "dtype": "string"
+        },
+        {
+          "column": "FWD_10_DATA_END_CENSORED",
+          "dtype": "boolean"
+        },
+        {
+          "column": "FWD_10_UNAVAILABLE_REASON",
+          "dtype": "string"
+        },
+        {
+          "column": "FWD_CLOSE_RETURN_10_ENTRY_INCLUSIVE_PCT",
+          "dtype": "float64"
+        },
+        {
+          "column": "FWD_CLOSE_RETURN_10_ENTRY_INCLUSIVE_R",
+          "dtype": "float64"
+        },
+        {
+          "column": "FWD_20_APPLICABLE",
+          "dtype": "boolean"
+        },
+        {
+          "column": "FWD_20_STATUS",
+          "dtype": "string"
+        },
+        {
+          "column": "FWD_20_DATA_END_CENSORED",
+          "dtype": "boolean"
+        },
+        {
+          "column": "FWD_20_UNAVAILABLE_REASON",
+          "dtype": "string"
+        },
+        {
+          "column": "FWD_CLOSE_RETURN_20_ENTRY_INCLUSIVE_PCT",
+          "dtype": "float64"
+        },
+        {
+          "column": "FWD_CLOSE_RETURN_20_ENTRY_INCLUSIVE_R",
+          "dtype": "float64"
+        },
+        {
+          "column": "FWD_30_APPLICABLE",
+          "dtype": "boolean"
+        },
+        {
+          "column": "FWD_30_STATUS",
+          "dtype": "string"
+        },
+        {
+          "column": "FWD_30_DATA_END_CENSORED",
+          "dtype": "boolean"
+        },
+        {
+          "column": "FWD_30_UNAVAILABLE_REASON",
+          "dtype": "string"
+        },
+        {
+          "column": "FWD_CLOSE_RETURN_30_ENTRY_INCLUSIVE_PCT",
+          "dtype": "float64"
+        },
+        {
+          "column": "FWD_CLOSE_RETURN_30_ENTRY_INCLUSIVE_R",
+          "dtype": "float64"
+        },
+        {
+          "column": "FWD_45_APPLICABLE",
+          "dtype": "boolean"
+        },
+        {
+          "column": "FWD_45_STATUS",
+          "dtype": "string"
+        },
+        {
+          "column": "FWD_45_DATA_END_CENSORED",
+          "dtype": "boolean"
+        },
+        {
+          "column": "FWD_45_UNAVAILABLE_REASON",
+          "dtype": "string"
+        },
+        {
+          "column": "FWD_CLOSE_RETURN_45_ENTRY_INCLUSIVE_PCT",
+          "dtype": "float64"
+        },
+        {
+          "column": "FWD_CLOSE_RETURN_45_ENTRY_INCLUSIVE_R",
+          "dtype": "float64"
+        },
+        {
+          "column": "FWD_63_APPLICABLE",
+          "dtype": "boolean"
+        },
+        {
+          "column": "FWD_63_STATUS",
+          "dtype": "string"
+        },
+        {
+          "column": "FWD_63_DATA_END_CENSORED",
+          "dtype": "boolean"
+        },
+        {
+          "column": "FWD_63_UNAVAILABLE_REASON",
+          "dtype": "string"
+        },
+        {
+          "column": "FWD_CLOSE_RETURN_63_ENTRY_INCLUSIVE_PCT",
+          "dtype": "float64"
+        },
+        {
+          "column": "FWD_CLOSE_RETURN_63_ENTRY_INCLUSIVE_R",
+          "dtype": "float64"
+        },
+        {
+          "column": "D1_SHADOW_APPLICABLE",
+          "dtype": "boolean"
+        },
+        {
+          "column": "D1_SHADOW_STATUS",
+          "dtype": "string"
+        },
+        {
+          "column": "D1_SHADOW_DATA_END_CENSORED",
+          "dtype": "boolean"
+        },
+        {
+          "column": "D1_SHADOW_UNAVAILABLE_REASON",
+          "dtype": "string"
+        },
+        {
+          "column": "Stage 3.1 Experiment ID",
+          "dtype": "str"
+        },
+        {
+          "column": "STAGE3_1_ROW_ID",
+          "dtype": "str"
+        }
+      ]
+    },
+    {
+      "artifact": "stage3_1_d1_position_day_dataset.csv.gz",
+      "artifact_hash": "1c8003d59f1563efcd9a9c826e83ed3ffeefa2166fe606df40af0ccb28ad9cc0",
+      "artifact_size_bytes": 173723,
+      "column_count": 107,
+      "content_hash": "8492fcebcea3df31767b0407322c83abbf17fd64b5f8588869ce21a1e32c5727",
+      "dataset_name": "d1_position_day",
+      "row_count": 523,
+      "schema": [
+        {
+          "column": "Signal ID",
+          "dtype": "str"
+        },
+        {
+          "column": "Ticker",
+          "dtype": "str"
+        },
+        {
+          "column": "Signal Date",
+          "dtype": "datetime64[us]"
+        },
+        {
+          "column": "Setup",
+          "dtype": "str"
+        },
+        {
+          "column": "Original Signal",
+          "dtype": "str"
+        },
+        {
+          "column": "Dataset Cohort",
+          "dtype": "str"
+        },
+        {
+          "column": "Source Experiment ID",
+          "dtype": "str"
+        },
+        {
+          "column": "Stage 3 Experiment ID",
+          "dtype": "str"
+        },
+        {
+          "column": "Entry Date",
+          "dtype": "datetime64[us]"
+        },
+        {
+          "column": "Management Date",
+          "dtype": "datetime64[us]"
+        },
+        {
+          "column": "Feature As-Of Date",
+          "dtype": "datetime64[us]"
+        },
+        {
+          "column": "Days Held",
+          "dtype": "int64"
+        },
+        {
+          "column": "Executed Entry",
+          "dtype": "float64"
+        },
+        {
+          "column": "Initial Stop",
+          "dtype": "float64"
+        },
+        {
+          "column": "Previous Session Stop",
+          "dtype": "float64"
+        },
+        {
+          "column": "Current Stop",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stop Effective Semantics",
+          "dtype": "str"
+        },
+        {
+          "column": "Original T1",
+          "dtype": "float64"
+        },
+        {
+          "column": "Original T2",
+          "dtype": "float64"
+        },
+        {
+          "column": "Current R",
+          "dtype": "float64"
+        },
+        {
+          "column": "Current MFE Conservative To Date",
+          "dtype": "float64"
+        },
+        {
+          "column": "Current MAE Conservative To Date",
+          "dtype": "float64"
+        },
+        {
+          "column": "Current MFE Full Bar Diagnostic To Date",
+          "dtype": "float64"
+        },
+        {
+          "column": "Current MAE Full Bar Diagnostic To Date",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stop Distance R",
+          "dtype": "float64"
+        },
+        {
+          "column": "T1 Distance R",
+          "dtype": "float64"
+        },
+        {
+          "column": "T2 Distance R",
+          "dtype": "float64"
+        },
+        {
+          "column": "Stop Revision Count",
+          "dtype": "int64"
+        },
+        {
+          "column": "Entry Market Regime",
+          "dtype": "str"
+        },
+        {
+          "column": "Entry Technical Score",
+          "dtype": "int64"
+        },
+        {
+          "column": "Entry Actionability Score",
+          "dtype": "int64"
+        },
+        {
+          "column": "ENTRY_DAY_SEQUENCE_AMBIGUOUS",
+          "dtype": "bool"
+        },
+        {
+          "column": "EXIT_DAY_SEQUENCE_AMBIGUOUS",
+          "dtype": "bool"
+        },
+        {
+          "column": "LABEL_SEMANTICS",
+          "dtype": "str"
+        },
+        {
+          "column": "Current Close",
+          "dtype": "float64"
+        },
+        {
+          "column": "SMA20",
+          "dtype": "float64"
+        },
+        {
+          "column": "SMA50",
+          "dtype": "float64"
+        },
+        {
+          "column": "SMA200",
+          "dtype": "float64"
+        },
+        {
+          "column": "Daily ST",
+          "dtype": "float64"
+        },
+        {
+          "column": "Daily ST Direction",
+          "dtype": "int64"
+        },
+        {
+          "column": "Weekly ST",
+          "dtype": "float64"
+        },
+        {
+          "column": "Weekly ST Direction",
+          "dtype": "int64"
+        },
+        {
+          "column": "RSI",
+          "dtype": "float64"
+        },
+        {
+          "column": "Weekly RSI",
+          "dtype": "float64"
+        },
+        {
+          "column": "ADX",
+          "dtype": "float64"
+        },
+        {
+          "column": "ATR",
+          "dtype": "float64"
+        },
+        {
+          "column": "RS20",
+          "dtype": "float64"
+        },
+        {
+          "column": "RS60",
+          "dtype": "float64"
+        },
+        {
+          "column": "RS120",
+          "dtype": "float64"
+        },
+        {
+          "column": "Current Stock Return 5D %",
+          "dtype": "float64"
+        },
+        {
+          "column": "Current Stock Return 20D %",
+          "dtype": "float64"
+        },
+        {
+          "column": "Current Stock Realized Volatility 20D %",
+          "dtype": "float64"
+        },
+        {
+          "column": "Current Volume Ratio",
+          "dtype": "float64"
+        },
+        {
+          "column": "Current Market Regime",
+          "dtype": "str"
+        },
+        {
+          "column": "Current NIFTY Close",
+          "dtype": "float64"
+        },
+        {
+          "column": "Current NIFTY Daily RSI",
+          "dtype": "float64"
+        },
+        {
+          "column": "Current NIFTY Weekly RSI",
+          "dtype": "float64"
+        },
+        {
+          "column": "Current NIFTY ADX",
+          "dtype": "float64"
+        },
+        {
+          "column": "Current NIFTY ATR %",
+          "dtype": "float64"
+        },
+        {
+          "column": "Current NIFTY Daily ST Direction",
+          "dtype": "int64"
+        },
+        {
+          "column": "Current NIFTY Weekly ST Direction",
+          "dtype": "int64"
+        },
+        {
+          "column": "Current NIFTY Return 5D %",
+          "dtype": "float64"
+        },
+        {
+          "column": "Current NIFTY Return 20D %",
+          "dtype": "float64"
+        },
+        {
+          "column": "Current NIFTY Volatility 20D %",
+          "dtype": "float64"
+        },
+        {
+          "column": "Current NIFTY Drawdown 252D %",
+          "dtype": "float64"
+        },
+        {
+          "column": "Current Market Feature Source Date",
+          "dtype": "datetime64[us]"
+        },
+        {
+          "column": "STAGE3_ROW_ID",
+          "dtype": "str"
+        },
+        {
+          "column": "D1_EXIT_NEXT_SESSION",
+          "dtype": "bool"
+        },
+        {
+          "column": "D1_REMAINING_SESSIONS",
+          "dtype": "int64"
+        },
+        {
+          "column": "D1_REMAINING_NET_R",
+          "dtype": "float64"
+        },
+        {
+          "column": "D1_FINAL_EXIT_REASON",
+          "dtype": "str"
+        },
+        {
+          "column": "ORIGINAL_T2_REACHED_BEFORE_D1_EXIT",
+          "dtype": "bool"
+        },
+        {
+          "column": "D1_LABEL_AVAILABLE_DATE",
+          "dtype": "datetime64[us]"
+        },
+        {
+          "column": "D1_LABEL_CENSORED",
+          "dtype": "boolean"
+        },
+        {
+          "column": "NEXT_5_SESSION_CENSORED",
+          "dtype": "boolean"
+        },
+        {
+          "column": "NEXT_5_SESSION_LABEL_AVAILABLE_DATE",
+          "dtype": "datetime64[us]"
+        },
+        {
+          "column": "NEXT_5_SESSION_RETURN",
+          "dtype": "float64"
+        },
+        {
+          "column": "NEXT_5_SESSION_MFE",
+          "dtype": "float64"
+        },
+        {
+          "column": "NEXT_5_SESSION_MAE",
+          "dtype": "float64"
+        },
+        {
+          "column": "NEXT_10_SESSION_CENSORED",
+          "dtype": "boolean"
+        },
+        {
+          "column": "NEXT_10_SESSION_LABEL_AVAILABLE_DATE",
+          "dtype": "datetime64[us]"
+        },
+        {
+          "column": "NEXT_10_SESSION_RETURN",
+          "dtype": "float64"
+        },
+        {
+          "column": "NEXT_10_SESSION_MFE",
+          "dtype": "float64"
+        },
+        {
+          "column": "NEXT_10_SESSION_MAE",
+          "dtype": "float64"
+        },
+        {
+          "column": "NEXT_20_SESSION_CENSORED",
+          "dtype": "boolean"
+        },
+        {
+          "column": "NEXT_20_SESSION_LABEL_AVAILABLE_DATE",
+          "dtype": "datetime64[us]"
+        },
+        {
+          "column": "NEXT_20_SESSION_RETURN",
+          "dtype": "float64"
+        },
+        {
+          "column": "NEXT_20_SESSION_MFE",
+          "dtype": "float64"
+        },
+        {
+          "column": "NEXT_20_SESSION_MAE",
+          "dtype": "float64"
+        },
+        {
+          "column": "D1_FINAL_APPLICABLE",
+          "dtype": "boolean"
+        },
+        {
+          "column": "D1_FINAL_STATUS",
+          "dtype": "string"
+        },
+        {
+          "column": "D1_FINAL_DATA_END_CENSORED",
+          "dtype": "boolean"
+        },
+        {
+          "column": "D1_FINAL_UNAVAILABLE_REASON",
+          "dtype": "string"
+        },
+        {
+          "column": "NEXT_5_SESSION_APPLICABLE",
+          "dtype": "boolean"
+        },
+        {
+          "column": "NEXT_5_SESSION_STATUS",
+          "dtype": "string"
+        },
+        {
+          "column": "NEXT_5_SESSION_DATA_END_CENSORED",
+          "dtype": "boolean"
+        },
+        {
+          "column": "NEXT_5_SESSION_UNAVAILABLE_REASON",
+          "dtype": "string"
+        },
+        {
+          "column": "NEXT_10_SESSION_APPLICABLE",
+          "dtype": "boolean"
+        },
+        {
+          "column": "NEXT_10_SESSION_STATUS",
+          "dtype": "string"
+        },
+        {
+          "column": "NEXT_10_SESSION_DATA_END_CENSORED",
+          "dtype": "boolean"
+        },
+        {
+          "column": "NEXT_10_SESSION_UNAVAILABLE_REASON",
+          "dtype": "string"
+        },
+        {
+          "column": "NEXT_20_SESSION_APPLICABLE",
+          "dtype": "boolean"
+        },
+        {
+          "column": "NEXT_20_SESSION_STATUS",
+          "dtype": "string"
+        },
+        {
+          "column": "NEXT_20_SESSION_DATA_END_CENSORED",
+          "dtype": "boolean"
+        },
+        {
+          "column": "NEXT_20_SESSION_UNAVAILABLE_REASON",
+          "dtype": "string"
+        },
+        {
+          "column": "Stage 3.1 Experiment ID",
+          "dtype": "str"
+        },
+        {
+          "column": "STAGE3_1_ROW_ID",
+          "dtype": "str"
+        }
+      ]
+    }
+  ]
+}

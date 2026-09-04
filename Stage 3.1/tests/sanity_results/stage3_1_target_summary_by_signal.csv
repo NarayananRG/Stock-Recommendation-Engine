@@ -1,0 +1,5 @@
+Signal,Rows,Filled Opportunities,Observed Non-Fills,Incomplete Entry-Window Censored,Invalid-Risk Fills,T1 Applicable,T1 Available,T1 Positive,T1 Negative,T1 Data-End Censored,T2 Applicable,T2 Available,T2 Positive,T2 Negative,T2 Data-End Censored,Fill Rate Among Resolved %
+BUY,130,105,25,0,0,105,105,40,65,0,105,105,29,76,0,80.7692307692
+WAIT FOR BETTER ENTRY,1024,780,244,0,5,775,775,468,307,0,775,775,304,471,0,76.171875
+WATCH,319,227,92,0,0,227,227,107,120,0,227,227,80,147,0,71.1598746082
+WATCH - MARKET RISK,46,35,11,0,1,34,34,18,16,0,34,34,8,26,0,76.0869565217

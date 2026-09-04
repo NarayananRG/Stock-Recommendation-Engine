@@ -1,0 +1,37 @@
+Dataset,Column,Data Type,Role,Date-Like,FEATURE_ALLOWED Violation
+d1_position_day,Current Market Feature Source Date,datetime64[us],LEAKAGE_EXCLUDE,True,False
+d1_position_day,D1_LABEL_AVAILABLE_DATE,datetime64[us],LABEL_METADATA,True,False
+d1_position_day,Entry Date,datetime64[us],IDENTIFIER,True,False
+d1_position_day,Feature As-Of Date,datetime64[us],IDENTIFIER,True,False
+d1_position_day,Management Date,datetime64[us],IDENTIFIER,True,False
+d1_position_day,NEXT_10_SESSION_LABEL_AVAILABLE_DATE,datetime64[us],LABEL_METADATA,True,False
+d1_position_day,NEXT_20_SESSION_LABEL_AVAILABLE_DATE,datetime64[us],LABEL_METADATA,True,False
+d1_position_day,NEXT_5_SESSION_LABEL_AVAILABLE_DATE,datetime64[us],LABEL_METADATA,True,False
+d1_position_day,Signal Date,datetime64[us],IDENTIFIER,True,False
+signal_state,Candidate Entry Date,datetime64[us],LEAKAGE_EXCLUDE,True,False
+signal_state,Candidate Exit Date,datetime64[us],LEAKAGE_EXCLUDE,True,False
+signal_state,Feature As-Of Date,datetime64[us],IDENTIFIER,True,False
+signal_state,NIFTY Feature Source Date,datetime64[us],LEAKAGE_EXCLUDE,True,False
+signal_state,Signal Date,datetime64[us],IDENTIFIER,True,False
+trade_opportunity,BASELINE_COMPAT_T1_EXIT_DATE,datetime64[us],LEAKAGE_EXCLUDE,True,False
+trade_opportunity,Candidate Entry Date,datetime64[us],LEAKAGE_EXCLUDE,True,False
+trade_opportunity,Candidate Exit Date,datetime64[us],LEAKAGE_EXCLUDE,True,False
+trade_opportunity,D1_SHADOW_EXIT_DATE,datetime64[us],LEAKAGE_EXCLUDE,True,False
+trade_opportunity,D1_SHADOW_LABEL_AVAILABLE_DATE,datetime64[us],LABEL_METADATA,True,False
+trade_opportunity,ENTRY_DATE,datetime64[us],LEAKAGE_EXCLUDE,True,False
+trade_opportunity,ENTRY_LABEL_AVAILABLE_DATE,datetime64[us],LABEL_METADATA,True,False
+trade_opportunity,FWD_10_AVAILABLE_DATE,datetime64[us],LABEL_METADATA,True,False
+trade_opportunity,FWD_20_AVAILABLE_DATE,datetime64[us],LABEL_METADATA,True,False
+trade_opportunity,FWD_30_AVAILABLE_DATE,datetime64[us],LABEL_METADATA,True,False
+trade_opportunity,FWD_45_AVAILABLE_DATE,datetime64[us],LABEL_METADATA,True,False
+trade_opportunity,FWD_63_AVAILABLE_DATE,datetime64[us],LABEL_METADATA,True,False
+trade_opportunity,Feature As-Of Date,datetime64[us],IDENTIFIER,True,False
+trade_opportunity,NIFTY Feature Source Date,datetime64[us],LEAKAGE_EXCLUDE,True,False
+trade_opportunity,Signal Date,datetime64[us],IDENTIFIER,True,False
+trade_opportunity,T1_LABEL_AVAILABLE_DATE,datetime64[us],LABEL_METADATA,True,False
+trade_opportunity,T1_RESOLUTION_DATE,datetime64[us],LABEL_METADATA,True,False
+trade_opportunity,T2_LABEL_AVAILABLE_DATE,datetime64[us],LABEL_METADATA,True,False
+trade_opportunity,T2_RESOLUTION_DATE,datetime64[us],LABEL_METADATA,True,False
+trade_opportunity,TARGET_TIME_LABEL_AVAILABLE_DATE,datetime64[us],LABEL_METADATA,True,False
+trade_opportunity,TIME_TO_T1_AVAILABLE_DATE,datetime64[us],LABEL_METADATA,True,False
+trade_opportunity,TIME_TO_T2_AVAILABLE_DATE,datetime64[us],LABEL_METADATA,True,False

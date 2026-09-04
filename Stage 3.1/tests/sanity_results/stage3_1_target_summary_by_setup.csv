@@ -1,0 +1,3 @@
+Setup,Rows,Filled Opportunities,Observed Non-Fills,Incomplete Entry-Window Censored,Invalid-Risk Fills,T1 Applicable,T1 Available,T1 Positive,T1 Negative,T1 Data-End Censored,T2 Applicable,T2 Available,T2 Positive,T2 Negative,T2 Data-End Censored,Fill Rate Among Resolved %
+BREAKOUT,137,100,37,0,1,99,99,33,66,0,99,99,14,85,0,72.9927007299
+PULLBACK,1382,1047,335,0,5,1042,1042,600,442,0,1042,1042,407,635,0,75.7597684515

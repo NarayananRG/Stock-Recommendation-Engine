@@ -1,0 +1,21 @@
+{
+  "EXPERIMENT_ID": "S3_1_20110830_20260828_6480f9a2ad30_SANITY",
+  "FEATURE_SELECTION_PERFORMED": false,
+  "HYPERPARAMETER_TUNING_PERFORMED": false,
+  "ML_MODEL_TRAINED": false,
+  "STAGE3_1_CODE_PACKAGE_HASH": "094747e51a46db0af0392250a5aeaf7ff9b45bb0fa932b47ab3fcc44221e9bae",
+  "STAGE3_1_CONFIG_HASH": "fec3cb02a0254d1d16f6fdcbf2eab9d15412d226b9ff2a0dba813e84705de9fe",
+  "STAGE3_1_SCHEMA_HASH": "7e6fb19e0618c70c9ea04300b2825bf674ac14322ab24eb1c958145781a6d2c4",
+  "STRATEGY_THRESHOLD_TUNING_PERFORMED": false,
+  "baseline_commit": "c9cc9f4fcaf2fe81128365be09515fbf9fa67c28",
+  "baseline_tag": "stage2b.1-dynamic-research-baseline",
+  "sanity_mode": true,
+  "stage": "3.1",
+  "stage3_reference_branch": "stage3-point-in-time-dataset",
+  "stage3_reference_commit": "70951a5a05727a605bb579973da6216fb9887e44",
+  "stage3_reference_experiment": "S3_20110830_20260828_bb15e0fa65d2",
+  "tickers": [
+    "INFY.NS",
+    "TCS.NS"
+  ]
+}
