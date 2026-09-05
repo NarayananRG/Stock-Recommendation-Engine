@@ -1,0 +1,103 @@
+{
+  "frozen_inputs": {
+    "merge_base": "9e2ce2f4bcba7a97e08193ae6e84491df02307f5",
+    "stage4a_predictions": {
+      "stage4a_joint_oos_predictions.csv.gz": {
+        "artifact_sha256": "a458d45d5f9e6cbb09d31d86408c85e19e54368a2f1434e6b7c2b0097f6279bc",
+        "logical_content_hash": "e320862e2b24d3af7a5991bb626b595a68f543a5d1ebe08de9d6cf9fd94d9d5d",
+        "rows": 95130
+      },
+      "stage4a_oos_predictions.csv.gz": {
+        "artifact_sha256": "c79d599e2c506ffce7ed1f84fb0088217632bc1a28148e0d463753199729879e",
+        "logical_content_hash": "a6839e7543ffb4327d57fb03ad8d2d8e11994889dc277118c72a2e04edceecde",
+        "rows": 142695
+      }
+    },
+    "trade_opportunity_logical_hash": "3da733b3f1a9fa03c107c960495690290e7fe065901e4f0822c2905ba62d11d5"
+  },
+  "stage4a1": {
+    "package_hash": "8faeb82028289186c5d3bef40d242298b2d4f812c606b20b9b3cd7eb7e2a319d",
+    "sources": [
+      {
+        "bytes": 3876,
+        "relative_path": "config/stage4a1_config.json",
+        "sha256": "81870545011208cc5bdc97021f7470f38a58b3a8470cd0714d79a33cd7e5f57a"
+      },
+      {
+        "bytes": 33539,
+        "relative_path": "stage4a1/Stock_Alert_Stage4A1_Executable_Cohort.py",
+        "sha256": "03bc861f516bf5f48586d52dfbb01e02064d51383dcb36bed8daec882a7dbc6c"
+      },
+      {
+        "bytes": 87,
+        "relative_path": "stage4a1/__init__.py",
+        "sha256": "fb2147b1c86eefc021488112f6eb17327399aba5e073ba3dca4109960d919cb4"
+      },
+      {
+        "bytes": 9257,
+        "relative_path": "stage4a1/bootstrap.py",
+        "sha256": "d2c9586234ea2d65ecb145951ef11c022b5f5d26575097665ca4471d8fef4744"
+      },
+      {
+        "bytes": 2203,
+        "relative_path": "stage4a1/correction_review.py",
+        "sha256": "9f6e91fb46150a6b382908d380b99d6022fb46e3a8fda7bba2c6ffbdb507b3ed"
+      },
+      {
+        "bytes": 6511,
+        "relative_path": "stage4a1/data_contract.py",
+        "sha256": "5ea73ed9ed581588d4f5ffef03ae9dd486c654709b8e5de7dd7dfe573d1e6506"
+      },
+      {
+        "bytes": 4784,
+        "relative_path": "stage4a1/diagnostics.py",
+        "sha256": "60f00cd652766a0613ea2ce4e5c84468a7ea2121ceaac77dfdadb4c1c2d25ea3"
+      },
+      {
+        "bytes": 3805,
+        "relative_path": "stage4a1/folds.py",
+        "sha256": "54914a4002704fbdd5dff2fd1a7cf403af6fc9e94a8133d4e3e5c5d574330f34"
+      },
+      {
+        "bytes": 3296,
+        "relative_path": "stage4a1/hashing.py",
+        "sha256": "68abfe783af1a5bd10ae84fd6de2184f618ed45c1bfcdde8ad3374e4b087e35d"
+      },
+      {
+        "bytes": 2358,
+        "relative_path": "stage4a1/metric_audit.py",
+        "sha256": "a0463b78a289f2eee439196573634f47ee5f61a484efc961c9506792c46b0445"
+      },
+      {
+        "bytes": 8872,
+        "relative_path": "stage4a1/metrics.py",
+        "sha256": "34790d92dc13be6d59e2fbfdb90a47fba92222ca344d72e24a4e9fbc97e8cab4"
+      },
+      {
+        "bytes": 1713,
+        "relative_path": "stage4a1/models.py",
+        "sha256": "cd1b575d5e8bb16fdc2f4d72511a2ab81eb34b6479215c3e36c207e0c232e157"
+      },
+      {
+        "bytes": 3093,
+        "relative_path": "stage4a1/ranking.py",
+        "sha256": "caf094b2138c384671f5d61291780250837ef8c060747c6f491104681a10ca06"
+      },
+      {
+        "bytes": 10151,
+        "relative_path": "stage4a1/validation.py",
+        "sha256": "5868d296c2d73f4ba9bd80f5f372d21bacc0d444b2efca65eda5481f0488c45a"
+      },
+      {
+        "bytes": 14346,
+        "relative_path": "tests/run_stage4a1_tests.py",
+        "sha256": "4c4872b0d3d0b8365a9d0c0167362608027e047eca93da99e180eb69649e53f6"
+      },
+      {
+        "bytes": 8115,
+        "relative_path": "tests/test_ranking_regression.py",
+        "sha256": "ecb57f2396d2c84cfa68203c9b0d72c5a56a352372a791ec78126305a2a8b7e8"
+      }
+    ]
+  }
+}

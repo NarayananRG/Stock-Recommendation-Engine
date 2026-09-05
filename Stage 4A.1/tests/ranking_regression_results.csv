@@ -1,0 +1,11 @@
+Test,Status,Details
+Identity sample all bucket rates and lifts,PASS,
+All probabilities tied deterministic memberships,PASS,
+Bottom-bucket original failing case,PASS,
+Duplicated observations counted repeatedly,PASS,
+Paired modes identical observation multiplicities every replicate,PASS,
+Additional classification identity: log loss at boundaries,PASS,
+Extreme probabilities frozen Stage 4A clipping,PASS,
+Metric-local clipping nonmutation and input validation,PASS,
+Every bootstrap Log Loss route uses shared helper,PASS,
+Full shared metric identity,PASS,

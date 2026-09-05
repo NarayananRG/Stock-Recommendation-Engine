@@ -1,0 +1,340 @@
+Artifact,Column,Changed Cells,Maximum Absolute Difference
+stage4a1_metrics_pooled.csv,Scope,0,
+stage4a1_metrics_pooled.csv,Mode,0,
+stage4a1_metrics_pooled.csv,Target,0,
+stage4a1_metrics_pooled.csv,Model Variant,0,
+stage4a1_metrics_pooled.csv,Feature Set,0,
+stage4a1_metrics_pooled.csv,Rows,0,0
+stage4a1_metrics_pooled.csv,Positive Count,0,0
+stage4a1_metrics_pooled.csv,Prevalence,0,0
+stage4a1_metrics_pooled.csv,ROC AUC,0,0
+stage4a1_metrics_pooled.csv,Average Precision,0,0
+stage4a1_metrics_pooled.csv,Brier Score,0,0
+stage4a1_metrics_pooled.csv,Brier Benchmark Score,0,0
+stage4a1_metrics_pooled.csv,Brier Skill Score vs Training Prior,0,0
+stage4a1_metrics_pooled.csv,Log Loss,0,0
+stage4a1_metrics_pooled.csv,Accuracy at 0.50,0,0
+stage4a1_metrics_pooled.csv,Precision at 0.50,0,0
+stage4a1_metrics_pooled.csv,Recall at 0.50,0,0
+stage4a1_metrics_pooled.csv,Specificity at 0.50,0,0
+stage4a1_metrics_pooled.csv,F1 at 0.50,0,0
+stage4a1_metrics_by_year.csv,Mode,0,
+stage4a1_metrics_by_year.csv,Target,0,
+stage4a1_metrics_by_year.csv,Model Variant,0,
+stage4a1_metrics_by_year.csv,Feature Set,0,
+stage4a1_metrics_by_year.csv,Evaluation Year,0,0
+stage4a1_metrics_by_year.csv,Rows,0,0
+stage4a1_metrics_by_year.csv,Positive Count,0,0
+stage4a1_metrics_by_year.csv,Prevalence,0,0
+stage4a1_metrics_by_year.csv,ROC AUC,0,0
+stage4a1_metrics_by_year.csv,Average Precision,0,0
+stage4a1_metrics_by_year.csv,Brier Score,0,0
+stage4a1_metrics_by_year.csv,Brier Benchmark Score,0,0
+stage4a1_metrics_by_year.csv,Brier Skill Score vs Training Prior,0,0
+stage4a1_metrics_by_year.csv,Log Loss,0,0
+stage4a1_metrics_by_year.csv,Accuracy at 0.50,0,0
+stage4a1_metrics_by_year.csv,Precision at 0.50,0,0
+stage4a1_metrics_by_year.csv,Recall at 0.50,0,0
+stage4a1_metrics_by_year.csv,Specificity at 0.50,0,0
+stage4a1_metrics_by_year.csv,F1 at 0.50,0,0
+stage4a1_metrics_by_era.csv,Mode,0,
+stage4a1_metrics_by_era.csv,Target,0,
+stage4a1_metrics_by_era.csv,Model Variant,0,
+stage4a1_metrics_by_era.csv,Feature Set,0,
+stage4a1_metrics_by_era.csv,Scope,0,
+stage4a1_metrics_by_era.csv,Rows,0,0
+stage4a1_metrics_by_era.csv,Positive Count,0,0
+stage4a1_metrics_by_era.csv,Prevalence,0,0
+stage4a1_metrics_by_era.csv,ROC AUC,0,0
+stage4a1_metrics_by_era.csv,Average Precision,0,0
+stage4a1_metrics_by_era.csv,Brier Score,0,0
+stage4a1_metrics_by_era.csv,Brier Benchmark Score,0,0
+stage4a1_metrics_by_era.csv,Brier Skill Score vs Training Prior,0,0
+stage4a1_metrics_by_era.csv,Log Loss,0,0
+stage4a1_metrics_by_era.csv,Accuracy at 0.50,0,0
+stage4a1_metrics_by_era.csv,Precision at 0.50,0,0
+stage4a1_metrics_by_era.csv,Recall at 0.50,0,0
+stage4a1_metrics_by_era.csv,Specificity at 0.50,0,0
+stage4a1_metrics_by_era.csv,F1 at 0.50,0,0
+stage4a1_ranking_lift.csv,Mode,0,
+stage4a1_ranking_lift.csv,Target,0,
+stage4a1_ranking_lift.csv,Model Variant,0,
+stage4a1_ranking_lift.csv,Feature Set,0,
+stage4a1_ranking_lift.csv,Scope,0,
+stage4a1_ranking_lift.csv,Rows,0,0
+stage4a1_ranking_lift.csv,Overall Success Rate,0,0
+stage4a1_ranking_lift.csv,Top 10% Rows,0,0
+stage4a1_ranking_lift.csv,Top 10% Success Rate,0,0
+stage4a1_ranking_lift.csv,Top 10% Lift,0,0
+stage4a1_ranking_lift.csv,Top 20% Rows,0,0
+stage4a1_ranking_lift.csv,Top 20% Success Rate,0,0
+stage4a1_ranking_lift.csv,Top 20% Lift,0,0
+stage4a1_ranking_lift.csv,Bottom 20% Rows,0,0
+stage4a1_ranking_lift.csv,Bottom 20% Success Rate,0,0
+stage4a1_ranking_lift.csv,Bottom 20% Lift,0,0
+stage4a1_bootstrap_summary.csv,Block Length,0,0
+stage4a1_bootstrap_summary.csv,Mode,0,
+stage4a1_bootstrap_summary.csv,Target,0,
+stage4a1_bootstrap_summary.csv,Model Variant,0,
+stage4a1_bootstrap_summary.csv,Feature Set,0,
+stage4a1_bootstrap_summary.csv,Scope,0,
+stage4a1_bootstrap_summary.csv,Metric,0,
+stage4a1_bootstrap_summary.csv,Valid Replicates,0,0
+stage4a1_bootstrap_summary.csv,2.5%,314,0.673109243698
+stage4a1_bootstrap_summary.csv,Median,330,0.623105458395
+stage4a1_bootstrap_summary.csv,97.5%,282,0.5935593469
+stage4a1_transfer_vs_primary_only_paired.csv,Target,0,
+stage4a1_transfer_vs_primary_only_paired.csv,Model Variant,0,
+stage4a1_transfer_vs_primary_only_paired.csv,Scope,0,
+stage4a1_transfer_vs_primary_only_paired.csv,Feature Set,0,
+stage4a1_transfer_vs_primary_only_paired.csv,Block Length,0,0
+stage4a1_transfer_vs_primary_only_paired.csv,TRANSFER ROC AUC,0,0
+stage4a1_transfer_vs_primary_only_paired.csv,PRIMARY_ONLY ROC AUC,0,0
+stage4a1_transfer_vs_primary_only_paired.csv,Delta ROC AUC,0,0
+stage4a1_transfer_vs_primary_only_paired.csv,Delta ROC AUC 2.5%,0,0
+stage4a1_transfer_vs_primary_only_paired.csv,Delta ROC AUC Median,0,0
+stage4a1_transfer_vs_primary_only_paired.csv,Delta ROC AUC 97.5%,0,0
+stage4a1_transfer_vs_primary_only_paired.csv,Delta ROC AUC Valid Replicates,0,0
+stage4a1_transfer_vs_primary_only_paired.csv,TRANSFER Brier Score,0,0
+stage4a1_transfer_vs_primary_only_paired.csv,PRIMARY_ONLY Brier Score,0,0
+stage4a1_transfer_vs_primary_only_paired.csv,Delta Brier Score,0,0
+stage4a1_transfer_vs_primary_only_paired.csv,Delta Brier Score 2.5%,0,0
+stage4a1_transfer_vs_primary_only_paired.csv,Delta Brier Score Median,0,0
+stage4a1_transfer_vs_primary_only_paired.csv,Delta Brier Score 97.5%,0,0
+stage4a1_transfer_vs_primary_only_paired.csv,Delta Brier Score Valid Replicates,0,0
+stage4a1_transfer_vs_primary_only_paired.csv,TRANSFER Brier Skill Score vs Training Prior,0,0
+stage4a1_transfer_vs_primary_only_paired.csv,PRIMARY_ONLY Brier Skill Score vs Training Prior,0,0
+stage4a1_transfer_vs_primary_only_paired.csv,Delta Brier Skill Score vs Training Prior,0,0
+stage4a1_transfer_vs_primary_only_paired.csv,Delta Brier Skill Score vs Training Prior 2.5%,0,0
+stage4a1_transfer_vs_primary_only_paired.csv,Delta Brier Skill Score vs Training Prior Median,0,0
+stage4a1_transfer_vs_primary_only_paired.csv,Delta Brier Skill Score vs Training Prior 97.5%,0,0
+stage4a1_transfer_vs_primary_only_paired.csv,Delta Brier Skill Score vs Training Prior Valid Replicates,0,0
+stage4a1_transfer_vs_primary_only_paired.csv,TRANSFER Top 20% Lift,0,0
+stage4a1_transfer_vs_primary_only_paired.csv,PRIMARY_ONLY Top 20% Lift,0,0
+stage4a1_transfer_vs_primary_only_paired.csv,Delta Top 20% Lift,0,0
+stage4a1_transfer_vs_primary_only_paired.csv,Delta Top 20% Lift 2.5%,0,0
+stage4a1_transfer_vs_primary_only_paired.csv,Delta Top 20% Lift Median,0,0
+stage4a1_transfer_vs_primary_only_paired.csv,Delta Top 20% Lift 97.5%,0,0
+stage4a1_transfer_vs_primary_only_paired.csv,Delta Top 20% Lift Valid Replicates,0,0
+stage4a1_research_evidence_classification.csv,Mode,0,
+stage4a1_research_evidence_classification.csv,Target,0,
+stage4a1_research_evidence_classification.csv,Model Variant,0,
+stage4a1_research_evidence_classification.csv,Feature Set,0,
+stage4a1_research_evidence_classification.csv,Pooled ROC AUC,0,0
+stage4a1_research_evidence_classification.csv,Pooled AUC 63-Date Lower 95%,0,0
+stage4a1_research_evidence_classification.csv,Pooled Brier Skill,0,0
+stage4a1_research_evidence_classification.csv,Recent 2024-2026 ROC AUC,0,0
+stage4a1_research_evidence_classification.csv,Valid Annual AUCs,0,0
+stage4a1_research_evidence_classification.csv,Years AUC > 0.50,0,0
+stage4a1_research_evidence_classification.csv,Valid Pooled 63-Date AUC Replicates,0,0
+stage4a1_research_evidence_classification.csv,Research Evidence Classification,0,
+stage4a1_block_bootstrap_63.csv.gz,Block Length,0,0
+stage4a1_block_bootstrap_63.csv.gz,Mode,0,
+stage4a1_block_bootstrap_63.csv.gz,Target,0,
+stage4a1_block_bootstrap_63.csv.gz,Model Variant,0,
+stage4a1_block_bootstrap_63.csv.gz,Feature Set,0,
+stage4a1_block_bootstrap_63.csv.gz,Scope,0,
+stage4a1_block_bootstrap_63.csv.gz,Replicate,0,0
+stage4a1_block_bootstrap_63.csv.gz,Rows,0,0
+stage4a1_block_bootstrap_63.csv.gz,Positive Count,0,0
+stage4a1_block_bootstrap_63.csv.gz,Prevalence,0,0
+stage4a1_block_bootstrap_63.csv.gz,ROC AUC,0,0
+stage4a1_block_bootstrap_63.csv.gz,Average Precision,0,0
+stage4a1_block_bootstrap_63.csv.gz,Brier Score,0,0
+stage4a1_block_bootstrap_63.csv.gz,Brier Benchmark Score,0,0
+stage4a1_block_bootstrap_63.csv.gz,Brier Skill Score vs Training Prior,0,0
+stage4a1_block_bootstrap_63.csv.gz,Log Loss,43,1.00008890058e-12
+stage4a1_block_bootstrap_63.csv.gz,Accuracy at 0.50,0,0
+stage4a1_block_bootstrap_63.csv.gz,Precision at 0.50,0,0
+stage4a1_block_bootstrap_63.csv.gz,Recall at 0.50,0,0
+stage4a1_block_bootstrap_63.csv.gz,Specificity at 0.50,0,0
+stage4a1_block_bootstrap_63.csv.gz,F1 at 0.50,0,0
+stage4a1_block_bootstrap_63.csv.gz,Top 10% Rows,0,0
+stage4a1_block_bootstrap_63.csv.gz,Top 10% Success Rate,0,0
+stage4a1_block_bootstrap_63.csv.gz,Top 10% Lift,0,0
+stage4a1_block_bootstrap_63.csv.gz,Top 20% Rows,0,0
+stage4a1_block_bootstrap_63.csv.gz,Top 20% Success Rate,0,0
+stage4a1_block_bootstrap_63.csv.gz,Top 20% Lift,0,0
+stage4a1_block_bootstrap_63.csv.gz,Bottom 20% Rows,0,0
+stage4a1_block_bootstrap_63.csv.gz,Bottom 20% Success Rate,71102,0.45
+stage4a1_block_bootstrap_63.csv.gz,Bottom 20% Lift,71102,1.85062656641
+stage4a1_block_bootstrap_21_sensitivity.csv.gz,Block Length,0,0
+stage4a1_block_bootstrap_21_sensitivity.csv.gz,Mode,0,
+stage4a1_block_bootstrap_21_sensitivity.csv.gz,Target,0,
+stage4a1_block_bootstrap_21_sensitivity.csv.gz,Model Variant,0,
+stage4a1_block_bootstrap_21_sensitivity.csv.gz,Feature Set,0,
+stage4a1_block_bootstrap_21_sensitivity.csv.gz,Scope,0,
+stage4a1_block_bootstrap_21_sensitivity.csv.gz,Replicate,0,0
+stage4a1_block_bootstrap_21_sensitivity.csv.gz,Rows,0,0
+stage4a1_block_bootstrap_21_sensitivity.csv.gz,Positive Count,0,0
+stage4a1_block_bootstrap_21_sensitivity.csv.gz,Prevalence,0,0
+stage4a1_block_bootstrap_21_sensitivity.csv.gz,ROC AUC,0,0
+stage4a1_block_bootstrap_21_sensitivity.csv.gz,Average Precision,0,0
+stage4a1_block_bootstrap_21_sensitivity.csv.gz,Brier Score,0,0
+stage4a1_block_bootstrap_21_sensitivity.csv.gz,Brier Benchmark Score,0,0
+stage4a1_block_bootstrap_21_sensitivity.csv.gz,Brier Skill Score vs Training Prior,0,0
+stage4a1_block_bootstrap_21_sensitivity.csv.gz,Log Loss,47,1.00008890058e-12
+stage4a1_block_bootstrap_21_sensitivity.csv.gz,Accuracy at 0.50,0,0
+stage4a1_block_bootstrap_21_sensitivity.csv.gz,Precision at 0.50,0,0
+stage4a1_block_bootstrap_21_sensitivity.csv.gz,Recall at 0.50,0,0
+stage4a1_block_bootstrap_21_sensitivity.csv.gz,Specificity at 0.50,0,0
+stage4a1_block_bootstrap_21_sensitivity.csv.gz,F1 at 0.50,0,0
+stage4a1_block_bootstrap_21_sensitivity.csv.gz,Top 10% Rows,0,0
+stage4a1_block_bootstrap_21_sensitivity.csv.gz,Top 10% Success Rate,0,0
+stage4a1_block_bootstrap_21_sensitivity.csv.gz,Top 10% Lift,0,0
+stage4a1_block_bootstrap_21_sensitivity.csv.gz,Top 20% Rows,0,0
+stage4a1_block_bootstrap_21_sensitivity.csv.gz,Top 20% Success Rate,0,0
+stage4a1_block_bootstrap_21_sensitivity.csv.gz,Top 20% Lift,0,0
+stage4a1_block_bootstrap_21_sensitivity.csv.gz,Bottom 20% Rows,0,0
+stage4a1_block_bootstrap_21_sensitivity.csv.gz,Bottom 20% Success Rate,68797,0.631578947369
+stage4a1_block_bootstrap_21_sensitivity.csv.gz,Bottom 20% Lift,68797,2.40476190476
+stage4a1_block_bootstrap_126_sensitivity.csv.gz,Block Length,0,0
+stage4a1_block_bootstrap_126_sensitivity.csv.gz,Mode,0,
+stage4a1_block_bootstrap_126_sensitivity.csv.gz,Target,0,
+stage4a1_block_bootstrap_126_sensitivity.csv.gz,Model Variant,0,
+stage4a1_block_bootstrap_126_sensitivity.csv.gz,Feature Set,0,
+stage4a1_block_bootstrap_126_sensitivity.csv.gz,Scope,0,
+stage4a1_block_bootstrap_126_sensitivity.csv.gz,Replicate,0,0
+stage4a1_block_bootstrap_126_sensitivity.csv.gz,Rows,0,0
+stage4a1_block_bootstrap_126_sensitivity.csv.gz,Positive Count,0,0
+stage4a1_block_bootstrap_126_sensitivity.csv.gz,Prevalence,0,0
+stage4a1_block_bootstrap_126_sensitivity.csv.gz,ROC AUC,0,0
+stage4a1_block_bootstrap_126_sensitivity.csv.gz,Average Precision,0,0
+stage4a1_block_bootstrap_126_sensitivity.csv.gz,Brier Score,0,0
+stage4a1_block_bootstrap_126_sensitivity.csv.gz,Brier Benchmark Score,0,0
+stage4a1_block_bootstrap_126_sensitivity.csv.gz,Brier Skill Score vs Training Prior,0,0
+stage4a1_block_bootstrap_126_sensitivity.csv.gz,Log Loss,27,1.00008890058e-12
+stage4a1_block_bootstrap_126_sensitivity.csv.gz,Accuracy at 0.50,0,0
+stage4a1_block_bootstrap_126_sensitivity.csv.gz,Precision at 0.50,0,0
+stage4a1_block_bootstrap_126_sensitivity.csv.gz,Recall at 0.50,0,0
+stage4a1_block_bootstrap_126_sensitivity.csv.gz,Specificity at 0.50,0,0
+stage4a1_block_bootstrap_126_sensitivity.csv.gz,F1 at 0.50,0,0
+stage4a1_block_bootstrap_126_sensitivity.csv.gz,Top 10% Rows,0,0
+stage4a1_block_bootstrap_126_sensitivity.csv.gz,Top 10% Success Rate,0,0
+stage4a1_block_bootstrap_126_sensitivity.csv.gz,Top 10% Lift,0,0
+stage4a1_block_bootstrap_126_sensitivity.csv.gz,Top 20% Rows,0,0
+stage4a1_block_bootstrap_126_sensitivity.csv.gz,Top 20% Success Rate,0,0
+stage4a1_block_bootstrap_126_sensitivity.csv.gz,Top 20% Lift,0,0
+stage4a1_block_bootstrap_126_sensitivity.csv.gz,Bottom 20% Rows,0,0
+stage4a1_block_bootstrap_126_sensitivity.csv.gz,Bottom 20% Success Rate,68482,0.294117647058
+stage4a1_block_bootstrap_126_sensitivity.csv.gz,Bottom 20% Lift,68482,1.14027149321
+stage4a1_primary_only_oos_predictions.csv.gz,Mode,0,
+stage4a1_primary_only_oos_predictions.csv.gz,Signal ID,0,
+stage4a1_primary_only_oos_predictions.csv.gz,Ticker,0,
+stage4a1_primary_only_oos_predictions.csv.gz,Signal Date,0,
+stage4a1_primary_only_oos_predictions.csv.gz,Dataset Cohort,0,
+stage4a1_primary_only_oos_predictions.csv.gz,Original Signal,0,
+stage4a1_primary_only_oos_predictions.csv.gz,Setup,0,
+stage4a1_primary_only_oos_predictions.csv.gz,Market Regime,0,
+stage4a1_primary_only_oos_predictions.csv.gz,Actionability Score,0,0
+stage4a1_primary_only_oos_predictions.csv.gz,Technical Score,0,0
+stage4a1_primary_only_oos_predictions.csv.gz,Evaluation Year,0,0
+stage4a1_primary_only_oos_predictions.csv.gz,Target,0,
+stage4a1_primary_only_oos_predictions.csv.gz,Model Variant,0,
+stage4a1_primary_only_oos_predictions.csv.gz,Feature Set,0,
+stage4a1_primary_only_oos_predictions.csv.gz,Model Spec Hash,0,
+stage4a1_primary_only_oos_predictions.csv.gz,Feature Set Hash,0,
+stage4a1_primary_only_oos_predictions.csv.gz,Stage 3.1 Experiment ID,0,
+stage4a1_primary_only_oos_predictions.csv.gz,Stage 4A Experiment ID,0,
+stage4a1_primary_only_oos_predictions.csv.gz,Training Cutoff Date,0,
+stage4a1_primary_only_oos_predictions.csv.gz,Predicted Probability,0,0
+stage4a1_primary_only_oos_predictions.csv.gz,Actual Label,0,0
+stage4a1_primary_only_oos_predictions.csv.gz,Label Status,0,
+stage4a1_primary_only_oos_predictions.csv.gz,Label Available Date,0,
+stage4a1_primary_only_oos_predictions.csv.gz,Training Rows,0,0
+stage4a1_primary_only_oos_predictions.csv.gz,Training Positive Count,0,0
+stage4a1_primary_only_oos_predictions.csv.gz,Training Prevalence,0,0
+stage4a1_primary_only_oos_predictions.csv.gz,Training Prior,0,0
+stage4a1_primary_only_joint_oos_predictions.csv.gz,Mode,0,
+stage4a1_primary_only_joint_oos_predictions.csv.gz,Signal ID,0,
+stage4a1_primary_only_joint_oos_predictions.csv.gz,Ticker,0,
+stage4a1_primary_only_joint_oos_predictions.csv.gz,Signal Date,0,
+stage4a1_primary_only_joint_oos_predictions.csv.gz,Dataset Cohort,0,
+stage4a1_primary_only_joint_oos_predictions.csv.gz,Original Signal,0,
+stage4a1_primary_only_joint_oos_predictions.csv.gz,Setup,0,
+stage4a1_primary_only_joint_oos_predictions.csv.gz,Market Regime,0,
+stage4a1_primary_only_joint_oos_predictions.csv.gz,Actionability Score,0,0
+stage4a1_primary_only_joint_oos_predictions.csv.gz,Technical Score,0,0
+stage4a1_primary_only_joint_oos_predictions.csv.gz,Evaluation Year,0,0
+stage4a1_primary_only_joint_oos_predictions.csv.gz,Target,0,
+stage4a1_primary_only_joint_oos_predictions.csv.gz,Model Variant,0,
+stage4a1_primary_only_joint_oos_predictions.csv.gz,Feature Set,0,
+stage4a1_primary_only_joint_oos_predictions.csv.gz,Entry Model Spec Hash,0,
+stage4a1_primary_only_joint_oos_predictions.csv.gz,Conditional Model Spec Hash,0,
+stage4a1_primary_only_joint_oos_predictions.csv.gz,Entry Feature Set Hash,0,
+stage4a1_primary_only_joint_oos_predictions.csv.gz,Conditional Feature Set Hash,0,
+stage4a1_primary_only_joint_oos_predictions.csv.gz,Stage 3.1 Experiment ID,0,
+stage4a1_primary_only_joint_oos_predictions.csv.gz,Stage 4A Experiment ID,0,
+stage4a1_primary_only_joint_oos_predictions.csv.gz,Training Cutoff Date,0,
+stage4a1_primary_only_joint_oos_predictions.csv.gz,P Fill,0,0
+stage4a1_primary_only_joint_oos_predictions.csv.gz,P T1 Conditional,0,0
+stage4a1_primary_only_joint_oos_predictions.csv.gz,Predicted Probability,0,0
+stage4a1_primary_only_joint_oos_predictions.csv.gz,Actual Label,0,0
+stage4a1_primary_only_joint_oos_predictions.csv.gz,Label Status,0,
+stage4a1_primary_only_joint_oos_predictions.csv.gz,Label Available Date,0,
+stage4a1_primary_only_joint_oos_predictions.csv.gz,Training Prior Entry,0,0
+stage4a1_primary_only_joint_oos_predictions.csv.gz,Training Prior Conditional,0,0
+stage4a1_primary_only_joint_oos_predictions.csv.gz,Training Prior,0,0
+stage4a1_primary_only_joint_oos_predictions.csv.gz,Training Rows Entry,0,0
+stage4a1_primary_only_joint_oos_predictions.csv.gz,Training Rows Conditional,0,0
+stage4a1_primary_only_joint_oos_predictions.csv.gz,P T2 Conditional,0,0
+stage4a1_transfer_baseline_primary_predictions.csv.gz,Mode,0,
+stage4a1_transfer_baseline_primary_predictions.csv.gz,Signal ID,0,
+stage4a1_transfer_baseline_primary_predictions.csv.gz,Ticker,0,
+stage4a1_transfer_baseline_primary_predictions.csv.gz,Signal Date,0,
+stage4a1_transfer_baseline_primary_predictions.csv.gz,Dataset Cohort,0,
+stage4a1_transfer_baseline_primary_predictions.csv.gz,Original Signal,0,
+stage4a1_transfer_baseline_primary_predictions.csv.gz,Setup,0,
+stage4a1_transfer_baseline_primary_predictions.csv.gz,Market Regime,0,
+stage4a1_transfer_baseline_primary_predictions.csv.gz,Actionability Score,0,0
+stage4a1_transfer_baseline_primary_predictions.csv.gz,Technical Score,0,0
+stage4a1_transfer_baseline_primary_predictions.csv.gz,Evaluation Year,0,0
+stage4a1_transfer_baseline_primary_predictions.csv.gz,Target,0,
+stage4a1_transfer_baseline_primary_predictions.csv.gz,Model Variant,0,
+stage4a1_transfer_baseline_primary_predictions.csv.gz,Feature Set,0,
+stage4a1_transfer_baseline_primary_predictions.csv.gz,Model Spec Hash,0,
+stage4a1_transfer_baseline_primary_predictions.csv.gz,Feature Set Hash,0,
+stage4a1_transfer_baseline_primary_predictions.csv.gz,Stage 3.1 Experiment ID,0,
+stage4a1_transfer_baseline_primary_predictions.csv.gz,Stage 4A Experiment ID,0,
+stage4a1_transfer_baseline_primary_predictions.csv.gz,Training Cutoff Date,0,
+stage4a1_transfer_baseline_primary_predictions.csv.gz,Predicted Probability,0,0
+stage4a1_transfer_baseline_primary_predictions.csv.gz,Actual Label,0,0
+stage4a1_transfer_baseline_primary_predictions.csv.gz,Label Status,0,
+stage4a1_transfer_baseline_primary_predictions.csv.gz,Label Available Date,0,
+stage4a1_transfer_baseline_primary_predictions.csv.gz,Training Rows,0,0
+stage4a1_transfer_baseline_primary_predictions.csv.gz,Training Positive Count,0,0
+stage4a1_transfer_baseline_primary_predictions.csv.gz,Training Prevalence,0,0
+stage4a1_transfer_baseline_primary_predictions.csv.gz,Training Prior,0,0
+stage4a1_transfer_baseline_primary_joint_predictions.csv.gz,Mode,0,
+stage4a1_transfer_baseline_primary_joint_predictions.csv.gz,Signal ID,0,
+stage4a1_transfer_baseline_primary_joint_predictions.csv.gz,Ticker,0,
+stage4a1_transfer_baseline_primary_joint_predictions.csv.gz,Signal Date,0,
+stage4a1_transfer_baseline_primary_joint_predictions.csv.gz,Dataset Cohort,0,
+stage4a1_transfer_baseline_primary_joint_predictions.csv.gz,Original Signal,0,
+stage4a1_transfer_baseline_primary_joint_predictions.csv.gz,Setup,0,
+stage4a1_transfer_baseline_primary_joint_predictions.csv.gz,Market Regime,0,
+stage4a1_transfer_baseline_primary_joint_predictions.csv.gz,Actionability Score,0,0
+stage4a1_transfer_baseline_primary_joint_predictions.csv.gz,Technical Score,0,0
+stage4a1_transfer_baseline_primary_joint_predictions.csv.gz,Evaluation Year,0,0
+stage4a1_transfer_baseline_primary_joint_predictions.csv.gz,Target,0,
+stage4a1_transfer_baseline_primary_joint_predictions.csv.gz,Model Variant,0,
+stage4a1_transfer_baseline_primary_joint_predictions.csv.gz,Feature Set,0,
+stage4a1_transfer_baseline_primary_joint_predictions.csv.gz,Entry Model Spec Hash,0,
+stage4a1_transfer_baseline_primary_joint_predictions.csv.gz,Conditional Model Spec Hash,0,
+stage4a1_transfer_baseline_primary_joint_predictions.csv.gz,Entry Feature Set Hash,0,
+stage4a1_transfer_baseline_primary_joint_predictions.csv.gz,Conditional Feature Set Hash,0,
+stage4a1_transfer_baseline_primary_joint_predictions.csv.gz,Stage 3.1 Experiment ID,0,
+stage4a1_transfer_baseline_primary_joint_predictions.csv.gz,Stage 4A Experiment ID,0,
+stage4a1_transfer_baseline_primary_joint_predictions.csv.gz,Training Cutoff Date,0,
+stage4a1_transfer_baseline_primary_joint_predictions.csv.gz,P Fill,0,0
+stage4a1_transfer_baseline_primary_joint_predictions.csv.gz,P T1 Conditional,0,0
+stage4a1_transfer_baseline_primary_joint_predictions.csv.gz,Predicted Probability,0,0
+stage4a1_transfer_baseline_primary_joint_predictions.csv.gz,Actual Label,0,0
+stage4a1_transfer_baseline_primary_joint_predictions.csv.gz,Label Status,0,
+stage4a1_transfer_baseline_primary_joint_predictions.csv.gz,Label Available Date,0,
+stage4a1_transfer_baseline_primary_joint_predictions.csv.gz,Training Prior Entry,0,0
+stage4a1_transfer_baseline_primary_joint_predictions.csv.gz,Training Prior Conditional,0,0
+stage4a1_transfer_baseline_primary_joint_predictions.csv.gz,Training Prior,0,0
+stage4a1_transfer_baseline_primary_joint_predictions.csv.gz,Training Rows Entry,0,0
+stage4a1_transfer_baseline_primary_joint_predictions.csv.gz,Training Rows Conditional,0,0
+stage4a1_transfer_baseline_primary_joint_predictions.csv.gz,P T2 Conditional,0,0

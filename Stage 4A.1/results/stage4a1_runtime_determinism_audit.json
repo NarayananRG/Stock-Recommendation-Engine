@@ -1,0 +1,11 @@
+{
+  "BEHAVIORAL LOGICAL DIFFERENCES": 0,
+  "Excluded Runtime Fields": {
+    "stage4a1_primary_only_model_fit_audit.csv": [
+      "Fit Seconds",
+      "Prediction Seconds"
+    ]
+  },
+  "RAW RUNTIME FIELD DIFFERENCES": 328,
+  "Raw differences limited to timing": true
+}

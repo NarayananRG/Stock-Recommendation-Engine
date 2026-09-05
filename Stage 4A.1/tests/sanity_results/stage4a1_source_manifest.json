@@ -1,0 +1,83 @@
+{
+  "frozen_inputs": {
+    "merge_base": "9e2ce2f4bcba7a97e08193ae6e84491df02307f5",
+    "stage4a_predictions": {
+      "stage4a_joint_oos_predictions.csv.gz": {
+        "artifact_sha256": "a458d45d5f9e6cbb09d31d86408c85e19e54368a2f1434e6b7c2b0097f6279bc",
+        "logical_content_hash": "e320862e2b24d3af7a5991bb626b595a68f543a5d1ebe08de9d6cf9fd94d9d5d",
+        "rows": 95130
+      },
+      "stage4a_oos_predictions.csv.gz": {
+        "artifact_sha256": "c79d599e2c506ffce7ed1f84fb0088217632bc1a28148e0d463753199729879e",
+        "logical_content_hash": "a6839e7543ffb4327d57fb03ad8d2d8e11994889dc277118c72a2e04edceecde",
+        "rows": 142695
+      }
+    },
+    "trade_opportunity_logical_hash": "3da733b3f1a9fa03c107c960495690290e7fe065901e4f0822c2905ba62d11d5"
+  },
+  "stage4a1": {
+    "package_hash": "4ef0231b849fa86622af27f1b7747021b4d2e07060c35e2d8b1155abc9434b17",
+    "sources": [
+      {
+        "bytes": 3876,
+        "relative_path": "config/stage4a1_config.json",
+        "sha256": "81870545011208cc5bdc97021f7470f38a58b3a8470cd0714d79a33cd7e5f57a"
+      },
+      {
+        "bytes": 28121,
+        "relative_path": "stage4a1/Stock_Alert_Stage4A1_Executable_Cohort.py",
+        "sha256": "30fbfdbfb268ab7f166e28ee908d01f42e939bbbf1585f1a7db261ab51f79e6d"
+      },
+      {
+        "bytes": 87,
+        "relative_path": "stage4a1/__init__.py",
+        "sha256": "fb2147b1c86eefc021488112f6eb17327399aba5e073ba3dca4109960d919cb4"
+      },
+      {
+        "bytes": 10620,
+        "relative_path": "stage4a1/bootstrap.py",
+        "sha256": "994a7031885f31151eec01a23e711d1bf0e50711a95ec1ded6392ce7841e0440"
+      },
+      {
+        "bytes": 6511,
+        "relative_path": "stage4a1/data_contract.py",
+        "sha256": "5ea73ed9ed581588d4f5ffef03ae9dd486c654709b8e5de7dd7dfe573d1e6506"
+      },
+      {
+        "bytes": 4978,
+        "relative_path": "stage4a1/diagnostics.py",
+        "sha256": "c8c00091607f04c18528925beb7178266806e537a032b589acbe4a0a78a5be6e"
+      },
+      {
+        "bytes": 3805,
+        "relative_path": "stage4a1/folds.py",
+        "sha256": "54914a4002704fbdd5dff2fd1a7cf403af6fc9e94a8133d4e3e5c5d574330f34"
+      },
+      {
+        "bytes": 3296,
+        "relative_path": "stage4a1/hashing.py",
+        "sha256": "68abfe783af1a5bd10ae84fd6de2184f618ed45c1bfcdde8ad3374e4b087e35d"
+      },
+      {
+        "bytes": 8923,
+        "relative_path": "stage4a1/metrics.py",
+        "sha256": "a7322f249d3d5425ca3d71e4d111243707b857aca5811538f17bc158cb77a531"
+      },
+      {
+        "bytes": 1713,
+        "relative_path": "stage4a1/models.py",
+        "sha256": "cd1b575d5e8bb16fdc2f4d72511a2ab81eb34b6479215c3e36c207e0c232e157"
+      },
+      {
+        "bytes": 9685,
+        "relative_path": "stage4a1/validation.py",
+        "sha256": "c9df33e3a21d6b3a1b9d36d78f01da3a4e1d84b244732b77d988f5fb40488ce6"
+      },
+      {
+        "bytes": 13131,
+        "relative_path": "tests/run_stage4a1_tests.py",
+        "sha256": "7582408a49bef571456bc8a9c5196fc19ca7c79c50813d3755b2b9b8cf53cb42"
+      }
+    ]
+  }
+}
