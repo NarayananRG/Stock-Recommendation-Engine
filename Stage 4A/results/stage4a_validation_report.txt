@@ -1,0 +1,54 @@
+STAGE 4A ENGINEERING VALIDATION
+ENGINEERING STATUS: PASS WITH WARNINGS
+CHECKS: 47
+PASS: 46
+WARN: 1
+FAIL: 0
+
+[PASS] REFERENCE :: Immutable reference gate :: expected=all PASS :: actual={'PASS': 37} :: 
+[PASS] REFERENCE :: Stage 3.1 frozen tag verified :: expected=PASS :: actual=['PASS'] :: 
+[PASS] UPSTREAM :: Stage 3.1 unmodified :: expected=all PASS :: actual=['PASS', 'PASS', 'PASS'] :: 
+[PASS] FEATURES :: Exactly three pre-registered feature sets :: expected=['FS1_RULE_SUMMARY', 'FS2_RAW_SIGNAL_STATE', 'FS3_FULL_SIGNAL_STATE'] :: actual=['FS1_RULE_SUMMARY', 'FS2_RAW_SIGNAL_STATE', 'FS3_FULL_SIGNAL_STATE'] :: 
+[PASS] FEATURES :: FS1 contains only rule-engine derived features :: expected=RULE_ENGINE_DERIVED_FEATURES :: actual=['RULE_ENGINE_DERIVED_FEATURES'] :: 
+[PASS] FEATURES :: FS2 excludes rule-engine derived features :: expected=disjoint :: actual=0 :: 
+[PASS] FEATURES :: FS3 equals FS1 union FS2 :: expected=97 :: actual=97 :: 
+[PASS] FEATURES :: Feature counts fixed :: expected=5/92/97 :: actual=5/92/97 :: 
+[PASS] LEAKAGE :: Target leakage count :: expected=0 :: actual=0 :: 
+[PASS] LEAKAGE :: Ticker excluded :: expected=excluded :: actual=excluded :: 
+[PASS] LEAKAGE :: Signal ID excluded :: expected=excluded :: actual=excluded :: 
+[PASS] LEAKAGE :: Raw date feature count :: expected=0 :: actual=0 :: 
+[PASS] IDENTITY :: Feature-set hashes deterministic and complete :: expected=['FS1_RULE_SUMMARY', 'FS2_RAW_SIGNAL_STATE', 'FS3_FULL_SIGNAL_STATE'] :: actual=['FS1_RULE_SUMMARY', 'FS2_RAW_SIGNAL_STATE', 'FS3_FULL_SIGNAL_STATE'] :: 
+[PASS] MODELS :: Exactly five pre-registered model variants :: expected=['DUMMY_PRIOR', 'LOGIT_RULE', 'LOGIT_RAW', 'LOGIT_FULL', 'RF_FULL'] :: actual=['DUMMY_PRIOR', 'LOGIT_FULL', 'LOGIT_RAW', 'LOGIT_RULE', 'RF_FULL'] :: 
+[PASS] MODELS :: Model specification hashes complete :: expected=['DUMMY_PRIOR', 'LOGIT_RULE', 'LOGIT_RAW', 'LOGIT_FULL', 'RF_FULL'] :: actual=['DUMMY_PRIOR', 'LOGIT_FULL', 'LOGIT_RAW', 'LOGIT_RULE', 'RF_FULL'] :: 
+[PASS] MODELS :: Logistic hyperparameters frozen :: expected={'penalty': 'l2', 'C': 1.0, 'solver': 'liblinear', 'max_iter': 5000, 'class_weight': None, 'random_state': 42} :: actual={'C': 1.0, 'class_weight': None, 'max_iter': 5000, 'penalty': 'l2', 'random_state': 42, 'solver': 'liblinear'} :: 
+[PASS] MODELS :: Random Forest hyperparameters frozen :: expected={'n_estimators': 300, 'max_depth': 8, 'min_samples_leaf': 20, 'max_features': 'sqrt', 'bootstrap': True, 'class_weight': None, 'random_state': 42, 'n_jobs': 1} :: actual={'bootstrap': True, 'class_weight': None, 'max_depth': 8, 'max_features': 'sqrt', 'min_samples_leaf': 20, 'n_estimators': 300, 'n_jobs': 1, 'random_state': 42} :: 
+[PASS] MODELS :: Random seed fixed :: expected=42 :: actual=[42] :: 
+[PASS] MODELS :: No class rebalancing :: expected=None :: actual={'logit': None, 'rf': None} :: 
+[PASS] CHRONOLOGY :: Fold reconstruction exact :: expected=0 :: actual=0 :: 
+[PASS] CHRONOLOGY :: Zero training-availability violations :: expected=0 :: actual=0 :: 
+[PASS] CHRONOLOGY :: All reconstructed folds pass :: expected=all PASS :: actual={'PASS': 33} :: 
+[PASS] CHRONOLOGY :: Only requested evaluation years scored :: expected=[2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026] :: actual=[np.int64(2016), np.int64(2017), np.int64(2018), np.int64(2019), np.int64(2020), np.int64(2021), np.int64(2022), np.int64(2023), np.int64(2024), np.int64(2025), np.int64(2026)] :: 
+[PASS] PREPROCESSING :: Training-only imputation :: expected=True :: actual=True :: 
+[PASS] PREPROCESSING :: Training-only encoding :: expected=True :: actual=True :: 
+[PASS] PREPROCESSING :: No evaluation fit operations :: expected=True :: actual=True :: 
+[PASS] PREPROCESSING :: No global scaling :: expected=True :: actual=True :: 
+[PASS] PREPROCESSING :: No target encoding :: expected=True :: actual=True :: 
+[PASS] MODELS :: No silent fit failure :: expected=165 :: actual=165 :: 
+[WARN] MODELS :: Model fit warnings disclosed :: expected=record every warning :: actual=99 :: Warnings are preserved in stage4a_model_fit_audit.csv; no convergence failure occurred.
+[PASS] MODELS :: Dummy prior equals training prevalence :: expected=exact equality :: actual=exact :: 
+[PASS] MODELS :: Prediction probabilities in range :: expected=[0,1] :: actual=[2.76837644293e-06, 0.997550364649] :: 
+[PASS] PREDICTIONS :: Yearly prediction uniqueness :: expected=0 :: actual=0 :: 
+[PASS] PREDICTIONS :: OOS prediction lineage complete :: expected=0 :: actual=0 :: 
+[PASS] PREDICTIONS :: Complete target/model annual OOS coverage :: expected=15 groups x 11 years :: actual={('ENTRY_FILLED', 'DUMMY_PRIOR'): 11, ('ENTRY_FILLED', 'LOGIT_FULL'): 11, ('ENTRY_FILLED', 'LOGIT_RAW'): 11, ('ENTRY_FILLED', 'LOGIT_RULE'): 11, ('ENTRY_FILLED', 'RF_FULL'): 11, ('T1_BEFORE_STOP_63', 'DUMMY_PRIOR'): 11, ('T1_BEFORE_STOP_63', 'LOGIT_FULL'): 11, ('T1_BEFORE_STOP_63', 'LOGIT_RAW'): 11, ('T1_BEFORE_STOP_63', 'LOGIT_RULE'): 11, ('T1_BEFORE_STOP_63', 'RF_FULL'): 11, ('T2_BEFORE_STOP_63', 'DUMMY_PRIOR'): 11, ('T2_BEFORE_STOP_63', 'LOGIT_FULL'): 11, ('T2_BEFORE_STOP_63', 'LOGIT_RAW'): 11, ('T2_BEFORE_STOP_63', 'LOGIT_RULE'): 11, ('T2_BEFORE_STOP_63', 'RF_FULL'): 11} :: 
+[PASS] JOINT :: Joint probability arithmetic exact :: expected=exact :: actual=exact :: 
+[PASS] JOINT :: Observed non-fill joint actual is zero :: expected=0 :: actual=[np.float64(0.0)] :: 
+[PASS] JOINT :: Unresolved/invalid joint labels excluded :: expected=all NA :: actual=0 :: 
+[PASS] JOINT :: Joint label availability date present only for available labels :: expected=consistent :: actual=consistent :: 
+[PASS] JOINT :: Joint probabilities in range :: expected=[0,1] :: actual=[2.58827026895e-06, 0.902321410825] :: 
+[PASS] RECENT :: Dedicated 2024-2026 metrics produced :: expected=['ENTRY_FILLED', 'JOINT_T1', 'JOINT_T2', 'T1_BEFORE_STOP_63', 'T2_BEFORE_STOP_63'] :: actual=['ENTRY_FILLED', 'JOINT_T1', 'JOINT_T2', 'T1_BEFORE_STOP_63', 'T2_BEFORE_STOP_63'] :: 
+[PASS] REPRODUCIBILITY :: No model binaries required :: expected=0 :: actual=0 :: 
+[PASS] SCOPE :: No feature selection :: expected=prohibited :: actual=prohibited :: 
+[PASS] SCOPE :: No hyperparameter search :: expected=prohibited :: actual=prohibited :: 
+[PASS] SCOPE :: No threshold optimization :: expected=prohibited :: actual=prohibited :: 
+[PASS] SCOPE :: No ML trading backtest :: expected=prohibited :: actual=prohibited :: 
+[PASS] DETERMINISM :: Second full run exact match :: expected=all PASS :: actual={'PASS': 28} :: 

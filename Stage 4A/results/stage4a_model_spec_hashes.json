@@ -1,0 +1,157 @@
+{
+  "DUMMY_PRIOR": {
+    "MODEL_SPEC_HASH": "92ac2a35c57c8d6b437d003cea954a83dd1301d470400667434d22266bd7fa03",
+    "specification": {
+      "feature_set": "NONE",
+      "feature_set_hash": "NONE",
+      "hyperparameters": {
+        "strategy": "training_fold_prior"
+      },
+      "model_family": "DUMMY_PRIOR",
+      "model_variant": "DUMMY_PRIOR",
+      "preprocessing": {
+        "features": "NONE",
+        "fit_scope": "training_fold_only"
+      },
+      "random_seed": 42
+    }
+  },
+  "LOGIT_FULL": {
+    "MODEL_SPEC_HASH": "233401f0fa7093b8055c86b7f5aec0d1096c5b30c6fe7a5136620ada96f4b6f2",
+    "specification": {
+      "feature_set": "FS3_FULL_SIGNAL_STATE",
+      "feature_set_hash": "62c26716ced06ea266e50ac79e404a2377015361b5ecd4f6228da77a8f6491b9",
+      "hyperparameters": {
+        "C": 1.0,
+        "class_weight": null,
+        "max_iter": 5000,
+        "penalty": "l2",
+        "random_state": 42,
+        "solver": "liblinear"
+      },
+      "model_family": "LOGISTIC_L2",
+      "model_variant": "LOGIT_FULL",
+      "preprocessing": {
+        "categorical_encoder": {
+          "handle_unknown": "ignore"
+        },
+        "categorical_imputer": {
+          "strategy": "most_frequent"
+        },
+        "fit_scope": "training_fold_only",
+        "global_preprocessing": false,
+        "logistic_numeric_scaler": "StandardScaler",
+        "numeric_imputer": {
+          "strategy": "median"
+        },
+        "numeric_scaler": "StandardScaler",
+        "target_encoding": false
+      },
+      "random_seed": 42
+    }
+  },
+  "LOGIT_RAW": {
+    "MODEL_SPEC_HASH": "1d7251d431f8d3b4b6fb14d0ddcbe9ec69e84ac89352da118c296bf3344a43fc",
+    "specification": {
+      "feature_set": "FS2_RAW_SIGNAL_STATE",
+      "feature_set_hash": "a7712564c2b308c570374a1b1634f59971b9823a87a276fed8f995e1321bd490",
+      "hyperparameters": {
+        "C": 1.0,
+        "class_weight": null,
+        "max_iter": 5000,
+        "penalty": "l2",
+        "random_state": 42,
+        "solver": "liblinear"
+      },
+      "model_family": "LOGISTIC_L2",
+      "model_variant": "LOGIT_RAW",
+      "preprocessing": {
+        "categorical_encoder": {
+          "handle_unknown": "ignore"
+        },
+        "categorical_imputer": {
+          "strategy": "most_frequent"
+        },
+        "fit_scope": "training_fold_only",
+        "global_preprocessing": false,
+        "logistic_numeric_scaler": "StandardScaler",
+        "numeric_imputer": {
+          "strategy": "median"
+        },
+        "numeric_scaler": "StandardScaler",
+        "target_encoding": false
+      },
+      "random_seed": 42
+    }
+  },
+  "LOGIT_RULE": {
+    "MODEL_SPEC_HASH": "7d072a4f9d1bafb55d5c66f8c49e4beb61d6189193be1870a17356effe9650c8",
+    "specification": {
+      "feature_set": "FS1_RULE_SUMMARY",
+      "feature_set_hash": "3b59219251db699f1732edbee9212c16a763fa5e28c826ae97e36e7b26ef1ba1",
+      "hyperparameters": {
+        "C": 1.0,
+        "class_weight": null,
+        "max_iter": 5000,
+        "penalty": "l2",
+        "random_state": 42,
+        "solver": "liblinear"
+      },
+      "model_family": "LOGISTIC_L2",
+      "model_variant": "LOGIT_RULE",
+      "preprocessing": {
+        "categorical_encoder": {
+          "handle_unknown": "ignore"
+        },
+        "categorical_imputer": {
+          "strategy": "most_frequent"
+        },
+        "fit_scope": "training_fold_only",
+        "global_preprocessing": false,
+        "logistic_numeric_scaler": "StandardScaler",
+        "numeric_imputer": {
+          "strategy": "median"
+        },
+        "numeric_scaler": "StandardScaler",
+        "target_encoding": false
+      },
+      "random_seed": 42
+    }
+  },
+  "RF_FULL": {
+    "MODEL_SPEC_HASH": "32d835a1c7e64d9929a0d78d3811bf3228919c1e4d2a00b5d6d0ea12fd8e5b1a",
+    "specification": {
+      "feature_set": "FS3_FULL_SIGNAL_STATE",
+      "feature_set_hash": "62c26716ced06ea266e50ac79e404a2377015361b5ecd4f6228da77a8f6491b9",
+      "hyperparameters": {
+        "bootstrap": true,
+        "class_weight": null,
+        "max_depth": 8,
+        "max_features": "sqrt",
+        "min_samples_leaf": 20,
+        "n_estimators": 300,
+        "n_jobs": 1,
+        "random_state": 42
+      },
+      "model_family": "RANDOM_FOREST_FIXED",
+      "model_variant": "RF_FULL",
+      "preprocessing": {
+        "categorical_encoder": {
+          "handle_unknown": "ignore"
+        },
+        "categorical_imputer": {
+          "strategy": "most_frequent"
+        },
+        "fit_scope": "training_fold_only",
+        "global_preprocessing": false,
+        "logistic_numeric_scaler": "StandardScaler",
+        "numeric_imputer": {
+          "strategy": "median"
+        },
+        "numeric_scaler": "NONE",
+        "target_encoding": false
+      },
+      "random_seed": 42
+    }
+  }
+}

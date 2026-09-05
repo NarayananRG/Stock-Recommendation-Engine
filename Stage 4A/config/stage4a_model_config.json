@@ -1,0 +1,107 @@
+{
+  "stage": "4A",
+  "experiment_start": "2016-01-01",
+  "experiment_end": "2026-08-28",
+  "evaluation_years": [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026],
+  "sanity_evaluation_years": [2016, 2017],
+  "sanity_tickers": ["TCS.NS", "INFY.NS"],
+  "random_seed": 42,
+  "fixed_probability_threshold": 0.5,
+  "calibration_bucket_width": 0.1,
+  "ranking_fractions": [0.1, 0.2],
+  "stage3_1": {
+    "tag": "stage3.1-point-in-time-ml-dataset-baseline",
+    "commit": "ac62c35f2a47bc862e406030b81f93da17c75d74",
+    "experiment_id": "S3_1_20110830_20260828_4bbdb236598d",
+    "package_hash": "8747ee0582a7feddf4282e5801dd11e2c20b7085bf54e6629aafc31fc08165cb",
+    "schema_hash": "7e6fb19e0618c70c9ea04300b2825bf674ac14322ab24eb1c958145781a6d2c4",
+    "datasets": {
+      "signal_state": {"rows": 68081, "content_hash": "5876e3629cb609eed16f776d035ff9c13e3c6947dee5c2ecb4e846c8b18f74bd"},
+      "trade_opportunity": {"rows": 13544, "content_hash": "3da733b3f1a9fa03c107c960495690290e7fe065901e4f0822c2905ba62d11d5"},
+      "d1_position_day": {"rows": 4350, "content_hash": "8e095d8cfd5bbca523881956b18283d36677e13d58dacee9048cea43252284b6"}
+    }
+  },
+  "stage2b_1": {
+    "tag": "stage2b.1-dynamic-research-baseline",
+    "commit": "c9cc9f4fcaf2fe81128365be09515fbf9fa67c28"
+  },
+  "stage3_reference": {
+    "ref": "origin/stage3-point-in-time-dataset",
+    "commit": "70951a5a05727a605bb579973da6216fb9887e44"
+  },
+  "source_paths": {
+    "stage3_1_root": "Stage 3.1",
+    "results": "Stage 3.1/results",
+    "trade_opportunity": "Stage 3.1/results/stage3_1_trade_opportunity_dataset.csv.gz",
+    "feature_registry": "Stage 3.1/results/stage3_1_feature_registry.csv",
+    "ml_column_registry": "Stage 3.1/results/stage3_1_ml_column_registry.csv",
+    "label_registry": "Stage 3.1/results/stage3_1_label_registry.csv",
+    "fold_manifest": "Stage 3.1/results/stage3_1_walk_forward_split_manifest.csv",
+    "dataset_manifest": "Stage 3.1/results/stage3_1_dataset_manifest.json",
+    "source_manifest": "Stage 3.1/results/stage3_1_source_manifest.json",
+    "experiment_identity": "Stage 3.1/results/stage3_1_experiment_identity.json"
+  },
+  "targets": {
+    "ENTRY_FILLED": {
+      "applicable": "ENTRY_APPLICABLE",
+      "status": "ENTRY_STATUS",
+      "available_statuses": ["FILLED", "FILLED_INVALID_RISK", "NOT_FILLED"],
+      "available_date": "ENTRY_LABEL_AVAILABLE_DATE",
+      "data_end_censored": "ENTRY_DATA_END_CENSORED"
+    },
+    "T1_BEFORE_STOP_63": {
+      "applicable": "T1_APPLICABLE",
+      "status": "T1_STATUS",
+      "available_statuses": ["AVAILABLE"],
+      "available_date": "T1_LABEL_AVAILABLE_DATE",
+      "data_end_censored": "T1_DATA_END_CENSORED"
+    },
+    "T2_BEFORE_STOP_63": {
+      "applicable": "T2_APPLICABLE",
+      "status": "T2_STATUS",
+      "available_statuses": ["AVAILABLE"],
+      "available_date": "T2_LABEL_AVAILABLE_DATE",
+      "data_end_censored": "T2_DATA_END_CENSORED"
+    }
+  },
+  "feature_sets": {
+    "FS1_RULE_SUMMARY": {"definition": "only RULE_ENGINE_DERIVED_FEATURES"},
+    "FS2_RAW_SIGNAL_STATE": {"definition": "all FEATURE_ALLOWED except RULE_ENGINE_DERIVED_FEATURES"},
+    "FS3_FULL_SIGNAL_STATE": {"definition": "all trade_opportunity FEATURE_ALLOWED fields"}
+  },
+  "model_variants": {
+    "DUMMY_PRIOR": {"family": "DUMMY_PRIOR", "feature_set": "NONE"},
+    "LOGIT_RULE": {"family": "LOGISTIC_L2", "feature_set": "FS1_RULE_SUMMARY"},
+    "LOGIT_RAW": {"family": "LOGISTIC_L2", "feature_set": "FS2_RAW_SIGNAL_STATE"},
+    "LOGIT_FULL": {"family": "LOGISTIC_L2", "feature_set": "FS3_FULL_SIGNAL_STATE"},
+    "RF_FULL": {"family": "RANDOM_FOREST_FIXED", "feature_set": "FS3_FULL_SIGNAL_STATE"}
+  },
+  "logistic_parameters": {
+    "penalty": "l2", "C": 1.0, "solver": "liblinear", "max_iter": 5000,
+    "class_weight": null, "random_state": 42
+  },
+  "random_forest_parameters": {
+    "n_estimators": 300, "max_depth": 8, "min_samples_leaf": 20,
+    "max_features": "sqrt", "bootstrap": true, "class_weight": null,
+    "random_state": 42, "n_jobs": 1
+  },
+  "preprocessing": {
+    "numeric_imputer": {"strategy": "median"},
+    "logistic_numeric_scaler": "StandardScaler",
+    "categorical_imputer": {"strategy": "most_frequent"},
+    "categorical_encoder": {"handle_unknown": "ignore"},
+    "fit_scope": "training_fold_only",
+    "target_encoding": false,
+    "global_preprocessing": false
+  },
+  "prohibitions": {
+    "random_train_test_split": true,
+    "shuffled_cross_validation": true,
+    "class_rebalancing": true,
+    "feature_selection": true,
+    "hyperparameter_search": true,
+    "probability_threshold_optimization": true,
+    "ml_trading_backtest": true,
+    "d1_model_training": true
+  }
+}
