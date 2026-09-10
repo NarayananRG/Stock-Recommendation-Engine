@@ -1,0 +1,4 @@
+Check,Status,Expected,Actual
+reference gates,PASS,all PASS,{'PASS': 15}
+prediction lineage,PASS,all PASS,{'PASS': 20}
+sanity policies executed,PASS,3,3

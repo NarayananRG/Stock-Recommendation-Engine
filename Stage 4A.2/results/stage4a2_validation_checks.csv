@@ -1,0 +1,10 @@
+Check,Status,Expected,Actual
+all reference gates pass,PASS,True,True
+all prediction lineage gates pass,PASS,True,True
+D1 parity exact,PASS,True,True
+D0 parity exact,PASS,True,True
+candidate count,PASS,754,754
+named policies,PASS,13,13
+random controls,PASS,1000,1000
+bootstrap replicates,PASS,60000,60000
+exposure bounded,PASS,True,True

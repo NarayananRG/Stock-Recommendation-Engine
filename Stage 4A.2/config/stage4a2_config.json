@@ -1,0 +1,20 @@
+{
+  "evaluation_start": "2016-01-01",
+  "evaluation_end": "2026-08-28",
+  "starting_equity": 100000.0,
+  "daily_k_values": [1, 2],
+  "random_seeds_per_k": 500,
+  "random_seed_first": 0,
+  "bootstrap_seed": 42,
+  "bootstrap_replicates": 2000,
+  "bootstrap_block_lengths": [63, 21, 126],
+  "primary_exit_engine": "D1_TRAIL_ONLY",
+  "secondary_exit_engine": "D0_STATIC_COMPAT",
+  "risk_per_trade": 0.0075,
+  "max_position_pct": 0.25,
+  "max_open_positions": 5,
+  "slippage_bps": 5.0,
+  "transaction_cost_bps": 5.0,
+  "max_holding_sessions": 63,
+  "intraday_ambiguity": "STOP_FIRST"
+}

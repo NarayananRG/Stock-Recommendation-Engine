@@ -1,0 +1,3 @@
+Check,Status,Expected,Actual
+D1 ending equity,PASS,120093.408187,120093.408187
+D1 trade count,PASS,285,285

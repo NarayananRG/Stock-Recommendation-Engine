@@ -1,0 +1,117 @@
+Test,Status,Expected,Actual
+frozen tag stage4a1-executable-cohort-robustness-baseline,PASS,012fd37df9158d4c5f7b2165de1d0ec1debbde6f,012fd37df9158d4c5f7b2165de1d0ec1debbde6f
+frozen tag stage4a-chronological-ml-research-baseline,PASS,9e2ce2f4bcba7a97e08193ae6e84491df02307f5,9e2ce2f4bcba7a97e08193ae6e84491df02307f5
+frozen tag stage3.1-point-in-time-ml-dataset-baseline,PASS,ac62c35f2a47bc862e406030b81f93da17c75d74,ac62c35f2a47bc862e406030b81f93da17c75d74
+frozen tag stage2b.1-dynamic-research-baseline,PASS,c9cc9f4fcaf2fe81128365be09515fbf9fa67c28,c9cc9f4fcaf2fe81128365be09515fbf9fa67c28
+Stage 4A.1 experiment exact,PASS,True,True
+Stage 4A.1 package exact,PASS,True,True
+BASELINE_PRIMARY used directly,PASS,True,True
+candidate count exact,PASS,754,754
+Signal ID unique,PASS,True,True
+BUY definitions frozen,PASS,True,True
+evaluation lower bound,PASS,True,True
+evaluation upper bound,PASS,True,True
+prediction merge one-to-one,PASS,True,True
+evaluation year matches,PASS,True,True
+training cutoff valid,PASS,True,True
+no missing prediction,PASS,True,True
+R0 ordering exact,PASS,True,True
+R1 ranking exact,PASS,True,True
+R2 ranking exact,PASS,True,True
+R3 ranking exact,PASS,True,True
+R4 ranking exact,PASS,True,True
+R5 ranking exact,PASS,True,True
+R0 K1 cardinality,PASS,True,True
+R0 K2 cardinality,PASS,True,True
+R1 K1 cardinality,PASS,True,True
+R1 K2 cardinality,PASS,True,True
+R2 K1 cardinality,PASS,True,True
+R2 K2 cardinality,PASS,True,True
+R3 K1 cardinality,PASS,True,True
+R3 K2 cardinality,PASS,True,True
+R4 K1 cardinality,PASS,True,True
+R4 K2 cardinality,PASS,True,True
+R5 K1 cardinality,PASS,True,True
+R5 K2 cardinality,PASS,True,True
+only K1/K2,PASS,True,True
+all baseline membership exact,PASS,True,True
+future permutation invariant,PASS,True,True
+random seed 0 deterministic,PASS,True,True
+random key 0 formula,PASS,True,True
+random seed 1 deterministic,PASS,True,True
+random key 1 formula,PASS,True,True
+random seed 42 deterministic,PASS,True,True
+random key 42 formula,PASS,True,True
+random seed 499 deterministic,PASS,True,True
+random key 499 formula,PASS,True,True
+random K1 cardinality,PASS,True,True
+random K1 future invariant,PASS,True,True
+random K2 cardinality,PASS,True,True
+random K2 future invariant,PASS,True,True
+registry 13 policies,PASS,13,13
+threshold NONE,PASS,True,True
+future data NO,PASS,True,True
+model retrained NO,PASS,True,True
+T2 excluded from ranking,PASS,True,True
+selection timestamp signal close,PASS,True,True
+no LogisticRegression.fit,PASS,True,True
+no RandomForestClassifier.fit,PASS,True,True
+no xgboost,PASS,True,True
+no lightgbm,PASS,True,True
+no catboost,PASS,True,True
+no isotonic,PASS,True,True
+no Platt,PASS,True,True
+no threshold loop,PASS,True,True
+no hyperparameter search,PASS,True,True
+no feature selection,PASS,True,True
+no Stage 5,PASS,True,True
+no live recommendation,PASS,True,True
+risk frozen,PASS,0.0075,0.0075
+max position frozen,PASS,0.25,0.25
+max positions frozen,PASS,5,5
+slippage frozen,PASS,5.0,5.0
+cost frozen,PASS,5.0,5.0
+holding frozen,PASS,63,63
+stop-first frozen,PASS,STOP_FIRST,STOP_FIRST
+random seeds exact,PASS,500,500
+bootstrap reps exact,PASS,2000,2000
+bootstrap seed exact,PASS,42,42
+K exact,PASS,True,True
+blocks exact,PASS,True,True
+D1 primary,PASS,True,True
+D0 secondary,PASS,True,True
+bootstrap 21 deterministic,PASS,True,True
+bootstrap 21 sample length,PASS,True,True
+bootstrap 21 paired arithmetic,PASS,True,True
+bootstrap 63 deterministic,PASS,True,True
+bootstrap 63 sample length,PASS,True,True
+bootstrap 63 paired arithmetic,PASS,True,True
+bootstrap 126 deterministic,PASS,True,True
+bootstrap 126 sample length,PASS,True,True
+bootstrap 126 paired arithmetic,PASS,True,True
+exposure match cap source present,PASS,True,True
+prior-session shift source present,PASS,True,True
+no ML sizing,PASS,True,True
+no ML stop changes,PASS,True,True
+no ML target changes,PASS,True,True
+no ML exit changes,PASS,True,True
+cash only implicit frozen adapter,PASS,True,True
+candidate filter before engine,PASS,True,True
+output exists stage4a2_portfolio_summary_d1.csv,PASS,True,True
+output exists stage4a2_portfolio_summary_d0.csv,PASS,True,True
+output exists stage4a2_random_control_raw.csv.gz,PASS,True,True
+output exists stage4a2_bootstrap_summary.csv,PASS,True,True
+output exists stage4a2_validation_checks.csv,PASS,True,True
+output exists stage4a2_trade_ledger_d1.csv.gz,PASS,True,True
+output exists stage4a2_daily_portfolio_d1.csv.gz,PASS,True,True
+output exists stage4a2_recent_2024_2026_metrics.csv,PASS,True,True
+D1 baseline ending parity,PASS,True,True
+D1 baseline trades parity,PASS,True,True
+all 13 named policies,PASS,True,True
+D0 baseline ending parity,PASS,True,True
+D0 baseline trades parity,PASS,True,True
+1000 random controls,PASS,True,True
+500 K1,PASS,True,True
+500 K2,PASS,True,True
+exposure bounded,PASS,True,True
+daily policies 13,PASS,True,True

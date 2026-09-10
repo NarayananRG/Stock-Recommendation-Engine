@@ -1,0 +1,21 @@
+Policy,Check,Status,Failures
+R1,one score per expected Signal ID,PASS,0
+R1,Evaluation Year equals Signal Date year,PASS,0
+R1,Training Cutoff Date <= Signal Date,PASS,0
+R1,frozen Stage 4A.1 lineage,PASS,0
+R2,one score per expected Signal ID,PASS,0
+R2,Evaluation Year equals Signal Date year,PASS,0
+R2,Training Cutoff Date <= Signal Date,PASS,0
+R2,frozen Stage 4A.1 lineage,PASS,0
+R3,one score per expected Signal ID,PASS,0
+R3,Evaluation Year equals Signal Date year,PASS,0
+R3,Training Cutoff Date <= Signal Date,PASS,0
+R3,frozen Stage 4A.1 lineage,PASS,0
+R4,one score per expected Signal ID,PASS,0
+R4,Evaluation Year equals Signal Date year,PASS,0
+R4,Training Cutoff Date <= Signal Date,PASS,0
+R4,frozen Stage 4A.1 lineage,PASS,0
+R5,one score per expected Signal ID,PASS,0
+R5,Evaluation Year equals Signal Date year,PASS,0
+R5,Training Cutoff Date <= Signal Date,PASS,0
+R5,frozen Stage 4A.1 lineage,PASS,0

@@ -1,0 +1,3 @@
+Check,Status,Expected,Actual
+D1 ending equity,FAIL,120093.408187,103290.56669
+D1 trade count,FAIL,285,32
