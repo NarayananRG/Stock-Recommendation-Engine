@@ -1,0 +1,34 @@
+{
+  "bootstrap": {
+    "primary_block_sessions": 63,
+    "replicates": 2000,
+    "seed": 42,
+    "sensitivity_block_sessions": [
+      21,
+      126
+    ]
+  },
+  "definition": "TRANSFER JOINT_T1 LOGIT_FULL, K=1",
+  "economic_criteria": {
+    "bootstrap_63_delta_terminal_return_lower_2_5_gt_zero": true,
+    "cagr_gt_r0": true,
+    "expectancy_r_gt_r0": true,
+    "ledger_integrity_pass": true,
+    "max_drawdown_not_worse_than_r0_by_more_than_pp": 2,
+    "minimum_completed_trades": 50,
+    "no_protocol_drift": true,
+    "profit_factor_gte_r0": true,
+    "random_k1_total_return_percentile_gte": 95,
+    "total_return_gt_r0": true
+  },
+  "primary_comparator": "R0_K1",
+  "primary_confirmatory_policy": "R3_K1",
+  "random_control": {
+    "k1_seeds_end": 499,
+    "k1_seeds_start": 0,
+    "k2_secondary": true,
+    "key_formula": "SHA256(seed + '|' + Signal ID)"
+  },
+  "secondary_substitution_allowed": false,
+  "stage5_requires_all_ten": true
+}

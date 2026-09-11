@@ -1,0 +1,63 @@
+{
+  "protocol_version": "STAGE4A3A_V1",
+  "protocol_tag": "stage4a3-prospective-shadow-protocol-baseline",
+  "primary_policy": "R3_K1",
+  "primary_comparator": "R0_K1",
+  "prediction_semantics": "SHADOW_ONLY_NO_TRADING_EFFECT",
+  "primary_cohort": "BASELINE_PRIMARY",
+  "after_close_time_asia_kolkata": "15:45:00",
+  "model_environment": {
+    "python": "3.12.14",
+    "numpy": "2.3.5",
+    "pandas": "3.0.1",
+    "scikit-learn": "1.9.0",
+    "scipy": "1.18.1",
+    "joblib": "1.6.0",
+    "threadpoolctl": "3.6.0"
+  },
+  "frozen_references": {
+    "stage4a2-economic-utility-validation-baseline": "4e1d852c0cacc6c7d717feb9103c3cf438d044d0",
+    "stage4a1-executable-cohort-robustness-baseline": "012fd37df9158d4c5f7b2165de1d0ec1debbde6f",
+    "stage4a-chronological-ml-research-baseline": "9e2ce2f4bcba7a97e08193ae6e84491df02307f5",
+    "stage3.1-point-in-time-ml-dataset-baseline": "ac62c35f2a47bc862e406030b81f93da17c75d74",
+    "stage2b.1-dynamic-research-baseline": "c9cc9f4fcaf2fe81128365be09515fbf9fa67c28"
+  },
+  "stage4a2_experiment_id": "S4A2_20160101_20260828_022dc86ab7df",
+  "stage4a2_package_hash": "0da2a240880b70701f87067c6d355cff7607de9a86dd60d0d42a8fdbbfd39b33",
+  "required_models": [
+    {"name":"PRIMARY_ONLY_T1_LOGIT_FULL","mode":"PRIMARY_ONLY","target":"T1_BEFORE_STOP_63","variant":"LOGIT_FULL","feature_set":"FS3_FULL_SIGNAL_STATE"},
+    {"name":"PRIMARY_ONLY_T1_LOGIT_RAW","mode":"PRIMARY_ONLY","target":"T1_BEFORE_STOP_63","variant":"LOGIT_RAW","feature_set":"FS2_RAW_SIGNAL_STATE"},
+    {"name":"TRANSFER_ENTRY_LOGIT_FULL","mode":"TRANSFER","target":"ENTRY_FILLED","variant":"LOGIT_FULL","feature_set":"FS3_FULL_SIGNAL_STATE"},
+    {"name":"TRANSFER_T1_LOGIT_FULL","mode":"TRANSFER","target":"T1_BEFORE_STOP_63","variant":"LOGIT_FULL","feature_set":"FS3_FULL_SIGNAL_STATE"},
+    {"name":"TRANSFER_ENTRY_LOGIT_RAW","mode":"TRANSFER","target":"ENTRY_FILLED","variant":"LOGIT_RAW","feature_set":"FS2_RAW_SIGNAL_STATE"},
+    {"name":"TRANSFER_T1_LOGIT_RAW","mode":"TRANSFER","target":"T1_BEFORE_STOP_63","variant":"LOGIT_RAW","feature_set":"FS2_RAW_SIGNAL_STATE"},
+    {"name":"TRANSFER_ENTRY_RF_FULL","mode":"TRANSFER","target":"ENTRY_FILLED","variant":"RF_FULL","feature_set":"FS3_FULL_SIGNAL_STATE"}
+  ],
+  "shadow_policies": ["R0_K1","R0_K2","R1_K1","R1_K2","R2_K1","R2_K2","R3_K1","R3_K2","R4_K1","R4_K2","R5_K1","R5_K2"],
+  "final_gate": {
+    "minimum_calendar_months": 24,
+    "minimum_baseline_primary_candidates": 150,
+    "minimum_r0_k1_completed_d1_trades": 50,
+    "minimum_r3_k1_completed_d1_trades": 50,
+    "minimum_resolved_entry_labels": 100,
+    "minimum_resolved_t1_filled_outcomes": 60,
+    "require_ledger_chain": true,
+    "require_protocol_integrity": true
+  },
+  "final_economic_criteria": {
+    "total_return_gt_r0": true,
+    "cagr_gt_r0": true,
+    "expectancy_r_gt_r0": true,
+    "profit_factor_gte_r0": true,
+    "bootstrap_63_delta_terminal_return_lower_2_5_gt_zero": true,
+    "random_k1_total_return_percentile_gte": 95,
+    "max_drawdown_not_worse_than_r0_by_more_than_pp": 2,
+    "minimum_completed_trades": 50,
+    "ledger_integrity_pass": true,
+    "no_protocol_drift": true
+  },
+  "bootstrap": {"primary_block_sessions":63,"sensitivity_block_sessions":[21,126],"replicates":2000,"seed":42},
+  "random_control": {"k1_seeds_start":0,"k1_seeds_end":499,"k2_secondary":true,"key_formula":"SHA256(seed + '|' + Signal ID)"},
+  "frozen_d1": {"exit_engine":"TRAIL_ONLY","risk_per_trade":0.0075,"max_position_pct":0.25,"max_open_positions":5,"cash_only":true,"leverage":false,"max_holding_sessions":63,"intraday_ambiguity":"STOP_FIRST"},
+  "production_collection_active": false
+}

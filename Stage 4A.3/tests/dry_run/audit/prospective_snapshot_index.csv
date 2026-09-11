@@ -1,0 +1,2 @@
+Sequence,Signal Date,Snapshot ID,Created UTC,Candidate Count,Snapshot Content Hash,Previous Chain Hash,Current Chain Hash,Git Commit if available,Status
+1,2025-12-10,S4A3_20251210_e098ae0c28fa,2025-12-10T10:30:00+00:00,3,c6d619f0e47f1397cc3b21986013125ce3ecfd5d4c422f2b8fc6f1b0b9bca1d9,4c7bb7002b0b83d1ea4ddaf7c8d3ccb4a3f94bdd175217f43432b147770bd441,585f7f502ddfb62382f8331968409bc5b1e52068b1479c42ebe73d5726b8df46,,CAPTURED

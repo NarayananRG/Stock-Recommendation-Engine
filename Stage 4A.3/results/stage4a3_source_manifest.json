@@ -1,0 +1,145 @@
+{
+  "SOURCE_PACKAGE_HASH": "484167b3c23840ae3ccd501b5770e4691fcfc5116ac6b303d0cfb71bf24ee3db",
+  "files": [
+    {
+      "Bytes": 3632,
+      "Path": "config/stage4a3_protocol.json",
+      "SHA256": "02c93a235503c4c074196850ffb4e80030ab553b86b071e340a73d13b59659c6"
+    },
+    {
+      "Bytes": 112,
+      "Path": "requirements-lock.txt",
+      "SHA256": "95dcf48ff5b5b517c6b3007a204bb71565f0951cb610f33dba46c564d4a53507"
+    },
+    {
+      "Bytes": 137,
+      "Path": "scripts/resolve_outcomes.bat",
+      "SHA256": "4e6d7b38e030e81905eb2cb18860f1ec87766bd3050841a01f3ccf395784d98f"
+    },
+    {
+      "Bytes": 138,
+      "Path": "scripts/run_after_close.bat",
+      "SHA256": "2e0cd94afae1d693f344a97cef70294d6ef62c963fd0e94c7ffe6ada5a8265e4"
+    },
+    {
+      "Bytes": 322,
+      "Path": "scripts/run_after_close.ps1",
+      "SHA256": "93641257e86a55bf66fdaa00da6a51e89eda3164bcfa24ae48ad75b84cfe91bb"
+    },
+    {
+      "Bytes": 92,
+      "Path": "scripts/verify_ledger.bat",
+      "SHA256": "7c8c6e5c2a4840ed3e18b7f125a3df194434f1915f3d2741b6b52da4b417f937"
+    },
+    {
+      "Bytes": 107,
+      "Path": "stage4a3/__init__.py",
+      "SHA256": "281eacb88381ff75314647831d500d09f0965a776a8a5a16286d9a9bca25647a"
+    },
+    {
+      "Bytes": 3122,
+      "Path": "stage4a3/activation.py",
+      "SHA256": "8df2a306aabbd4085154b9cf80d37318efdb7b509f5e2971c554dadc32b51245"
+    },
+    {
+      "Bytes": 9217,
+      "Path": "stage4a3/build_frozen_model_bundle.py",
+      "SHA256": "31e25190d6d6bab54f13bdeea79381d9b5393d05993f023de2e898d561972321"
+    },
+    {
+      "Bytes": 8499,
+      "Path": "stage4a3/build_phase_a.py",
+      "SHA256": "cc3934a43ddd37f21af7150de8b1e429013e7a927e49859c713de4d82e4fef3b"
+    },
+    {
+      "Bytes": 1126,
+      "Path": "stage4a3/candidate_selection.py",
+      "SHA256": "488d6582a96b52c0539d22369269d165f589fca2fec79d633a16b77e008fab80"
+    },
+    {
+      "Bytes": 2049,
+      "Path": "stage4a3/determinism.py",
+      "SHA256": "057a6463d27bd96c3ed3797d76ebc65a3a4eea75a1f92e493100a5d1d82e2cc6"
+    },
+    {
+      "Bytes": 1346,
+      "Path": "stage4a3/feature_snapshot.py",
+      "SHA256": "79ae8d3d0561b68eb7ddb8977c2c1594b5abb2ff73461753421c5da8341c9241"
+    },
+    {
+      "Bytes": 1933,
+      "Path": "stage4a3/final_analysis_gate.py",
+      "SHA256": "da4c72318891ad6b5caa8e4fd9509a1e27624c658fd17fa3a69453746df921b0"
+    },
+    {
+      "Bytes": 3391,
+      "Path": "stage4a3/final_evaluation.py",
+      "SHA256": "c8ec82f02b445bc5e4b11c6865123d36674db7b892881f727c2d26e5ea736b09"
+    },
+    {
+      "Bytes": 1433,
+      "Path": "stage4a3/hash_chain.py",
+      "SHA256": "c6894845f46412bc47aa5e25491e00b816a494acd4104cd8ef16ac86ea3c1a8b"
+    },
+    {
+      "Bytes": 2327,
+      "Path": "stage4a3/hashing.py",
+      "SHA256": "5970100dbae73e5fb5ccf2f0cf3fb899fc2632e3e32b4a1f2a262682831741fd"
+    },
+    {
+      "Bytes": 5288,
+      "Path": "stage4a3/immutable_ledger.py",
+      "SHA256": "8598d8e6327bb9f2a9212adba228e7d61f6901377220327611048925f944e641"
+    },
+    {
+      "Bytes": 737,
+      "Path": "stage4a3/ledger_cli.py",
+      "SHA256": "49c3bee5098c038db4b3d40c57267f1e25e2c503ffa98cc41d444fe82e5d5135"
+    },
+    {
+      "Bytes": 1176,
+      "Path": "stage4a3/market_data_adapter.py",
+      "SHA256": "9f8a1cc632f9c08deefc997c9fdbe971011dc09ea2d80b5468c2311ec2e99d76"
+    },
+    {
+      "Bytes": 1961,
+      "Path": "stage4a3/model_scoring.py",
+      "SHA256": "17a9a9b9bd20bdf1066b8b78eab79d4ebe07002bc700fec6bc1fd35cc8bbf440"
+    },
+    {
+      "Bytes": 726,
+      "Path": "stage4a3/outcome_contract.py",
+      "SHA256": "8eb62948c1dc61d819985056e0047d8ce458aafab6f692b0b91cdbdd64cae933"
+    },
+    {
+      "Bytes": 1785,
+      "Path": "stage4a3/outcome_resolver.py",
+      "SHA256": "7f817f5b832f1724a1fda0bcfe626c66eed21e9cdeaffc9d91479e585bd60e07"
+    },
+    {
+      "Bytes": 7286,
+      "Path": "stage4a3/prospective_runner.py",
+      "SHA256": "af13aec73bdde175f7e4612a7c54c755bb3bc69b2f69e66995b6ba696a967a6f"
+    },
+    {
+      "Bytes": 2443,
+      "Path": "stage4a3/snapshot_contract.py",
+      "SHA256": "7b944834411851de0eac6fb19e4afadeab9cdfab8a7ad7b852057c918a8db313"
+    },
+    {
+      "Bytes": 610,
+      "Path": "stage4a3/status_report.py",
+      "SHA256": "0af4ed2f0b09bfee38888ccf022a1f8e68b56031b2ddaa6343c957ebf19e6a0f"
+    },
+    {
+      "Bytes": 805,
+      "Path": "stage4a3/strategy_adapter.py",
+      "SHA256": "cd9742304e294ef5900f29780fd60360fbe0a75f9d55b0a482536db9d4af6803"
+    },
+    {
+      "Bytes": 552,
+      "Path": "stage4a3/validation.py",
+      "SHA256": "b1ca6b1eaa230e721dcaff15ee6b6c67138c1685fc9af58567d7f2f1b5123a4e"
+    }
+  ]
+}

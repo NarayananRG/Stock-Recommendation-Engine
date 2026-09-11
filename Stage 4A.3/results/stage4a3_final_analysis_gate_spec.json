@@ -1,0 +1,15 @@
+{
+  "conditions": {
+    "minimum_baseline_primary_candidates": 150,
+    "minimum_calendar_months": 24,
+    "minimum_r0_k1_completed_d1_trades": 50,
+    "minimum_r3_k1_completed_d1_trades": 50,
+    "minimum_resolved_entry_labels": 100,
+    "minimum_resolved_t1_filled_outcomes": 60,
+    "require_ledger_chain": true,
+    "require_protocol_integrity": true
+  },
+  "final_outputs_locked": true,
+  "force_flags_allowed": false,
+  "status": "LOCKED_UNTIL_ALL_PASS"
+}

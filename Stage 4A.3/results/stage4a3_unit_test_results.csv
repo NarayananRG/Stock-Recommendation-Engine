@@ -1,0 +1,119 @@
+Test Number,Test,Status,Details
+1,Stage 4A.2 tag exact,PASS,contract assertion
+2,Stage 4A.1 tag exact,PASS,contract assertion
+3,Stage 4A tag exact,PASS,contract assertion
+4,Stage 3.1 tag exact,PASS,contract assertion
+5,Stage 2B.1 tag exact,PASS,contract assertion
+6,Stage 4A.2 experiment exact,PASS,contract assertion
+7,Stage 4A.2 package hash exact,PASS,contract assertion
+8,upstream folders unchanged,PASS,contract assertion
+9,branch merge base exact Stage 4A.2 frozen commit,PASS,contract assertion
+10,seven required model components exist,PASS,contract assertion
+11,no extra model variant silently added,PASS,contract assertion
+12,exact feature sets,PASS,contract assertion
+13,exact model hyperparameters,PASS,contract assertion
+14,exact preprocessing,PASS,contract assertion
+15,exact 2026 training cutoff,PASS,contract assertion
+16,no post-2026-01-01 label availability in training,PASS,contract assertion
+17,deterministic model reconstruction,PASS,contract assertion
+18,historical 2026 Signal IDs match,PASS,contract assertion
+19,reconstructed probability parity,PASS,contract assertion
+20,max abs probability difference <= allowed parity contract,PASS,contract assertion
+21,model bundle manifest hashes exact,PASS,contract assertion
+22,bundle mutation is detected,PASS,contract assertion
+23,prospective scorer refuses altered bundle,PASS,contract assertion
+24,FS2 exactly 92,PASS,contract assertion
+25,FS3 exactly 97,PASS,contract assertion
+26,no date-like feature,PASS,contract assertion
+27,no ticker feature,PASS,contract assertion
+28,no Signal ID feature,PASS,contract assertion
+29,no target label column,PASS,contract assertion
+30,no future-return feature,PASS,contract assertion
+31,no entry-outcome feature,PASS,contract assertion
+32,no D1-outcome feature,PASS,contract assertion
+33,categorical unknown handling frozen,PASS,contract assertion
+34,feature row hash deterministic,PASS,contract assertion
+35,production mode cannot specify historical date,PASS,contract assertion
+36,dry-run historical date stays under tests only,PASS,contract assertion
+37,snapshot before after-close window blocked,PASS,contract assertion
+38,stale market-data date blocked,PASS,contract assertion
+39,future market-data date blocked,PASS,contract assertion
+40,existing snapshot overwrite blocked,PASS,contract assertion
+41,existing snapshot append blocked,PASS,contract assertion
+42,zero-candidate day snapshot valid,PASS,contract assertion
+43,candidate snapshot contains no outcome fields,PASS,contract assertion
+44,all expected scores exist,PASS,contract assertion
+45,no missing score imputation,PASS,contract assertion
+46,R0 ranking exact,PASS,contract assertion
+47,R1 ranking exact,PASS,contract assertion
+48,R2 ranking exact,PASS,contract assertion
+49,R3 product formula exact,PASS,contract assertion
+50,R4 product formula exact,PASS,contract assertion
+51,R5 score exact,PASS,contract assertion
+52,K1 exact,PASS,contract assertion
+53,K2 exact,PASS,contract assertion
+54,future non-fill still consumes K slot,PASS,contract assertion
+55,future winner cannot replace selected non-fill,PASS,contract assertion
+56,snapshot canonical hash deterministic,PASS,contract assertion
+57,genesis chain deterministic,PASS,contract assertion
+58,current chain formula exact,PASS,contract assertion
+59,changing historical snapshot breaks chain verification,PASS,contract assertion
+60,deleting historical snapshot breaks chain verification,PASS,contract assertion
+61,inserting out-of-order snapshot detected,PASS,contract assertion
+62,duplicate Signal Date detected,PASS,contract assertion
+63,snapshot index append-only semantics,PASS,contract assertion
+64,protocol code drift detected,PASS,contract assertion
+65,model bundle drift detected,PASS,contract assertion
+66,activation impossible before protocol tag verification,PASS,contract assertion
+67,activation record immutable,PASS,contract assertion
+68,no signal before activation accepted,PASS,contract assertion
+69,first eligible session after activation accepted,PASS,contract assertion
+70,repeated activation blocked,PASS,contract assertion
+71,outcomes stored outside prediction snapshot,PASS,contract assertion
+72,prediction snapshot remains byte/logically unchanged after outcome resolution,PASS,contract assertion
+73,label availability date valid,PASS,contract assertion
+74,ENTRY_FILLED semantics frozen,PASS,contract assertion
+75,T1 semantics frozen,PASS,contract assertion
+76,T2 semantics frozen,PASS,contract assertion
+77,D1 semantics frozen,PASS,contract assertion
+78,STOP_FIRST preserved,PASS,contract assertion
+79,63-session max hold preserved,PASS,contract assertion
+80,outcome event hash deterministic,PASS,contract assertion
+81,outcome-event chain detects tampering,PASS,contract assertion
+82,status report contains no AUC,PASS,contract assertion
+83,status report contains no return,PASS,contract assertion
+84,status report contains no expectancy,PASS,contract assertion
+85,status report contains no PF,PASS,contract assertion
+86,status report contains no policy winner,PASS,contract assertion
+87,final evaluation locked before 24 months,PASS,contract assertion
+88,final evaluation locked below 150 candidates,PASS,contract assertion
+89,final evaluation locked below 50 R0_K1 trades,PASS,contract assertion
+90,final evaluation locked below 50 R3_K1 trades,PASS,contract assertion
+91,final evaluation locked below 100 entry labels,PASS,contract assertion
+92,final evaluation locked below 60 T1-resolved fills,PASS,contract assertion
+93,no force flag exists,PASS,contract assertion
+94,premature evaluation attempt logged as protocol breach,PASS,contract assertion
+95,R3_K1 is primary confirmatory policy,PASS,contract assertion
+96,comparator is R0_K1,PASS,contract assertion
+97,R1 cannot substitute for failed R3,PASS,contract assertion
+98,R2 cannot substitute for failed R3,PASS,contract assertion
+99,R4 cannot substitute for failed R3,PASS,contract assertion
+100,R5 cannot unlock Stage 5,PASS,contract assertion
+101,K2 cannot unlock Stage 5,PASS,contract assertion
+102,all ten prospective economic criteria implemented exactly,PASS,contract assertion
+103,bootstrap 63 / 2000 / seed42 exact,PASS,contract assertion
+104,random K1 seeds exactly 0..499,PASS,contract assertion
+105,95th-percentile criterion exact,PASS,contract assertion
+106,max-DD +2pp criterion exact,PASS,contract assertion
+107,trade minimum 50 exact,PASS,contract assertion
+108,no refit callable in prospective_runner,PASS,contract assertion
+109,no annual refit,PASS,contract assertion
+110,no threshold optimization,PASS,contract assertion
+111,no calibration,PASS,contract assertion
+112,no new feature generation beyond frozen feature contract,PASS,contract assertion
+113,no ML position sizing,PASS,contract assertion
+114,no ML stop logic,PASS,contract assertion
+115,no ML target logic,PASS,contract assertion
+116,no ML exit logic,PASS,contract assertion
+117,no production recommendation text,PASS,contract assertion
+118,no Stage 5 implementation,PASS,contract assertion
