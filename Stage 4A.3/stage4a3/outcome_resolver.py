@@ -125,8 +125,8 @@ def compute_frozen_label_events(repo: Path, snapshot_dir: Path, market_frames: M
     return events
 
 
-def compute_frozen_d1_policy_events(repo:Path,predictions:pd.DataFrame,feature_rows:pd.DataFrame,raw_market_frames:Mapping[str,pd.DataFrame],observation_through:str,generated_utc:str,source_market_hash:str,include_random_controls:bool=False,include_d0:bool=True,policies:list[str]|None=None)->list[dict[str,Any]]:
-    """Run the exact frozen Stage 2B.1 portfolio engine; outcome values are never operator supplied."""
+def run_frozen_portfolio_results(repo:Path,predictions:pd.DataFrame,feature_rows:pd.DataFrame,raw_market_frames:Mapping[str,pd.DataFrame],observation_through:str,include_random_controls:bool=False,include_d0:bool=True,policies:list[str]|None=None,evaluation_start:str|None=None)->dict[str,dict[str,Any]]:
+    """One authoritative Stage 2B.1/Stage 2.2.2 execution path for outcomes and final economics."""
     if len(predictions)!=len(feature_rows):raise RuntimeError("PREDICTION_FEATURE_ROW_MISMATCH")
     stage2b1_path=str((repo/"Stage 2B.1/stage2b").resolve());sys.path.remove(stage2b1_path) if stage2b1_path in sys.path else None;sys.path.insert(0,stage2b1_path)
     for helper in ("hashing","validation","policies","calibration","diagnostics"):sys.modules.pop(helper,None)
@@ -134,7 +134,7 @@ def compute_frozen_d1_policy_events(repo:Path,predictions:pd.DataFrame,feature_r
     baseline_root=repo/"Stage 2.2.2 Final"
     module.PATHS={"stage21":baseline_root/"baseline/stage2_1/Stock_Alert_Stage2_1_Optimized_15Y.py","stage221":baseline_root/"stage2_2_1/Stock_Alert_Stage2_2_1_Reproducible_Benchmark.py","stage222":baseline_root/"stage2_2_2/Stock_Alert_Stage2_2_2_Final_Baseline.py","frozen":baseline_root/"stage2_2_1/data/frozen","baseline_root":baseline_root}
     baseline,stage21=module.load_baseline();policy_values=json.loads((repo/"Stage 2B.1/config/stage2b_1_policy_config.json").read_text());policy_config=module.PolicyConfig.from_mapping(policy_values)
-    tickers=sorted(set(predictions["Ticker"].astype(str)));start=pd.to_datetime(predictions["Signal Date"]).min().date().isoformat();cfg=baseline.Stage22Config(test_start=start,test_end=observation_through,starting_equity=100000.,risk_per_trade=.0075,max_position_pct=.25,max_open_positions=5,slippage_bps=5.,transaction_cost_bps=5.)
+    tickers=sorted(set(predictions["Ticker"].astype(str)));start=evaluation_start or pd.to_datetime(predictions["Signal Date"]).min().date().isoformat();cfg=baseline.Stage22Config(test_start=start,test_end=observation_through,starting_equity=100000.,risk_per_trade=.0075,max_position_pct=.25,max_open_positions=5,slippage_bps=5.,transaction_cost_bps=5.)
     engine=baseline.CandidateSignalEngine(stage21,cfg,tickers);engine.engine.raw_data={name:stage21.normalize_index(frame.copy()) for name,frame in raw_market_frames.items()};engine.precompute()
     combined=pd.concat([predictions.reset_index(drop=True),feature_rows.reset_index(drop=True)],axis=1);combined=combined.loc[:,~combined.columns.duplicated()].copy()
     combined["Stop Loss"]=combined["Initial Stop"];combined["Target 1"]=combined["Original T1"];combined["Target 2"]=combined["Original T2"]
@@ -160,17 +160,28 @@ def compute_frozen_d1_policy_events(repo:Path,predictions:pd.DataFrame,feature_r
     years=range(pd.Timestamp(start).year,pd.Timestamp(observation_through).year+1)
     first_sessions={year:min(date for date in available_dates if date.year==year) for year in years if any(date.year==year for date in available_dates)}
     _,calibration_tables=module.candidate_calibration(baseline,cfg,engine.engine.features,calibration_candidates,first_sessions)
-    dynamic=module.DynamicBacktester.build(baseline);events=[]
+    dynamic=module.DynamicBacktester.build(baseline);results:dict[str,dict[str,Any]]={}
     for policy,ids in selections.items():
         candidates=combined.loc[combined["Signal ID"].astype(str).isin(ids)].copy()
         bt=dynamic(cfg,engine.engine.features,candidates,"D1_TRAIL_ONLY","Target 2",63,policy="D1_TRAIL_ONLY",calibration_tables=calibration_tables,policy_config=policy_config,current_regime=engine.engine.market_history["MarketRegime"]);result=bt.run()
         if result["runtime_errors"]:raise RuntimeError(f"FROZEN_D1_RUNTIME_ERRORS: {result['runtime_errors']}")
-        trades=result["trades"]
+        results[policy]={"D1":result,"membership":candidates}
+        if include_d0 and policy in {f"R{r}_K{k}" for r in range(6) for k in (1,2)}:
+            results[policy]["D0"]=baseline.PortfolioBacktester(cfg,engine.engine.features,candidates,"T2_63D","Target 2",63).run()
+    return results
+
+
+def compute_frozen_d1_policy_events(repo:Path,predictions:pd.DataFrame,feature_rows:pd.DataFrame,raw_market_frames:Mapping[str,pd.DataFrame],observation_through:str,generated_utc:str,source_market_hash:str,include_random_controls:bool=False,include_d0:bool=True,policies:list[str]|None=None)->list[dict[str,Any]]:
+    """Derive immutable terminal events from the common frozen portfolio execution."""
+    results=run_frozen_portfolio_results(repo,predictions,feature_rows,raw_market_frames,observation_through,include_random_controls,include_d0,policies);events=[]
+    combined=pd.concat([predictions.reset_index(drop=True),feature_rows.reset_index(drop=True)],axis=1);combined=combined.loc[:,~combined.columns.duplicated()]
+    for policy,engines in results.items():
+        trades=engines["D1"]["trades"]
         for _,trade in trades.loc[~trades["Exit Reason"].eq("END_OF_DATA")].iterrows():
             value={"Net R":float(trade["R Multiple"]),"Net PnL":float(trade["Net PnL"]),"Portfolio Return Fraction":float(trade["Net PnL"])/float(trade["Portfolio Equity At Entry"]),"Exit Reason":trade["Exit Reason"],"Bars Held":int(trade["Bars Held"])}
             events.append({"Generated UTC":generated_utc,"Signal ID":trade["Signal ID"],"Signal Date":pd.Timestamp(trade["Signal Date"]).date().isoformat(),"Ticker":trade["Ticker"],"Policy":policy,"Outcome Type":"D1_TRADE_COMPLETION","Outcome State":"COMPLETED","Outcome Value":json.dumps(value,sort_keys=True,separators=(",",":")),"Observation Through Date":observation_through,"Label Available Date":pd.Timestamp(trade["Exit Date"]).date().isoformat(),"Source Market Data Hash":source_market_hash,"Is Terminal":True})
-        if include_d0 and policy in {f"R{r}_K{k}" for r in range(6) for k in (1,2)}:
-            static=baseline.PortfolioBacktester(cfg,engine.engine.features,candidates,"T2_63D","Target 2",63).run()
+        if "D0" in engines:
+            static=engines["D0"]
             for _,trade in static["trades"].loc[~static["trades"]["Exit Reason"].eq("END_OF_DATA")].iterrows():
                 value={"Net R":float(trade["R Multiple"]),"Net PnL":float(trade["Net PnL"]),"Portfolio Return Fraction":float(trade["Net PnL"])/float(trade.get("Portfolio Equity At Entry",100000.)),"Exit Reason":trade["Exit Reason"],"Bars Held":int(trade["Bars Held"])}
                 events.append({"Generated UTC":generated_utc,"Signal ID":trade.get("Signal ID",combined.loc[(combined["Ticker"]==trade["Ticker"])&(pd.to_datetime(combined["Signal Date"])==pd.Timestamp(trade["Signal Date"])),"Signal ID"].iloc[0]),"Signal Date":pd.Timestamp(trade["Signal Date"]).date().isoformat(),"Ticker":trade["Ticker"],"Policy":policy+"_D0","Outcome Type":"D1_TRADE_COMPLETION","Outcome State":"COMPLETED","Outcome Value":json.dumps(value,sort_keys=True,separators=(",",":")),"Observation Through Date":observation_through,"Label Available Date":pd.Timestamp(trade["Exit Date"]).date().isoformat(),"Source Market Data Hash":source_market_hash,"Is Terminal":True})

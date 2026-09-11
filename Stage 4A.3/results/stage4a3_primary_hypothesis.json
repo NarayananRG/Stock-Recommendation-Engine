@@ -21,13 +21,27 @@
     "random_k1_total_return_percentile_gte": 95,
     "total_return_gt_r0": true
   },
+  "market_data": {
+    "adapter": "FROZEN_STAGE2_2_1_INGESTION",
+    "archive_immutable": true,
+    "operator_daily_return_arrays_prohibited": true,
+    "provider_revision_risk_documented": true
+  },
+  "portfolio_window": {
+    "end": "FINAL_ANALYSIS_AS_OF_DATE",
+    "include_zero_candidate_and_cash_sessions": true,
+    "start": "FIRST_VALID_MARKET_SESSION_STRICTLY_AFTER_ACTIVATION_LOCAL_DATE",
+    "starting_equity": 100000,
+    "starts_flat": true
+  },
   "primary_comparator": "R0_K1",
   "primary_confirmatory_policy": "R3_K1",
   "random_control": {
     "k1_seeds_end": 499,
     "k1_seeds_start": 0,
-    "k2_secondary": true,
-    "key_formula": "SHA256(seed + '|' + Signal ID)"
+    "k2_secondary": false,
+    "key_formula": "SHA256(seed + '|' + Signal ID)",
+    "percentile_tie_rule": "MID_RANK"
   },
   "secondary_substitution_allowed": false,
   "stage5_requires_all_ten": true

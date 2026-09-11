@@ -1,0 +1,21 @@
+Test Number,Test,Status,Details
+145,historical R0_K1 exact daily-equity parity,PASS,Final economic methodology/session coverage hardening
+146,historical R3_K1 exact daily-equity parity,PASS,Final economic methodology/session coverage hardening
+147,historical D0 R0/R3 parity,PASS,Final economic methodology/session coverage hardening
+148,historical non-circular 63-session bootstrap parity,PASS,Final economic methodology/session coverage hardening
+149,historical mid-rank random percentile parity,PASS,Final economic methodology/session coverage hardening
+150,mid-rank ties are half weighted,PASS,Final economic methodology/session coverage hardening
+151,bootstrap blocks are contiguous and non-circular,PASS,Final economic methodology/session coverage hardening
+152,terminal trade-fraction compounding removed,PASS,Final economic methodology/session coverage hardening
+153,T2 fake-score usage removed,PASS,Final economic methodology/session coverage hardening
+154,missing valid session recorded exactly once,PASS,Final economic methodology/session coverage hardening
+155,missed session never creates prediction,PASS,Final economic methodology/session coverage hardening
+156,coverage rerun is idempotent,PASS,Final economic methodology/session coverage hardening
+157,holiday and weekend not inferred as missed,PASS,Final economic methodology/session coverage hardening
+158,coverage ledger tamper detected,PASS,Final economic methodology/session coverage hardening
+159,final market archive hashes verify,PASS,Final economic methodology/session coverage hardening
+160,synthetic matured fixture asserts known portfolio numbers,PASS,Final economic methodology/session coverage hardening
+161,synthetic matured fixture asserts known bootstrap numbers,PASS,Final economic methodology/session coverage hardening
+162,synthetic matured fixture asserts known random percentile,PASS,Final economic methodology/session coverage hardening
+163,all four final audit ledgers created,PASS,Final economic methodology/session coverage hardening
+164,synthetic conclusion remains non-confirmatory,PASS,Final economic methodology/session coverage hardening

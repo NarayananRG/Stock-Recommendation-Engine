@@ -1,2 +1,2 @@
-Policy,Random K1 Total Return Percentile
-R3_K1,0
+Policy,Metric,Random K1 Total Return Percentile,Tie Rule
+R3_K1,Total Return %,0,MID_RANK

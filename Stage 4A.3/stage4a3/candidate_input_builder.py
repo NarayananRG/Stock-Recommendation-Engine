@@ -75,7 +75,8 @@ def build_signal_close_input(repo: Path, requested_date: str | None, scratch_roo
     signal_ids=enriched[["Signal ID"]].sort_values("Signal ID").reset_index(drop=True) if len(enriched) else pd.DataFrame(columns=["Signal ID"])
     manifest={"Signal Date":signal_date,"Frozen Universe Hash":dataframe_content_hash(universe),"Raw Market Data Hash":raw_hash,"NIFTY Data Hash":nifty_hash,"Frozen Strategy/Feature Builder Identity":builder_identity(repo),"Feature Contract Hash":contract_hash,"Candidate Count":len(enriched),"Candidate Signal-ID Logical Hash":dataframe_content_hash(signal_ids),"Full Input Logical Hash":dataframe_content_hash(enriched),"Data Mode":data_mode,"Per-Ticker Raw Hashes":per_ticker}
     received={key for key in engine.engine.raw_data if key!="^NSEI"}
-    market_manifest={"provider_identifier":"FROZEN_YFINANCE_INGESTION" if data_mode=="FROZEN" else "YFINANCE_REFRESH_VIA_FROZEN_STAGE2_2_1","download_timestamp_utc":pd.Timestamp.now(tz="UTC").isoformat() if data_mode=="REFRESH" else "HISTORICAL_TEST_FIXTURE","maximum_market_data_date":signal_date,"nifty_maximum_date":signal_date,"ticker_count_requested":len(tickers),"ticker_count_received":len(received),"missing_tickers":sorted(set(tickers)-received),"raw_data_logical_hash":raw_hash}
+    nifty_sessions=[pd.Timestamp(value).date().isoformat() for value in engine.engine.raw_data["^NSEI"].index]
+    market_manifest={"provider_identifier":"FROZEN_YFINANCE_INGESTION" if data_mode=="FROZEN" else "YFINANCE_REFRESH_VIA_FROZEN_STAGE2_2_1","download_timestamp_utc":pd.Timestamp.now(tz="UTC").isoformat() if data_mode=="REFRESH" else "HISTORICAL_TEST_FIXTURE","maximum_market_data_date":signal_date,"nifty_maximum_date":signal_date,"ticker_count_requested":len(tickers),"ticker_count_received":len(received),"missing_tickers":sorted(set(tickers)-received),"raw_data_logical_hash":raw_hash,"nifty_valid_sessions":nifty_sessions}
     return enriched,manifest,market_manifest
 
 

@@ -1,15 +1,15 @@
 {
-  "Snapshot Content Hash": "3b10d3b777953d0daacc98e9fc647feff8d8c8b92f80f6c09537cde151b05f43",
+  "Snapshot Content Hash": "9eb7c5e7ebefa2b37111ddc281676f58f54cf4b66cd8054ac13b56c6cfb9ab92",
   "files": [
     {
       "bytes": 359,
       "file": "snapshot_metadata.json",
-      "sha256": "461347bdc283c2b661f29fd3cc2d6be4f2a8c6f59ff3e96042e5b48b8f584cd8"
+      "sha256": "f39de63e8ca3088f2274c0df16d5f7cdc1e4c248be1553e294299e3ba1b93a62"
     },
     {
-      "bytes": 1098,
+      "bytes": 1096,
       "file": "candidate_predictions.csv.gz",
-      "sha256": "0c7212705d205f40725c3f6aa5e5ad8c321816f6553f3a4f2b46721279098678"
+      "sha256": "4539f325bb0d155ae62b9c76641aeb0f6ceeb404ec94ac4adc57e5179c0115cd"
     },
     {
       "bytes": 2381,

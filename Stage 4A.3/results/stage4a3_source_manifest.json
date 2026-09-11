@@ -1,20 +1,20 @@
 {
-  "SOURCE_PACKAGE_HASH": "4e66f963a19c3f8d306e766bfc0076ce4de318a03cc85abec00cdcf4e8f6c380",
+  "SOURCE_PACKAGE_HASH": "2cf01a0a90410515b1f97f6b53400e95b29022b35b44facf420743b07cf5c42e",
   "files": [
     {
-      "Bytes": 1630,
+      "Bytes": 2144,
       "Path": "README.md",
-      "SHA256": "2dc7c0abd8ae0d2a5d9ca63db393837d19ca0c4c6ed1eff18f8eef58b0298693"
+      "SHA256": "b909045e68eac93eef34948c6ddcf7edd1211d5569d658a2211f066b9c53f2ea"
     },
     {
-      "Bytes": 3972,
+      "Bytes": 5519,
       "Path": "Stage4A3_Protocol.md",
-      "SHA256": "889bf5677ed6de671f9c91cc38e06465e0bceed8e916c160e47e970b155e3406"
+      "SHA256": "8ea37f6dba036b5e85888254b4344ee3ed2f35064c2fbb8d42f4eac16e220eb5"
     },
     {
-      "Bytes": 3732,
+      "Bytes": 4176,
       "Path": "config/stage4a3_protocol.json",
-      "SHA256": "70d0078754416624d37f78f7a3f7483d583fe37223f2e193b6fa121b5075eaa3"
+      "SHA256": "2494c2047792e19893c068fc52f847bb2a328529d3b9d565d8657fab879a4707"
     },
     {
       "Bytes": 128,
@@ -57,14 +57,14 @@
       "SHA256": "31e25190d6d6bab54f13bdeea79381d9b5393d05993f023de2e898d561972321"
     },
     {
-      "Bytes": 9678,
+      "Bytes": 9957,
       "Path": "stage4a3/build_phase_a.py",
-      "SHA256": "3ce71a8f58a6be288e80d12bbe8dc8a0001711c8f7ff067e6e4beba6ffaa2620"
+      "SHA256": "a8bf588bcf225efea5119cad61263344dfb6c9da0c189f5a3bcf6d7729c3c6e1"
     },
     {
-      "Bytes": 7229,
+      "Bytes": 7378,
       "Path": "stage4a3/candidate_input_builder.py",
-      "SHA256": "767f882e9fef67c8610b71fa31ac0ac2fed0a6305d7cd640f441e2e3cb71d229"
+      "SHA256": "2eb87470eb33281f53f8111f7c7ac929d08a46387fe3b0aa70f63760de313618"
     },
     {
       "Bytes": 1126,
@@ -77,6 +77,11 @@
       "SHA256": "6ff8934780d11b0e07eec22cd425340bb452858c5bc7d3bc9b550fab0aacd698"
     },
     {
+      "Bytes": 5464,
+      "Path": "stage4a3/economic_methodology.py",
+      "SHA256": "bbed300ebe67ddb40bf5f95831726b754d4ca50fc63704f38a3e26fbbeeb4938"
+    },
+    {
       "Bytes": 1346,
       "Path": "stage4a3/feature_snapshot.py",
       "SHA256": "79ae8d3d0561b68eb7ddb8977c2c1594b5abb2ff73461753421c5da8341c9241"
@@ -87,9 +92,14 @@
       "SHA256": "42c7fb7db43afecd1f7e9933b1eea17caa62839540d6b4989d7bbb4b022bfc16"
     },
     {
-      "Bytes": 13087,
+      "Bytes": 15221,
       "Path": "stage4a3/final_evaluation.py",
-      "SHA256": "76f7758e323f4eecc14f4e09c14448293c88c29e43b6e96cb8abb3df0dec454a"
+      "SHA256": "678e2476b7b3d8b0313e016f063d6dff31776ba22867a5a7d7cc63ab88c28f3e"
+    },
+    {
+      "Bytes": 5282,
+      "Path": "stage4a3/final_market_data.py",
+      "SHA256": "6877288f130b548954c027519f5942cfcafd53cc6f9d2da335928376fb53d795"
     },
     {
       "Bytes": 1527,
@@ -112,9 +122,9 @@
       "SHA256": "49c3bee5098c038db4b3d40c57267f1e25e2c503ffa98cc41d444fe82e5d5135"
     },
     {
-      "Bytes": 3208,
+      "Bytes": 3419,
       "Path": "stage4a3/ledger_counts.py",
-      "SHA256": "550b9771db530c3df0ede2ff46102e738c33368522fff9f951530e1e2abc986d"
+      "SHA256": "629c4766e853d71cc2203edf9151f726699109ff7d1e8bcf2e6f36735c4b4e9b"
     },
     {
       "Bytes": 1176,
@@ -132,9 +142,9 @@
       "SHA256": "16c19b94396a297fdb92a70b3d5c6dd79ac6bb02c7bedcb505c97dd4446e9b1d"
     },
     {
-      "Bytes": 17742,
+      "Bytes": 18708,
       "Path": "stage4a3/outcome_resolver.py",
-      "SHA256": "96b6ac021e913f53711b1db0e76ef3d11c221ed01dd3a7e1bdfa51f341c2dd0c"
+      "SHA256": "43115ca3c810ba688c7eff001e970da0a3dd6b8adc8586ebae3ff00ae8904b14"
     },
     {
       "Bytes": 4709,
@@ -142,9 +152,9 @@
       "SHA256": "d16476323bcd9ea402bf2fccc457a00009f952720696b0f998654144ad24892a"
     },
     {
-      "Bytes": 10500,
+      "Bytes": 10895,
       "Path": "stage4a3/prospective_runner.py",
-      "SHA256": "0ad0a2f1a2c2420448ce3dfe8e4fa0fde8aa9b39980e8d2507579e48914b5899"
+      "SHA256": "b9bbbe6ca0bb1fc7894f0a5be652aad1e8e819f2fd8300496a471dcbfb5071d2"
     },
     {
       "Bytes": 3742,
@@ -152,14 +162,19 @@
       "SHA256": "626d0fde26378339974cc8e6a4667b618865b4e16bffd1014fcf0f050968897f"
     },
     {
+      "Bytes": 4454,
+      "Path": "stage4a3/session_coverage.py",
+      "SHA256": "dd231cdad6a5eca66f6892a58c39f1e3a456c0e50729b056a463ddceb22e264c"
+    },
+    {
       "Bytes": 2584,
       "Path": "stage4a3/snapshot_contract.py",
       "SHA256": "0d26abadfeb15203fbe3584698a5e900837ba004bde8173b05a85c5582652137"
     },
     {
-      "Bytes": 2899,
+      "Bytes": 3095,
       "Path": "stage4a3/status_report.py",
-      "SHA256": "6b49d36699fb14a59275679b847a05593d17cc7946a6719c7f5ba2a18a01723c"
+      "SHA256": "be29ebf34a90a1b16d45deaf153ca0c48d172ebe219a45f8c1609dda6bf0c62f"
     },
     {
       "Bytes": 805,

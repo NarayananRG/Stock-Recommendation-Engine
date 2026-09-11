@@ -8,4 +8,6 @@ Conclusion: NOT PROSPECTIVELY CONFIRMED
 
 Stage 5: REMAINS BLOCKED
 
+T2 score-based prospective metric: NOT AVAILABLE — NO T2 MODEL IN FROZEN PROSPECTIVE BUNDLE.
+
 No secondary substitution is allowed.

@@ -103,7 +103,7 @@ def evaluate() -> list[dict]:
     values[18]=counts["candidate_count"]==150 and counts["r0_k1_completed_d1"]==50 and counts["r3_k1_completed_d1"]==50
     values[19]="counts_json" not in {a.dest for a in final_parser()._actions} and "derive_final_gate_counts(" in (ROOT/"stage4a3/final_evaluation.py").read_text()
     values[20]=all((synthetic/"tests/final_outputs"/name).exists() for name in FINAL_OUTPUTS)
-    values[21]=values[20] and len(FINAL_OUTPUTS)==16
+    values[21]=values[20] and len(FINAL_OUTPUTS)==20
     with tempfile.TemporaryDirectory() as td:
         copy=Path(td)/"tests"/"SYNTHETIC_LOCKED_FIXTURE";shutil.copytree(synthetic,copy);locked=False
         try:final_evaluate(REPO,copy,"2024-06-01",copy/"tests/locked_outputs")

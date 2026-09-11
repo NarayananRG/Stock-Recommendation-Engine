@@ -1,0 +1,3 @@
+Policy,Metric,Expected,Actual,Status
+R0_K1,Total Return %,0.565299619815,0.565299619815,PASS
+R3_K1,Total Return %,5.79452827472,5.79452827472,PASS

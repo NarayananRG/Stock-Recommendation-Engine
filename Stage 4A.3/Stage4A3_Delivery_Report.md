@@ -51,11 +51,19 @@ There is no force, unlock, override, or ignore-minimum option. Before unlock, st
 
 ## Verification
 
-All 118 original tests and all 26 new Stage 4A.3A hardening regressions pass (144 total). Two independent complete model/protocol rebuilds had zero behaviorally meaningful differences across 20 compared artifacts. Both rebuilt the same seven-component bundle with maximum probability difference `4.998224056862455e-13` and bundle hash `4631eb8a1d0b34212252df3b1aae180f64ec98ba5e7955a84729df0a471c62da`.
+All 118 original tests, 26 prior Stage 4A.3A regressions, and 20 final economic/session regressions pass (164 total). Two independent complete model/protocol rebuilds had zero behaviorally meaningful differences across 20 compared artifacts. Both rebuilt the same seven-component bundle with maximum probability difference `4.998224056862455e-13` and bundle hash `4631eb8a1d0b34212252df3b1aae180f64ec98ba5e7955a84729df0a471c62da`.
 
 The exact production input adapter recreated all three accepted historical Signal IDs and the 97 FS3 model inputs from the frozen strategy/feature functions; the maximum feature difference versus the text-rounded Stage 3.1 CSV was `3.4375261748209596e-08`, below the explicit `1e-7` serialization-parity tolerance. Its Signal-ID and full-input logical hashes independently verified. The hardened dry run wrote its immutable candidate-input provenance only under `tests/dry_run_hardened`.
 
-The test-only computed-outcome workflow produced five terminal Stage 3.1 label events and four R0/R3 D1/D0 events using the exact frozen engines, with a valid global event chain. The synthetic locked sample refused evaluation and logged the attempt. The matured 150-candidate synthetic ledger unlocked and generated all 16 preregistered outputs, including exactly 500 random controls and 63/21/126-session, 2,000-replicate, seed-42 bootstraps. Its deliberately weak R3 result kept Stage 5 blocked, proving that no secondary policy substitutes for R3.
+The test-only computed-outcome workflow produced five terminal Stage 3.1 label events and four R0/R3 D1/D0 events using the exact frozen engines, with a valid global event chain. The synthetic locked sample refused evaluation and logged the attempt. The matured 150-candidate synthetic ledger unlocked and generated all 20 preregistered outputs, including the four D1/D0 trade and daily-equity audit ledgers, exactly 500 random controls, and 63/21/126-session, 2,000-replicate, seed-42 non-circular daily bootstraps. Tests assert independently specified daily returns, ending equity, return, CAGR, daily-equity drawdown, trade count, expectancy, profit factor, random percentile and bootstrap results. Its deliberately weak R3 result kept Stage 5 blocked.
+
+## Final economic and session hardening
+
+The final evaluator no longer derives portfolio economics from terminal trade fractions. It archives complete daily OHLC data after the gate, replays the common frozen D1/D0 engine from the first valid market session strictly after activation, includes all cash and zero-candidate sessions, computes drawdown from daily equity, uses mid-rank random-control ties, and reports no score-based T2 metric. The historical parity gates pass for R0_K1, R3_K1, D0, the 63-session bootstrap and the 81.8% random-control percentile. Production session coverage now records missed NIFTY sessions once in a tamper-evident ledger without generating historical predictions.
+
+Protocol ID: `S4A3_PROTOCOL_48a2400f86bae226`
+
+Protocol package hash: `2cf01a0a90410515b1f97f6b53400e95b29022b35b44facf420743b07cf5c42e`
 
 Hardened identity: `S4A3_PROTOCOL_b4b02f1234e17499`; source/package hash: `4e66f963a19c3f8d306e766bfc0076ce4de318a03cc85abec00cdcf4e8f6c380`.
 

@@ -58,7 +58,9 @@
     "no_protocol_drift": true
   },
   "bootstrap": {"primary_block_sessions":63,"sensitivity_block_sessions":[21,126],"replicates":2000,"seed":42},
-  "random_control": {"k1_seeds_start":0,"k1_seeds_end":499,"k2_secondary":true,"key_formula":"SHA256(seed + '|' + Signal ID)"},
+  "random_control": {"k1_seeds_start":0,"k1_seeds_end":499,"k2_secondary":false,"key_formula":"SHA256(seed + '|' + Signal ID)","percentile_tie_rule":"MID_RANK"},
+  "final_portfolio_window": {"start":"FIRST_VALID_MARKET_SESSION_STRICTLY_AFTER_ACTIVATION_LOCAL_DATE","end":"FINAL_ANALYSIS_AS_OF_DATE","starting_equity":100000,"starts_flat":true,"include_zero_candidate_and_cash_sessions":true},
+  "final_market_data": {"adapter":"FROZEN_STAGE2_2_1_INGESTION","archive_immutable":true,"operator_daily_return_arrays_prohibited":true,"provider_revision_risk_documented":true},
   "frozen_d1": {"exit_engine":"TRAIL_ONLY","risk_per_trade":0.0075,"max_position_pct":0.25,"max_open_positions":5,"cash_only":true,"leverage":false,"max_holding_sessions":63,"intraday_ambiguity":"STOP_FIRST"},
   "production_collection_active": false
 }

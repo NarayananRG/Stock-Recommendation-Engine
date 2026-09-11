@@ -1,0 +1,39 @@
+{
+  "Bootstrap 63": {
+    "Lower 2.5%": -8.597901230212768,
+    "Median": -8.597901230212768,
+    "P(Delta > 0) %": 0.0,
+    "Upper 97.5%": -8.597901230212768
+  },
+  "R0_K1": {
+    "Annualized Volatility %": 2.1533034116480597e-17,
+    "Average Exposure %": 20.0,
+    "CAGR %": 2.653320122795444,
+    "Ending Equity": 105812.36257960176,
+    "Expectancy R": 0.20000000000000004,
+    "Maximum Drawdown %": 0.0,
+    "Mean Daily Return %": 0.010000000000000002,
+    "Policy": "R0_K1",
+    "Profit Factor": 6.0,
+    "Starting Equity": 100000.0,
+    "Total Costs": 50.0,
+    "Total Return %": 5.81236257960176,
+    "Trade Count": 50
+  },
+  "R3_K1": {
+    "Annualized Volatility %": 1.0766517058240299e-17,
+    "Average Exposure %": 20.0,
+    "CAGR %": -1.300927087009296,
+    "Ending Equity": 97214.46134938899,
+    "Expectancy R": -0.10000000000000002,
+    "Maximum Drawdown %": -2.7806776844952363,
+    "Mean Daily Return %": -0.005000000000000001,
+    "Policy": "R3_K1",
+    "Profit Factor": 0.16666666666666666,
+    "Starting Equity": 100000.0,
+    "Total Costs": 50.0,
+    "Total Return %": -2.785538650611008,
+    "Trade Count": 50
+  },
+  "Random Percentile": 0.0
+}

@@ -21,6 +21,7 @@ from .model_scoring import score_candidates, verify_bundle
 from .protocol_integrity import verify_runtime_protocol_integrity
 from .snapshot_contract import PREDICTION_COLUMNS
 from .hashing import canonical_json_hash, dataframe_content_hash
+from .session_coverage import append_coverage, audit_prior_sessions
 
 
 def parser() -> argparse.ArgumentParser:
@@ -77,6 +78,7 @@ def run(repo: Path,input_path: Path|None,market_manifest_path: Path|None,dry_run
             _breach(root,"SIGNAL_DATE_NOT_PROSPECTIVE_AFTER_ACTIVATION","signal_date <= Activation Local Date",signal_date,activation["Protocol Identity"])
             raise RuntimeError("SIGNAL_DATE_NOT_PROSPECTIVE_AFTER_ACTIVATION")
         verify_candidate_input(frame,candidate_input_manifest,activation["Frozen Universe Hash"])
+        audit_prior_sessions(root/"prospective/audit",activation["Activation Local Date"],signal_date,market_manifest["nifty_valid_sessions"],current.astimezone(timezone.utc).isoformat())
     else:
         signal_date=str(as_of);frame=pd.read_csv(input_path,low_memory=False);market_manifest=json.loads(market_manifest_path.read_text(encoding="utf-8"))
         universe=json.loads((root/"results/stage4a3_frozen_universe_hash.json").read_text(encoding="utf-8"))["FROZEN_UNIVERSE_HASH"]
@@ -122,6 +124,7 @@ def run(repo: Path,input_path: Path|None,market_manifest_path: Path|None,dry_run
     tag_commit=protocol_commit if dry_run else json.loads((root/"prospective/audit/activation_record.json").read_text(encoding="utf-8"))["Protocol Commit"]
     previous=_previous_chain(audit,genesis_hash(tag_commit,bundle_hash))
     row=write_snapshot(snapshots,audit,signal_date,metadata,predictions.reindex(columns=PREDICTION_COLUMNS),features,market_manifest,previous,protocol_commit,bundle_hash,candidate_input_manifest=candidate_input_manifest)
+    if not dry_run:append_coverage(audit/"session_coverage_index.csv",signal_date,"CAPTURED",created_utc,"AFTER_CLOSE_IMMUTABLE_SNAPSHOT")
     return {**row,"Output Root":str(output),"Dry Run":dry_run}
 
 
