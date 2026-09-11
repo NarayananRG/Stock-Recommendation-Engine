@@ -1,0 +1,2 @@
+as_of_date,candidate_count,r0_k1_completed_d1,r3_k1_completed_d1,resolved_entry_labels,resolved_t1_filled,ledger_chain_pass,protocol_integrity_pass,protocol_hash
+2026-02-01,150,50,50,144,108,True,True,SYNTHETIC_MATURED_PROSPECTIVE_FIXTURE

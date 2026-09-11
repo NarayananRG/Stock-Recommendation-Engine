@@ -1,0 +1,27 @@
+Test Number,Test,Status,Details
+119,same activation date signal blocked,PASS,Stage 4A.3A explicit regression
+120,next-day eligible signal accepted,PASS,Stage 4A.3A explicit regression
+121,production runner calls anti-backfill gate,PASS,Stage 4A.3A explicit regression
+122,protocol-tag source drift blocks production snapshot,PASS,Stage 4A.3A explicit regression
+123,committed source drift blocks production snapshot,PASS,Stage 4A.3A explicit regression
+124,coordinated model-manifest and joblib mutation blocked by activation identity,PASS,Stage 4A.3A explicit regression
+125,frozen universe mutation blocked,PASS,Stage 4A.3A explicit regression
+126,protocol identity mutation blocked,PASS,Stage 4A.3A explicit regression
+127,production arbitrary input prohibited,PASS,Stage 4A.3A explicit regression
+128,frozen production input builder parity on historical fixture,PASS,Stage 4A.3A explicit regression
+129,candidate Signal-ID set provenance verified,PASS,Stage 4A.3A explicit regression
+130,feature values and input logical hash provenance verified,PASS,Stage 4A.3A explicit regression
+131,multiple outcome batches for same Signal Date work,PASS,Stage 4A.3A explicit regression
+132,outcome-event global chain verifies,PASS,Stage 4A.3A explicit regression
+133,outcome-event tampering fails,PASS,Stage 4A.3A explicit regression
+134,duplicate contradictory terminal target blocked,PASS,Stage 4A.3A explicit regression
+135,labels computed from frozen logic not caller supplied,PASS,Stage 4A.3A explicit regression
+136,gate counts derived from ledger,PASS,Stage 4A.3A explicit regression
+137,no production counts-json,PASS,Stage 4A.3A explicit regression
+138,synthetic matured fixture unlocks final evaluator,PASS,Stage 4A.3A explicit regression
+139,final evaluator creates all preregistered outputs under tests,PASS,Stage 4A.3A explicit regression
+140,premature real evaluation remains blocked,PASS,Stage 4A.3A explicit regression
+141,status report contains operational counts only,PASS,Stage 4A.3A explicit regression
+142,real prospective snapshot count remains zero,PASS,Stage 4A.3A explicit regression
+143,real prospective outcome count remains zero,PASS,Stage 4A.3A explicit regression
+144,activation record remains absent,PASS,Stage 4A.3A explicit regression

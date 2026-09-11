@@ -1,0 +1,12 @@
+{
+  "Activation Asia/Kolkata": "2023-12-01T15:30:00+05:30",
+  "Activation Local Date": "2023-12-01",
+  "Activation UTC": "2023-12-01T10:00:00+00:00",
+  "Earliest Eligible Signal Date": "2023-12-02",
+  "Frozen Universe Hash": "SYNTHETIC_UNIVERSE",
+  "Genesis Chain Hash": "4baa0ded7f9547fa997339d997dd89f7724c6e304fc36b96f046dae2d4732502",
+  "Model Bundle Hash": "SYNTHETIC_MODEL_BUNDLE",
+  "Protocol Commit": "SYNTHETIC_PROTOCOL_COMMIT",
+  "Protocol Identity": "SYNTHETIC_MATURED_PROSPECTIVE_FIXTURE",
+  "Protocol Tag": "SYNTHETIC_TEST_FIXTURE"
+}

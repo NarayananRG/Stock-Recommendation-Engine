@@ -68,6 +68,7 @@
     "candidate_predictions.csv.gz",
     "feature_snapshot.csv.gz",
     "market_data_manifest.json",
+    "candidate_input_manifest.json",
     "snapshot_manifest.json",
     "hash_chain.json"
   ],

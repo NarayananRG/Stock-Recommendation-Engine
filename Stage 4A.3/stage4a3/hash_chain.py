@@ -17,7 +17,7 @@ def current_chain_hash(previous_chain_hash: str, signal_date: str, snapshot_cont
 def verify_index(index: pd.DataFrame, protocol_commit: str, model_bundle_hash: str, genesis: str) -> bool:
     if index.empty:
         return True
-    ordered=index.sort_values("Sequence",kind="mergesort").reset_index(drop=True)
+    ordered=index.assign(_Sequence=pd.to_numeric(index["Sequence"],errors="coerce")).sort_values("_Sequence",kind="mergesort").drop(columns="_Sequence").reset_index(drop=True)
     if pd.to_numeric(ordered["Sequence"],errors="coerce").tolist()!=list(range(1,len(ordered)+1)) or ordered["Signal Date"].duplicated().any() or not pd.to_datetime(ordered["Signal Date"]).is_monotonic_increasing:
         return False
     previous=genesis

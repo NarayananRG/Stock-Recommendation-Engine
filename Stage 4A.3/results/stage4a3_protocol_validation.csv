@@ -2,6 +2,10 @@ Check,Status,Details
 reference gate,PASS,9 checks
 model bundle,PASS,4631eb8a1d0b34212252df3b1aae180f64ec98ba5e7955a84729df0a471c62da
 probability parity,PASS,4.998224056862455e-13
+expected model bundle identity,PASS,4631eb8a1d0b34212252df3b1aae180f64ec98ba5e7955a84729df0a471c62da
+all 144 unit and hardening tests,PASS,118 original + 26 Stage 4A.3A
+frozen input builder historical parity,PASS,exact frozen builder adapter
+synthetic matured final evaluator,PASS,test-only
 universe,PASS,5499482303945f082b23c300bf7f9498496d9380da9809695903282da277d388
 collection inactive,PASS,no activation
 real snapshots empty,PASS,0 required

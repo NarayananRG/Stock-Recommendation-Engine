@@ -19,7 +19,7 @@ FORBIDDEN_OUTCOME_TOKENS = ("ENTRY_FILLED","T1_BEFORE","T2_BEFORE","NET R","NET 
 
 SNAPSHOT_SCHEMA: dict[str, Any] = {
     "schema_version":"STAGE4A3_SNAPSHOT_V1",
-    "required_files":["snapshot_metadata.json","candidate_predictions.csv.gz","feature_snapshot.csv.gz","market_data_manifest.json","snapshot_manifest.json","hash_chain.json"],
+    "required_files":["snapshot_metadata.json","candidate_predictions.csv.gz","feature_snapshot.csv.gz","market_data_manifest.json","candidate_input_manifest.json","snapshot_manifest.json","hash_chain.json"],
     "candidate_prediction_columns":PREDICTION_COLUMNS,
     "prediction_semantics":"SHADOW_ONLY_NO_TRADING_EFFECT",
     "forbidden_outcome_tokens":list(FORBIDDEN_OUTCOME_TOKENS),
@@ -41,5 +41,5 @@ def validate_candidate_predictions(frame: pd.DataFrame) -> None:
         raise ValueError("Missing scores may not be imputed")
 
 
-def snapshot_content_hash(metadata: dict[str, Any], predictions: pd.DataFrame, features: pd.DataFrame, market_manifest: dict[str, Any]) -> str:
-    return canonical_json_hash({"metadata":metadata,"prediction_hash":dataframe_content_hash(predictions),"feature_hash":dataframe_content_hash(features),"market_manifest":market_manifest})
+def snapshot_content_hash(metadata: dict[str, Any], predictions: pd.DataFrame, features: pd.DataFrame, market_manifest: dict[str, Any], candidate_input_manifest: dict[str,Any]|None=None) -> str:
+    return canonical_json_hash({"metadata":metadata,"prediction_hash":dataframe_content_hash(predictions),"feature_hash":dataframe_content_hash(features),"market_manifest":market_manifest,"candidate_input_manifest":candidate_input_manifest or {}})

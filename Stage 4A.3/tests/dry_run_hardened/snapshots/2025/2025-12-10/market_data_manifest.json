@@ -1,0 +1,11 @@
+{
+  "download_timestamp_utc": "2025-12-10T11:00:00+00:00",
+  "fixture_semantics": "HISTORICAL_TEST_FIXTURE",
+  "maximum_market_data_date": "2025-12-10",
+  "missing_tickers": [],
+  "nifty_maximum_date": "2025-12-10",
+  "provider_identifier": "FROZEN_STAGE3_1_TEST_DATA",
+  "raw_data_logical_hash": "HISTORICAL_TEST_FIXTURE_ONLY",
+  "ticker_count_received": 19,
+  "ticker_count_requested": 19
+}

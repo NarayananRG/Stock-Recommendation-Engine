@@ -1,0 +1,13 @@
+{
+  "Fixture": "SYNTHETIC_OUTCOME_RESOLUTION_FIXTURE",
+  "Global Outcome Chain Valid": true,
+  "Policies": [
+    "R0_K1",
+    "R3_K1",
+    "R0_K1_D0",
+    "R3_K1_D0"
+  ],
+  "Production Outcomes Written": 0,
+  "Stage 2B.1 Computed Events": 4,
+  "Stage 3.1 Computed Events": 5
+}

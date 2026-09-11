@@ -1,0 +1,12 @@
+{
+  "Candidate Count": 3,
+  "Candidate Signal-ID Logical Hash": "c956c584b411c8dfa129f2c394d325cd2b6ce3e27e32a7062b6245e9414da15b",
+  "Feature Contract Hash": "FROZEN_CONTRACT_TEST",
+  "Fixture Semantics": "HISTORICAL_TEST_FIXTURE",
+  "Frozen Strategy/Feature Builder Identity": "HISTORICAL_TEST_FIXTURE",
+  "Frozen Universe Hash": "5499482303945f082b23c300bf7f9498496d9380da9809695903282da277d388",
+  "Full Input Logical Hash": "b135d29e19bc7eb8c12b820e1ead6f083f20dbd5107b53cdeabffa0ffcf5f000",
+  "NIFTY Data Hash": "HISTORICAL_TEST_FIXTURE",
+  "Raw Market Data Hash": "HISTORICAL_TEST_FIXTURE_ONLY",
+  "Signal Date": "2025-12-10"
+}

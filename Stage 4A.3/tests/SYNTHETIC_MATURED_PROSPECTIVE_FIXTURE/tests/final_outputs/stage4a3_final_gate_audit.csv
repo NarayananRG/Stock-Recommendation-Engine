@@ -1,0 +1,9 @@
+Gate,Status,Required,Actual
+calendar duration months,PASS,24,26
+BASELINE_PRIMARY candidates,PASS,150,150
+R0_K1 completed D1 trades,PASS,50,50
+R3_K1 completed D1 trades,PASS,50,50
+resolved ENTRY_FILLED labels,PASS,100,144
+resolved filled T1 outcomes,PASS,60,108
+ledger chain,PASS,True,True
+protocol integrity,PASS,True,True

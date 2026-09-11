@@ -1,30 +1,40 @@
 {
-  "SOURCE_PACKAGE_HASH": "484167b3c23840ae3ccd501b5770e4691fcfc5116ac6b303d0cfb71bf24ee3db",
+  "SOURCE_PACKAGE_HASH": "4e66f963a19c3f8d306e766bfc0076ce4de318a03cc85abec00cdcf4e8f6c380",
   "files": [
     {
-      "Bytes": 3632,
+      "Bytes": 1630,
+      "Path": "README.md",
+      "SHA256": "2dc7c0abd8ae0d2a5d9ca63db393837d19ca0c4c6ed1eff18f8eef58b0298693"
+    },
+    {
+      "Bytes": 3972,
+      "Path": "Stage4A3_Protocol.md",
+      "SHA256": "889bf5677ed6de671f9c91cc38e06465e0bceed8e916c160e47e970b155e3406"
+    },
+    {
+      "Bytes": 3732,
       "Path": "config/stage4a3_protocol.json",
-      "SHA256": "02c93a235503c4c074196850ffb4e80030ab553b86b071e340a73d13b59659c6"
+      "SHA256": "70d0078754416624d37f78f7a3f7483d583fe37223f2e193b6fa121b5075eaa3"
     },
     {
-      "Bytes": 112,
+      "Bytes": 128,
       "Path": "requirements-lock.txt",
-      "SHA256": "95dcf48ff5b5b517c6b3007a204bb71565f0951cb610f33dba46c564d4a53507"
+      "SHA256": "502f945d9bcb50c583f8283036331287776ba3d582b3152f873eac119cdf7a21"
     },
     {
-      "Bytes": 137,
+      "Bytes": 415,
       "Path": "scripts/resolve_outcomes.bat",
-      "SHA256": "4e6d7b38e030e81905eb2cb18860f1ec87766bd3050841a01f3ccf395784d98f"
+      "SHA256": "34f9bc49a1ab5274986ca6b75fd5270edbc3ad7f680d100f5dd8ea840af6bdda"
     },
     {
-      "Bytes": 138,
+      "Bytes": 100,
       "Path": "scripts/run_after_close.bat",
-      "SHA256": "2e0cd94afae1d693f344a97cef70294d6ef62c963fd0e94c7ffe6ada5a8265e4"
+      "SHA256": "001571bbc31eafbb3336232d3ce32bcea5ad615f835efe7100aaf4c9198d67ed"
     },
     {
-      "Bytes": 322,
+      "Bytes": 165,
       "Path": "scripts/run_after_close.ps1",
-      "SHA256": "93641257e86a55bf66fdaa00da6a51e89eda3164bcfa24ae48ad75b84cfe91bb"
+      "SHA256": "df0be2a46f37a59d0f2314967b0ab3fd327f5570c4b8e611fb1190fdf03f2bb2"
     },
     {
       "Bytes": 92,
@@ -37,9 +47,9 @@
       "SHA256": "281eacb88381ff75314647831d500d09f0965a776a8a5a16286d9a9bca25647a"
     },
     {
-      "Bytes": 3122,
+      "Bytes": 3095,
       "Path": "stage4a3/activation.py",
-      "SHA256": "8df2a306aabbd4085154b9cf80d37318efdb7b509f5e2971c554dadc32b51245"
+      "SHA256": "b63bd35a88139fe40487aa3c2d3772541e329b2a86c3932abb3d5d4600f5d877"
     },
     {
       "Bytes": 9217,
@@ -47,9 +57,14 @@
       "SHA256": "31e25190d6d6bab54f13bdeea79381d9b5393d05993f023de2e898d561972321"
     },
     {
-      "Bytes": 8499,
+      "Bytes": 9678,
       "Path": "stage4a3/build_phase_a.py",
-      "SHA256": "cc3934a43ddd37f21af7150de8b1e429013e7a927e49859c713de4d82e4fef3b"
+      "SHA256": "3ce71a8f58a6be288e80d12bbe8dc8a0001711c8f7ff067e6e4beba6ffaa2620"
+    },
+    {
+      "Bytes": 7229,
+      "Path": "stage4a3/candidate_input_builder.py",
+      "SHA256": "767f882e9fef67c8610b71fa31ac0ac2fed0a6305d7cd640f441e2e3cb71d229"
     },
     {
       "Bytes": 1126,
@@ -57,9 +72,9 @@
       "SHA256": "488d6582a96b52c0539d22369269d165f589fca2fec79d633a16b77e008fab80"
     },
     {
-      "Bytes": 2049,
+      "Bytes": 2178,
       "Path": "stage4a3/determinism.py",
-      "SHA256": "057a6463d27bd96c3ed3797d76ebc65a3a4eea75a1f92e493100a5d1d82e2cc6"
+      "SHA256": "6ff8934780d11b0e07eec22cd425340bb452858c5bc7d3bc9b550fab0aacd698"
     },
     {
       "Bytes": 1346,
@@ -67,19 +82,19 @@
       "SHA256": "79ae8d3d0561b68eb7ddb8977c2c1594b5abb2ff73461753421c5da8341c9241"
     },
     {
-      "Bytes": 1933,
+      "Bytes": 2282,
       "Path": "stage4a3/final_analysis_gate.py",
-      "SHA256": "da4c72318891ad6b5caa8e4fd9509a1e27624c658fd17fa3a69453746df921b0"
+      "SHA256": "42c7fb7db43afecd1f7e9933b1eea17caa62839540d6b4989d7bbb4b022bfc16"
     },
     {
-      "Bytes": 3391,
+      "Bytes": 13087,
       "Path": "stage4a3/final_evaluation.py",
-      "SHA256": "c8ec82f02b445bc5e4b11c6865123d36674db7b892881f727c2d26e5ea736b09"
+      "SHA256": "76f7758e323f4eecc14f4e09c14448293c88c29e43b6e96cb8abb3df0dec454a"
     },
     {
-      "Bytes": 1433,
+      "Bytes": 1527,
       "Path": "stage4a3/hash_chain.py",
-      "SHA256": "c6894845f46412bc47aa5e25491e00b816a494acd4104cd8ef16ac86ea3c1a8b"
+      "SHA256": "be76a1b1bece446ca26fd2c67e088a4c616608fa8ee98d564c1179c9ebf33092"
     },
     {
       "Bytes": 2327,
@@ -87,14 +102,19 @@
       "SHA256": "5970100dbae73e5fb5ccf2f0cf3fb899fc2632e3e32b4a1f2a262682831741fd"
     },
     {
-      "Bytes": 5288,
+      "Bytes": 5522,
       "Path": "stage4a3/immutable_ledger.py",
-      "SHA256": "8598d8e6327bb9f2a9212adba228e7d61f6901377220327611048925f944e641"
+      "SHA256": "d182624458466a5a5d875899ccb8e8764b259bfa9dcf159c2ba38c53932b3d10"
     },
     {
       "Bytes": 737,
       "Path": "stage4a3/ledger_cli.py",
       "SHA256": "49c3bee5098c038db4b3d40c57267f1e25e2c503ffa98cc41d444fe82e5d5135"
+    },
+    {
+      "Bytes": 3208,
+      "Path": "stage4a3/ledger_counts.py",
+      "SHA256": "550b9771db530c3df0ede2ff46102e738c33368522fff9f951530e1e2abc986d"
     },
     {
       "Bytes": 1176,
@@ -107,29 +127,39 @@
       "SHA256": "17a9a9b9bd20bdf1066b8b78eab79d4ebe07002bc700fec6bc1fd35cc8bbf440"
     },
     {
-      "Bytes": 726,
+      "Bytes": 942,
       "Path": "stage4a3/outcome_contract.py",
-      "SHA256": "8eb62948c1dc61d819985056e0047d8ce458aafab6f692b0b91cdbdd64cae933"
+      "SHA256": "16c19b94396a297fdb92a70b3d5c6dd79ac6bb02c7bedcb505c97dd4446e9b1d"
     },
     {
-      "Bytes": 1785,
+      "Bytes": 17742,
       "Path": "stage4a3/outcome_resolver.py",
-      "SHA256": "7f817f5b832f1724a1fda0bcfe626c66eed21e9cdeaffc9d91479e585bd60e07"
+      "SHA256": "96b6ac021e913f53711b1db0e76ef3d11c221ed01dd3a7e1bdfa51f341c2dd0c"
     },
     {
-      "Bytes": 7286,
+      "Bytes": 4709,
+      "Path": "stage4a3/outcome_runner.py",
+      "SHA256": "d16476323bcd9ea402bf2fccc457a00009f952720696b0f998654144ad24892a"
+    },
+    {
+      "Bytes": 10500,
       "Path": "stage4a3/prospective_runner.py",
-      "SHA256": "af13aec73bdde175f7e4612a7c54c755bb3bc69b2f69e66995b6ba696a967a6f"
+      "SHA256": "0ad0a2f1a2c2420448ce3dfe8e4fa0fde8aa9b39980e8d2507579e48914b5899"
     },
     {
-      "Bytes": 2443,
+      "Bytes": 3742,
+      "Path": "stage4a3/protocol_integrity.py",
+      "SHA256": "626d0fde26378339974cc8e6a4667b618865b4e16bffd1014fcf0f050968897f"
+    },
+    {
+      "Bytes": 2584,
       "Path": "stage4a3/snapshot_contract.py",
-      "SHA256": "7b944834411851de0eac6fb19e4afadeab9cdfab8a7ad7b852057c918a8db313"
+      "SHA256": "0d26abadfeb15203fbe3584698a5e900837ba004bde8173b05a85c5582652137"
     },
     {
-      "Bytes": 610,
+      "Bytes": 2899,
       "Path": "stage4a3/status_report.py",
-      "SHA256": "0af4ed2f0b09bfee38888ccf022a1f8e68b56031b2ddaa6343c957ebf19e6a0f"
+      "SHA256": "6b49d36699fb14a59275679b847a05593d17cc7946a6719c7f5ba2a18a01723c"
     },
     {
       "Bytes": 805,

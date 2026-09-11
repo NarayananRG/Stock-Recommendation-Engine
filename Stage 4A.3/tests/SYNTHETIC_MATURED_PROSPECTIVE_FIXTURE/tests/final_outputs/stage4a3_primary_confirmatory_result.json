@@ -1,0 +1,50 @@
+{
+  "All Ten Criteria Pass": false,
+  "Comparator": "R0_K1",
+  "Conclusion": "NOT PROSPECTIVELY CONFIRMED",
+  "Criteria": [
+    {
+      "Criterion": "total return",
+      "Status": "FAIL"
+    },
+    {
+      "Criterion": "CAGR",
+      "Status": "FAIL"
+    },
+    {
+      "Criterion": "expectancy R",
+      "Status": "FAIL"
+    },
+    {
+      "Criterion": "profit factor",
+      "Status": "FAIL"
+    },
+    {
+      "Criterion": "bootstrap lower 2.5%",
+      "Status": "FAIL"
+    },
+    {
+      "Criterion": "random K1 percentile",
+      "Status": "FAIL"
+    },
+    {
+      "Criterion": "max drawdown tolerance",
+      "Status": "FAIL"
+    },
+    {
+      "Criterion": "minimum completed trades",
+      "Status": "PASS"
+    },
+    {
+      "Criterion": "ledger integrity",
+      "Status": "PASS"
+    },
+    {
+      "Criterion": "no protocol drift",
+      "Status": "PASS"
+    }
+  ],
+  "Primary Policy": "R3_K1",
+  "Secondary Substitution Allowed": false,
+  "Stage 5": "REMAINS BLOCKED"
+}

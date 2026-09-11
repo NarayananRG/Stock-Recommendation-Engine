@@ -2,6 +2,6 @@
   "current_formula": "SHA256(previous_chain_hash + signal_date + snapshot_content_hash + protocol_commit + model_bundle_hash)",
   "genesis_formula": "SHA256(protocol_tag_commit + model_bundle_hash + 'STAGE4A3_GENESIS')",
   "index": "append-only, strictly increasing Signal Date",
-  "snapshot_content": "canonical metadata + prediction logical hash + feature logical hash + market manifest",
+  "snapshot_content": "canonical metadata + prediction logical hash + feature logical hash + market manifest + candidate input manifest",
   "version": "STAGE4A3_HASH_CHAIN_V1"
 }

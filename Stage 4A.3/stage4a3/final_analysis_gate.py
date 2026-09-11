@@ -8,9 +8,11 @@ import pandas as pd
 
 def gate_audit(config: dict[str,Any],activation: dict[str,Any]|None,counts: dict[str,Any]) -> pd.DataFrame:
     gate=config["final_gate"]
-    months=0 if activation is None else (pd.Timestamp(counts["as_of_date"])-pd.Timestamp(activation["Activation UTC"]).tz_localize(None)).days/30.4375
+    as_of=pd.Timestamp(counts["as_of_date"]).normalize();activated=None if activation is None else pd.Timestamp(activation["Activation Local Date"] if activation.get("Activation Local Date") else activation["Activation UTC"]).tz_localize(None).normalize()
+    months=0 if activated is None or as_of<activated else (as_of.year-activated.year)*12+as_of.month-activated.month-(1 if as_of.day<activated.day else 0)
+    duration_pass=activated is not None and as_of>=activated+pd.DateOffset(months=gate["minimum_calendar_months"])
     checks=[
-        ("calendar duration months",months>=gate["minimum_calendar_months"],gate["minimum_calendar_months"],months),
+        ("calendar duration months",duration_pass,gate["minimum_calendar_months"],months),
         ("BASELINE_PRIMARY candidates",counts["candidate_count"]>=gate["minimum_baseline_primary_candidates"],gate["minimum_baseline_primary_candidates"],counts["candidate_count"]),
         ("R0_K1 completed D1 trades",counts["r0_k1_completed_d1"]>=gate["minimum_r0_k1_completed_d1_trades"],gate["minimum_r0_k1_completed_d1_trades"],counts["r0_k1_completed_d1"]),
         ("R3_K1 completed D1 trades",counts["r3_k1_completed_d1"]>=gate["minimum_r3_k1_completed_d1_trades"],gate["minimum_r3_k1_completed_d1_trades"],counts["r3_k1_completed_d1"]),

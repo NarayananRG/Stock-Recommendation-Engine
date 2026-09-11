@@ -9,10 +9,10 @@ FILES=[
 "results/stage4a3_model_bundle_manifest.json","results/stage4a3_model_reconstruction_audit.csv","results/stage4a3_2026_prediction_parity.csv",
 "results/stage4a3_snapshot_schema.json","results/stage4a3_outcome_schema.json","results/stage4a3_hash_chain_spec.json",
 "results/stage4a3_final_analysis_gate_spec.json","results/stage4a3_primary_hypothesis.json","results/stage4a3_protocol_identity.json",
-"results/stage4a3_source_manifest.json","dry_run/snapshots/2025/2025-12-10/snapshot_metadata.json",
-"dry_run/snapshots/2025/2025-12-10/candidate_predictions.csv.gz","dry_run/snapshots/2025/2025-12-10/feature_snapshot.csv.gz",
-"dry_run/snapshots/2025/2025-12-10/snapshot_manifest.json","dry_run/snapshots/2025/2025-12-10/hash_chain.json",
-"dry_run/audit/prospective_snapshot_index.csv",
+"results/stage4a3_source_manifest.json","dry_run_hardened/snapshots/2025/2025-12-10/snapshot_metadata.json",
+"dry_run_hardened/snapshots/2025/2025-12-10/candidate_predictions.csv.gz","dry_run_hardened/snapshots/2025/2025-12-10/feature_snapshot.csv.gz",
+"dry_run_hardened/snapshots/2025/2025-12-10/candidate_input_manifest.json","dry_run_hardened/snapshots/2025/2025-12-10/snapshot_manifest.json","dry_run_hardened/snapshots/2025/2025-12-10/hash_chain.json",
+"dry_run_hardened/audit/prospective_snapshot_index.csv",
 ]
 
 def compare(a:Path,b:Path)->pd.DataFrame:

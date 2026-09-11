@@ -6,6 +6,7 @@
     "Signal ID",
     "Signal Date",
     "Ticker",
+    "Policy",
     "Outcome Type",
     "Outcome State",
     "Outcome Value",
@@ -17,8 +18,8 @@
     "Prior Event Hash",
     "Event Hash"
   ],
-  "d1_semantics": "TRAIL_ONLY frozen Stage 2B.1",
-  "entry_semantics": "frozen Stage 3.1",
+  "d1_semantics": "computed by frozen Stage 2B.1 TRAIL_ONLY; risk 0.75%; max position 25%; five positions; cash only; no leverage",
+  "entry_semantics": "computed by frozen Stage 3.1 opportunity engine",
   "location": "prospective/outcomes only",
   "outcome_types": [
     "ENTRY_FILLED",
@@ -26,6 +27,7 @@
     "T2_BEFORE_STOP_63",
     "D1_TRADE_COMPLETION"
   ],
-  "schema_version": "STAGE4A3_OUTCOME_V1",
-  "target_semantics": "STOP_FIRST, 63-session maximum hold"
+  "schema_version": "STAGE4A3_OUTCOME_V2",
+  "storage": "immutable event batches with global event hash chain",
+  "target_semantics": "computed by frozen Stage 3.1 STOP_FIRST, 63-session maximum hold"
 }

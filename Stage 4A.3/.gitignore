@@ -1,3 +1,5 @@
 **/__pycache__/
 tests/phase_a_build_1/
 tests/phase_a_build_2/
+tests/phase_a_build_hardened_1/
+tests/phase_a_build_hardened_2/

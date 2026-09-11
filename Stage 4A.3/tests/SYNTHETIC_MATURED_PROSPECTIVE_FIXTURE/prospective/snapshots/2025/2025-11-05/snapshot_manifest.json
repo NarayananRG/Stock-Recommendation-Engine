@@ -1,0 +1,30 @@
+{
+  "Snapshot Content Hash": "f6b277f2a608a4666044f0978b1048331b45741643bdee9a855df5d4d552afad",
+  "files": [
+    {
+      "bytes": 155,
+      "file": "snapshot_metadata.json",
+      "sha256": "88ae343db5c9d36f5aa6b3ccfcd06775b07188f9afeb169d28097e2a571ff1af"
+    },
+    {
+      "bytes": 727,
+      "file": "candidate_predictions.csv.gz",
+      "sha256": "6afca02939f9265136443e5b0b32691423726b6dcedb23062db74c6d11533842"
+    },
+    {
+      "bytes": 122,
+      "file": "feature_snapshot.csv.gz",
+      "sha256": "40cc299f598daf581203d46e0192ec12329f076fd9a0a72e56256dc99da3a6d5"
+    },
+    {
+      "bytes": 193,
+      "file": "market_data_manifest.json",
+      "sha256": "01a4b9d5c99f928ee218f27b544730ee6ec5b07190de33e55db1d5c53781dba8"
+    },
+    {
+      "bytes": 122,
+      "file": "candidate_input_manifest.json",
+      "sha256": "92a74e14886a5e5a184ba937817c44aaa2a732fa2658f00b935a9350f6a0570c"
+    }
+  ]
+}

@@ -27,7 +27,7 @@ def git(repo: Path,*args: str) -> str:
 
 def source_files(stage_root: Path) -> list[Path]:
     roots=[stage_root/"stage4a3",stage_root/"config",stage_root/"scripts"]
-    files=[stage_root/"requirements-lock.txt"]
+    files=[stage_root/"requirements-lock.txt",stage_root/"Stage4A3_Protocol.md",stage_root/"README.md"]
     for root in roots:
         if root.exists(): files.extend(p for p in root.rglob("*") if p.is_file() and p.suffix.lower() in SOURCE_SUFFIXES and "__pycache__" not in p.parts)
     return sorted(set(files),key=lambda p:p.relative_to(stage_root).as_posix())
@@ -41,7 +41,7 @@ def build(repo: Path,stage_root: Path,output_root: Path) -> dict[str,Any]:
     universe_hash=dataframe_content_hash(universe)
     write_csv(universe,output_root/"prospective_universe.csv");write_csv(universe,result/"stage4a3_frozen_universe.csv")
     write_json({"FROZEN_UNIVERSE_HASH":universe_hash,"ticker_count":len(universe),"logical_hash_semantics":"canonical dataframe"},result/"stage4a3_frozen_universe_hash.json")
-    hash_spec={"version":"STAGE4A3_HASH_CHAIN_V1","snapshot_content":"canonical metadata + prediction logical hash + feature logical hash + market manifest","genesis_formula":"SHA256(protocol_tag_commit + model_bundle_hash + 'STAGE4A3_GENESIS')","current_formula":"SHA256(previous_chain_hash + signal_date + snapshot_content_hash + protocol_commit + model_bundle_hash)","index":"append-only, strictly increasing Signal Date"}
+    hash_spec={"version":"STAGE4A3_HASH_CHAIN_V1","snapshot_content":"canonical metadata + prediction logical hash + feature logical hash + market manifest + candidate input manifest","genesis_formula":"SHA256(protocol_tag_commit + model_bundle_hash + 'STAGE4A3_GENESIS')","current_formula":"SHA256(previous_chain_hash + signal_date + snapshot_content_hash + protocol_commit + model_bundle_hash)","index":"append-only, strictly increasing Signal Date"}
     gate_spec={"status":"LOCKED_UNTIL_ALL_PASS","conditions":config["final_gate"],"force_flags_allowed":False,"final_outputs_locked":True}
     hypothesis={"primary_confirmatory_policy":"R3_K1","definition":"TRANSFER JOINT_T1 LOGIT_FULL, K=1","primary_comparator":"R0_K1","secondary_substitution_allowed":False,"stage5_requires_all_ten":True,"economic_criteria":config["final_economic_criteria"],"bootstrap":config["bootstrap"],"random_control":config["random_control"]}
     write_json(SNAPSHOT_SCHEMA,result/"stage4a3_snapshot_schema.json");write_json(OUTCOME_SCHEMA,result/"stage4a3_outcome_schema.json");write_json(hash_spec,result/"stage4a3_hash_chain_spec.json");write_json(gate_spec,result/"stage4a3_final_analysis_gate_spec.json");write_json(hypothesis,result/"stage4a3_primary_hypothesis.json")
@@ -69,6 +69,10 @@ def build(repo: Path,stage_root: Path,output_root: Path) -> dict[str,Any]:
         {"Check":"reference gate","Status":"PASS" if reference["Status"].eq("PASS").all() else "FAIL","Details":f"{len(reference)} checks"},
         {"Check":"model bundle","Status":"PASS" if len(bundle["models"])==7 else "FAIL","Details":bundle["FROZEN_PROSPECTIVE_MODEL_BUNDLE_HASH"]},
         {"Check":"probability parity","Status":"PASS" if max(x["parity_maximum_absolute_difference"] for x in bundle["models"])<=1e-12 else "FAIL","Details":str(max(x["parity_maximum_absolute_difference"] for x in bundle["models"]))},
+        {"Check":"expected model bundle identity","Status":"PASS" if bundle["FROZEN_PROSPECTIVE_MODEL_BUNDLE_HASH"]==config["expected_model_bundle_hash"] else "FAIL","Details":bundle["FROZEN_PROSPECTIVE_MODEL_BUNDLE_HASH"]},
+        {"Check":"all 144 unit and hardening tests","Status":"PASS" if all(pd.read_csv(path)["Status"].eq("PASS").all() for path in (stage_root/"results/stage4a3_unit_test_results.csv",stage_root/"results/stage4a3a_hardening_test_results.csv")) else "FAIL","Details":"118 original + 26 Stage 4A.3A"},
+        {"Check":"frozen input builder historical parity","Status":"PASS" if pd.read_csv(stage_root/"results/stage4a3_frozen_input_builder_parity.csv")["Status"].eq("PASS").all() else "FAIL","Details":"exact frozen builder adapter"},
+        {"Check":"synthetic matured final evaluator","Status":"PASS" if all((stage_root/"tests/SYNTHETIC_MATURED_PROSPECTIVE_FIXTURE/tests/final_outputs"/name).exists() for name in ["stage4a3_final_gate_audit.csv","stage4a3_primary_confirmatory_result.json","Stage4A3_Final_Prospective_Report.md"]) else "FAIL","Details":"test-only"},
         {"Check":"universe","Status":"PASS" if len(universe)==19 else "FAIL","Details":universe_hash},
         {"Check":"collection inactive","Status":"PASS" if not config["production_collection_active"] else "FAIL","Details":"no activation"},
         {"Check":"real snapshots empty","Status":"PASS" if not any((stage_root/"prospective/snapshots").glob("*/*")) else "FAIL","Details":"0 required"},
