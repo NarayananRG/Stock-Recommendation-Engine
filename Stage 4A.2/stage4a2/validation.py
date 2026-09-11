@@ -39,10 +39,18 @@ def evidence_classification(paired: pd.DataFrame, bootstrap: pd.DataFrame, rando
             "At least 50 trades": item["Trade Count"] >= 50,
         }
         passed = sum(criteria.values())
-        if passed == len(criteria): label = "ROBUST POSITIVE ECONOMIC UTILITY"
-        elif passed >= 8: label = "WEAK POSITIVE ECONOMIC UTILITY"
-        elif passed >= 5: label = "MIXED / INCONCLUSIVE"
-        elif item["Trade Count"] < 50: label = "INSUFFICIENT SAMPLE"
-        else: label = "NO ECONOMIC UTILITY"
-        rows.append({"Policy": policy, "Economic Evidence Classification": label, "Criteria Passed": passed, "Criteria Required": len(criteria), **criteria})
+        point_names = ("Return > R0", "CAGR > R0", "Expectancy > R0", "Profit Factor >= R0")
+        point_passed = sum(bool(criteria[name]) for name in point_names)
+        if passed == len(criteria):
+            label = "ROBUST POSITIVE ECONOMIC UTILITY"
+        elif item["Trade Count"] < 50:
+            label = "INSUFFICIENT SAMPLE"
+        elif point_passed == len(point_names):
+            label = "WEAK POSITIVE ECONOMIC UTILITY"
+        elif point_passed == 0:
+            label = "NO ECONOMIC UTILITY"
+        else:
+            label = "MIXED / INCONCLUSIVE"
+        rows.append({"Policy": policy, "Economic Evidence Classification": label, "Primary Point Criteria Passed": point_passed,
+                     "Criteria Passed": passed, "Criteria Required": len(criteria), **criteria})
     return pd.DataFrame(rows)

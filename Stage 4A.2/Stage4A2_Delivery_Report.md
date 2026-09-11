@@ -8,9 +8,9 @@ This experiment was designed after Stage 4A and Stage 4A.1 results were observed
 
 No model was trained, recalibrated, tuned, or selected. The experiment used only frozen pseudo-OOS predictions, fixed same-date K values of 1 and 2, the frozen D1 `TRAIL_ONLY` engine as primary, and frozen D0 `STATIC_COMPAT` as sensitivity. Results are historical research, not a live or paper-trading recommendation.
 
-Experiment ID: `S4A2_20160101_20260828_9a527d225420`
+Experiment ID: `S4A2_20160101_20260828_022dc86ab7df`
 
-Stage 4A.2 package hash: `279ab520ecfcae3a1b909d10ec97f95f3f9b09d7d3c62c33efa4e3eae497a6c3`
+Stage 4A.2 package hash: `0da2a240880b70701f87067c6d355cff7607de9a86dd60d0d42a8fdbbfd39b33`
 
 ## Primary D1 results
 
@@ -19,10 +19,10 @@ Bootstrap columns are paired policy-minus-R0_K terminal-return deltas from the p
 | Policy | K | Trades | Return % | CAGR % | Max DD % | Expectancy R | PF | Avg exposure % | Δ return vs R0 | Bootstrap 2.5% | Median | 97.5% | Random percentile | 2024–26 Δ return | Classification |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
 | R0_K1 | 1 | 249 | 15.05 | 1.32 | -8.51 | 0.073 | 1.223 | 9.59 | — | — | — | — | 23.4% | — | Control |
-| R1_K1 | 1 | 241 | 16.86 | 1.47 | -9.83 | 0.083 | 1.263 | 9.53 | +1.81 | -9.38 | +1.60 | +14.14 | 37.6% | +2.70 | MIXED / INCONCLUSIVE |
-| R2_K1 | 1 | 240 | 18.71 | 1.62 | -10.17 | 0.096 | 1.289 | 9.57 | +3.66 | -6.82 | +3.56 | +16.41 | 55.2% | +2.80 | MIXED / INCONCLUSIVE |
-| R3_K1 | 1 | 249 | 22.41 | 1.92 | -9.97 | 0.111 | 1.329 | 9.64 | +7.36 | -3.78 | +7.64 | +21.73 | 81.8% | +2.19 | MIXED / INCONCLUSIVE |
-| R4_K1 | 1 | 249 | 19.97 | 1.72 | -10.41 | 0.102 | 1.297 | 9.61 | +4.91 | -5.35 | +4.95 | +17.48 | 64.2% | +1.95 | MIXED / INCONCLUSIVE |
+| R1_K1 | 1 | 241 | 16.86 | 1.47 | -9.83 | 0.083 | 1.263 | 9.53 | +1.81 | -9.38 | +1.60 | +14.14 | 37.6% | +2.70 | WEAK POSITIVE ECONOMIC UTILITY |
+| R2_K1 | 1 | 240 | 18.71 | 1.62 | -10.17 | 0.096 | 1.289 | 9.57 | +3.66 | -6.82 | +3.56 | +16.41 | 55.2% | +2.80 | WEAK POSITIVE ECONOMIC UTILITY |
+| R3_K1 | 1 | 249 | 22.41 | 1.92 | -9.97 | 0.111 | 1.329 | 9.64 | +7.36 | -3.78 | +7.64 | +21.73 | 81.8% | +2.19 | WEAK POSITIVE ECONOMIC UTILITY |
+| R4_K1 | 1 | 249 | 19.97 | 1.72 | -10.41 | 0.102 | 1.297 | 9.61 | +4.91 | -5.35 | +4.95 | +17.48 | 64.2% | +1.95 | WEAK POSITIVE ECONOMIC UTILITY |
 | R5_K1 | 1 | 250 | 16.29 | 1.43 | -12.16 | 0.074 | 1.236 | 9.49 | +1.24 | -12.23 | +1.23 | +15.79 | 32.6% | +2.03 | Diagnostic only |
 | R0_K2 | 2 | 275 | 22.09 | 1.89 | -10.20 | 0.095 | 1.294 | 10.65 | — | — | — | — | 84.0% | — | Control |
 | R1_K2 | 2 | 276 | 19.99 | 1.72 | -12.32 | 0.086 | 1.267 | 10.71 | -2.10 | -10.70 | -2.03 | +5.68 | 49.2% | +0.20 | NO ECONOMIC UTILITY |
@@ -67,6 +67,16 @@ The frozen fill model modestly improved entry capture, most clearly at K=2, but 
 
 The sign of each R1–R4 return delta versus its same-K R0 comparator was the same under D1 and D0: positive for all K=1 policies and negative for all K=2 policies. No result is flagged `EXIT-POLICY DEPENDENT` by sign reversal. The magnitude remains sensitive to exit policy, and D0 is a sensitivity analysis rather than part of the formal robust criterion.
 
+## Exposure-matched diagnostic
+
+The added exposure-matched summary uses only prior-session (`t-1`) exposure, caps the scale at 1, and never uses same-day exposure. For every R1–R5/K policy, actual ML return was below its prior-session exposure-matched R0 comparator; differences ranged from -3.44 percentage points (R3_K1) to -8.38 percentage points (R5_K2). This is diagnostic only and does not enter the evidence classification.
+
+## Realized PnL and target diagnostics
+
+Daily `Realized PnL` is now the frozen trade ledger's Net PnL aggregated on true Exit Date, with zero on sessions without an exit. Equity and Daily Return were not changed, and all daily realized values reconcile exactly to closed-trade Net PnL.
+
+D1 exposes full-bar MFE but no authoritative within-bar target-before-stop event. Its fields are therefore labelled `T1 Price Touched` and `T2 Price Touched`, with semantics `FULL_BAR_PRICE_TOUCH_NON_CONSERVATIVE_STOP_FIRST_AMBIGUITY`; they are not presented as conservative target success. D0 uses the authoritative frozen STOP_FIRST outcome labels and retains reached semantics. Diagnostic counts did not change: across the 13 named policies, D1 totals remain T1=698 and T2=474, while D0 totals remain T1=1,049 and T2=787. Only the semantic labels were corrected.
+
 ## Research questions
 
 1. **Does T1 ML ranking improve economics over rule ranking?** Point estimates improve for R1/R2 at K=1, but not at K=2 and not with robust uncertainty evidence.
@@ -83,11 +93,11 @@ No policy meets `ROBUST POSITIVE ECONOMIC UTILITY`. The observed K=1 benefit app
 
 ## Determinism and validation
 
-Two complete official experiments were run. All 33 behavior/research artifacts common to the clean runs are byte-identical, including membership, named ledgers, daily series, summaries, all 1,000 random controls, random summaries, all bootstraps, paired comparisons, evidence classifications, and validation. Behavioral logical differences: **0**.
+Two complete official experiments were run. All 30 behavioral/research artifacts compared under stable keys have zero logical differences. Nonnumeric and integer fields match exactly; float differences are checked at an absolute tolerance of 1e-6 and the largest observed raw difference was below 1.0e-9. Behavioral logical differences: **0**.
 
 The initial output-manifest byte difference was non-behavioral: Run 1 contained the separately generated unit-test CSV at manifest creation time, while clean Run 2 did not. The final manifest was rebuilt after all deliverables, and the difference is explicitly excluded from behavioral determinism.
 
-Executable tests: **116 passed, 0 failed**.
+Executable tests: **173 passed, 0 failed**.
 
 ## Limitations and warnings
 
@@ -142,3 +152,24 @@ STAGE 5 IMPLEMENTED: NO
 LIVE RECOMMENDATION GENERATED: NO  
 
 READY FOR INDEPENDENT STAGE 4A.2 AUDIT: YES
+
+CORE ECONOMIC RESULTS CHANGED: NO
+EXPECTED: NO
+
+CANDIDATE MEMBERSHIP CHANGED: NO
+EXPECTED: NO
+
+PORTFOLIO RETURNS CHANGED: NO
+EXPECTED: NO
+
+RANDOM CONTROL RESULTS CHANGED: NO
+EXPECTED: NO
+
+BOOTSTRAP ECONOMIC RESULTS CHANGED: NO
+EXPECTED: NO
+
+EVIDENCE CLASSIFICATION LABELS CHANGED: YES
+REALIZED PNL DIAGNOSTIC CORRECTED: YES
+T1/T2 DIAGNOSTIC SEMANTICS VERIFIED: YES
+NO POLICY MEETS ROBUST POSITIVE ECONOMIC UTILITY: YES
+READY FOR FINAL INDEPENDENT STAGE 4A.2 FREEZE AUDIT: YES

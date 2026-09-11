@@ -97,6 +97,18 @@ no ML target changes,PASS,True,True
 no ML exit changes,PASS,True,True
 cash only implicit frozen adapter,PASS,True,True
 candidate filter before engine,PASS,True,True
+A selected future nonfill consumes K,PASS,True,True
+B unselected future winner cannot enter,PASS,True,True
+I synthetic random percentile tie midrank,PASS,62.5,62.5
+J evidence robust exact,PASS,True,True
+J evidence weak exact,PASS,True,True
+J evidence no utility exact,PASS,True,True
+J evidence mixed exact,PASS,True,True
+J evidence insufficient precedence,PASS,True,True
+K realized PnL zero without exit,PASS,True,True
+K realized PnL equals exit Net PnL,PASS,True,True
+L D1 target diagnostic uses price touched,PASS,True,True
+L D1 target diagnostic flags STOP_FIRST ambiguity,PASS,True,True
 output exists stage4a2_portfolio_summary_d1.csv,PASS,True,True
 output exists stage4a2_portfolio_summary_d0.csv,PASS,True,True
 output exists stage4a2_random_control_raw.csv.gz,PASS,True,True
@@ -115,3 +127,48 @@ D0 baseline trades parity,PASS,True,True
 500 K2,PASS,True,True
 exposure bounded,PASS,True,True
 daily policies 13,PASS,True,True
+C ALL_BASELINE_PRIMARY ledger final equity reconcile,PASS,True,True
+D ALL_BASELINE_PRIMARY daily final equals summary,PASS,True,True
+E ALL_BASELINE_PRIMARY costs reconcile,PASS,True,True
+C R0_K1 ledger final equity reconcile,PASS,True,True
+D R0_K1 daily final equals summary,PASS,True,True
+E R0_K1 costs reconcile,PASS,True,True
+C R0_K2 ledger final equity reconcile,PASS,True,True
+D R0_K2 daily final equals summary,PASS,True,True
+E R0_K2 costs reconcile,PASS,True,True
+C R1_K1 ledger final equity reconcile,PASS,True,True
+D R1_K1 daily final equals summary,PASS,True,True
+E R1_K1 costs reconcile,PASS,True,True
+C R1_K2 ledger final equity reconcile,PASS,True,True
+D R1_K2 daily final equals summary,PASS,True,True
+E R1_K2 costs reconcile,PASS,True,True
+C R2_K1 ledger final equity reconcile,PASS,True,True
+D R2_K1 daily final equals summary,PASS,True,True
+E R2_K1 costs reconcile,PASS,True,True
+C R2_K2 ledger final equity reconcile,PASS,True,True
+D R2_K2 daily final equals summary,PASS,True,True
+E R2_K2 costs reconcile,PASS,True,True
+C R3_K1 ledger final equity reconcile,PASS,True,True
+D R3_K1 daily final equals summary,PASS,True,True
+E R3_K1 costs reconcile,PASS,True,True
+C R3_K2 ledger final equity reconcile,PASS,True,True
+D R3_K2 daily final equals summary,PASS,True,True
+E R3_K2 costs reconcile,PASS,True,True
+C R4_K1 ledger final equity reconcile,PASS,True,True
+D R4_K1 daily final equals summary,PASS,True,True
+E R4_K1 costs reconcile,PASS,True,True
+C R4_K2 ledger final equity reconcile,PASS,True,True
+D R4_K2 daily final equals summary,PASS,True,True
+E R4_K2 costs reconcile,PASS,True,True
+C R5_K1 ledger final equity reconcile,PASS,True,True
+D R5_K1 daily final equals summary,PASS,True,True
+E R5_K1 costs reconcile,PASS,True,True
+C R5_K2 ledger final equity reconcile,PASS,True,True
+D R5_K2 daily final equals summary,PASS,True,True
+E R5_K2 costs reconcile,PASS,True,True
+F Net R formula,PASS,True,True
+K official realized PnL reconciles,PASS,True,True
+G yearly metrics use continuous slices,PASS,True,True
+H 2026 explicitly partial through date,PASS,True,True
+M exact D1 core parity,PASS,True,True
+N exact D0 core parity,PASS,True,True

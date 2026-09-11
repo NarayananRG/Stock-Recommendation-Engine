@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import concurrent.futures
 import gzip
+import io
 import json
 import os
 import platform
@@ -45,6 +46,7 @@ STAGE4A1_PACKAGE = "8faeb82028289186c5d3bef40d242298b2d4f812c606b20b9b3cd7eb7e2a
 STAGE2B1_PACKAGE = "9bba171b9917b9d125d2487e4afa53f6cc047e0a5ccbe3055ebb3e84363d854e"
 STAGE2B1_POLICY_HASH = "1830639ace2e2ddcdb24a899b52e44e3305b3ec297b74a6e620a5ee1d1d93e28"
 STAGE2B_MAIN_HASH = "5cdf4b4060ea093d0c6655c76e8d262f9a33e36f728655fd7fad35ede7d4e673"
+AUDITED_STAGE4A2_COMMIT = "67977db730c8b9ae27fbc9862cd0a9c1d89dcf5d"
 
 _RANDOM_CONTEXT: Any = None
 _RANDOM_UNIVERSE: pd.DataFrame | None = None
@@ -129,6 +131,62 @@ def reference_gate(repo: Path) -> pd.DataFrame:
     frame = checks_to_frame(checks); require_pass(frame); return frame
 
 
+def _old_frame(repo: Path, relative: str) -> pd.DataFrame:
+    payload = subprocess.check_output(["git", "-c", f"safe.directory={repo.as_posix()}", "show", f"{AUDITED_STAGE4A2_COMMIT}:{relative}"], cwd=repo)
+    return pd.read_csv(io.BytesIO(payload), compression="gzip" if relative.endswith(".gz") else None, low_memory=False)
+
+
+def core_result_parity(repo: Path, out: Path) -> pd.DataFrame:
+    specs: list[tuple[str, list[str] | None, list[str]]] = [
+        ("stage4a2_candidate_membership_audit.csv.gz", None, ["Signal Date", "Signal ID"]),
+        ("stage4a2_trade_ledger_d1.csv.gz", ["Policy", "Exit Engine", "Signal ID", "Ticker", "Signal Date", "Entry Date", "Exit Date", "Executed Entry", "Initial Stop", "Original T1", "Original T2", "Quantity", "Position Value", "Exit Reason", "Executed Exit", "Gross PnL", "Costs", "Net PnL", "Net R", "Holding Sessions", "Selection Rank", "Selection Score", "Daily K", "Same-Date Candidate Count"], ["Policy", "Signal ID"]),
+        ("stage4a2_trade_ledger_d0.csv.gz", ["Policy", "Exit Engine", "Signal ID", "Ticker", "Signal Date", "Entry Date", "Exit Date", "Executed Entry", "Initial Stop", "Original T1", "Original T2", "Quantity", "Position Value", "Exit Reason", "Executed Exit", "Gross PnL", "Costs", "Net PnL", "Net R", "Holding Sessions", "Selection Rank", "Selection Score", "Daily K", "Same-Date Candidate Count"], ["Policy", "Signal ID"]),
+        ("stage4a2_daily_portfolio_d1.csv.gz", ["Policy", "Exit Engine", "Date", "Equity", "Daily Return %", "Cash", "Invested Value", "Exposure", "Open Positions", "Costs"], ["Policy", "Date"]),
+        ("stage4a2_daily_portfolio_d0.csv.gz", ["Policy", "Exit Engine", "Date", "Equity", "Daily Return %", "Cash", "Invested Value", "Exposure", "Open Positions", "Costs"], ["Policy", "Date"]),
+        ("stage4a2_portfolio_summary_d1.csv", ["Policy", "Starting Equity", "Ending Equity", "Total Return %", "CAGR %", "Annualized Volatility %", "Sharpe Ratio RF=0", "Sharpe Ratio RF=6%", "Sortino RF=0", "Sortino RF=6%", "Calmar Ratio", "Maximum Drawdown %", "Trade Count", "Winning Trades", "Losing Trades", "Win Rate %", "Mean Net R", "Median Net R", "Expectancy R", "Profit Factor", "Average Holding Sessions", "Median Holding Sessions", "Average Exposure %", "Maximum Exposure %", "Average Open Positions", "Maximum Open Positions", "Days Fully Cash", "Candidate Count", "Selected Candidate Count", "Entry Filled Count", "Fill Rate %", "Invalid Risk Count", "Expired Entry Count", "Capital Rejection Count", "Total Costs"], ["Policy"]),
+        ("stage4a2_portfolio_summary_d0.csv", ["Policy", "Starting Equity", "Ending Equity", "Total Return %", "CAGR %", "Annualized Volatility %", "Sharpe Ratio RF=0", "Sharpe Ratio RF=6%", "Sortino RF=0", "Sortino RF=6%", "Calmar Ratio", "Maximum Drawdown %", "Trade Count", "Winning Trades", "Losing Trades", "Win Rate %", "Mean Net R", "Median Net R", "Expectancy R", "Profit Factor", "Average Holding Sessions", "Median Holding Sessions", "Average Exposure %", "Maximum Exposure %", "Average Open Positions", "Maximum Open Positions", "Days Fully Cash", "Candidate Count", "Selected Candidate Count", "Entry Filled Count", "Fill Rate %", "Invalid Risk Count", "Expired Entry Count", "Capital Rejection Count", "Total Costs"], ["Policy"]),
+        ("stage4a2_random_control_raw.csv.gz", ["Policy", "Daily K", "Seed", "Starting Equity", "Ending Equity", "Total Return %", "CAGR %", "Annualized Volatility %", "Maximum Drawdown %", "Trade Count", "Win Rate %", "Mean Net R", "Median Net R", "Expectancy R", "Profit Factor", "Average Exposure %", "Maximum Exposure %", "Average Open Positions", "Maximum Open Positions", "Days Fully Cash", "Candidate Count", "Selected Candidate Count", "Entry Filled Count", "Fill Rate %", "Invalid Risk Count", "Expired Entry Count", "Capital Rejection Count", "Total Costs"], ["Daily K", "Seed"]),
+        ("stage4a2_random_control_summary.csv", None, ["Daily K", "Metric"]),
+        ("stage4a2_block_bootstrap_63.csv.gz", None, ["Policy", "Replicate"]),
+        ("stage4a2_block_bootstrap_21_sensitivity.csv.gz", None, ["Policy", "Replicate"]),
+        ("stage4a2_block_bootstrap_126_sensitivity.csv.gz", None, ["Policy", "Replicate"]),
+        ("stage4a2_bootstrap_summary.csv", None, ["Policy", "Block Length", "Metric"]),
+        ("stage4a2_paired_economic_comparison.csv", None, ["Policy"]),
+    ]
+    rows = []
+    for file_name, columns, keys in specs:
+        current = pd.read_csv(out / file_name, low_memory=False).sort_values(keys, kind="mergesort").reset_index(drop=True)
+        previous = _old_frame(repo, f"Stage 4A.2/results/{file_name}").sort_values(keys, kind="mergesort").reset_index(drop=True)
+        selected = columns if columns is not None else list(current.columns)
+        missing = [column for column in selected if column not in current or column not in previous]
+        logical_current=current[selected].copy() if not missing else current.iloc[:,0:0]
+        logical_previous=previous[selected].copy() if not missing else previous.iloc[:,0:0]
+        numeric_columns=[column for column in selected if not missing and pd.api.types.is_numeric_dtype(logical_current[column]) and pd.api.types.is_numeric_dtype(logical_previous[column])]
+        integer_columns=[column for column in numeric_columns if pd.api.types.is_integer_dtype(logical_current[column]) and pd.api.types.is_integer_dtype(logical_previous[column])]
+        float_columns=[column for column in numeric_columns if column not in integer_columns]
+        nonnumeric_columns=[column for column in selected if column not in numeric_columns]
+        logical_differences=0
+        if not missing and len(current)==len(previous):
+            logical_differences += sum(int((current[column].to_numpy()!=previous[column].to_numpy()).sum()) for column in integer_columns)
+            logical_differences += sum(int((current[column].fillna("<NA>").astype(str).to_numpy()!=previous[column].fillna("<NA>").astype(str).to_numpy()).sum()) for column in nonnumeric_columns)
+            logical_differences += sum(int((~np.isclose(pd.to_numeric(current[column],errors="coerce").to_numpy(float),pd.to_numeric(previous[column],errors="coerce").to_numpy(float),rtol=0,atol=1e-6,equal_nan=True)).sum()) for column in float_columns)
+        else:
+            logical_differences=1
+        for column in numeric_columns:
+            logical_current[column]=pd.to_numeric(logical_current[column],errors="coerce").round(6)
+            logical_previous[column]=pd.to_numeric(logical_previous[column],errors="coerce").round(6)
+        actual_hash = "MISSING_COLUMNS" if missing else dataframe_content_hash(logical_current)
+        expected_hash = "MISSING_COLUMNS" if missing else dataframe_content_hash(logical_previous)
+        maximum_difference=max((float(np.nanmax(np.abs(pd.to_numeric(current[column],errors="coerce").to_numpy(float)-pd.to_numeric(previous[column],errors="coerce").to_numpy(float)))) for column in numeric_columns if len(current)),default=0.0)
+        rows.append({"Artifact": file_name, "Audited Commit": AUDITED_STAGE4A2_COMMIT, "Compared Columns": "|".join(selected),
+                     "Comparison Contract":"stable key order; exact nonnumeric/integer identity; float serialization normalized to 6 decimals (absolute delta also reported)",
+                     "Expected Logical Hash": expected_hash, "Actual Logical Hash": actual_hash,
+                     "Logical Difference Count":logical_differences,
+                     "Maximum Absolute Numeric Difference":maximum_difference,
+                     "Status": "PASS" if not missing and logical_differences == 0 and maximum_difference <= 1e-6 else "FAIL", "Missing Columns": "|".join(missing)})
+    return pd.DataFrame(rows)
+
+
 def run_named(context: Any, universe: pd.DataFrame, selections: dict[str, set[str]], membership: pd.DataFrame, run_static: bool = True) -> tuple[dict[str, pd.DataFrame], dict[str, pd.DataFrame], pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     d1_ledgers: dict[str, pd.DataFrame] = {}; d1_daily: dict[str, pd.DataFrame] = {}; d1_rows = []
     d0_ledgers: dict[str, pd.DataFrame] = {}; d0_daily: dict[str, pd.DataFrame] = {}; d0_rows = []
@@ -172,7 +230,11 @@ def main() -> None:
     selections, membership = select_named(universe, scores)
     internal_membership = membership.merge(universe[["Signal ID", "T1_BEFORE_STOP_63", "T2_BEFORE_STOP_63"]], on="Signal ID", how="left", validate="one_to_one")
     write_csv(lineage, out / "stage4a2_prediction_lineage_audit.csv")
-    write_csv(pd.DataFrame([{"Input": name, "Expected Logical Hash": value, "Status": "PASS"} for name, value in PREDICTION_HASHES.items()]), out / "stage4a2_prediction_input_audit.csv")
+    prediction_rows=[]
+    for name, expected in PREDICTION_HASHES.items():
+        gate=ref[ref["Check"]==f"prediction logical hash: {name}"].iloc[0]
+        prediction_rows.append({"Input":name,"Expected Logical Hash":expected,"Actual Logical Hash":gate["Actual"],"Status":"PASS" if gate["Actual"]==expected else "FAIL"})
+    prediction_audit=pd.DataFrame(prediction_rows);require_pass(prediction_audit.rename(columns={"Expected Logical Hash":"Expected","Actual Logical Hash":"Actual"}));write_csv(prediction_audit,out/"stage4a2_prediction_input_audit.csv")
     write_csv_gz(membership, out / "stage4a2_candidate_membership_audit.csv.gz")
     reg = pd.DataFrame(registry()); write_csv(reg, out / "stage4a2_policy_registry.csv")
     context = load_frozen_context(repo, args.dependency_root.resolve())
@@ -214,6 +276,13 @@ def main() -> None:
     attribution=selection_attribution(selections,d1_ledgers); attribution["Same-Date Candidate Dates"]=universe["Signal Date"].nunique();write_csv(attribution,out/"stage4a2_selection_attribution.csv")
     fill=paired[paired.Policy.str.startswith("R5_")].copy();write_csv(fill,out/"stage4a2_fill_efficiency.csv")
     exposure=pd.concat([exposure_matched_control(d1_daily[p],d1_daily[f"R0_K{p[-1]}"],p) for p in [f"R{x}_K{k}" for x in range(1,6) for k in (1,2)]],ignore_index=True);write_csv(exposure,out/"stage4a2_exposure_matched_rule_control.csv")
+    exposure_rows=[]
+    for policy,group in exposure.sort_values("Date").groupby("Policy",sort=True):
+        actual=float(d1_summary.loc[d1_summary["Policy"]==policy,"Total Return %"].iloc[0]);matched=(float(group["Exposure-Matched Equity"].iloc[-1])/100000.0-1)*100
+        exposure_rows.append({"Policy":policy,"Comparator":f"R0_K{policy[-1]}","ML Actual Total Return %":actual,
+                              "Prior-Session Exposure-Matched Rule Return %":matched,"Difference %":actual-matched,
+                              "Exposure Lag":"t-1","Scale Cap":1.0,"Same-Day Exposure Lookahead":"NO"})
+    write_csv(pd.DataFrame(exposure_rows),out/"stage4a2_exposure_matched_summary.csv")
     tasks=[(k,seed) for k in (1,2) for seed in range(500)]
     worker_count=min(4,os.cpu_count() or 1)
     print(f"random controls: {len(tasks)} tasks across {worker_count} frozen-engine workers",flush=True)
@@ -234,7 +303,17 @@ def main() -> None:
         file={63:"stage4a2_block_bootstrap_63.csv.gz",21:"stage4a2_block_bootstrap_21_sensitivity.csv.gz",126:"stage4a2_block_bootstrap_126_sensitivity.csv.gz"}[block];write_csv_gz(frame,out/file)
     bootall=pd.concat(bootstrap_parts,ignore_index=True);bootsum=summarize_bootstrap(bootall);write_csv(bootsum,out/"stage4a2_bootstrap_summary.csv")
     evidence=evidence_classification(paired,bootsum,percentiles,recent,yearly);write_csv(evidence,out/"stage4a2_economic_evidence_classification.csv")
-    validations=checks_to_frame([("all reference gates pass",(ref.Status=="PASS").all(),True,(ref.Status=="PASS").all()),("all prediction lineage gates pass",(lineage.Status=="PASS").all(),True,(lineage.Status=="PASS").all()),("D1 parity exact",(parity1.Status=="PASS").all(),True,(parity1.Status=="PASS").all()),("D0 parity exact",(parity0.Status=="PASS").all(),True,(parity0.Status=="PASS").all()),("candidate count",len(universe)==754,754,len(universe)),("named policies",len(d1_summary)==13,13,len(d1_summary)),("random controls",len(random_raw)==1000,1000,len(random_raw)),("bootstrap replicates",len(bootall)==60000,60000,len(bootall)),("exposure bounded",d1_daily_all.Exposure.between(0,1+1e-12).all(),True,d1_daily_all.Exposure.between(0,1+1e-12).all())]);require_pass(validations);write_csv(validations,out/"stage4a2_validation_checks.csv");(out/"stage4a2_validation_report.txt").write_text("STAGE 4A.2 ENGINEERING VALIDATION: PASS WITH WARNINGS\nAll behavior gates passed. Scientific limitations remain.\n",encoding="utf-8",newline="\n")
+    old_evidence=_old_frame(repo,"Stage 4A.2/results/stage4a2_economic_evidence_classification.csv")[["Policy","Economic Evidence Classification"]].rename(columns={"Economic Evidence Classification":"Old Classification"})
+    classification_audit=old_evidence.merge(evidence[["Policy","Economic Evidence Classification"]].rename(columns={"Economic Evidence Classification":"Corrected Classification"}),on="Policy",validate="one_to_one");classification_audit["Changed"]=classification_audit["Old Classification"]!=classification_audit["Corrected Classification"];write_csv(classification_audit,out/"stage4a2_evidence_classification_correction_audit.csv")
+    core_parity=core_result_parity(repo,out);write_csv(core_parity,out/"stage4a2_core_result_parity.csv");require_pass(core_parity.rename(columns={"Artifact":"Check","Expected Logical Hash":"Expected","Actual Logical Hash":"Actual"}))
+    expected_labels={**{f"R{x}_K1":"WEAK POSITIVE ECONOMIC UTILITY" for x in range(1,5)},**{f"R{x}_K2":"NO ECONOMIC UTILITY" for x in range(1,5)}}
+    actual_labels=evidence.set_index("Policy")["Economic Evidence Classification"].to_dict()
+    realized_ok=True
+    for policy,group in d1_daily_all.groupby("Policy"):
+        expected=d1_ledger_all[d1_ledger_all["Policy"]==policy].assign(Date=lambda f:pd.to_datetime(f["Exit Date"]).dt.normalize()).groupby("Date")["Net PnL"].sum()
+        actual=group.assign(Date=lambda f:pd.to_datetime(f["Date"]).dt.normalize()).set_index("Date")["Realized PnL"]
+        realized_ok &= bool(np.allclose(actual,expected.reindex(actual.index,fill_value=0.0),rtol=0,atol=1e-9))
+    validations=checks_to_frame([("all reference gates pass",(ref.Status=="PASS").all(),True,(ref.Status=="PASS").all()),("all prediction lineage gates pass",(lineage.Status=="PASS").all(),True,(lineage.Status=="PASS").all()),("prediction input actual hashes",(prediction_audit.Status=="PASS").all(),True,(prediction_audit.Status=="PASS").all()),("D1 parity exact",(parity1.Status=="PASS").all(),True,(parity1.Status=="PASS").all()),("D0 parity exact",(parity0.Status=="PASS").all(),True,(parity0.Status=="PASS").all()),("core results unchanged from audited commit",(core_parity.Status=="PASS").all(),True,(core_parity.Status=="PASS").all()),("corrected classification contract",all(actual_labels.get(k)==v for k,v in expected_labels.items()),expected_labels,actual_labels),("no robust policy",not evidence["Economic Evidence Classification"].eq("ROBUST POSITIVE ECONOMIC UTILITY").any(),True,evidence["Economic Evidence Classification"].eq("ROBUST POSITIVE ECONOMIC UTILITY").sum()),("realized PnL exit-event reconciliation",realized_ok,True,realized_ok),("candidate count",len(universe)==754,754,len(universe)),("named policies",len(d1_summary)==13,13,len(d1_summary)),("random controls",len(random_raw)==1000,1000,len(random_raw)),("bootstrap replicates",len(bootall)==60000,60000,len(bootall)),("exposure bounded",d1_daily_all.Exposure.between(0,1+1e-12).all(),True,d1_daily_all.Exposure.between(0,1+1e-12).all())]);require_pass(validations);write_csv(validations,out/"stage4a2_validation_checks.csv");(out/"stage4a2_validation_report.txt").write_text("STAGE 4A.2 FINAL AUDIT HARDENING: PASS WITH WARNINGS\nAll behavior and hardening gates passed. Core economic results are unchanged. Scientific limitations remain.\n",encoding="utf-8",newline="\n")
     pkg=package_hash(stage,source_paths());config_hash=sha256_file(stage/"config/stage4a2_config.json");registry_hash=dataframe_content_hash(reg)
     seed={"stage4a1_commit":EXPECTED_TAGS["stage4a1-executable-cohort-robustness-baseline"],"stage4a1_experiment":STAGE4A1_ID,"stage4a1_package":STAGE4A1_PACKAGE,"prediction_hashes":PREDICTION_HASHES,"stage31_hash":STAGE31_HASH,"stage2b1_commit":EXPECTED_TAGS["stage2b.1-dynamic-research-baseline"],"stage2b1_package":STAGE2B1_PACKAGE,"stage2b1_policy_hash":STAGE2B1_POLICY_HASH,"code_package_hash":pkg,"config_hash":config_hash,"policy_registry_hash":registry_hash,"random":{"seeds":list(range(500)),"k":[1,2]},"bootstrap":{"seed":42,"replicates":2000,"blocks":[63,21,126]},"dates":["2016-01-01","2026-08-28"]}
     experiment="S4A2_20160101_20260828_"+canonical_json_hash(seed)[:12]

@@ -1,5 +1,5 @@
 {
-  "package_hash": "279ab520ecfcae3a1b909d10ec97f95f3f9b09d7d3c62c33efa4e3eae497a6c3",
+  "package_hash": "0da2a240880b70701f87067c6d355cff7607de9a86dd60d0d42a8fdbbfd39b33",
   "sources": [
     {
       "bytes": 581,
@@ -7,9 +7,9 @@
       "sha256": "5f75af77537447b32f171049b125d8a74785a36ccf02d8598924d49c4aa091e1"
     },
     {
-      "bytes": 20881,
+      "bytes": 32080,
       "relative_path": "stage4a2/Stock_Alert_Stage4A2_Economic_Utility.py",
-      "sha256": "24b094e3926ef287da9190ced821fdd86c9ae5c50329ee0308d62b30975ad724"
+      "sha256": "1da5ce81a7fa0026ba30a7298894bcbcec687c83d9c2cc299bbc5eeb5f3fccb3"
     },
     {
       "bytes": 1261,
@@ -37,9 +37,9 @@
       "sha256": "60a62fbf2a8f05a5a9cd16a1e55e21c6f188a160cca02b9c295c42ac7e019ff0"
     },
     {
-      "bytes": 11455,
+      "bytes": 12518,
       "relative_path": "stage4a2/economic_metrics.py",
-      "sha256": "38dcba61d374ca07fc9159ece80b58bfe771a35ef3513c3b2217c8dd8a157e86"
+      "sha256": "1e7f8c8946dcbc988f4f790c74da20b96e5b8ebeda804b5a467246ef59aa6f9e"
     },
     {
       "bytes": 1412,
@@ -52,14 +52,14 @@
       "sha256": "f0e48fbbd8d4029cf8b63f0e732c65ce8677d953aaea9463d40dca71b67a76f3"
     },
     {
-      "bytes": 3305,
+      "bytes": 3349,
       "relative_path": "stage4a2/diagnostics.py",
-      "sha256": "bba9aee9100ccb11317933c9167e88c6dea7299c1e6b2e8741fbcd9b2ecac70e"
+      "sha256": "1ced81f5458e39218486086acd16c5406c169dfb7b45bbdf9b367477b113fa82"
     },
     {
-      "bytes": 2545,
+      "bytes": 2866,
       "relative_path": "stage4a2/validation.py",
-      "sha256": "0a6c5e728618776506e976cd229b3dbd62753025d3dde3e8c2a24f736d91aa16"
+      "sha256": "c8beb895e38c8dfd42ae05f9c01beb6a342f8cbdb1c8e610c5e6238151979e0a"
     },
     {
       "bytes": 2012,
@@ -67,9 +67,9 @@
       "sha256": "ac3e99675cc76798763ed120ea5498f355b4aa090eb1ac0309579d1f9948eb0b"
     },
     {
-      "bytes": 10455,
+      "bytes": 17680,
       "relative_path": "tests/run_stage4a2_tests.py",
-      "sha256": "4ac2ad500e67311807652c3a9aa808c2c2efbafaba90d30af4c4cf9c09dcebb1"
+      "sha256": "d3ed952e7319652d211254c4eb07e8dedd8ef0a543fbd0e96559a8b877e7b471"
     }
   ]
 }

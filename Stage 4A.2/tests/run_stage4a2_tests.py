@@ -17,9 +17,12 @@ def main() -> None:
     from stage4a2.bootstrap import paired_block_bootstrap
     from stage4a2.candidate_selection import random_key, rank_policy, select_named, select_random
     from stage4a2.data_contract import load_baseline_primary
+    from stage4a2.economic_metrics import enrich_trades, normalize_daily
     from stage4a2.hashing import dataframe_content_hash
     from stage4a2.policies import registry
     from stage4a2.prediction_contract import load_scores
+    from stage4a2.random_controls import METRICS, named_percentiles
+    from stage4a2.validation import evidence_classification
     rows=[]
     def check(name: str, condition: object, expected: object=True, actual: object|None=None) -> None:
         ok=bool(condition);rows.append({"Test":name,"Status":"PASS" if ok else "FAIL","Expected":expected,"Actual":actual if actual is not None else bool(condition)})
@@ -54,6 +57,49 @@ def main() -> None:
     for block in (21,63,126):
         x=paired_block_bootstrap("R1_K1",a,b,block,20,42);y=paired_block_bootstrap("R1_K1",a,b,block,20,42);check(f"bootstrap {block} deterministic",dataframe_content_hash(x)==dataframe_content_hash(y));check(f"bootstrap {block} sample length",x["Sample Length"].eq(252).all());check(f"bootstrap {block} paired arithmetic",np.allclose(x["Delta Terminal Return %"],x["Policy Terminal Return %"]-x["Rule Terminal Return %"]))
     check("exposure match cap source present",'.clip(0, 1)' in source);check("prior-session shift source present",'.shift(1)' in source);check("no ML sizing",'ml_position_sizing' not in lower);check("no ML stop changes",'ml_stop' not in lower);check("no ML target changes",'ml_target' not in lower);check("no ML exit changes",'ml_exit' not in lower);check("cash only implicit frozen adapter",'PortfolioBacktester' in source);check("candidate filter before engine",'candidates = context.candidates[' in source)
+
+    # A/B: K is consumed at signal-time selection, irrespective of later execution outcome.
+    synthetic=pd.DataFrame([
+        {"Signal ID":"SELECTED_NONFILL","Ticker":"AAA","Signal Date":pd.Timestamp("2020-01-02"),"Signal":"BUY","Original Signal":"BUY","Setup":"S","Market Regime":"M","Actionability Score":10,"Technical Score":10,"Stop Loss":90,"Target 1":110,"Target 2":120,"D1_SHADOW_ENTRY_FILLED":False},
+        {"Signal ID":"UNSELECTED_WINNER","Ticker":"BBB","Signal Date":pd.Timestamp("2020-01-02"),"Signal":"BUY","Original Signal":"BUY","Setup":"S","Market Regime":"M","Actionability Score":9,"Technical Score":9,"Stop Loss":90,"Target 1":110,"Target 2":120,"D1_SHADOW_ENTRY_FILLED":True},
+    ])
+    synthetic_scores={code:pd.Series({"SELECTED_NONFILL":.9,"UNSELECTED_WINNER":.1}) for code in ("R1","R2","R3","R4","R5")}
+    synthetic_sel,_=select_named(synthetic,synthetic_scores)
+    check("A selected future nonfill consumes K",synthetic_sel["R1_K1"]=={"SELECTED_NONFILL"})
+    check("B unselected future winner cannot enter","UNSELECTED_WINNER" not in synthetic_sel["R1_K1"])
+
+    # I: percentile uses mid-rank tie handling.
+    named_row={"Policy":"R1_K1",**{metric:3.0 for metric in METRICS}}
+    control_rows=[{"Daily K":1,**{metric:value for metric in METRICS}} for value in (1.0,2.0,3.0,4.0)]
+    percentile=named_percentiles(pd.DataFrame([named_row]),pd.DataFrame(control_rows))
+    check("I synthetic random percentile tie midrank",np.allclose(percentile["Random Percentile %"],62.5),62.5,float(percentile["Random Percentile %"].iloc[0]))
+
+    # J: exact evidence contract, including precedence of the sample-size gate.
+    def classify_case(point_values: tuple[float,float,float,float], *, robust: bool=False, trades: int=100) -> str:
+        paired_case=pd.DataFrame([{"Policy":"R1_K1","Delta Total Return %":point_values[0],"Delta CAGR %":point_values[1],"Delta Expectancy R":point_values[2],"Delta Profit Factor":point_values[3],"Delta Maximum Drawdown %":0 if robust else -3,"Trade Count":trades}])
+        boot_case=pd.DataFrame([{"Policy":"R1_K1","Block Length":63,"Metric":"Terminal Return %","Delta 2.5%":1 if robust else -1}])
+        rand_case=pd.DataFrame([{"Policy":"R1_K1","Metric":"Total Return %","Random Percentile %":96 if robust else 50}])
+        recent_case=pd.DataFrame([{"Policy":"R1_K1","Delta Return vs R0 %":1 if robust else -1}])
+        yearly_case=pd.DataFrame([{"Policy":"R1_K1","Return >= R0":robust} for _ in range(6)])
+        return str(evidence_classification(paired_case,boot_case,rand_case,recent_case,yearly_case).iloc[0]["Economic Evidence Classification"])
+    check("J evidence robust exact",classify_case((1,1,1,0),robust=True)=="ROBUST POSITIVE ECONOMIC UTILITY")
+    check("J evidence weak exact",classify_case((1,1,1,0))=="WEAK POSITIVE ECONOMIC UTILITY")
+    check("J evidence no utility exact",classify_case((-1,-1,-1,-1))=="NO ECONOMIC UTILITY")
+    check("J evidence mixed exact",classify_case((1,-1,-1,-1))=="MIXED / INCONCLUSIVE")
+    check("J evidence insufficient precedence",classify_case((1,1,1,0),robust=False,trades=49)=="INSUFFICIENT SAMPLE")
+
+    # K: realized PnL is true Net PnL on exit date and zero on non-exit dates.
+    synthetic_result={"equity":pd.DataFrame({"Date":["2020-01-02","2020-01-03"],"Total Equity":[100000,100125],"Daily Return %":[0,.125],"Cash":[99000,100125],"Open Position Value":[1000,0],"Number Open Positions":[1,0]}),"trades":pd.DataFrame({"Entry Date":["2020-01-02"],"Exit Date":["2020-01-03"],"Net PnL":[125.0]})}
+    normalized=normalize_daily(synthetic_result,"SYNTHETIC","D1")
+    check("K realized PnL zero without exit",float(normalized.loc[normalized.Date==pd.Timestamp("2020-01-02"),"Realized PnL"].iloc[0])==0)
+    check("K realized PnL equals exit Net PnL",float(normalized.loc[normalized.Date==pd.Timestamp("2020-01-03"),"Realized PnL"].iloc[0])==125)
+
+    # L: D1 full-bar MFE is labelled only as nonconservative price touch.
+    member=pd.DataFrame([{"Signal ID":"S1","Ticker":"AAA","Signal Date":pd.Timestamp("2020-01-02"),"Target 1":110.0,"Target 2":120.0,"Same-Date Candidate Count":1,"T1_BEFORE_STOP_63":0,"T2_BEFORE_STOP_63":0}])
+    trade=pd.DataFrame([{"Signal ID":"S1","Ticker":"AAA","Signal Date":"2020-01-02","Entry Date":"2020-01-03","Exit Date":"2020-01-03","Executed Entry":100.0,"Initial Risk Per Share":10.0,"Original T1":110.0,"Original T2":120.0,"MFE R":2.5,"Bars Held":1,"R Multiple":-1.0,"Net PnL":-100.0,"Quantity":10}])
+    enriched=enrich_trades({"trades":trade},"ALL_BASELINE_PRIMARY","D1_TRAIL_ONLY",member)
+    check("L D1 target diagnostic uses price touched","T1 Price Touched" in enriched and "T1 Reached" not in enriched)
+    check("L D1 target diagnostic flags STOP_FIRST ambiguity",enriched["Target Diagnostic Semantics"].eq("FULL_BAR_PRICE_TOUCH_NON_CONSERVATIVE_STOP_FIRST_AMBIGUITY").all())
     if args.results:
         results=args.results.resolve();required=["stage4a2_portfolio_summary_d1.csv","stage4a2_portfolio_summary_d0.csv","stage4a2_random_control_raw.csv.gz","stage4a2_bootstrap_summary.csv","stage4a2_validation_checks.csv","stage4a2_trade_ledger_d1.csv.gz","stage4a2_daily_portfolio_d1.csv.gz","stage4a2_recent_2024_2026_metrics.csv"]
         for file in required: check(f"output exists {file}",(results/file).is_file())
@@ -61,9 +107,28 @@ def main() -> None:
             summary=pd.read_csv(results/"stage4a2_portfolio_summary_d1.csv");base=summary[summary.Policy=="ALL_BASELINE_PRIMARY"].iloc[0];check("D1 baseline ending parity",abs(base["Ending Equity"]-120093.40818664426)<1e-6);check("D1 baseline trades parity",base["Trade Count"]==285);check("all 13 named policies",len(summary)==13)
             d0=pd.read_csv(results/"stage4a2_portfolio_summary_d0.csv");base0=d0[d0.Policy=="ALL_BASELINE_PRIMARY"].iloc[0];check("D0 baseline ending parity",abs(base0["Ending Equity"]-106745.30976890605)<1e-6);check("D0 baseline trades parity",base0["Trade Count"]==225)
         if (results/"stage4a2_random_control_raw.csv.gz").is_file(): raw=pd.read_csv(results/"stage4a2_random_control_raw.csv.gz");check("1000 random controls",len(raw)==1000);check("500 K1",(raw["Daily K"]==1).sum()==500);check("500 K2",(raw["Daily K"]==2).sum()==500)
-        if (results/"stage4a2_daily_portfolio_d1.csv.gz").is_file(): daily=pd.read_csv(results/"stage4a2_daily_portfolio_d1.csv.gz");check("exposure bounded",daily.Exposure.between(0,1+1e-12).all());check("daily policies 13",daily.Policy.nunique()==13)
-    while len(rows)<86:
-        idx=len(rows)+1;check(f"structural behavior-bearing source {idx}",len(source)>10000 and "fit(" not in lower)
+        if (results/"stage4a2_daily_portfolio_d1.csv.gz").is_file():
+            daily=pd.read_csv(results/"stage4a2_daily_portfolio_d1.csv.gz",parse_dates=["Date"]);ledger=pd.read_csv(results/"stage4a2_trade_ledger_d1.csv.gz",parse_dates=["Exit Date"])
+            check("exposure bounded",daily.Exposure.between(0,1+1e-12).all());check("daily policies 13",daily.Policy.nunique()==13)
+            for policy,srow in summary.set_index("Policy").iterrows():
+                pdaily=daily[daily.Policy==policy].sort_values("Date");pledger=ledger[ledger.Policy==policy]
+                check(f"C {policy} ledger final equity reconcile",abs(100000+pledger["Net PnL"].sum()-srow["Ending Equity"])<1e-6)
+                check(f"D {policy} daily final equals summary",abs(pdaily["Equity"].iloc[-1]-srow["Ending Equity"])<1e-6)
+                check(f"E {policy} costs reconcile",abs(pledger["Costs"].sum()-srow["Total Costs"])<1e-6 and abs(pdaily["Costs"].sum()-srow["Total Costs"])<1e-6)
+            calculated=ledger["Net PnL"]/(ledger["Initial Risk Per Share"]*ledger["Quantity"])
+            check("F Net R formula",np.allclose(calculated,ledger["Net R"],rtol=0,atol=2e-11))
+            check("K official realized PnL reconciles",abs(daily["Realized PnL"].sum()-ledger["Net PnL"].sum())<1e-6)
+        yearly_path=results/"stage4a2_yearly_metrics_d1.csv"
+        if yearly_path.is_file() and (results/"stage4a2_daily_portfolio_d1.csv.gz").is_file():
+            yearly=pd.read_csv(yearly_path);daily=pd.read_csv(results/"stage4a2_daily_portfolio_d1.csv.gz",parse_dates=["Date"])
+            continuous=True
+            for _,yr in yearly.iterrows():
+                year=int(str(yr["Year"]).split()[0]);segment=daily[(daily.Policy==yr.Policy)&(daily.Date.dt.year==year)].sort_values("Date");expected_start=segment.Equity.iloc[0]/(1+segment["Daily Return %"].iloc[0]/100);continuous &= abs(expected_start-yr["Start Equity"])<1e-6
+            check("G yearly metrics use continuous slices",continuous)
+            partial=yearly[yearly.Year.astype(str)=="2026 partial"]
+            check("H 2026 explicitly partial through date",len(partial)==daily.Policy.nunique() and daily.Date.max()==pd.Timestamp("2026-08-28"))
+        if (results/"stage4a2_core_result_parity.csv").is_file():
+            parity=pd.read_csv(results/"stage4a2_core_result_parity.csv");check("M exact D1 core parity",parity[parity.Artifact.str.contains("d1",case=False)].Status.eq("PASS").all());check("N exact D0 core parity",parity[parity.Artifact.str.contains("d0",case=False)].Status.eq("PASS").all())
     result=pd.DataFrame(rows);args.output.parent.mkdir(parents=True,exist_ok=True);result.to_csv(args.output,index=False,lineterminator="\n");print(result.Status.value_counts().to_dict());
     if (result.Status!="PASS").any(): print(result[result.Status!="PASS"].to_string(index=False));raise SystemExit(1)
 

@@ -1,3 +1,6 @@
 __pycache__/
 *.pyc
 tests/determinism_run2/
+tests/hardening_sanity_results/
+tests/hardening_full_run1/
+tests/hardening_full_run2/

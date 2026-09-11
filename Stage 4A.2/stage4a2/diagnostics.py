@@ -23,8 +23,8 @@ def selection_attribution(selections: dict[str, set[str]], ledgers: dict[str, pd
                 r = pd.to_numeric(frame.get("Net R", pd.Series(dtype=float)), errors="coerce")
                 row[f"{label} Mean Net R"] = r.mean(); row[f"{label} Median Net R"] = r.median()
                 row[f"{label} Win Rate %"] = (pd.to_numeric(frame.get("Net PnL", pd.Series(dtype=float)), errors="coerce") > 0).mean() * 100 if len(frame) else np.nan
-                row[f"{label} T1 Rate %"] = frame.get("T1 Reached", pd.Series(dtype=bool)).mean() * 100 if len(frame) else np.nan
-                row[f"{label} T2 Rate %"] = frame.get("T2 Reached", pd.Series(dtype=bool)).mean() * 100 if len(frame) else np.nan
+                row[f"{label} T1 Diagnostic Rate %"] = frame.get("T1 Diagnostic Success", pd.Series(dtype=bool)).mean() * 100 if len(frame) else np.nan
+                row[f"{label} T2 Diagnostic Rate %"] = frame.get("T2 Diagnostic Success", pd.Series(dtype=bool)).mean() * 100 if len(frame) else np.nan
                 row[f"{label} Average Hold"] = pd.to_numeric(frame.get("Holding Sessions", pd.Series(dtype=float)), errors="coerce").mean()
             rows.append(row)
     return pd.DataFrame(rows)

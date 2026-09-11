@@ -1,8 +1,13 @@
 Check,Status,Expected,Actual
 all reference gates pass,PASS,True,True
 all prediction lineage gates pass,PASS,True,True
+prediction input actual hashes,PASS,True,True
 D1 parity exact,PASS,True,True
 D0 parity exact,PASS,True,True
+core results unchanged from audited commit,PASS,True,True
+corrected classification contract,PASS,"{'R1_K1': 'WEAK POSITIVE ECONOMIC UTILITY', 'R2_K1': 'WEAK POSITIVE ECONOMIC UTILITY', 'R3_K1': 'WEAK POSITIVE ECONOMIC UTILITY', 'R4_K1': 'WEAK POSITIVE ECONOMIC UTILITY', 'R1_K2': 'NO ECONOMIC UTILITY', 'R2_K2': 'NO ECONOMIC UTILITY', 'R3_K2': 'NO ECONOMIC UTILITY', 'R4_K2': 'NO ECONOMIC UTILITY'}","{'R1_K1': 'WEAK POSITIVE ECONOMIC UTILITY', 'R1_K2': 'NO ECONOMIC UTILITY', 'R2_K1': 'WEAK POSITIVE ECONOMIC UTILITY', 'R2_K2': 'NO ECONOMIC UTILITY', 'R3_K1': 'WEAK POSITIVE ECONOMIC UTILITY', 'R3_K2': 'NO ECONOMIC UTILITY', 'R4_K1': 'WEAK POSITIVE ECONOMIC UTILITY', 'R4_K2': 'NO ECONOMIC UTILITY'}"
+no robust policy,PASS,True,0
+realized PnL exit-event reconciliation,PASS,True,True
 candidate count,PASS,754,754
 named policies,PASS,13,13
 random controls,PASS,1000,1000

@@ -1,9 +1,9 @@
-Policy,Economic Evidence Classification,Criteria Passed,Criteria Required,Return > R0,CAGR > R0,Expectancy > R0,Profit Factor >= R0,Bootstrap lower delta return > 0,Random return percentile >= 95,Recent delta return >= 0,Max DD not worse by >2pp,At least 6 years >= R0,At least 50 trades
-R1_K1,MIXED / INCONCLUSIVE,7,10,True,True,True,True,False,False,True,True,False,True
-R1_K2,NO ECONOMIC UTILITY,2,10,False,False,False,False,False,False,True,False,False,True
-R2_K1,MIXED / INCONCLUSIVE,7,10,True,True,True,True,False,False,True,True,False,True
-R2_K2,NO ECONOMIC UTILITY,2,10,False,False,False,False,False,False,True,False,False,True
-R3_K1,MIXED / INCONCLUSIVE,7,10,True,True,True,True,False,False,True,True,False,True
-R3_K2,NO ECONOMIC UTILITY,2,10,False,False,False,False,False,False,True,False,False,True
-R4_K1,MIXED / INCONCLUSIVE,7,10,True,True,True,True,False,False,True,True,False,True
-R4_K2,NO ECONOMIC UTILITY,2,10,False,False,False,False,False,False,True,False,False,True
+Policy,Economic Evidence Classification,Primary Point Criteria Passed,Criteria Passed,Criteria Required,Return > R0,CAGR > R0,Expectancy > R0,Profit Factor >= R0,Bootstrap lower delta return > 0,Random return percentile >= 95,Recent delta return >= 0,Max DD not worse by >2pp,At least 6 years >= R0,At least 50 trades
+R1_K1,WEAK POSITIVE ECONOMIC UTILITY,4,7,10,True,True,True,True,False,False,True,True,False,True
+R1_K2,NO ECONOMIC UTILITY,0,2,10,False,False,False,False,False,False,True,False,False,True
+R2_K1,WEAK POSITIVE ECONOMIC UTILITY,4,7,10,True,True,True,True,False,False,True,True,False,True
+R2_K2,NO ECONOMIC UTILITY,0,2,10,False,False,False,False,False,False,True,False,False,True
+R3_K1,WEAK POSITIVE ECONOMIC UTILITY,4,7,10,True,True,True,True,False,False,True,True,False,True
+R3_K2,NO ECONOMIC UTILITY,0,2,10,False,False,False,False,False,False,True,False,False,True
+R4_K1,WEAK POSITIVE ECONOMIC UTILITY,4,7,10,True,True,True,True,False,False,True,True,False,True
+R4_K2,NO ECONOMIC UTILITY,0,2,10,False,False,False,False,False,False,True,False,False,True

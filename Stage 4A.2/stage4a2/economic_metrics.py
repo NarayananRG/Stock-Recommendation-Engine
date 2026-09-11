@@ -15,23 +15,29 @@ def normalize_daily(result: dict[str, Any], policy: str, exit_engine: str) -> pd
         "Open Position Value": "Invested Value", "Number Open Positions": "Open Positions",
     })
     frame["Exposure"] = (frame["Invested Value"] / frame["Equity"]).fillna(0.0)
-    frame["Realized PnL"] = frame["Equity"].diff().fillna(frame["Equity"].iloc[0] - 100000.0)
+    frame["Realized PnL"] = 0.0
     frame["Costs"] = 0.0
     trades = result.get("trades", pd.DataFrame()).copy()
     if not trades.empty:
-        entry_transaction = pd.to_numeric(trades["Entry Transaction Cost"] if "Entry Transaction Cost" in trades else 0.0, errors="coerce").fillna(0)
-        exit_transaction = pd.to_numeric(trades["Exit Transaction Cost"] if "Exit Transaction Cost" in trades else 0.0, errors="coerce").fillna(0)
+        zero_cost = pd.Series(0.0, index=trades.index)
+        entry_transaction = pd.to_numeric(trades["Entry Transaction Cost"] if "Entry Transaction Cost" in trades else zero_cost, errors="coerce").fillna(0)
+        exit_transaction = pd.to_numeric(trades["Exit Transaction Cost"] if "Exit Transaction Cost" in trades else zero_cost, errors="coerce").fillna(0)
         if "Entry Slippage Cost" in trades:
             entry_slippage = pd.to_numeric(trades["Entry Slippage Cost"], errors="coerce").fillna(0)
             exit_slippage = pd.to_numeric(trades["Exit Slippage Cost"], errors="coerce").fillna(0)
         else:
-            entry_slippage = pd.Series(0.0, index=trades.index)
-            exit_slippage = pd.to_numeric(trades["Slippage Cost"] if "Slippage Cost" in trades else 0.0, errors="coerce").fillna(0)
+            entry_slippage = zero_cost
+            exit_slippage = pd.to_numeric(trades["Slippage Cost"] if "Slippage Cost" in trades else zero_cost, errors="coerce").fillna(0)
         costs = pd.concat([
             pd.DataFrame({"Date": pd.to_datetime(trades["Entry Date"]).dt.normalize(), "Cost": entry_transaction + entry_slippage}),
             pd.DataFrame({"Date": pd.to_datetime(trades["Exit Date"]).dt.normalize(), "Cost": exit_transaction + exit_slippage}),
         ]).groupby("Date")["Cost"].sum()
         frame["Costs"] = frame["Date"].map(costs).fillna(0.0)
+        realized = pd.DataFrame({
+            "Date": pd.to_datetime(trades["Exit Date"]).dt.normalize(),
+            "Realized Net PnL": pd.to_numeric(trades["Net PnL"], errors="coerce").fillna(0.0),
+        }).groupby("Date")["Realized Net PnL"].sum()
+        frame["Realized PnL"] = frame["Date"].map(realized).fillna(0.0)
     frame["Policy"] = policy
     frame["Exit Engine"] = exit_engine
     return frame[["Policy", "Exit Engine", "Date", "Equity", "Daily Return %", "Cash", "Invested Value", "Exposure", "Open Positions", "Realized PnL", "Costs"]]
@@ -70,11 +76,17 @@ def enrich_trades(result: dict[str, Any], policy: str, exit_engine: str, members
     mfe_column = next((name for name in ("MFE R Full Bar", "MFE R", "MFE_R_FULL_BAR_DIAGNOSTIC") if name in frame), None)
     mfe = pd.to_numeric(frame[mfe_column] if mfe_column else pd.Series(np.nan, index=frame.index), errors="coerce")
     if mfe.notna().any():
-        frame["T1 Reached"] = mfe.ge(t1_r)
-        frame["T2 Reached"] = mfe.ge(t2_r)
+        frame["T1 Price Touched"] = mfe.ge(t1_r)
+        frame["T2 Price Touched"] = mfe.ge(t2_r)
+        frame["T1 Diagnostic Success"] = frame["T1 Price Touched"]
+        frame["T2 Diagnostic Success"] = frame["T2 Price Touched"]
+        frame["Target Diagnostic Semantics"] = "FULL_BAR_PRICE_TOUCH_NON_CONSERVATIVE_STOP_FIRST_AMBIGUITY"
     else:
         frame["T1 Reached"] = frame["Signal ID"].map(lookup["T1_BEFORE_STOP_63"]).eq(1)
         frame["T2 Reached"] = frame["Signal ID"].map(lookup["T2_BEFORE_STOP_63"]).eq(1)
+        frame["T1 Diagnostic Success"] = frame["T1 Reached"]
+        frame["T2 Diagnostic Success"] = frame["T2 Reached"]
+        frame["Target Diagnostic Semantics"] = "AUTHORITATIVE_FROZEN_STOP_FIRST_OUTCOME"
     frame["Holding Sessions"] = pd.to_numeric(frame["Bars Held"], errors="coerce")
     frame["Net R"] = pd.to_numeric(frame["R Multiple"], errors="coerce")
     return frame
@@ -112,8 +124,9 @@ def portfolio_metrics(policy: str, daily: pd.DataFrame, trades: pd.DataFrame, or
     cagr = (ending / start) ** (1 / years) - 1
     exposure = pd.to_numeric(e["Exposure"], errors="coerce").fillna(0)
     open_positions = pd.to_numeric(e["Open Positions"], errors="coerce").fillna(0)
-    t1 = trades.get("T1 Reached", pd.Series(dtype=bool)).fillna(False).astype(bool)
-    t2 = trades.get("T2 Reached", pd.Series(dtype=bool)).fillna(False).astype(bool)
+    t1 = trades.get("T1 Diagnostic Success", pd.Series(dtype=bool)).fillna(False).astype(bool)
+    t2 = trades.get("T2 Diagnostic Success", pd.Series(dtype=bool)).fillna(False).astype(bool)
+    diagnostic_semantics = trades.get("Target Diagnostic Semantics", pd.Series(dtype=str)).dropna().unique().tolist()
     costs = pd.to_numeric(trades.get("Costs", pd.Series(dtype=float)), errors="coerce").fillna(0)
     avg_exposure = float(exposure.mean() * 100)
     avg_invested = float(pd.to_numeric(e["Invested Value"], errors="coerce").mean())
@@ -140,9 +153,11 @@ def portfolio_metrics(policy: str, daily: pd.DataFrame, trades: pd.DataFrame, or
         "Days Fully Cash": int(exposure.eq(0).sum()), "Candidate Count": candidate_count, "Selected Candidate Count": selected_count,
         "Entry Filled Count": int(statuses.eq("FILLED").sum()), "Fill Rate %": float(statuses.eq("FILLED").sum() / selected_count * 100),
         "Invalid Risk Count": int(statuses.eq("INVALID_DATA").sum()), "Expired Entry Count": int(statuses.eq("EXPIRED").sum()),
-        "Capital Rejection Count": int(statuses.eq("REJECTED_CAPACITY").sum()), "T1 Hit Count": int(t1.sum()),
-        "T1 Hit Rate %": float(t1.mean() * 100) if len(t1) else np.nan, "T2 Hit Count": int(t2.sum()),
-        "T2 Hit Rate %": float(t2.mean() * 100) if len(t2) else np.nan, "Total Costs": float(costs.sum()),
+        "Capital Rejection Count": int(statuses.eq("REJECTED_CAPACITY").sum()),
+        "Target Diagnostic Semantics": diagnostic_semantics[0] if len(diagnostic_semantics) == 1 else "NONE",
+        "T1 Diagnostic Count": int(t1.sum()), "T1 Diagnostic Rate %": float(t1.mean() * 100) if len(t1) else np.nan,
+        "T2 Diagnostic Count": int(t2.sum()), "T2 Diagnostic Rate %": float(t2.mean() * 100) if len(t2) else np.nan,
+        "Total Costs": float(costs.sum()),
     }
 
 

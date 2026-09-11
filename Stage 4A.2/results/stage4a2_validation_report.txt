@@ -1,2 +1,2 @@
-STAGE 4A.2 ENGINEERING VALIDATION: PASS WITH WARNINGS
-All behavior gates passed. Scientific limitations remain.
+STAGE 4A.2 FINAL AUDIT HARDENING: PASS WITH WARNINGS
+All behavior and hardening gates passed. Core economic results are unchanged. Scientific limitations remain.
