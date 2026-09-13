@@ -1,0 +1,67 @@
+{
+  "artifact": "STAGE5D1B_SOURCE_PARITY",
+  "frozen_ranking_contract": [
+    "SIGNAL",
+    "ACTIONABILITY_DESC",
+    "TECHNICAL_DESC",
+    "RR_T1_DESC",
+    "RS60_DESC",
+    "TICKER_ASC"
+  ],
+  "frozen_signal_id_contract": {
+    "canonicalization": "sorted compact JSON; UTF-8; ensure_ascii=false",
+    "format": "SIG_ plus first 24 hex characters",
+    "hash": "SHA256",
+    "strategy_version": "STAGE_2_1_FROZEN"
+  },
+  "representative_ranking_parity_results": [
+    {
+      "case": "STRONG_BUY_BEFORE_BUY",
+      "expected_first_ticker": "STRONG.NS",
+      "stage5d_first_ticker": "STRONG.NS",
+      "status": "PASS"
+    },
+    {
+      "case": "ACTIONABILITY_DESC",
+      "expected_first_ticker": "HIGH.NS",
+      "stage5d_first_ticker": "HIGH.NS",
+      "status": "PASS"
+    },
+    {
+      "case": "TECHNICAL_DESC",
+      "expected_first_ticker": "HIGH.NS",
+      "stage5d_first_ticker": "HIGH.NS",
+      "status": "PASS"
+    },
+    {
+      "case": "RR_T1_DESC",
+      "expected_first_ticker": "HIGH.NS",
+      "stage5d_first_ticker": "HIGH.NS",
+      "status": "PASS"
+    },
+    {
+      "case": "RS60_DESC",
+      "expected_first_ticker": "HIGH.NS",
+      "stage5d_first_ticker": "HIGH.NS",
+      "status": "PASS"
+    },
+    {
+      "case": "TICKER_ASC",
+      "expected_first_ticker": "ALPHA.NS",
+      "stage5d_first_ticker": "ALPHA.NS",
+      "status": "PASS"
+    }
+  ],
+  "representative_signal_id_parity_results": [
+    {
+      "frozen_stage2_2_2_signal_id": "SIG_766f6b2f5c15f62036172051",
+      "stage5d_signal_id": "SIG_766f6b2f5c15f62036172051",
+      "status": "PASS",
+      "ticker": "PARITY.NS"
+    }
+  ],
+  "stage2_2_2_reference": {
+    "path": "Stage 2.2.2 Final/stage2_2_2/Stock_Alert_Stage2_2_2_Final_Baseline.py",
+    "sha256": "3f01ee029b2944bbc5596dc325d13f5588bdda9f745fdd25a3cd2cbcc15386b4"
+  }
+}

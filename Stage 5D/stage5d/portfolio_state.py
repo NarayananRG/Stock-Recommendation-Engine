@@ -52,6 +52,33 @@ class OpenPosition:
 
 
 @dataclass(frozen=True)
+class PendingEntryReservation:
+    ticker: str
+    reserved_capital_inr: Decimal
+    source_recommendation_id: str | None = None
+    source_signal_id: str | None = None
+
+    @classmethod
+    def create(
+        cls,
+        ticker: str,
+        reserved_capital_inr: object,
+        source_recommendation_id: str | None = None,
+        source_signal_id: str | None = None,
+    ) -> "PendingEntryReservation":
+        normalized_ticker = str(ticker).strip()
+        reserved = decimal_value(reserved_capital_inr)
+        if not normalized_ticker or reserved <= 0:
+            raise ValueError("pending reservations require a ticker and positive reserved capital")
+        return cls(
+            normalized_ticker,
+            reserved,
+            None if source_recommendation_id is None else str(source_recommendation_id),
+            None if source_signal_id is None else str(source_signal_id),
+        )
+
+
+@dataclass(frozen=True)
 class PortfolioSnapshot:
     capital_ceiling_inr: Decimal
     current_market_value_of_open_positions_inr: Decimal
@@ -65,13 +92,24 @@ class PortfolioSnapshot:
     capital_overage_inr: Decimal
     committed_capital_overage_inr: Decimal
     positions: tuple[OpenPosition, ...]
+    pending_entry_reservations: tuple[PendingEntryReservation, ...]
 
     @classmethod
-    def create(cls, capital_ceiling_inr: object, positions: Iterable[OpenPosition] = (), reserved_capital_for_pending_entries_inr: object = 0) -> "PortfolioSnapshot":
+    def create(
+        cls,
+        capital_ceiling_inr: object,
+        positions: Iterable[OpenPosition] = (),
+        reserved_capital_for_pending_entries_inr: object = 0,
+        pending_entry_reservations: Iterable[PendingEntryReservation] = (),
+    ) -> "PortfolioSnapshot":
         ceiling = decimal_value(capital_ceiling_inr)
-        reserved = decimal_value(reserved_capital_for_pending_entries_inr)
-        if ceiling <= 0 or reserved < 0:
+        aggregate_reserved = decimal_value(reserved_capital_for_pending_entries_inr)
+        reservations = tuple(pending_entry_reservations)
+        if ceiling <= 0 or aggregate_reserved < 0:
             raise ValueError("capital ceiling must be positive and reserved capital cannot be negative")
+        if reservations and aggregate_reserved != 0:
+            raise ValueError("use structured pending reservations or aggregate reserved capital, not both")
+        reserved = sum((item.reserved_capital_inr for item in reservations), Decimal("0")) if reservations else aggregate_reserved
         items = tuple(positions)
         market_value = sum((item.market_value_inr for item in items), Decimal("0"))
         cost_basis = sum((item.cost_basis_inr for item in items), Decimal("0"))
@@ -88,5 +126,5 @@ class PortfolioSnapshot:
         return cls(
             ceiling, market_value, cost_basis, reserved, committed, available,
             len(items), status, committed_overage == 0, market_overage,
-            committed_overage, items,
+            committed_overage, items, reservations,
         )

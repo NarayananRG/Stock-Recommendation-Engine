@@ -6,49 +6,19 @@ from dataclasses import dataclass
 from decimal import Decimal, ROUND_FLOOR
 from typing import Iterable
 
-from .horizon import HorizonAssessment, HorizonPreference, HorizonStatus, assess_horizon
-from .portfolio_state import OpenPosition, PortfolioSnapshot, decimal_value
+from .horizon import HorizonAssessment, HorizonStatus, assess_horizon
+from .portfolio_state import OpenPosition, PendingEntryReservation, PortfolioSnapshot
+from .source_contract import (
+    ACTIONABLE_DETERMINISTIC_SIGNALS,
+    canonical_date,
+    frozen_priority_key,
+    normalize_source_candidate,
+)
 from .user_profile import InvestmentProfile
 
 RISK_FRACTION = Decimal("0.0075")
 POSITION_CAP_FRACTION = Decimal("0.25")
 MAX_OPEN_POSITIONS = 5
-ACTIONABLE_DETERMINISTIC_SIGNALS = frozenset({"STRONG BUY", "BUY"})
-
-SOURCE_FIELD_ALIASES: dict[str, tuple[str, ...]] = {
-    "signal_id": ("signal_id", "Signal ID"),
-    "ticker": ("ticker", "Ticker", "Symbol"),
-    "signal_date": ("signal_date", "Signal Date", "Date"),
-    "decision_date": ("decision_date", "Decision Date"),
-    "deterministic_signal": ("deterministic_signal", "Signal"),
-    "entry_low": ("entry_low", "Entry Low"),
-    "entry_high": ("entry_high", "Entry High"),
-    "sizing_entry_price": ("sizing_entry_price", "Sizing Entry Price"),
-    "stop": ("stop", "Stop", "Stop Loss"),
-    "target_1": ("target_1", "Target 1"),
-    "target_2": ("target_2", "Target 2"),
-    "deterministic_rank": ("deterministic_rank", "Deterministic Rank", "Rank"),
-}
-
-
-def _source_value(candidate: dict[str, object], field: str) -> object | None:
-    for alias in SOURCE_FIELD_ALIASES[field]:
-        if alias in candidate:
-            return candidate[alias]
-    return None
-
-
-def normalize_source_candidate(candidate: dict[str, object]) -> dict[str, object]:
-    """Explicitly adapt frozen Stage 1.2.3-style fields to Stage 5D names."""
-    normalized = {field: _source_value(candidate, field) for field in SOURCE_FIELD_ALIASES}
-    normalized["ticker"] = str(normalized["ticker"] or "").strip()
-    normalized["signal_id"] = str(normalized["signal_id"] or "").strip()
-    normalized["signal_date"] = str(normalized["signal_date"] or "").strip()
-    normalized["decision_date"] = str(normalized["decision_date"] or normalized["signal_date"]).strip()
-    normalized["deterministic_signal"] = " ".join(str(normalized["deterministic_signal"] or "").strip().upper().split())
-    if normalized["sizing_entry_price"] is None:
-        normalized["sizing_entry_price"] = normalized["entry_high"]
-    return normalized
 
 
 def _whole_shares(amount: Decimal, price_or_risk: Decimal) -> int:
@@ -61,55 +31,49 @@ def _money(value: Decimal) -> float:
     return float(value.quantize(Decimal("0.01")))
 
 
-def _nullable_decimal(value: object | None) -> Decimal | None:
-    if value is None:
-        return None
-    try:
-        return decimal_value(value)
-    except (ValueError, TypeError, ArithmeticError):
-        return None
-
-
 def _nullable_money(value: Decimal | None) -> float | None:
     return None if value is None else _money(value)
 
 
-def _rank_key(value: object | None) -> tuple[int, str]:
-    if value is None:
-        return 2_147_483_647, ""
-    try:
-        return int(value), ""
-    except (ValueError, TypeError):
-        return 2_147_483_647, str(value)
-
-
-def _stable_order(candidate: dict[str, object]) -> tuple[object, ...]:
-    rank, invalid_rank = _rank_key(candidate.get("deterministic_rank"))
-    return (
-        rank, invalid_rank, str(candidate.get("signal_date", "")),
-        str(candidate.get("ticker", "")), str(candidate.get("signal_id", "")),
-    )
+def _nullable_number(value: Decimal | None) -> float | None:
+    return None if value is None else float(value)
 
 
 def _canonical_value(value: object | None) -> object:
     if value is None:
         return None
-    try:
-        number = Decimal(str(value))
-    except Exception:
-        return str(value)
-    if not number.is_finite():
-        return None
-    return format(number.normalize(), "f")
+    if isinstance(value, Decimal):
+        return format(value.normalize(), "f")
+    return value
 
 
 def _candidate_identity(candidate: dict[str, object]) -> dict[str, object]:
-    return {
-        key: (_canonical_value(value) if key in {
-            "entry_low", "entry_high", "sizing_entry_price", "stop", "target_1", "target_2", "deterministic_rank"
-        } else value)
-        for key, value in candidate.items()
-    }
+    return {key: _canonical_value(value) for key, value in candidate.items()}
+
+
+def _allocation_order_key(candidate: dict[str, object]) -> tuple[object, ...]:
+    return frozen_priority_key(candidate) + (str(candidate["signal_id"]),)
+
+
+def _resolve_decision_session(candidates: list[dict[str, object]], decision_date: object | None) -> str:
+    explicit = canonical_date(decision_date, "decision_date") if decision_date is not None else None
+    if not candidates:
+        if explicit is None:
+            raise ValueError("Zero-candidate allocation runs require an explicit decision_date")
+        return explicit
+    signal_dates = {str(candidate["signal_date"]) for candidate in candidates}
+    if len(signal_dates) != 1:
+        raise ValueError(f"One allocation run may contain only one Signal Date; received {sorted(signal_dates)}")
+    signal_date = next(iter(signal_dates))
+    candidate_decision_dates = {str(candidate["decision_date"]) for candidate in candidates if candidate.get("decision_date") is not None}
+    if any(value != signal_date for value in candidate_decision_dates):
+        raise ValueError("Candidate decision_date must match the allocation run Signal Date")
+    if explicit is not None and explicit != signal_date:
+        raise ValueError("Explicit decision_date must match the allocation run Signal Date")
+    effective = explicit or (next(iter(candidate_decision_dates)) if candidate_decision_dates else signal_date)
+    for candidate in candidates:
+        candidate["decision_date"] = effective
+    return effective
 
 
 def _allocation_run_id(
@@ -117,7 +81,7 @@ def _allocation_run_id(
     portfolio: PortfolioSnapshot,
     candidates: list[dict[str, object]],
     horizon: HorizonAssessment,
-    decision_date: str | None,
+    decision_date: str,
 ) -> str:
     positions = [
         {
@@ -126,7 +90,25 @@ def _allocation_run_id(
             "current_market_price_inr": _canonical_value(position.current_price_inr),
             "cost_basis_per_share_inr": _canonical_value(position.cost_basis_per_share_inr),
         }
-        for position in sorted(portfolio.positions, key=lambda item: (item.ticker.strip().upper(), item.quantity, item.current_price_inr, item.cost_basis_per_share_inr))
+        for position in sorted(
+            portfolio.positions,
+            key=lambda item: (item.ticker.strip().upper(), item.quantity, item.current_price_inr, item.cost_basis_per_share_inr),
+        )
+    ]
+    pending = [
+        {
+            "ticker": reservation.ticker.strip().upper(),
+            "reserved_capital_inr": _canonical_value(reservation.reserved_capital_inr),
+            "source_recommendation_id": reservation.source_recommendation_id,
+            "source_signal_id": reservation.source_signal_id,
+        }
+        for reservation in sorted(
+            portfolio.pending_entry_reservations,
+            key=lambda item: (
+                item.ticker.strip().upper(), item.reserved_capital_inr,
+                item.source_recommendation_id or "", item.source_signal_id or "",
+            ),
+        )
     ]
     payload = {
         "profile_version": profile.profile_version,
@@ -139,7 +121,10 @@ def _allocation_run_id(
             "validation_semantics": horizon.management_policy_validation_semantics,
         },
         "open_positions": positions,
-        "reserved_capital_for_pending_entries_inr": _canonical_value(portfolio.reserved_capital_for_pending_entries_inr),
+        "pending_entry_reservations": pending,
+        "unattributed_aggregate_reserved_capital_inr": (
+            _canonical_value(portfolio.reserved_capital_for_pending_entries_inr) if not pending else "0"
+        ),
         "candidate_decision_inputs": [_candidate_identity(item) for item in candidates],
         "decision_date": decision_date,
     }
@@ -150,6 +135,7 @@ def _allocation_run_id(
 def _recommendation_id(allocation_run_id: str, candidate: dict[str, object], ordinal: int) -> str:
     identity = {
         "allocation_run_id": allocation_run_id,
+        "signal_id": candidate["signal_id"],
         "candidate_identity": _candidate_identity(candidate),
         "candidate_ordinal": ordinal,
     }
@@ -179,15 +165,19 @@ def allocate_candidates(
     candidates: Iterable[dict[str, object]],
     *,
     reserved_capital_for_pending_entries_inr: object = 0,
-    decision_date: str | None = None,
+    pending_entry_reservations: Iterable[PendingEntryReservation] = (),
+    decision_date: object | None = None,
 ) -> AllocationResult:
-    portfolio = PortfolioSnapshot.create(profile.capital_ceiling_inr, open_positions, reserved_capital_for_pending_entries_inr)
-    normalized_candidates = sorted((normalize_source_candidate(dict(item)) for item in candidates), key=_stable_order)
+    normalized_candidates = [normalize_source_candidate(dict(item)) for item in candidates]
+    effective_decision_date = _resolve_decision_session(normalized_candidates, decision_date)
+    normalized_candidates.sort(key=_allocation_order_key)
+    portfolio = PortfolioSnapshot.create(
+        profile.capital_ceiling_inr,
+        open_positions,
+        reserved_capital_for_pending_entries_inr,
+        pending_entry_reservations,
+    )
     horizon = assess_horizon({}, profile.preferred_horizon)
-    effective_decision_date = decision_date
-    if effective_decision_date is None:
-        dates = [str(item["decision_date"]) for item in normalized_candidates if item.get("decision_date")]
-        effective_decision_date = max(dates) if dates else None
     allocation_run_id = _allocation_run_id(profile, portfolio, normalized_candidates, horizon, effective_decision_date)
 
     available = portfolio.available_capital_for_new_positions_inr
@@ -196,6 +186,7 @@ def allocate_candidates(
     risk_budget = profile.capital_ceiling_inr * RISK_FRACTION
     position_cap = profile.capital_ceiling_inr * POSITION_CAP_FRACTION
     existing_tickers = {position.ticker.strip().upper() for position in portfolio.positions}
+    pending_tickers = {reservation.ticker.strip().upper() for reservation in portfolio.pending_entry_reservations}
     seen_actionable_tickers: set[str] = set()
 
     for ordinal, candidate in enumerate(normalized_candidates, start=1):
@@ -204,25 +195,25 @@ def allocate_candidates(
         ticker = str(candidate["ticker"])
         ticker_key = ticker.upper()
         actionable_signal = signal in ACTIONABLE_DETERMINISTIC_SIGNALS
-
-        entry_low = _nullable_decimal(candidate.get("entry_low"))
-        entry_high = _nullable_decimal(candidate.get("entry_high"))
-        entry = _nullable_decimal(candidate.get("sizing_entry_price"))
-        stop = _nullable_decimal(candidate.get("stop"))
-        target_1 = _nullable_decimal(candidate.get("target_1"))
-        target_2 = _nullable_decimal(candidate.get("target_2"))
+        entry_low = candidate["entry_low"]
+        entry_high = candidate["entry_high"]
+        entry = candidate["sizing_entry_price"]
+        stop = candidate["stop"]
+        target_1 = candidate["target_1"]
+        target_2 = candidate["target_2"]
+        assert all(value is None or isinstance(value, Decimal) for value in (entry_low, entry_high, entry, stop, target_1, target_2))
         risk_per_share = entry - stop if entry is not None and stop is not None else None
         max_cash = max_risk = max_position = 0
         quantity = 0
 
         if not actionable_signal:
             status = _source_status(signal)
-            reason = f"Deterministic source signal {signal or 'UNSPECIFIED'} is not actionable; no capital is proposed."
+            reason = f"Deterministic source signal {signal} is not actionable; no capital is proposed."
         else:
             duplicate_ticker = ticker_key in seen_actionable_tickers
             seen_actionable_tickers.add(ticker_key)
             levels_valid = (
-                bool(ticker_key) and entry_low is not None and entry_high is not None and entry is not None
+                entry_low is not None and entry_high is not None and entry is not None
                 and stop is not None and target_1 is not None and target_2 is not None
                 and entry_low > 0 and entry_high > 0 and entry > 0 and stop >= 0
                 and target_1 > 0 and target_2 > 0 and risk_per_share is not None and risk_per_share > 0
@@ -231,6 +222,8 @@ def allocate_candidates(
                 status, reason = "BLOCKED_DUPLICATE_TICKER", "A prior actionable candidate for this ticker already exists in this allocation run."
             elif ticker_key in existing_tickers:
                 status, reason = "BLOCKED_EXISTING_POSITION", "Existing position already open; Stage 5D does not pyramid or average into an existing holding."
+            elif ticker_key in pending_tickers:
+                status, reason = "BLOCKED_PENDING_ENTRY", "An entry for this ticker is already pending; Stage 5D does not create a second overlapping order."
             elif portfolio.portfolio_status == "OVER_NEW_CAP":
                 status, reason = "BLOCKED_PORTFOLIO_OVER_CAP", f"Current market exposure exceeds the capital ceiling by INR {_money(portfolio.capital_overage_inr):.2f}; existing positions are not force-sold."
             elif portfolio.portfolio_status == "OVER_COMMITTED_CAP":
@@ -238,7 +231,7 @@ def allocate_candidates(
             elif horizon.horizon_status is not HorizonStatus.ELIGIBLE:
                 status, reason = "WATCH_HORIZON_MISMATCH", horizon.estimated_or_rule_based_holding_compatibility
             elif not levels_valid:
-                status, reason = "WATCH_INVALID_RISK", "Actionable BUY signals require finite positive entry, target, and risk-defining stop levels."
+                status, reason = "WATCH_INVALID_RISK", "Actionable BUY signals require positive entry, target, and risk-defining stop levels."
             else:
                 assert entry is not None and risk_per_share is not None
                 max_cash = _whole_shares(available, entry)
@@ -263,11 +256,21 @@ def allocate_candidates(
         row = {
             "allocation_run_id": allocation_run_id,
             "recommendation_id": _recommendation_id(allocation_run_id, candidate, ordinal),
+            "signal_id": candidate["signal_id"],
             "profile_version": profile.profile_version,
             "ticker": ticker,
-            "signal_date": str(candidate["signal_date"]),
-            "decision_date": str(candidate["decision_date"]),
+            "signal_date": candidate["signal_date"],
+            "decision_date": candidate["decision_date"],
             "deterministic_signal": signal,
+            "setup": candidate["setup"],
+            "trade_quality": candidate["trade_quality"],
+            "technical_score": _nullable_number(candidate["technical_score"]),
+            "actionability_score": _nullable_number(candidate["actionability_score"]),
+            "planned_rr_t1": _nullable_number(candidate["planned_rr_t1"]),
+            "planned_rr_t2": _nullable_number(candidate["planned_rr_t2"]),
+            "rs60": _nullable_number(candidate["rs60"]),
+            "market_regime": candidate["market_regime"],
+            "market_score": _nullable_number(candidate["market_score"]),
             "entry_low": _nullable_money(entry_low),
             "entry_high": _nullable_money(entry_high),
             "sizing_entry_price": _nullable_money(entry),
@@ -308,6 +311,7 @@ def allocate_candidates(
         "current_market_value_of_open_positions_inr": _money(portfolio.current_market_value_of_open_positions_inr),
         "cost_basis_of_open_positions_inr": _money(portfolio.cost_basis_of_open_positions_inr),
         "reserved_capital_for_pending_entries_inr": _money(portfolio.reserved_capital_for_pending_entries_inr),
+        "pending_entry_reservations": len(portfolio.pending_entry_reservations),
         "committed_capital_inr": _money(portfolio.committed_capital_inr),
         "committed_capital_overage_inr": _money(portfolio.committed_capital_overage_inr),
         "available_capital_before_inr": _money(portfolio.available_capital_for_new_positions_inr),

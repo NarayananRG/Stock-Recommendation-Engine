@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import csv
+import hashlib
+import importlib.util
 import json
 import math
 import subprocess
@@ -16,8 +18,9 @@ sys.path.insert(0, str(ROOT))
 
 from stage5d.allocator import allocate_candidates
 from stage5d.horizon import HorizonPreference
-from stage5d.portfolio_state import OpenPosition, PortfolioSnapshot
+from stage5d.portfolio_state import OpenPosition, PendingEntryReservation, PortfolioSnapshot
 from stage5d.recommendation_contract import contract_payload
+from stage5d.source_contract import derive_signal_id, frozen_priority_key, normalize_source_candidate
 from stage5d.user_profile import InvestmentProfile, ProfileStore
 
 
@@ -27,24 +30,44 @@ def profile(capital: int, horizon: HorizonPreference = HorizonPreference.THREE_M
 
 def candidate(ticker: str = "AAA.NS", **changes: object) -> dict[str, object]:
     value = {
-        "signal_id": f"S-{ticker}", "ticker": ticker, "signal_date": "2026-09-14",
-        "deterministic_signal": "BUY", "entry_low": 99, "entry_high": 100,
+        "ticker": ticker, "signal_date": "2026-09-14", "deterministic_signal": "BUY",
+        "setup": "PULLBACK", "trade_quality": "GOOD", "technical_score": 80,
+        "actionability_score": 85, "market_regime": "BULLISH", "market_score": 75,
+        "entry_low": 99, "entry_high": 100,
         "sizing_entry_price": 100, "stop": 99, "target_1": 110,
-        "target_2": 120, "deterministic_rank": 1,
+        "target_2": 120, "planned_rr_t1": 10, "planned_rr_t2": 20,
+        "rs60": 5, "deterministic_rank": 1,
     }
     value.update(changes)
     return value
 
 
-def source_candidate(signal: str, ticker: str = "SRC.NS", *, nullable_levels: bool = False) -> dict[str, object]:
+def source_candidate(
+    signal: str,
+    ticker: str = "SRC.NS",
+    *,
+    nullable_levels: bool = False,
+    actionability: object = 85,
+    technical: object = 80,
+    rr_t1: object = 10,
+    rr_t2: object = 20,
+    rs60: object = 5,
+) -> dict[str, object]:
     level = math.nan if nullable_levels else 100
+    ranking_null = math.nan if nullable_levels else None
     return {
-        "Signal ID": f"SOURCE-{ticker}-{signal}", "Ticker": ticker,
-        "Signal Date": "2026-09-14", "Signal": signal,
+        "Ticker": ticker, "Signal Date": "2026-09-14", "Signal": signal,
+        "Setup": "PULLBACK", "Trade Quality": "GOOD",
+        "Technical Score": ranking_null if nullable_levels else technical,
+        "Actionability Score": ranking_null if nullable_levels else actionability,
+        "Market Regime": "BULLISH", "Market Score": 75,
         "Entry Low": math.nan if nullable_levels else 99, "Entry High": level,
         "Stop Loss": math.nan if nullable_levels else 99,
         "Target 1": math.nan if nullable_levels else 110,
-        "Target 2": math.nan if nullable_levels else 120, "Rank": 1,
+        "Target 2": math.nan if nullable_levels else 120,
+        "R:R T1": ranking_null if nullable_levels else rr_t1,
+        "R:R T2": ranking_null if nullable_levels else rr_t2,
+        "RS 60D": ranking_null if nullable_levels else rs60, "Rank": 1,
     }
 
 
@@ -54,6 +77,25 @@ def rejects_quantity(value: object) -> bool:
     except ValueError:
         return True
     return False
+
+
+def captured_error(callable_object) -> str:
+    try:
+        callable_object()
+    except ValueError as exc:
+        return str(exc)
+    return ""
+
+
+def load_frozen_stage222_module():
+    path = REPO / "Stage 2.2.2 Final" / "stage2_2_2" / "Stock_Alert_Stage2_2_2_Final_Baseline.py"
+    spec = importlib.util.spec_from_file_location("stage222_signal_id_reference", path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Cannot load frozen Stage 2.2.2 source at {path}")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module, path
 
 
 def main() -> int:
@@ -134,7 +176,7 @@ def main() -> int:
     check(30, "non-BUY rows allocate zero shares", all(row["recommended_quantity"] == 0 and row["deterministic_signal"] in {"WATCH", "WATCH - MARKET RISK", "WATCH - EXTENDED", "WAIT FOR BETTER ENTRY", "WAIT - NO SETUP", "AVOID"} for row in non_buy_rows))
     existing = allocate_candidates(profile(20000), [OpenPosition.create("AAA.NS", 1, 100, 100)], [candidate()]).recommendations[0]
     check(31, "existing ticker blocks new allocation", existing["portfolio_action_status"] == "BLOCKED_EXISTING_POSITION" and existing["recommended_quantity"] == 0)
-    duplicate = allocate_candidates(profile(20000), [], [candidate("DUP.NS", signal_id="D1", deterministic_rank=1), candidate("DUP.NS", signal_id="D2", deterministic_rank=2)])
+    duplicate = allocate_candidates(profile(20000), [], [candidate("DUP.NS", setup="D1"), candidate("DUP.NS", setup="D2")])
     check(32, "duplicate candidate ticker cannot be allocated twice", duplicate.recommendations[0]["recommended_quantity"] > 0 and duplicate.recommendations[1]["portfolio_action_status"] == "BLOCKED_DUPLICATE_TICKER" and duplicate.recommendations[1]["recommended_quantity"] == 0)
     duplicate_value = sum(row["recommended_quantity"] * (row["sizing_entry_price"] or 0) for row in duplicate.recommendations)
     check(33, "duplicate ticker cannot bypass 25 percent cap", duplicate_value <= 20000 * 0.25)
@@ -176,6 +218,90 @@ def main() -> int:
     ml_shadow_allocation = allocate_candidates(profile(20000), [], ml_candidates)
     check(51, "ML metadata cannot affect ordering sizing status or IDs", ml_base_allocation == ml_shadow_allocation)
 
+    raw_strong = source_candidate("STRONG BUY", actionability=91, technical=87, rr_t1=2.4, rr_t2=3.8, rs60=12.5)
+    normalized_strong = normalize_source_candidate(raw_strong)
+    check(52, "raw frozen STRONG BUY row normalizes all ranking fields", normalized_strong["deterministic_signal"] == "STRONG BUY" and all(normalized_strong[field] is not None for field in ("actionability_score", "technical_score", "planned_rr_t1", "planned_rr_t2", "rs60")))
+    raw_buy = source_candidate("BUY", actionability=88, technical=82, rr_t1=2.1, rr_t2=3.2, rs60=9.5)
+    normalized_buy = normalize_source_candidate(raw_buy)
+    check(53, "raw frozen BUY row normalizes all ranking fields", normalized_buy["deterministic_signal"] == "BUY" and all(normalized_buy[field] is not None for field in ("actionability_score", "technical_score", "planned_rr_t1", "planned_rr_t2", "rs60")))
+
+    def first_ticker(items: list[dict[str, object]], capital: int = 20000, positions: list[OpenPosition] | None = None) -> str:
+        return str(allocate_candidates(profile(capital), positions or [], items).recommendations[0]["ticker"])
+
+    rank_signal = [source_candidate("BUY", "BUY.NS", actionability=100), source_candidate("STRONG BUY", "STRONG.NS", actionability=1)]
+    check(54, "exact STRONG BUY before BUY priority", first_ticker(rank_signal) == "STRONG.NS")
+    rank_actionability = [source_candidate("BUY", "LOW.NS", actionability=80), source_candidate("BUY", "HIGH.NS", actionability=90)]
+    check(55, "Actionability descending priority", first_ticker(rank_actionability) == "HIGH.NS")
+    rank_technical = [source_candidate("BUY", "LOW.NS", actionability=90, technical=70), source_candidate("BUY", "HIGH.NS", actionability=90, technical=80)]
+    check(56, "Technical Score descending tie-break", first_ticker(rank_technical) == "HIGH.NS")
+    rank_rr = [source_candidate("BUY", "LOW.NS", actionability=90, technical=80, rr_t1=2), source_candidate("BUY", "HIGH.NS", actionability=90, technical=80, rr_t1=3)]
+    check(57, "R:R T1 descending tie-break", first_ticker(rank_rr) == "HIGH.NS")
+    rank_rs = [source_candidate("BUY", "LOW.NS", actionability=90, technical=80, rr_t1=3, rs60=5), source_candidate("BUY", "HIGH.NS", actionability=90, technical=80, rr_t1=3, rs60=8)]
+    check(58, "RS60 descending tie-break", first_ticker(rank_rs) == "HIGH.NS")
+    rank_ticker = [source_candidate("BUY", "ZED.NS", actionability=90, technical=80, rr_t1=3, rs60=8), source_candidate("BUY", "ALPHA.NS", actionability=90, technical=80, rr_t1=3, rs60=8)]
+    check(59, "ticker ascending final tie-break", first_ticker(rank_ticker) == "ALPHA.NS")
+    four_positions = [OpenPosition.create(f"HELD{i}.NS", 1, 100, 100) for i in range(4)]
+    constrained = allocate_candidates(profile(20000), four_positions, rank_signal)
+    check(60, "capital-constrained allocation funds frozen-priority winner", constrained.recommendations[0]["ticker"] == "STRONG.NS" and constrained.recommendations[0]["recommended_quantity"] > 0 and constrained.recommendations[1]["portfolio_action_status"] == "BLOCKED_MAX_POSITIONS")
+    weak_caller_first = source_candidate("BUY", "WEAK.NS", actionability=70); weak_caller_first["Rank"] = 1
+    strong_caller_last = source_candidate("BUY", "POWER.NS", actionability=95); strong_caller_last["Rank"] = 999
+    caller_rank = allocate_candidates(profile(20000), four_positions, [weak_caller_first, strong_caller_last])
+    check(61, "caller Rank cannot override frozen priority", caller_rank.recommendations[0]["ticker"] == "POWER.NS" and caller_rank.recommendations[0]["recommended_quantity"] > 0)
+    missing_actionability = captured_error(lambda: allocate_candidates(profile(20000), [], [candidate(actionability_score=None)]))
+    check(62, "missing actionable Actionability fails loudly", "Actionability Score" in missing_actionability)
+    missing_technical = captured_error(lambda: allocate_candidates(profile(20000), [], [candidate(technical_score=None)]))
+    check(63, "missing actionable Technical Score fails loudly", "Technical Score" in missing_technical)
+    missing_rr = captured_error(lambda: allocate_candidates(profile(20000), [], [candidate(planned_rr_t1=None)]))
+    check(64, "missing actionable R:R T1 fails loudly", "R:R T1" in missing_rr)
+    missing_rs = captured_error(lambda: allocate_candidates(profile(20000), [], [candidate(rs60=None)]))
+    check(65, "missing actionable RS60 fails loudly", "RS 60D" in missing_rs)
+    signal_lineage = allocate_candidates(profile(20000), [], [candidate()]).recommendations[0]
+    check(66, "Signal ID is present in recommendation", str(signal_lineage["signal_id"]).startswith("SIG_") and len(str(signal_lineage["signal_id"])) == 28)
+    frozen_module, frozen_source_path = load_frozen_stage222_module()
+    parity_source_row = source_candidate("STRONG BUY", "PARITY.NS", actionability=92, technical=88, rr_t1=2.5, rr_t2=4, rs60=14)
+    stage5d_signal_id = normalize_source_candidate(parity_source_row)["signal_id"]
+    frozen_signal_id = frozen_module.make_signal_id(parity_source_row)
+    check(67, "generated Signal ID matches frozen Stage 2.2.2 function", stage5d_signal_id == frozen_signal_id, f"Stage5D={stage5d_signal_id}; frozen={frozen_signal_id}")
+    conflicting = candidate(signal_id="SIG_000000000000000000000000")
+    conflict_error = captured_error(lambda: allocate_candidates(profile(20000), [], [conflicting]))
+    check(68, "conflicting supplied Signal ID is rejected", "Signal ID mismatch" in conflict_error)
+    date_text = candidate(signal_date="2026-09-14")
+    date_datetime = candidate(signal_date="2026-09-14 00:00:00")
+    date_timestamp = candidate(signal_date=frozen_module.pd.Timestamp("2026-09-14"))
+    date_a = allocate_candidates(profile(20000), [], [date_text])
+    date_b = allocate_candidates(profile(20000), [], [date_datetime])
+    date_c = allocate_candidates(profile(20000), [], [date_timestamp])
+    check(69, "equivalent date representations produce same IDs", date_a.allocation_run_id == date_b.allocation_run_id == date_c.allocation_run_id and date_a.recommendations[0]["recommendation_id"] == date_b.recommendations[0]["recommendation_id"] == date_c.recommendations[0]["recommendation_id"])
+    mixed_date_error = captured_error(lambda: allocate_candidates(profile(20000), [], [candidate("A.NS", signal_date="2026-09-14"), candidate("B.NS", signal_date="2026-09-15")]))
+    check(70, "multiple Signal Dates in one allocation run rejected", "only one Signal Date" in mixed_date_error)
+    zero_date_error = captured_error(lambda: allocate_candidates(profile(20000), [], []))
+    check(71, "zero-candidate run requires explicit decision_date", "require an explicit decision_date" in zero_date_error)
+    zero_day = allocate_candidates(profile(20000), [], [], decision_date="2026-09-14 00:00:00")
+    check(72, "zero-candidate run with explicit decision_date succeeds", zero_day.recommendations == () and zero_day.portfolio_summary["decision_date"] == "2026-09-14")
+    pending_abc = PendingEntryReservation.create("ABC.NS", 1000, "REC-1", "SIG-1")
+    pending_snapshot = PortfolioSnapshot.create(10000, [OpenPosition.create("HELD.NS", 10, 200, 150)], pending_entry_reservations=[pending_abc])
+    check(73, "pending reservation included in committed capital", pending_snapshot.reserved_capital_for_pending_entries_inr == Decimal("1000") and pending_snapshot.committed_capital_inr == Decimal("3000"))
+    pending_block = allocate_candidates(profile(20000), [], [candidate("ABC.NS")], pending_entry_reservations=[pending_abc]).recommendations[0]
+    check(74, "candidate matching pending ticker is blocked", pending_block["portfolio_action_status"] == "BLOCKED_PENDING_ENTRY" and pending_block["recommended_quantity"] == 0)
+    pending_xyz = PendingEntryReservation.create("XYZ.NS", 1000, "REC-1", "SIG-1")
+    pending_id_abc = allocate_candidates(profile(20000), [], [candidate("OTHER.NS")], pending_entry_reservations=[pending_abc]).allocation_run_id
+    pending_id_xyz = allocate_candidates(profile(20000), [], [candidate("OTHER.NS")], pending_entry_reservations=[pending_xyz]).allocation_run_id
+    check(75, "same aggregate reservation with different pending ticker changes run ID", pending_id_abc != pending_id_xyz)
+    pending_id_repeat = allocate_candidates(profile(20000), [], [candidate("OTHER.NS")], pending_entry_reservations=[PendingEntryReservation.create("ABC.NS", 1000, "REC-1", "SIG-1")]).allocation_run_id
+    check(76, "pending reservation identity deterministic", pending_id_abc == pending_id_repeat)
+    metadata = allocate_candidates(profile(20000), [], [raw_strong]).recommendations[0]
+    retained = {
+        "signal_id", "setup", "trade_quality", "technical_score", "actionability_score",
+        "planned_rr_t1", "planned_rr_t2", "rs60", "market_regime", "market_score",
+    }
+    check(77, "source metadata retained in recommendation", retained.issubset(metadata) and metadata["setup"] == "PULLBACK" and metadata["actionability_score"] == 91)
+    ml_full_base = [source_candidate("STRONG BUY", "MLA.NS", actionability=90), source_candidate("BUY", "MLB.NS", actionability=99)]
+    ml_full_shadow = deepcopy(ml_full_base)
+    for item in ml_full_shadow:
+        item.update({"R3 Score": 1, "R4 Score": 2, "R5 Score": 3, "ml_probability": 0.99, "confidence": "MAX", "unknown ML metadata": {"shadow": True}})
+    check(78, "ML metadata still has zero influence", allocate_candidates(profile(20000), [], ml_full_base) == allocate_candidates(profile(20000), [], ml_full_shadow))
+    check(79, "Stage 4A.3 changed files equals zero after source parity hardening", changed == "", changed)
+
     results = ROOT / "results"
     results.mkdir(parents=True, exist_ok=True)
     ordered_rows = sorted(rows, key=lambda row: int(row["Test Number"]))
@@ -184,6 +310,43 @@ def main() -> int:
         writer.writeheader()
         writer.writerows(ordered_rows)
     (results / "stage5d1_contract.json").write_text(json.dumps(contract_payload(), indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    ranking_parity_cases = [
+        ("STRONG_BUY_BEFORE_BUY", rank_signal, "STRONG.NS"),
+        ("ACTIONABILITY_DESC", rank_actionability, "HIGH.NS"),
+        ("TECHNICAL_DESC", rank_technical, "HIGH.NS"),
+        ("RR_T1_DESC", rank_rr, "HIGH.NS"),
+        ("RS60_DESC", rank_rs, "HIGH.NS"),
+        ("TICKER_ASC", rank_ticker, "ALPHA.NS"),
+    ]
+    source_parity = {
+        "artifact": "STAGE5D1B_SOURCE_PARITY",
+        "frozen_ranking_contract": ["SIGNAL", "ACTIONABILITY_DESC", "TECHNICAL_DESC", "RR_T1_DESC", "RS60_DESC", "TICKER_ASC"],
+        "frozen_signal_id_contract": {
+            "strategy_version": "STAGE_2_1_FROZEN",
+            "canonicalization": "sorted compact JSON; UTF-8; ensure_ascii=false",
+            "hash": "SHA256",
+            "format": "SIG_ plus first 24 hex characters",
+        },
+        "representative_signal_id_parity_results": [{
+            "ticker": "PARITY.NS", "stage5d_signal_id": stage5d_signal_id,
+            "frozen_stage2_2_2_signal_id": frozen_signal_id,
+            "status": "PASS" if stage5d_signal_id == frozen_signal_id else "FAIL",
+        }],
+        "representative_ranking_parity_results": [
+            {
+                "case": case,
+                "expected_first_ticker": expected,
+                "stage5d_first_ticker": first_ticker(items),
+                "status": "PASS" if first_ticker(items) == expected else "FAIL",
+            }
+            for case, items, expected in ranking_parity_cases
+        ],
+        "stage2_2_2_reference": {
+            "path": frozen_source_path.relative_to(REPO).as_posix(),
+            "sha256": hashlib.sha256(frozen_source_path.read_bytes()).hexdigest(),
+        },
+    }
+    (results / "stage5d1_source_parity.json").write_text(json.dumps(source_parity, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     counts = {status: sum(row["Status"] == status for row in rows) for status in ("PASS", "FAIL")}
     print(json.dumps(counts, sort_keys=True))
     return 0 if counts["FAIL"] == 0 else 1

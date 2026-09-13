@@ -3,9 +3,24 @@
     "STRONG BUY",
     "BUY"
   ],
+  "actionable_ranking_fields_required_finite": [
+    "actionability_score",
+    "technical_score",
+    "planned_rr_t1",
+    "rs60"
+  ],
   "allocation_identity_rule": "CONTENT_ADDRESSED_COMPLETE_DETERMINISTIC_DECISION_CONTEXT_EXCLUDING_ML_METADATA",
   "capital_enforcement_basis": "CURRENT_POSITION_MARKET_VALUE_PLUS_RESERVED_PENDING_CAPITAL",
-  "contract_version": "STAGE5D1A_RECOMMENDATION_V2",
+  "contract_version": "STAGE5D1B_RECOMMENDATION_V3",
+  "date_contract": "YYYY-MM-DD_SINGLE_SIGNAL_SESSION",
+  "deterministic_ranking_contract": [
+    "SIGNAL",
+    "ACTIONABILITY_DESC",
+    "TECHNICAL_DESC",
+    "RR_T1_DESC",
+    "RS60_DESC",
+    "TICKER_ASC"
+  ],
   "execution_semantics": "PROPOSAL_ONLY_NOT_A_TRANSACTION",
   "management_policies": {
     "ONE_MONTH": {
@@ -37,6 +52,7 @@
     "target_2",
     "risk_per_share_inr"
   ],
+  "pending_entry_contract": "STRUCTURED_RESERVATIONS_SUM_TO_COMMITTED_CAPITAL_AND_BLOCK_DUPLICATE_TICKER",
   "portfolio_action_statuses": [
     "ACTIONABLE_BUY",
     "WATCH_INSUFFICIENT_CAPITAL",
@@ -47,6 +63,7 @@
     "BLOCKED_MAX_POSITIONS",
     "BLOCKED_EXISTING_POSITION",
     "BLOCKED_DUPLICATE_TICKER",
+    "BLOCKED_PENDING_ENTRY",
     "BLOCKED_COMMITTED_CAPITAL_OVERAGE",
     "WAIT_SOURCE_SIGNAL",
     "WATCH_SOURCE_SIGNAL",
@@ -71,11 +88,21 @@
   "recommendation_fields": [
     "allocation_run_id",
     "recommendation_id",
+    "signal_id",
     "profile_version",
     "ticker",
     "signal_date",
     "decision_date",
     "deterministic_signal",
+    "setup",
+    "trade_quality",
+    "technical_score",
+    "actionability_score",
+    "planned_rr_t1",
+    "planned_rr_t2",
+    "rs60",
+    "market_regime",
+    "market_score",
     "entry_low",
     "entry_high",
     "sizing_entry_price",
@@ -104,5 +131,18 @@
     "portfolio_action_status",
     "plain_language_reason"
   ],
-  "risk_per_trade_fraction": 0.0075
+  "risk_per_trade_fraction": 0.0075,
+  "signal_id_contract": {
+    "format": "SIG_ + first 24 lowercase hex characters",
+    "hash": "SHA256_CANONICAL_SORTED_JSON",
+    "payload_fields": [
+      "strategy_version",
+      "ticker",
+      "signal_date_YYYYMMDD",
+      "signal",
+      "setup"
+    ],
+    "strategy_version": "STAGE_2_1_FROZEN",
+    "supplied_id_policy": "RECOMPUTE_AND_REQUIRE_EXACT_MATCH"
+  }
 }

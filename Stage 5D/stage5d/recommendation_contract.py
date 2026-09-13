@@ -2,7 +2,9 @@ from __future__ import annotations
 
 
 RECOMMENDATION_FIELDS = [
-    "allocation_run_id", "recommendation_id", "profile_version", "ticker", "signal_date", "decision_date", "deterministic_signal",
+    "allocation_run_id", "recommendation_id", "signal_id", "profile_version", "ticker", "signal_date", "decision_date", "deterministic_signal",
+    "setup", "trade_quality", "technical_score", "actionability_score", "planned_rr_t1",
+    "planned_rr_t2", "rs60", "market_regime", "market_score",
     "entry_low", "entry_high", "sizing_entry_price", "stop", "target_1", "target_2",
     "capital_ceiling_inr", "deployed_before_inr", "available_before_inr", "risk_budget_inr",
     "risk_per_share_inr", "max_qty_by_cash", "max_qty_by_risk", "max_qty_by_position_cap",
@@ -17,20 +19,31 @@ PORTFOLIO_ACTION_STATUSES = [
     "ACTIONABLE_BUY", "WATCH_INSUFFICIENT_CAPITAL", "WATCH_RISK_BUDGET_TOO_SMALL",
     "WATCH_POSITION_CAP_TOO_SMALL", "WATCH_HORIZON_MISMATCH", "BLOCKED_PORTFOLIO_OVER_CAP",
     "BLOCKED_MAX_POSITIONS", "BLOCKED_EXISTING_POSITION", "BLOCKED_DUPLICATE_TICKER",
-    "BLOCKED_COMMITTED_CAPITAL_OVERAGE", "WAIT_SOURCE_SIGNAL", "WATCH_SOURCE_SIGNAL",
+    "BLOCKED_PENDING_ENTRY", "BLOCKED_COMMITTED_CAPITAL_OVERAGE", "WAIT_SOURCE_SIGNAL", "WATCH_SOURCE_SIGNAL",
     "AVOID_SOURCE_SIGNAL", "WATCH_INVALID_RISK",
 ]
 
 
 def contract_payload() -> dict[str, object]:
     return {
-        "contract_version": "STAGE5D1A_RECOMMENDATION_V2",
+        "contract_version": "STAGE5D1B_RECOMMENDATION_V3",
         "profile_record_fields": ["profile_version", "effective_timestamp", "maximum_total_capital_inr", "capital_ceiling_inr", "preferred_horizon", "previous_profile_version", "user_note"],
         "recommendation_fields": RECOMMENDATION_FIELDS,
         "portfolio_action_statuses": PORTFOLIO_ACTION_STATUSES,
         "capital_enforcement_basis": "CURRENT_POSITION_MARKET_VALUE_PLUS_RESERVED_PENDING_CAPITAL",
         "portfolio_summary_fields_added": ["allocation_run_id", "committed_capital_inr", "committed_capital_overage_inr"],
         "actionable_deterministic_signals": ["STRONG BUY", "BUY"],
+        "deterministic_ranking_contract": ["SIGNAL", "ACTIONABILITY_DESC", "TECHNICAL_DESC", "RR_T1_DESC", "RS60_DESC", "TICKER_ASC"],
+        "actionable_ranking_fields_required_finite": ["actionability_score", "technical_score", "planned_rr_t1", "rs60"],
+        "signal_id_contract": {
+            "strategy_version": "STAGE_2_1_FROZEN",
+            "payload_fields": ["strategy_version", "ticker", "signal_date_YYYYMMDD", "signal", "setup"],
+            "hash": "SHA256_CANONICAL_SORTED_JSON",
+            "format": "SIG_ + first 24 lowercase hex characters",
+            "supplied_id_policy": "RECOMPUTE_AND_REQUIRE_EXACT_MATCH",
+        },
+        "date_contract": "YYYY-MM-DD_SINGLE_SIGNAL_SESSION",
+        "pending_entry_contract": "STRUCTURED_RESERVATIONS_SUM_TO_COMMITTED_CAPITAL_AND_BLOCK_DUPLICATE_TICKER",
         "management_policies": {
             "ONE_MONTH": {
                 "management_policy_id": "STATIC_T2_20D",
