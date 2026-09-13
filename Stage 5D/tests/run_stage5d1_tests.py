@@ -302,6 +302,25 @@ def main() -> int:
     check(78, "ML metadata still has zero influence", allocate_candidates(profile(20000), [], ml_full_base) == allocate_candidates(profile(20000), [], ml_full_shadow))
     check(79, "Stage 4A.3 changed files equals zero after source parity hardening", changed == "", changed)
 
+    expected_stage222_source_sha = "63345c591b46c656b204236d147993cb283d57fdbccd0246b7cef281d7968730"
+    frozen_repo_path = "Stage 2.2.2 Final/stage2_2_2/Stock_Alert_Stage2_2_2_Final_Baseline.py"
+    canonical_blob_bytes = subprocess.check_output(["git", "show", f"HEAD:{frozen_repo_path}"], cwd=REPO)
+    canonical_git_blob_sha = hashlib.sha256(canonical_blob_bytes).hexdigest()
+    manifest_path = REPO / "Stage 2.2.2 Final" / "artifact_manifest.csv"
+    with manifest_path.open("r", encoding="utf-8-sig", newline="") as handle:
+        manifest_matches = [
+            row for row in csv.DictReader(handle)
+            if row.get("path") == "stage2_2_2/Stock_Alert_Stage2_2_2_Final_Baseline.py"
+        ]
+    manifest_sha = manifest_matches[0]["sha256"] if len(manifest_matches) == 1 else ""
+    canonical_hash_match = canonical_git_blob_sha == manifest_sha == expected_stage222_source_sha
+    check(
+        80,
+        "canonical frozen Stage 2.2.2 source SHA matches permanent artifact manifest",
+        canonical_hash_match,
+        f"canonical_git_blob_sha={canonical_git_blob_sha}; manifest_sha256={manifest_sha}; manifest_matches={len(manifest_matches)}",
+    )
+
     results = ROOT / "results"
     results.mkdir(parents=True, exist_ok=True)
     ordered_rows = sorted(rows, key=lambda row: int(row["Test Number"]))
@@ -343,7 +362,11 @@ def main() -> int:
         ],
         "stage2_2_2_reference": {
             "path": frozen_source_path.relative_to(REPO).as_posix(),
-            "sha256": hashlib.sha256(frozen_source_path.read_bytes()).hexdigest(),
+            "manifest_sha256": manifest_sha,
+            "canonical_git_blob_sha256": canonical_git_blob_sha,
+            "working_tree_sha256": hashlib.sha256(frozen_source_path.read_bytes()).hexdigest(),
+            "working_tree_sha256_authoritative": False,
+            "canonical_hash_match": canonical_hash_match,
         },
     }
     (results / "stage5d1_source_parity.json").write_text(json.dumps(source_parity, indent=2, sort_keys=True) + "\n", encoding="utf-8")

@@ -4,7 +4,7 @@ Branch: `stage5d-live-decision-support`
 
 Base: `stage4a3-prospective-shadow-protocol-baseline` at `3ff3c0283174589d43883ce75b1dfd87a33613ce`
 
-Stage 5D.1B hardens real frozen-scanner parity, signal lineage, canonical decision sessions, pending-entry context, allocation identity, and whole-share proposed allocations.
+Stage 5D.1C adds portable canonical frozen-source provenance verification to the completed Stage 5D.1B scanner-parity and lineage hardening. Recommendation contract semantics and allocator behavior are unchanged.
 
 ## Rules
 
@@ -26,15 +26,21 @@ Stage 5D.1B hardens real frozen-scanner parity, signal lineage, canonical decisi
 - Three months management policy: `D1_TRAIL_ONLY_63D`, 63 sessions, `FROZEN_STAGE2B_1_DYNAMIC_BASELINE`.
 - Six months: `UNSUPPORTED_NOT_VALIDATED`.
 
-Both supported mappings are historically tested deterministic policies, not prospective validation or profit guarantees. Stage 5D.1A records but does not execute the management policy.
+Both supported mappings are historically tested deterministic policies, not prospective validation or profit guarantees. Stage 5D.1B records but does not execute the management policy.
 
 ## Declarations
 
-Tests passed / failed: **79 / 0**
+Tests passed / failed: **80 / 0**
 
 Exact source ranking parity: **PASS**
 
 Signal-ID parity against imported frozen Stage 2.2.2 function: **PASS**
+
+Canonical Stage 2.2.2 source SHA: `63345c591b46c656b204236d147993cb283d57fdbccd0246b7cef281d7968730`
+
+Artifact-manifest source SHA: `63345c591b46c656b204236d147993cb283d57fdbccd0246b7cef281d7968730`
+
+Canonical source provenance: **PASS**
 
 Canonical date identity: **PASS**
 

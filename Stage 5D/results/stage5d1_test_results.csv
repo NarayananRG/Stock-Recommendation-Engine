@@ -78,3 +78,4 @@ Test Number,Test,Status,Details
 77,source metadata retained in recommendation,PASS,
 78,ML metadata still has zero influence,PASS,
 79,Stage 4A.3 changed files equals zero after source parity hardening,PASS,
+80,canonical frozen Stage 2.2.2 source SHA matches permanent artifact manifest,PASS,canonical_git_blob_sha=63345c591b46c656b204236d147993cb283d57fdbccd0246b7cef281d7968730; manifest_sha256=63345c591b46c656b204236d147993cb283d57fdbccd0246b7cef281d7968730; manifest_matches=1

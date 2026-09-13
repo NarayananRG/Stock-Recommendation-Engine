@@ -61,7 +61,11 @@
     }
   ],
   "stage2_2_2_reference": {
+    "canonical_git_blob_sha256": "63345c591b46c656b204236d147993cb283d57fdbccd0246b7cef281d7968730",
+    "canonical_hash_match": true,
+    "manifest_sha256": "63345c591b46c656b204236d147993cb283d57fdbccd0246b7cef281d7968730",
     "path": "Stage 2.2.2 Final/stage2_2_2/Stock_Alert_Stage2_2_2_Final_Baseline.py",
-    "sha256": "3f01ee029b2944bbc5596dc325d13f5588bdda9f745fdd25a3cd2cbcc15386b4"
+    "working_tree_sha256": "3f01ee029b2944bbc5596dc325d13f5588bdda9f745fdd25a3cd2cbcc15386b4",
+    "working_tree_sha256_authoritative": false
   }
 }
