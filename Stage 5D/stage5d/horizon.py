@@ -12,8 +12,6 @@ class HorizonPreference(str, Enum):
 
 class HorizonStatus(str, Enum):
     ELIGIBLE = "ELIGIBLE"
-    EXPECTED_MOVE_EXCEEDS_HORIZON = "EXPECTED_MOVE_EXCEEDS_HORIZON"
-    INSUFFICIENT_HORIZON_EVIDENCE = "INSUFFICIENT_HORIZON_EVIDENCE"
     UNSUPPORTED_NOT_VALIDATED = "UNSUPPORTED_NOT_VALIDATED"
 
 
@@ -21,26 +19,55 @@ class HorizonStatus(str, Enum):
 class HorizonAssessment:
     selected_horizon: HorizonPreference
     horizon_session_limit: int | None
-    estimated_or_rule_based_holding_compatibility: str
     horizon_status: HorizonStatus
+    management_policy_id: str | None
+    management_policy_source: str | None
+    management_policy_max_sessions: int | None
+    management_policy_validation_semantics: str | None
+    estimated_or_rule_based_holding_compatibility: str
+
+
+POLICY_BY_HORIZON: dict[HorizonPreference, HorizonAssessment] = {
+    HorizonPreference.ONE_MONTH: HorizonAssessment(
+        selected_horizon=HorizonPreference.ONE_MONTH,
+        horizon_session_limit=20,
+        horizon_status=HorizonStatus.ELIGIBLE,
+        management_policy_id="STATIC_T2_20D",
+        management_policy_source="FROZEN_STAGE2_2_2_STATIC_BASELINE",
+        management_policy_max_sessions=20,
+        management_policy_validation_semantics="HISTORICALLY_TESTED_DETERMINISTIC_NOT_PROSPECTIVE",
+        estimated_or_rule_based_holding_compatibility=(
+            "Approximately one month; later daily monitoring must apply STATIC_T2_20D. "
+            "Historical deterministic testing does not guarantee profit."
+        ),
+    ),
+    HorizonPreference.THREE_MONTHS: HorizonAssessment(
+        selected_horizon=HorizonPreference.THREE_MONTHS,
+        horizon_session_limit=63,
+        horizon_status=HorizonStatus.ELIGIBLE,
+        management_policy_id="D1_TRAIL_ONLY_63D",
+        management_policy_source="FROZEN_STAGE2B_1_DYNAMIC_BASELINE",
+        management_policy_max_sessions=63,
+        management_policy_validation_semantics="HISTORICALLY_TESTED_DETERMINISTIC_NOT_PROSPECTIVE",
+        estimated_or_rule_based_holding_compatibility=(
+            "Up to 63 sessions; later daily monitoring must apply D1_TRAIL_ONLY_63D. "
+            "Historical deterministic testing does not guarantee profit."
+        ),
+    ),
+    HorizonPreference.SIX_MONTHS: HorizonAssessment(
+        selected_horizon=HorizonPreference.SIX_MONTHS,
+        horizon_session_limit=None,
+        horizon_status=HorizonStatus.UNSUPPORTED_NOT_VALIDATED,
+        management_policy_id=None,
+        management_policy_source=None,
+        management_policy_max_sessions=None,
+        management_policy_validation_semantics=None,
+        estimated_or_rule_based_holding_compatibility="Six-month management has not been validated",
+    ),
+}
 
 
 def assess_horizon(candidate: dict[str, object], horizon: HorizonPreference) -> HorizonAssessment:
-    if horizon is HorizonPreference.SIX_MONTHS:
-        return HorizonAssessment(horizon, None, "Six-month behavior has not been validated", HorizonStatus.UNSUPPORTED_NOT_VALIDATED)
-    limit = 21 if horizon is HorizonPreference.ONE_MONTH else 63
-    validated = candidate.get("validated_holding_sessions")
-    source = str(candidate.get("holding_evidence_source", "")).upper()
-    if horizon is HorizonPreference.ONE_MONTH:
-        if validated is None or source != "VALIDATED_DETERMINISTIC":
-            estimate = candidate.get("estimated_holding_sessions")
-            detail = "No validated candidate-level time-to-target evidence"
-            if estimate is not None:
-                detail += f"; heuristic estimate {estimate} sessions is informational only"
-            return HorizonAssessment(horizon, limit, detail, HorizonStatus.INSUFFICIENT_HORIZON_EVIDENCE)
-        if int(validated) > limit:
-            return HorizonAssessment(horizon, limit, f"Validated deterministic holding evidence is {int(validated)} sessions", HorizonStatus.EXPECTED_MOVE_EXCEEDS_HORIZON)
-        return HorizonAssessment(horizon, limit, f"Validated deterministic holding evidence is {int(validated)} sessions", HorizonStatus.ELIGIBLE)
-    if validated is not None and int(validated) > limit:
-        return HorizonAssessment(horizon, limit, f"Validated deterministic holding evidence is {int(validated)} sessions", HorizonStatus.EXPECTED_MOVE_EXCEEDS_HORIZON)
-    return HorizonAssessment(horizon, limit, "Frozen deterministic strategy maximum is 63 market sessions", HorizonStatus.ELIGIBLE)
+    """Return the fixed policy contract; candidate assertions are intentionally ignored."""
+    del candidate
+    return POLICY_BY_HORIZON[horizon]

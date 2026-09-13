@@ -2,29 +2,55 @@ from __future__ import annotations
 
 
 RECOMMENDATION_FIELDS = [
-    "recommendation_id", "profile_version", "ticker", "signal_date", "deterministic_signal",
+    "allocation_run_id", "recommendation_id", "profile_version", "ticker", "signal_date", "decision_date", "deterministic_signal",
     "entry_low", "entry_high", "sizing_entry_price", "stop", "target_1", "target_2",
     "capital_ceiling_inr", "deployed_before_inr", "available_before_inr", "risk_budget_inr",
     "risk_per_share_inr", "max_qty_by_cash", "max_qty_by_risk", "max_qty_by_position_cap",
     "recommended_quantity", "estimated_purchase_value_inr", "available_after_inr", "selected_horizon",
-    "horizon_session_limit", "estimated_or_rule_based_holding_compatibility", "horizon_status",
+    "horizon_session_limit", "management_policy_id", "management_policy_source",
+    "management_policy_max_sessions", "management_policy_validation_semantics",
+    "estimated_or_rule_based_holding_compatibility", "horizon_status",
     "portfolio_action_status", "plain_language_reason",
 ]
 
 PORTFOLIO_ACTION_STATUSES = [
     "ACTIONABLE_BUY", "WATCH_INSUFFICIENT_CAPITAL", "WATCH_RISK_BUDGET_TOO_SMALL",
     "WATCH_POSITION_CAP_TOO_SMALL", "WATCH_HORIZON_MISMATCH", "BLOCKED_PORTFOLIO_OVER_CAP",
-    "BLOCKED_MAX_POSITIONS", "WAIT_NO_QUALIFYING_SETUP", "WATCH_INVALID_RISK",
+    "BLOCKED_MAX_POSITIONS", "BLOCKED_EXISTING_POSITION", "BLOCKED_DUPLICATE_TICKER",
+    "BLOCKED_COMMITTED_CAPITAL_OVERAGE", "WAIT_SOURCE_SIGNAL", "WATCH_SOURCE_SIGNAL",
+    "AVOID_SOURCE_SIGNAL", "WATCH_INVALID_RISK",
 ]
 
 
 def contract_payload() -> dict[str, object]:
     return {
-        "contract_version": "STAGE5D1_RECOMMENDATION_V1",
+        "contract_version": "STAGE5D1A_RECOMMENDATION_V2",
         "profile_record_fields": ["profile_version", "effective_timestamp", "maximum_total_capital_inr", "capital_ceiling_inr", "preferred_horizon", "previous_profile_version", "user_note"],
         "recommendation_fields": RECOMMENDATION_FIELDS,
         "portfolio_action_statuses": PORTFOLIO_ACTION_STATUSES,
-        "capital_enforcement_basis": "CURRENT_POSITION_MARKET_VALUE",
+        "capital_enforcement_basis": "CURRENT_POSITION_MARKET_VALUE_PLUS_RESERVED_PENDING_CAPITAL",
+        "portfolio_summary_fields_added": ["allocation_run_id", "committed_capital_inr", "committed_capital_overage_inr"],
+        "actionable_deterministic_signals": ["STRONG BUY", "BUY"],
+        "management_policies": {
+            "ONE_MONTH": {
+                "management_policy_id": "STATIC_T2_20D",
+                "management_policy_source": "FROZEN_STAGE2_2_2_STATIC_BASELINE",
+                "management_policy_max_sessions": 20,
+                "management_policy_validation_semantics": "HISTORICALLY_TESTED_DETERMINISTIC_NOT_PROSPECTIVE",
+            },
+            "THREE_MONTHS": {
+                "management_policy_id": "D1_TRAIL_ONLY_63D",
+                "management_policy_source": "FROZEN_STAGE2B_1_DYNAMIC_BASELINE",
+                "management_policy_max_sessions": 63,
+                "management_policy_validation_semantics": "HISTORICALLY_TESTED_DETERMINISTIC_NOT_PROSPECTIVE",
+            },
+            "SIX_MONTHS": {
+                "management_policy_id": None,
+                "horizon_status": "UNSUPPORTED_NOT_VALIDATED",
+            },
+        },
+        "nullable_non_actionable_level_fields": ["entry_low", "entry_high", "sizing_entry_price", "stop", "target_1", "target_2", "risk_per_share_inr"],
+        "allocation_identity_rule": "CONTENT_ADDRESSED_COMPLETE_DETERMINISTIC_DECISION_CONTEXT_EXCLUDING_ML_METADATA",
         "risk_per_trade_fraction": 0.0075,
         "maximum_position_fraction": 0.25,
         "maximum_open_positions": 5,
