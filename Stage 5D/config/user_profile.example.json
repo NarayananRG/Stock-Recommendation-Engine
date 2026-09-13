@@ -1,0 +1,9 @@
+{
+  "capital_ceiling_inr": 5000.0,
+  "effective_timestamp": "2026-09-13T00:00:00+00:00",
+  "preferred_horizon": "ONE_MONTH",
+  "maximum_total_capital_inr": 5000.0,
+  "previous_profile_version": null,
+  "profile_version": 1,
+  "user_note": "Example only; create a versioned profile through ProfileStore"
+}

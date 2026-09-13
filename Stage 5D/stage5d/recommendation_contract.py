@@ -1,0 +1,34 @@
+from __future__ import annotations
+
+
+RECOMMENDATION_FIELDS = [
+    "recommendation_id", "profile_version", "ticker", "signal_date", "deterministic_signal",
+    "entry_low", "entry_high", "sizing_entry_price", "stop", "target_1", "target_2",
+    "capital_ceiling_inr", "deployed_before_inr", "available_before_inr", "risk_budget_inr",
+    "risk_per_share_inr", "max_qty_by_cash", "max_qty_by_risk", "max_qty_by_position_cap",
+    "recommended_quantity", "estimated_purchase_value_inr", "available_after_inr", "selected_horizon",
+    "horizon_session_limit", "estimated_or_rule_based_holding_compatibility", "horizon_status",
+    "portfolio_action_status", "plain_language_reason",
+]
+
+PORTFOLIO_ACTION_STATUSES = [
+    "ACTIONABLE_BUY", "WATCH_INSUFFICIENT_CAPITAL", "WATCH_RISK_BUDGET_TOO_SMALL",
+    "WATCH_POSITION_CAP_TOO_SMALL", "WATCH_HORIZON_MISMATCH", "BLOCKED_PORTFOLIO_OVER_CAP",
+    "BLOCKED_MAX_POSITIONS", "WAIT_NO_QUALIFYING_SETUP", "WATCH_INVALID_RISK",
+]
+
+
+def contract_payload() -> dict[str, object]:
+    return {
+        "contract_version": "STAGE5D1_RECOMMENDATION_V1",
+        "profile_record_fields": ["profile_version", "effective_timestamp", "maximum_total_capital_inr", "capital_ceiling_inr", "preferred_horizon", "previous_profile_version", "user_note"],
+        "recommendation_fields": RECOMMENDATION_FIELDS,
+        "portfolio_action_statuses": PORTFOLIO_ACTION_STATUSES,
+        "capital_enforcement_basis": "CURRENT_POSITION_MARKET_VALUE",
+        "risk_per_trade_fraction": 0.0075,
+        "maximum_position_fraction": 0.25,
+        "maximum_open_positions": 5,
+        "quantity_rule": "WHOLE_SHARES_ONLY",
+        "ml_score_usage": "PROHIBITED_FOR_USER_FACING_SELECTION_SIZING_RANKING_OR_CONFIDENCE",
+        "execution_semantics": "PROPOSAL_ONLY_NOT_A_TRANSACTION",
+    }
