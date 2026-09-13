@@ -125,7 +125,7 @@ def compute_frozen_label_events(repo: Path, snapshot_dir: Path, market_frames: M
     return events
 
 
-def run_frozen_portfolio_results(repo:Path,predictions:pd.DataFrame,feature_rows:pd.DataFrame,raw_market_frames:Mapping[str,pd.DataFrame],observation_through:str,include_random_controls:bool=False,include_d0:bool=True,policies:list[str]|None=None,evaluation_start:str|None=None)->dict[str,dict[str,Any]]:
+def run_frozen_portfolio_results(repo:Path,predictions:pd.DataFrame,feature_rows:pd.DataFrame,raw_market_frames:Mapping[str,pd.DataFrame],observation_through:str,include_random_controls:bool=False,include_d0:bool=True,policies:list[str]|None=None,evaluation_start:str|None=None,random_seeds:range|list[int]|None=None)->dict[str,dict[str,Any]]:
     """One authoritative Stage 2B.1/Stage 2.2.2 execution path for outcomes and final economics."""
     if len(predictions)!=len(feature_rows):raise RuntimeError("PREDICTION_FEATURE_ROW_MISMATCH")
     stage2b1_path=str((repo/"Stage 2B.1/stage2b").resolve());sys.path.remove(stage2b1_path) if stage2b1_path in sys.path else None;sys.path.insert(0,stage2b1_path)
@@ -139,11 +139,11 @@ def run_frozen_portfolio_results(repo:Path,predictions:pd.DataFrame,feature_rows
     combined=pd.concat([predictions.reset_index(drop=True),feature_rows.reset_index(drop=True)],axis=1);combined=combined.loc[:,~combined.columns.duplicated()].copy()
     combined["Stop Loss"]=combined["Initial Stop"];combined["Target 1"]=combined["Original T1"];combined["Target 2"]=combined["Original T2"]
     named=[f"R{r}_K{k}" for r in range(6) for k in (1,2)]
-    selected_policies=policies or named
+    selected_policies=named if policies is None else policies
     truth=lambda values:values.astype(str).str.strip().str.lower().isin({"true","1","yes"})
     selections={name:set(combined.loc[truth(combined[name+" Selected"]),"Signal ID"].astype(str)) for name in named if name in selected_policies}
     if include_random_controls:
-        for seed in range(500):
+        for seed in (range(500) if random_seeds is None else random_seeds):
             ids=[]
             for _,group in combined.groupby("Signal Date"):ids.append(min(group["Signal ID"].astype(str),key=lambda value:random_key(seed,value)))
             selections[f"RANDOM_K1_SEED_{seed:03d}"]=set(ids)

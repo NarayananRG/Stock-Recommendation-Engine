@@ -53,6 +53,9 @@ def archive_market_frames(frames: Mapping[str, pd.DataFrame], archive_root: Path
 
 def verify_and_load_archive(archive_root: Path, manifest_path: Path) -> dict[str, pd.DataFrame]:
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    expected_files={str(item["File"]) for item in manifest["files"]}
+    present_files={path.name for path in archive_root.iterdir() if path.is_file()}
+    if expected_files!=present_files:raise RuntimeError("FINAL_MARKET_DATA_ARCHIVE_FILE_SET_MISMATCH")
     frames: dict[str, pd.DataFrame] = {}
     logical: dict[str, str] = {}
     for item in manifest["files"]:
@@ -63,26 +66,37 @@ def verify_and_load_archive(archive_root: Path, manifest_path: Path) -> dict[str
         if dataframe_content_hash(frame) != item["Logical Hash"]:
             raise RuntimeError("FINAL_MARKET_DATA_LOGICAL_HASH_MISMATCH")
         frame["Date"] = pd.to_datetime(frame["Date"])
+        if len(frame)!=int(item["Rows"]) or frame["Date"].min().date().isoformat()!=item["Minimum Date"] or frame["Date"].max().date().isoformat()!=item["Maximum Date"]:raise RuntimeError("FINAL_MARKET_DATA_MANIFEST_RANGE_MISMATCH")
+        if frame["Date"].max()>pd.Timestamp(manifest["as_of_date"]):raise RuntimeError("FINAL_MARKET_DATA_AFTER_AS_OF")
         frames[item["Ticker"]] = frame.set_index("Date")
         logical[item["Ticker"]] = item["Logical Hash"]
     if canonical_json_hash(logical) != manifest["overall_logical_hash"]:
         raise RuntimeError("FINAL_MARKET_DATA_OVERALL_HASH_MISMATCH")
+    if logical!=manifest.get("per_ticker_logical_hashes",{}):raise RuntimeError("FINAL_MARKET_DATA_PER_TICKER_HASH_MISMATCH")
     return frames
 
 
 def acquire_and_archive(repo: Path, stage_root: Path, as_of_date: str,
                         archive_parent: Path, downloaded_utc: str) -> tuple[dict[str, pd.DataFrame], dict[str, Any]]:
     """Use frozen Stage 2.2.1 ingestion; no operator-supplied return arrays exist."""
+    tickers = pd.read_csv(stage_root/"prospective_universe.csv")["Ticker"].astype(str).tolist()
+    expected = set(tickers)|{"^NSEI"}
+    archive = archive_parent/"final_market_data"
+    manifest_path=archive_parent/"stage4a3_final_market_data_manifest.json"
+    if archive.exists() or manifest_path.exists():
+        if not archive.exists() or not manifest_path.exists():raise RuntimeError("FINAL_MARKET_DATA_ARCHIVE_RETRY_INCOMPLETE")
+        manifest=json.loads(manifest_path.read_text(encoding="utf-8"))
+        actual={str(item["Ticker"]) for item in manifest.get("files",[])}
+        if str(manifest.get("as_of_date"))!=str(as_of_date):raise RuntimeError("FINAL_MARKET_DATA_ARCHIVE_RETRY_AS_OF_MISMATCH")
+        if actual!=expected:raise RuntimeError("FINAL_MARKET_DATA_ARCHIVE_RETRY_UNIVERSE_MISMATCH")
+        return verify_and_load_archive(archive,manifest_path),manifest
     stage221 = _module("stage4a3_final_stage221", repo/"Stage 2.2.2 Final/stage2_2_1/Stock_Alert_Stage2_2_1_Reproducible_Benchmark.py")
     stage21 = stage221.load_stage21_module(repo/"Stage 2.2.2 Final/baseline/stage2_1/Stock_Alert_Stage2_1_Optimized_15Y.py")
     dataset_config = json.loads((repo/"Stage 3/config/stage3_dataset_config.json").read_text(encoding="utf-8"))
-    tickers = pd.read_csv(stage_root/"prospective_universe.csv")["Ticker"].astype(str).tolist()
     scratch = archive_parent/"provider_download_cache"
     cfg = stage221.Stage22Config(test_start=dataset_config["test_start"],test_end=as_of_date,warmup_anchor_start=dataset_config["test_start"],cache_directory=scratch,frozen_data_directory=scratch,data_mode="REFRESH")
     engine = stage221.CandidateSignalEngine(stage21,cfg,tickers);engine.load_data()
-    expected = set(tickers)|{"^NSEI"}
     if set(engine.engine.raw_data) != expected:
         raise RuntimeError("FINAL_MARKET_DATA_UNIVERSE_INCOMPLETE")
-    archive = archive_parent/"final_market_data"
     manifest = archive_market_frames(engine.engine.raw_data,archive,as_of_date,"YFINANCE_REFRESH_VIA_FROZEN_STAGE2_2_1",downloaded_utc)
-    return verify_and_load_archive(archive,archive_parent/"stage4a3_final_market_data_manifest.json"),manifest
+    return verify_and_load_archive(archive,manifest_path),manifest

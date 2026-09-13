@@ -1,7 +1,7 @@
 {
-  "PROTOCOL_HASH": "48a2400f86bae2263f491280b22d17b090f438a89499c629e15d73ec8b756d70",
-  "PROTOCOL_ID": "S4A3_PROTOCOL_48a2400f86bae226",
-  "PROTOCOL_PACKAGE_HASH": "2cf01a0a90410515b1f97f6b53400e95b29022b35b44facf420743b07cf5c42e",
+  "PROTOCOL_HASH": "ee14ae516b33deac81f07dc66fadd953047eae7c92523907e271ade726defe39",
+  "PROTOCOL_ID": "S4A3_PROTOCOL_ee14ae516b33deac",
+  "PROTOCOL_PACKAGE_HASH": "cc1b7bfc85c77e40f029a5ccff670e531445e5051932dab7e7e8abd2116bdc2f",
   "activation_timestamp_included": false,
   "identity_components": {
     "final_gate_spec_hash": "fdf07e34501ba6032e504d2448c074fe20dfd39d38d8264ddf7703b85955c870",
@@ -10,7 +10,7 @@
     "outcome_schema_hash": "cb8c1796961db0491f5c4f24b469b34b75ea4031bf7a80bc0af555c9b1690e3b",
     "primary_hypothesis_hash": "a7541d2da240d6833dd4fc3fb8e17ff62e302200d64da0e7ceab668fe7ccbc60",
     "snapshot_schema_hash": "736e9ae74dcc55d0c740e2dcb63a728b96c6ab7506d54b995c5eec613329242b",
-    "source_package_hash": "2cf01a0a90410515b1f97f6b53400e95b29022b35b44facf420743b07cf5c42e",
+    "source_package_hash": "cc1b7bfc85c77e40f029a5ccff670e531445e5051932dab7e7e8abd2116bdc2f",
     "stage2b_1_commit": "c9cc9f4fcaf2fe81128365be09515fbf9fa67c28",
     "stage3_1_commit": "ac62c35f2a47bc862e406030b81f93da17c75d74",
     "stage4a1_commit": "012fd37df9158d4c5f7b2165de1d0ec1debbde6f",

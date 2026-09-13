@@ -13,8 +13,19 @@ def normalize_daily(result: dict[str, Any], policy: str, exit_engine: str) -> pd
     frame=frame.rename(columns={"Total Equity":"Equity","Open Position Value":"Invested Value","Number Open Positions":"Open Positions"})
     frame["Exposure"]=(pd.to_numeric(frame["Invested Value"])/pd.to_numeric(frame["Equity"])).fillna(0.)
     frame["Daily Return"]=pd.to_numeric(frame["Daily Return %"],errors="coerce").fillna(0.)/100.
+    frame["Realized PnL"]=0.;frame["Costs"]=0.
+    trades=result.get("trades",pd.DataFrame()).copy()
+    if not trades.empty:
+        zero=pd.Series(0.,index=trades.index)
+        entry_transaction=pd.to_numeric(trades.get("Entry Transaction Cost",zero),errors="coerce").fillna(0)
+        exit_transaction=pd.to_numeric(trades.get("Exit Transaction Cost",zero),errors="coerce").fillna(0)
+        entry_slippage=pd.to_numeric(trades.get("Entry Slippage Cost",zero),errors="coerce").fillna(0)
+        exit_slippage=pd.to_numeric(trades.get("Exit Slippage Cost",trades.get("Slippage Cost",zero)),errors="coerce").fillna(0)
+        costs=pd.concat([pd.DataFrame({"Date":pd.to_datetime(trades["Entry Date"]).dt.normalize(),"Cost":entry_transaction+entry_slippage}),pd.DataFrame({"Date":pd.to_datetime(trades["Exit Date"]).dt.normalize(),"Cost":exit_transaction+exit_slippage})]).groupby("Date")["Cost"].sum()
+        realized=pd.DataFrame({"Date":pd.to_datetime(trades["Exit Date"]).dt.normalize(),"PnL":pd.to_numeric(trades["Net PnL"],errors="coerce").fillna(0)}).groupby("Date")["PnL"].sum()
+        frame["Costs"]=frame["Date"].map(costs).fillna(0.);frame["Realized PnL"]=frame["Date"].map(realized).fillna(0.)
     frame["Policy"]=policy;frame["Exit Engine"]=exit_engine
-    return frame[["Policy","Exit Engine","Date","Equity","Daily Return","Cash","Invested Value","Exposure","Open Positions"]]
+    return frame[["Policy","Exit Engine","Date","Equity","Daily Return %","Daily Return","Cash","Invested Value","Exposure","Open Positions","Realized PnL","Costs"]]
 
 
 def enrich_trades(result: dict[str, Any], policy: str, exit_engine: str, membership: pd.DataFrame) -> pd.DataFrame:
@@ -24,7 +35,16 @@ def enrich_trades(result: dict[str, Any], policy: str, exit_engine: str, members
     if "Signal ID" not in frame:
         key=membership[["Signal ID","Ticker","Signal Date"]].copy();key["Signal Date"]=pd.to_datetime(key["Signal Date"]).dt.normalize()
         frame=frame.merge(key,on=["Ticker","Signal Date"],how="left",validate="many_to_one")
+    lookup=membership.assign(**{"Signal ID":membership["Signal ID"].astype(str)}).set_index("Signal ID");ids=frame["Signal ID"].astype(str)
+    if "Initial Stop" not in frame and "Stop" in frame:frame["Initial Stop"]=frame["Stop"]
+    if "Original T1" not in frame:frame["Original T1"]=ids.map(lookup["Target 1"])
+    if "Original T2" not in frame:frame["Original T2"]=ids.map(lookup["Target 2"])
     frame["Policy"]=policy;frame["Exit Engine"]=exit_engine
+    code=policy.split("_K")[0]
+    frame["Selection Rank"]=ids.map(lookup.get(f"{code} Rank",pd.Series(dtype=float))) if policy.startswith("R") else np.nan
+    frame["Selection Score"]=ids.map(lookup.get(f"{code} Score",pd.Series(dtype=float))) if policy.startswith("R") else np.nan
+    frame["Daily K"]=int(policy[-1]) if policy.endswith(("K1","K2")) else "ALL"
+    frame["Same-Date Candidate Count"]=ids.map(lookup.get("Same-Date Candidate Count",pd.Series(dtype=float)))
     frame["Net R"]=pd.to_numeric(frame.get("R Multiple"),errors="coerce")
     frame["Holding Sessions"]=pd.to_numeric(frame.get("Bars Held"),errors="coerce")
     zero=pd.Series(0.,index=frame.index)

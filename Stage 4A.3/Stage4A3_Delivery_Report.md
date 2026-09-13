@@ -51,21 +51,42 @@ There is no force, unlock, override, or ignore-minimum option. Before unlock, st
 
 ## Verification
 
-All 118 original tests, 26 prior Stage 4A.3A regressions, and 20 final economic/session regressions pass (164 total). Two independent complete model/protocol rebuilds had zero behaviorally meaningful differences across 20 compared artifacts. Both rebuilt the same seven-component bundle with maximum probability difference `4.998224056862455e-13` and bundle hash `4631eb8a1d0b34212252df3b1aae180f64ec98ba5e7955a84729df0a471c62da`.
+All 118 original tests, 26 prior Stage 4A.3A regressions, 20 economic/session regressions, and 24 final freeze-readiness regressions pass (188 total, 0 failed). Two independent complete model/protocol rebuilds had zero behaviorally meaningful differences across 20 compared artifacts. Both rebuilt the same seven-component bundle with maximum probability difference `4.998224056862455e-13` and bundle hash `4631eb8a1d0b34212252df3b1aae180f64ec98ba5e7955a84729df0a471c62da`.
 
 The exact production input adapter recreated all three accepted historical Signal IDs and the 97 FS3 model inputs from the frozen strategy/feature functions; the maximum feature difference versus the text-rounded Stage 3.1 CSV was `3.4375261748209596e-08`, below the explicit `1e-7` serialization-parity tolerance. Its Signal-ID and full-input logical hashes independently verified. The hardened dry run wrote its immutable candidate-input provenance only under `tests/dry_run_hardened`.
 
 The test-only computed-outcome workflow produced five terminal Stage 3.1 label events and four R0/R3 D1/D0 events using the exact frozen engines, with a valid global event chain. The synthetic locked sample refused evaluation and logged the attempt. The matured 150-candidate synthetic ledger unlocked and generated all 20 preregistered outputs, including the four D1/D0 trade and daily-equity audit ledgers, exactly 500 random controls, and 63/21/126-session, 2,000-replicate, seed-42 non-circular daily bootstraps. Tests assert independently specified daily returns, ending equity, return, CAGR, daily-equity drawdown, trade count, expectancy, profit factor, random percentile and bootstrap results. Its deliberately weak R3 result kept Stage 5 blocked.
 
-## Final economic and session hardening
+## Final freeze-readiness hardening
 
-The final evaluator no longer derives portfolio economics from terminal trade fractions. It archives complete daily OHLC data after the gate, replays the common frozen D1/D0 engine from the first valid market session strictly after activation, includes all cash and zero-candidate sessions, computes drawdown from daily equity, uses mid-rank random-control ties, and reports no score-based T2 metric. The historical parity gates pass for R0_K1, R3_K1, D0, the 63-session bootstrap and the 81.8% random-control percentile. Production session coverage now records missed NIFTY sessions once in a tamper-evident ledger without generating historical predictions.
+The final evaluator uses true `JOINT_T1`: no fill is a terminal false outcome at the entry-label date, filled and resolved T1 uses the T1 label, and filled but unresolved T1 is excluded. Conditional T1 contains only filled, resolved opportunities. Prediction/feature rows, outcome events, and market bars are all filtered point-in-time at the requested as-of date. A matching final market-data archive is verified and reused byte-for-byte; conflicting as-of dates, universes, or hashes stop without overwrite.
 
-Protocol ID: `S4A3_PROTOCOL_48a2400f86bae226`
+The end-to-end historical replay reconstructed 754 candidates and ran the current adapter without changing any strategy threshold or Stage 2.1 entry behavior. Named-policy scope is explicit and separate from random controls.
 
-Protocol package hash: `2cf01a0a90410515b1f97f6b53400e95b29022b35b44facf420743b07cf5c42e`
+| Acceptance gate | Status | Maximum raw numeric difference |
+|---|---|---:|
+| R0_K1 D1 replay | PASS_EXACT / PASS_SERIALIZATION_ONLY | included below by artifact |
+| R3_K1 D1 replay | PASS_EXACT / PASS_SERIALIZATION_ONLY | included below by artifact |
+| D0 R0_K1 / R3_K1 replay | PASS_EXACT / PASS_SERIALIZATION_ONLY | 4.99931047671e-07 |
+| 63-session paired moving-block bootstrap, 2,000 replicates, seed 42 | PASS_EXACT / PASS_SERIALIZATION_ONLY | 3.3729829596e-07 |
+| 500 K1 random controls, seeds 0–499 | PASS_EXACT | 4.99156271871e-11 raw parse diagnostic |
+| R3_K1 random-control mid-rank percentile | PASS_EXACT | 0 (81.8 exactly) |
 
-Hardened identity: `S4A3_PROTOCOL_b4b02f1234e17499`; source/package hash: `4e66f963a19c3f8d306e766bfc0076ce4de318a03cc85abec00cdcf4e8f6c380`.
+All discrete behavioral comparisons have zero mismatches. Numeric-only deltas are classified at the frozen Stage 4A.2 six-decimal serialized-delta boundary, while full-precision absolute differences remain visible in the audit artifacts: summary `2.829474397e-07`, trade `5.00003807247e-08`, daily `4.99683665112e-07`, D0 `4.99931047671e-07`, and bootstrap `3.3729829596e-07`. No broad strategy or validation tolerance was introduced.
+
+JOINT_T1: **PASS**
+
+AS-OF ISOLATION: **PASS**
+
+ARCHIVE RETRY / HASH / UNIVERSE GUARDS: **PASS**
+
+DETERMINISM: **PASS** — 20/20 compared artifacts, zero meaningful differences
+
+TESTS: **PASS** — 188 passed, 0 failed
+
+Protocol ID: `S4A3_PROTOCOL_ee14ae516b33deac`
+
+Protocol package hash: `cc1b7bfc85c77e40f029a5ccff670e531445e5051932dab7e7e8abd2116bdc2f`
 
 Known limitations remain: fixed current-universe and inherited survivorship limitations, generic costs, daily-OHLC ordering ambiguity, possible provider revisions, no user-facing calibrated probability, frozen-model staleness, and a sample that may take years to mature. The material improvement is that prediction and policy are frozen before future outcomes exist.
 
@@ -85,6 +106,7 @@ STAGE 4A.3 REAL PROSPECTIVE COLLECTION STARTED: NO
 REAL PROSPECTIVE SNAPSHOTS CREATED: 0  
 REAL PROSPECTIVE OUTCOMES CREATED: 0  
 ACTIVATION RUN: NO
+PROTOCOL TAG CREATED: NO
 FROZEN 2026 MODEL BUNDLE BUILT: YES  
 HISTORICAL 2026 MODEL PARITY PASSED: YES  
 PROSPECTIVE MODEL REFITTING ALLOWED: NO  

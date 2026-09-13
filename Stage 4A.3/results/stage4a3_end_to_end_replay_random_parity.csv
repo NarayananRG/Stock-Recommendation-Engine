@@ -1,0 +1,3 @@
+Scope,Comparison Class,Field,Expected,Actual,Absolute Difference,Canonical Expected,Canonical Actual,Behavioral Match,Status,Explanation
+500 K1 random controls,CANONICAL_SERIALIZED_VALUE,Seeds 0..499 Total Return %,500,500,4.99156271871e-11,ALL_500_EQUAL,ALL_500_EQUAL,True,PASS_EXACT,All seed identities and all values exactly match the frozen %.12g representation; raw parse deltas are retained as diagnostics.
+R3_K1 random percentile,MID_RANK_PERCENTILE,Total Return %,81.8,81.8,0,81.8,81.8,True,PASS_EXACT,Mid-rank tie convention over exactly 500 current-adapter controls.

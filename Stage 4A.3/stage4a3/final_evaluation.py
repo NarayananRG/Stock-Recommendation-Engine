@@ -55,6 +55,66 @@ def feature_rows(stage_root:Path)->pd.DataFrame:
     return pd.concat(parts,ignore_index=True) if parts else pd.DataFrame()
 
 
+def filter_as_of_inputs(predictions:pd.DataFrame,features:pd.DataFrame,events:pd.DataFrame,as_of_date:str)->tuple[pd.DataFrame,pd.DataFrame,pd.DataFrame]:
+    """Return only information that was observable on or before ``as_of_date``.
+
+    Predictions and feature snapshots are kept as an inseparable Signal-ID pair;
+    terminal events are admitted only when their frozen label-availability date is
+    observable.  This is the final defence against later appended ledger records
+    changing an earlier evaluation.
+    """
+    cutoff=pd.Timestamp(as_of_date).normalize()
+    prediction=predictions.copy();feature=features.copy();event=events.copy()
+    if len(prediction):
+        prediction=prediction.loc[pd.to_datetime(prediction["Signal Date"]).dt.normalize().le(cutoff)].copy()
+        if prediction["Signal ID"].astype(str).duplicated().any():raise RuntimeError("AS_OF_DUPLICATE_PREDICTION_SIGNAL_ID")
+    if len(feature):
+        if feature["Signal ID"].astype(str).duplicated().any():raise RuntimeError("AS_OF_DUPLICATE_FEATURE_SIGNAL_ID")
+        feature=prediction[["Signal ID"]].assign(**{"Signal ID":lambda f:f["Signal ID"].astype(str)}).merge(
+            feature.assign(**{"Signal ID":feature["Signal ID"].astype(str)}),on="Signal ID",how="left",validate="one_to_one")
+        if len(feature)!=len(prediction) or feature.drop(columns=["Signal ID"]).isna().all(axis=1).any():raise RuntimeError("AS_OF_PREDICTION_FEATURE_PAIR_MISMATCH")
+    elif len(prediction):raise RuntimeError("AS_OF_PREDICTION_FEATURE_PAIR_MISMATCH")
+    if len(event):
+        available=pd.to_datetime(event["Label Available Date"],errors="coerce").dt.normalize()
+        event=event.loc[available.notna()&available.le(cutoff)].copy()
+    return prediction.reset_index(drop=True),feature.reset_index(drop=True),event.reset_index(drop=True)
+
+
+def filter_market_as_of(frames:dict[str,pd.DataFrame],as_of_date:str)->dict[str,pd.DataFrame]:
+    cutoff=pd.Timestamp(as_of_date).normalize();filtered={}
+    for ticker,source in frames.items():
+        frame=source.copy();frame.index=pd.to_datetime(frame.index).tz_localize(None).normalize();filtered[ticker]=frame.loc[frame.index<=cutoff].copy()
+    return filtered
+
+
+def joint_t1_outcomes(events:pd.DataFrame)->pd.DataFrame:
+    """Construct the preregistered joint event without treating non-fills as missing.
+
+    No-fill terminal entry labels are joint negatives at the entry-label date;
+    filled rows enter only after a terminal T1 resolution is available.  Filled,
+    unresolved T1 rows remain excluded.
+    """
+    base=events.loc[events["Policy"].fillna("").eq("")].copy()
+    entry=base.loc[base["Outcome Type"].eq("ENTRY_FILLED"),["Signal ID","Outcome Value","Label Available Date"]].copy()
+    entry=entry.rename(columns={"Outcome Value":"Entry Filled","Label Available Date":"Entry Label Available Date"})
+    entry["Entry Filled"]=entry["Entry Filled"].map(_boolean)
+    t1=base.loc[base["Outcome Type"].eq("T1_BEFORE_STOP_63"),["Signal ID","Outcome Value","Label Available Date"]].copy()
+    t1=t1.rename(columns={"Outcome Value":"T1 Outcome","Label Available Date":"T1 Label Available Date"})
+    t1["T1 Outcome"]=t1["T1 Outcome"].map(_boolean)
+    joint=entry.merge(t1,on="Signal ID",how="left",validate="one_to_one")
+    no_fill=joint.loc[~joint["Entry Filled"]].assign(Observed=False,**{"Label Available Date":lambda f:f["Entry Label Available Date"]})
+    filled=joint.loc[joint["Entry Filled"]&joint["T1 Label Available Date"].notna()].assign(Observed=lambda f:f["T1 Outcome"],**{"Label Available Date":lambda f:f["T1 Label Available Date"]})
+    return pd.concat([no_fill,filled],ignore_index=True)[["Signal ID","Observed","Label Available Date"]]
+
+
+def conditional_t1_outcomes(events:pd.DataFrame)->pd.DataFrame:
+    """Return T1 labels only for opportunities with a terminal filled entry."""
+    base=events.loc[events["Policy"].fillna("").eq("")].copy()
+    filled=base.loc[base["Outcome Type"].eq("ENTRY_FILLED")&base["Outcome Value"].map(_boolean),["Signal ID"]].drop_duplicates()
+    t1=base.loc[base["Outcome Type"].eq("T1_BEFORE_STOP_63")].copy();t1["Observed"]=t1["Outcome Value"].map(_boolean)
+    return filled.merge(t1[["Signal ID","Observed","Label Available Date"]],on="Signal ID",how="inner",validate="one_to_one")
+
+
 def predictive_outputs(predictions:pd.DataFrame,features:pd.DataFrame,events:pd.DataFrame,model_dir:Path,synthetic:bool=False)->tuple[pd.DataFrame,pd.DataFrame]:
     verify_bundle(model_dir);t1_bundle=joblib.load(model_dir/"TRANSFER_T1_LOGIT_FULL.joblib")
     missing=set(t1_bundle["feature_names"])-set(features)
@@ -67,8 +127,10 @@ def predictive_outputs(predictions:pd.DataFrame,features:pd.DataFrame,events:pd.
     score_table=predictions[["Signal ID","R5 Score","R3 Score"]].copy();score_table["TRANSFER T1 LOGIT_FULL Score"]=t1_score
     specs=[("ENTRY_FILLED","R5 Score"),("T1_BEFORE_STOP_63","TRANSFER T1 LOGIT_FULL Score"),("JOINT_T1","R3 Score")];rows=[];cal=[]
     for target,score in specs:
-        event_target="T1_BEFORE_STOP_63" if target=="JOINT_T1" else target
-        outcome=events.loc[(events["Outcome Type"]==event_target)&events["Policy"].fillna("").eq("")].copy();outcome["Observed"]=outcome["Outcome Value"].map(_boolean)
+        if target=="JOINT_T1":outcome=joint_t1_outcomes(events)
+        elif target=="T1_BEFORE_STOP_63":outcome=conditional_t1_outcomes(events)
+        else:
+            outcome=events.loc[(events["Outcome Type"]==target)&events["Policy"].fillna("").eq("")].copy();outcome["Observed"]=outcome["Outcome Value"].map(_boolean)
         merged=score_table[["Signal ID",score]].merge(outcome[["Signal ID","Observed"]],on="Signal ID");y=merged["Observed"].astype(int).to_numpy();p=merged[score].astype(float).to_numpy();valid=len(np.unique(y))==2
         rows.append({"Target":target,"Score":score,"Rows":len(y),"ROC AUC":roc_auc_score(y,p) if valid else np.nan,"Average Precision":average_precision_score(y,p) if len(y) else np.nan,"Brier":brier_score_loss(y,p) if len(y) else np.nan,"Brier Skill":1-brier_score_loss(y,p)/(np.mean(y)*(1-np.mean(y))) if valid else np.nan,"Log Loss":log_loss(y,np.clip(p,1e-15,1-1e-15),labels=[0,1]) if len(y) else np.nan})
         if len(merged):
@@ -88,7 +150,7 @@ def _test_replays(stage_root:Path)->tuple[pd.DataFrame,pd.DataFrame,pd.DataFrame
 
 def _execute(repo:Path,stage_root:Path,as_of_date:str,output_root:Path,predictions:pd.DataFrame,features:pd.DataFrame,synthetic:bool,activation_local_date:str)->tuple[pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame]:
     if synthetic:return _test_replays(stage_root)
-    frames,_=acquire_and_archive(repo,stage_root,as_of_date,output_root,pd.Timestamp.now(tz="UTC").isoformat())
+    frames,_=acquire_and_archive(repo,stage_root,as_of_date,output_root,pd.Timestamp.now(tz="UTC").isoformat());frames=filter_market_as_of(frames,as_of_date)
     sessions=pd.DatetimeIndex(pd.to_datetime(frames["^NSEI"].index)).normalize();eligible=sessions[(sessions>pd.Timestamp(activation_local_date))&(sessions<=pd.Timestamp(as_of_date))]
     if eligible.empty:raise RuntimeError("NO_VALID_FINAL_PORTFOLIO_SESSIONS")
     results=run_frozen_portfolio_results(repo,predictions,features,frames,as_of_date,include_random_controls=True,include_d0=True,evaluation_start=eligible.min().date().isoformat())
@@ -103,7 +165,8 @@ def _execute(repo:Path,stage_root:Path,as_of_date:str,output_root:Path,predictio
 def evaluate(repo:Path,stage_root:Path,as_of_date:str,output_root:Path)->dict[str,Any]:
     config=json.loads((stage_root/"config/stage4a3_protocol.json").read_text());activation=json.loads((stage_root/"prospective/audit/activation_record.json").read_text());synthetic="tests" in {p.lower() for p in stage_root.parts}
     counts=derive_final_gate_counts(repo,stage_root,as_of_date,synthetic_integrity=synthetic);audit=require_unlocked(config,activation,counts,stage_root/"prospective/audit")
-    predictions=prediction_rows(stage_root);features=feature_rows(stage_root);events=load_all_events(stage_root/"prospective/outcomes");terminal=events.loc[events["Is Terminal"].map(_boolean)]
+    predictions=prediction_rows(stage_root);features=feature_rows(stage_root);events=load_all_events(stage_root/"prospective/outcomes")
+    predictions,features,events=filter_as_of_inputs(predictions,features,events,as_of_date);terminal=events.loc[events["Is Terminal"].map(_boolean)]
     d1_daily,d1_trades,d0_daily,d0_trades=_execute(repo,stage_root,as_of_date,output_root,predictions,features,synthetic,activation["Activation Local Date"])
     d1_summary=pd.DataFrame([portfolio_metrics(policy,daily,d1_trades.loc[d1_trades["Policy"].eq(policy)]) for policy,daily in d1_daily.groupby("Policy")]);d0_summary=pd.DataFrame([portfolio_metrics(policy,daily,d0_trades.loc[d0_trades["Policy"].eq(policy)]) for policy,daily in d0_daily.groupby("Policy")])
     predictive,calibration=predictive_outputs(predictions,features,terminal,repo/"Stage 4A.3/models/frozen_2026",synthetic)

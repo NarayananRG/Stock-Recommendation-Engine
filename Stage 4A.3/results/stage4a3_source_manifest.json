@@ -1,5 +1,5 @@
 {
-  "SOURCE_PACKAGE_HASH": "2cf01a0a90410515b1f97f6b53400e95b29022b35b44facf420743b07cf5c42e",
+  "SOURCE_PACKAGE_HASH": "cc1b7bfc85c77e40f029a5ccff670e531445e5051932dab7e7e8abd2116bdc2f",
   "files": [
     {
       "Bytes": 2144,
@@ -37,6 +37,11 @@
       "SHA256": "df0be2a46f37a59d0f2314967b0ab3fd327f5570c4b8e611fb1190fdf03f2bb2"
     },
     {
+      "Bytes": 721,
+      "Path": "scripts/run_freeze_readiness_replay.py",
+      "SHA256": "b47ce762280d6fdabdaf3da852722a815f0e9916b840877a7e3804f4886c206c"
+    },
+    {
       "Bytes": 92,
       "Path": "scripts/verify_ledger.bat",
       "SHA256": "7c8c6e5c2a4840ed3e18b7f125a3df194434f1915f3d2741b6b52da4b417f937"
@@ -57,9 +62,9 @@
       "SHA256": "31e25190d6d6bab54f13bdeea79381d9b5393d05993f023de2e898d561972321"
     },
     {
-      "Bytes": 9957,
+      "Bytes": 10613,
       "Path": "stage4a3/build_phase_a.py",
-      "SHA256": "a8bf588bcf225efea5119cad61263344dfb6c9da0c189f5a3bcf6d7729c3c6e1"
+      "SHA256": "fae122c058fe83516919b369b0ecc3bf7c66f3abd6dfe56445d26746c23272ce"
     },
     {
       "Bytes": 7378,
@@ -77,9 +82,9 @@
       "SHA256": "6ff8934780d11b0e07eec22cd425340bb452858c5bc7d3bc9b550fab0aacd698"
     },
     {
-      "Bytes": 5464,
+      "Bytes": 7584,
       "Path": "stage4a3/economic_methodology.py",
-      "SHA256": "bbed300ebe67ddb40bf5f95831726b754d4ca50fc63704f38a3e26fbbeeb4938"
+      "SHA256": "76522ccafa2528e3fae3c1eedb7e55efd277f88ebe36e66ba2fe80dc40039517"
     },
     {
       "Bytes": 1346,
@@ -92,14 +97,19 @@
       "SHA256": "42c7fb7db43afecd1f7e9933b1eea17caa62839540d6b4989d7bbb4b022bfc16"
     },
     {
-      "Bytes": 15221,
+      "Bytes": 19729,
       "Path": "stage4a3/final_evaluation.py",
-      "SHA256": "678e2476b7b3d8b0313e016f063d6dff31776ba22867a5a7d7cc63ab88c28f3e"
+      "SHA256": "37ae3a4fffc46958302b391c43963635ded68a4b29a4db26166554a7e5476543"
     },
     {
-      "Bytes": 5282,
+      "Bytes": 6671,
       "Path": "stage4a3/final_market_data.py",
-      "SHA256": "6877288f130b548954c027519f5942cfcafd53cc6f9d2da335928376fb53d795"
+      "SHA256": "dc6459df066c79d15866ac71aa5c5bc69437550fd608133560949c47e19fb463"
+    },
+    {
+      "Bytes": 19373,
+      "Path": "stage4a3/freeze_readiness.py",
+      "SHA256": "86f439273fb3e1db844006ec8308522af9b645e7de8f33f92fb4fe2f3fe75e2e"
     },
     {
       "Bytes": 1527,
@@ -142,9 +152,9 @@
       "SHA256": "16c19b94396a297fdb92a70b3d5c6dd79ac6bb02c7bedcb505c97dd4446e9b1d"
     },
     {
-      "Bytes": 18708,
+      "Bytes": 18813,
       "Path": "stage4a3/outcome_resolver.py",
-      "SHA256": "43115ca3c810ba688c7eff001e970da0a3dd6b8adc8586ebae3ff00ae8904b14"
+      "SHA256": "25bc88df5b71f2deb5a8978424404ebb90c06effa990c56e6c1ee1a10cb20488"
     },
     {
       "Bytes": 4709,
