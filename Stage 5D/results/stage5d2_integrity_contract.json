@@ -1,0 +1,35 @@
+{
+  "allocation_atomicity": true,
+  "append_only_entities": [
+    "recommendation_events",
+    "user_transactions",
+    "transaction_voids",
+    "opening_positions"
+  ],
+  "automatic_execution": false,
+  "broker_integration": false,
+  "canonical_json": "sort_keys=true,separators=(',', ':'),ensure_ascii=false,UTF-8",
+  "contract": "STAGE5D2_INTEGRITY_CONTRACT_V1",
+  "cost_basis_method": "WEIGHTED_AVERAGE_NON_TAX_COST_BASIS",
+  "hash": "SHA256",
+  "immutable_entities": [
+    "allocation_runs",
+    "recommendations",
+    "position_state_snapshots",
+    "recommendation_outcome_versions"
+  ],
+  "integrity_checks": [
+    "PRAGMA integrity_check",
+    "PRAGMA foreign_key_check",
+    "payload hashes",
+    "recommendation allocation links",
+    "nonnegative positions",
+    "outcome version continuity"
+  ],
+  "ml_user_facing_influence": false,
+  "outcome_versions": "strictly monotonic per recommendation; exact duplicates idempotent",
+  "position_source_of_truth": "opening positions plus non-void BUY minus non-void SELL",
+  "recommendation_fill_atomicity": true,
+  "schema_version": "STAGE5D2_SCHEMA_V1",
+  "tax_accounting": false
+}
