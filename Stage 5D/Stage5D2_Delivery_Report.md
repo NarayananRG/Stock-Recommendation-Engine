@@ -1,9 +1,9 @@
-# Stage 5D.2 / 5D.2A Delivery Report
+# Stage 5D.2 / 5D.2A / 5D.2B Delivery Report
 
 ## Delivery identity
 
 - Branch: `stage5d2-persistent-ledger`
-- Verified Stage 5D.2A implementation commit: `9c9f29b6d0361d418e19eb7ab63faa5349431d86`
+- Verified Stage 5D.2B implementation commit: `2ac889f69910033ad00feb3f5a76f3f37885edba`
 - Frozen Stage 5D.1 base tag: `stage5d1-portfolio-allocator-baseline`
 - Frozen Stage 5D.1 base commit: `de3b80c5c494a11c1dde7b4abc39481a7493f108`
 - Schema version: `STAGE5D2_SCHEMA_V1`
@@ -49,12 +49,19 @@ Tables created:
 - Typed-column integrity binding: all eight canonical evidence tables verify hashes and typed query columns against canonical payloads, identities, dates, quantities, money, and lineage.
 - Allocation child consistency: stored counts, actionable counts, embedded recommendation evidence, IDs, hashes, and child rows must agree; missing child evidence fails integrity and idempotent re-persistence.
 - Outcome input validation: only known fields, strict booleans, canonical entry dates, nonnegative integer session counts, finite decimals, and non-empty methodology versions are accepted.
+- Protected event fields: caller payloads cannot supply or override `recommendation_id`, `event_type`, or `effective_date`. System lifecycle events require dedicated APIs.
+- Custom pending quantity: an explicit reserved quantity is authoritative and cannot expand to the original recommendation quantity after partial fills. Fills above the explicit remaining reservation are rejected.
+- Fill void reconciliation: current lifecycle state is derived from non-void recommendation-fill BUY transactions. Historical `PARTIALLY_FILLED` and `FILLED` events remain immutable and queryable.
+- Corrected fills: voiding a fill restores its reserved quantity and removes execution-derived `FILLED` terminal state, permitting a corrected fill under a new idempotency key.
+- Independent terminal intent: `CANCELLED`, `DECLINED`, and `EXPIRED` remain terminal after a fill void and cannot be reopened by execution correction.
+- Fill lineage: new fill events store both `transaction_id` and `transaction_idempotency_key`; integrity checks bind event, transaction, recommendation, ticker, Signal ID, date, and non-void effective quantity.
+- Legacy fill lineage: pre-5D.2B `FILL_EVENT:<transaction-idempotency-key>` evidence is resolved without mutation.
 - Recommendation, lifecycle intent, user execution, derived position state, and engine outcome remain separate entities.
 - Current market prices are caller-supplied. No live-price download occurs.
 
 ## Verification
 
-- Stage 5D.2/5D.2A tests: **103 PASS / 0 FAIL**
+- Stage 5D.2/5D.2A/5D.2B tests: **129 PASS / 0 FAIL**
 - Frozen Stage 5D.1 regression: **80 PASS / 0 FAIL**
 - Standalone transaction reopen durability: **PASS**
 - Backdated chronology safety: **PASS**
@@ -64,6 +71,14 @@ Tables created:
 - Typed-column integrity binding: **PASS**
 - Allocation child consistency: **PASS**
 - Outcome validation: **PASS**
+- Protected event fields: **PASS**
+- Custom pending quantity: **PASS**
+- Fill-above-reservation rejection: **PASS**
+- Partial-fill void reconciliation: **PASS**
+- Full-fill void reconciliation: **PASS**
+- Corrected fill after void: **PASS**
+- Fill transaction/event lineage: **PASS**
+- Lifecycle integrity checks: **PASS**
 - Stage 4A.3 changed files: **0**
 - Stage 2.2.2 changed files: **0**
 - Stage 2B.1 changed files: **0**
@@ -74,4 +89,4 @@ Tables created:
 - Automatic trade execution: **NO**
 - Stage 5D.3 daily position monitor implemented: **NO**
 
-Stage 5D.2A hardening is complete and stops here for the final independent Stage 5D.2 freeze audit.
+Stage 5D.2B final lifecycle hardening is complete and stops here for the final independent Stage 5D.2 freeze audit.
