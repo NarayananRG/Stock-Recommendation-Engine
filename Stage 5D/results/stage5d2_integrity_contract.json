@@ -13,6 +13,19 @@
   "contract": "STAGE5D2_INTEGRITY_CONTRACT_V1",
   "cost_basis_method": "WEIGHTED_AVERAGE_NON_TAX_COST_BASIS",
   "custom_pending_price_basis_preserved": true,
+  "custom_reserved_quantity": "AUTHORITATIVE_INTENDED_QUANTITY; FILLS_CANNOT_EXPAND_OR_EXCEED_IT",
+  "event_protected_fields": [
+    "recommendation_id",
+    "event_type",
+    "effective_date"
+  ],
+  "fill_event_transaction_lineage_fields": [
+    "transaction_id",
+    "transaction_idempotency_key"
+  ],
+  "fill_void_reconciliation": "CURRENT_STATE_DERIVED_FROM_NON_VOID_EXPLICITLY_LINKED_FILL_TRANSACTIONS; HISTORICAL_EVENTS_RETAINED",
+  "filled_terminal_semantics": "EFFECTIVE_ONLY_WHILE_NON_VOID_LINKED_FILL_QUANTITY_SATISFIES_INTENDED_QUANTITY",
+  "generic_event_api_restriction": "PROPOSED_PENDING_ENTRY_PARTIALLY_FILLED_FILLED_REQUIRE_DEDICATED_API",
   "hash": "SHA256",
   "immutable_entities": [
     "allocation_runs",
@@ -27,11 +40,16 @@
     "typed-column-to-payload binding",
     "derived identities",
     "recommendation lineage",
+    "fill event transaction lineage",
+    "effective non-void fill quantities",
+    "active pending quantity bounds",
+    "effective FILLED non-void support",
     "allocation child counts and embedded evidence",
     "nonnegative chronological positions",
     "single effective void",
     "outcome version continuity"
   ],
+  "legacy_fill_lineage_compatibility": "PRE_5D2B FILL_EVENT:<transaction_idempotency_key> EVENTS ARE RESOLVED WITHOUT MUTATION",
   "ml_user_facing_influence": false,
   "one_effective_void_per_transaction": true,
   "outcome_input_validation": "ALLOWLISTED_FIELDS_CANONICAL_DATES_STRICT_BOOLEANS_NONNEGATIVE_SESSION_COUNTS_FINITE_DECIMALS",

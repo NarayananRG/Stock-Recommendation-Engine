@@ -288,6 +288,12 @@ class Stage5DLedger:
     def append_recommendation_event(self, recommendation_id: str, event_type: str, effective_date: Any, payload: Mapping[str, Any], idempotency_key: str) -> OperationResult:
         if self.get_recommendation(recommendation_id) is None:
             raise ValueError(f"Unknown recommendation: {recommendation_id}")
+        protected = {"recommendation_id", "event_type", "effective_date"}
+        supplied_protected = protected.intersection(payload)
+        if supplied_protected:
+            raise ValueError(f"Caller payload cannot contain protected event fields: {sorted(supplied_protected)}")
+        if event_type in {"PROPOSED", "PENDING_ENTRY", "PARTIALLY_FILLED", "FILLED"}:
+            raise ValueError(f"{event_type} must be recorded through its dedicated lifecycle API")
         normalized_payload = {"recommendation_id": recommendation_id, "event_type": event_type, "effective_date": canonical_date(effective_date, "effective_date"), **dict(payload)}
         with self.connection:
             return self._insert_event(recommendation_id, event_type, normalized_payload["effective_date"], normalized_payload, idempotency_key)
@@ -305,19 +311,27 @@ class Stage5DLedger:
             raise ValueError(f"Unknown recommendation: {recommendation_id}")
         if recommendation["portfolio_action_status"] != "ACTIONABLE_BUY":
             raise ValueError("Only ACTIONABLE_BUY recommendations can become pending entries")
-        _, terminal = self._active_pending_state(recommendation_id)
+        state = self._recommendation_lifecycle_state(recommendation_id)
+        terminal = bool(state["terminal"])
         if terminal:
             raise ValueError("Terminal recommendation lifecycle cannot be reactivated as pending")
-        quantity = whole_share_quantity(reserved_quantity if reserved_quantity is not None else recommendation["recommended_quantity"])
-        if quantity > int(recommendation["recommended_quantity"]):
-            raise ValueError("Reserved quantity exceeds recommended quantity")
+        active_fill_quantity = int(state["active_fill_quantity"])
+        maximum_remaining = int(recommendation["recommended_quantity"]) - active_fill_quantity
+        quantity = whole_share_quantity(reserved_quantity if reserved_quantity is not None else maximum_remaining)
+        if quantity > maximum_remaining:
+            raise ValueError("Reserved quantity exceeds remaining recommended quantity")
         price = _money(reservation_price_basis if reservation_price_basis is not None else recommendation["sizing_entry_price"], "reservation_price_basis", positive=True)
         payload = {
             "ticker": recommendation["ticker"], "reserved_quantity": quantity,
+            "filled_quantity_at_reservation": active_fill_quantity,
+            "intended_quantity": active_fill_quantity + quantity,
             "reservation_price_basis": price, "reserved_capital_inr": price * quantity,
             "source_recommendation_id": recommendation_id, "source_signal_id": recommendation["signal_id"],
         }
-        return self.append_recommendation_event(recommendation_id, "PENDING_ENTRY", effective_date, payload, idempotency_key)
+        normalized_date = canonical_date(effective_date, "effective_date")
+        normalized_payload = {"recommendation_id": recommendation_id, "event_type": "PENDING_ENTRY", "effective_date": normalized_date, **payload}
+        with self.connection:
+            return self._insert_event(recommendation_id, "PENDING_ENTRY", normalized_date, normalized_payload, idempotency_key)
 
     def mark_declined(self, recommendation_id: str, effective_date: Any, *, idempotency_key: str, reason: str | None = None) -> OperationResult:
         return self.append_recommendation_event(recommendation_id, "DECLINED", effective_date, {"reason": reason}, idempotency_key)
@@ -328,23 +342,79 @@ class Stage5DLedger:
     def mark_expired(self, recommendation_id: str, effective_date: Any, *, idempotency_key: str, reason: str | None = None) -> OperationResult:
         return self.append_recommendation_event(recommendation_id, "EXPIRED", effective_date, {"reason": reason}, idempotency_key)
 
-    def _active_pending_state(self, recommendation_id: str) -> tuple[dict[str, Any] | None, bool]:
-        active: dict[str, Any] | None = None
-        terminal = False
+    def _fill_event_lineage(self, recommendation_id: str) -> tuple[dict[str, Any], ...]:
+        lineage: list[dict[str, Any]] = []
         for event in self.recommendation_event_history(recommendation_id):
-            event_type = event["event_type"]
-            if event_type == "PENDING_ENTRY":
-                if terminal:
-                    raise ValueError(f"Invalid pending reactivation found for terminal recommendation {recommendation_id}")
-                active = event["payload"]
-            elif event_type == "PARTIALLY_FILLED":
-                if terminal:
-                    raise ValueError(f"Invalid partial fill found after terminal recommendation {recommendation_id}")
-                active = {**(active or {}), **event["payload"]}
-            elif event_type in {"FILLED", "CANCELLED", "EXPIRED", "DECLINED"}:
-                active = None
-                terminal = True
-        return active, terminal
+            if event["event_type"] not in {"PARTIALLY_FILLED", "FILLED"}:
+                continue
+            payload = event["payload"]
+            transaction_id = payload.get("transaction_id")
+            transaction_key = payload.get("transaction_idempotency_key")
+            transaction = None
+            legacy_lineage = False
+            if transaction_id is not None:
+                transaction = self.connection.execute("SELECT * FROM user_transactions WHERE transaction_id=?", (str(transaction_id),)).fetchone()
+            elif transaction_key is not None:
+                transaction = self.connection.execute("SELECT * FROM user_transactions WHERE idempotency_key=?", (str(transaction_key),)).fetchone()
+            elif str(event["idempotency_key"]).startswith("FILL_EVENT:"):
+                transaction_key = str(event["idempotency_key"]).split(":", 1)[1]
+                transaction = self.connection.execute("SELECT * FROM user_transactions WHERE idempotency_key=?", (transaction_key,)).fetchone()
+                legacy_lineage = True
+            voided = bool(transaction is not None and self.connection.execute("SELECT 1 FROM transaction_voids WHERE transaction_id=?", (transaction["transaction_id"],)).fetchone())
+            lineage.append({"event": event, "payload": payload, "transaction": transaction, "voided": voided, "legacy_lineage": legacy_lineage})
+        return tuple(lineage)
+
+    def _effective_fill_quantity(self, recommendation_id: str) -> int:
+        seen: set[str] = set()
+        quantity = 0
+        for item in self._fill_event_lineage(recommendation_id):
+            transaction = item["transaction"]
+            if transaction is None or item["voided"] or transaction["transaction_id"] in seen:
+                continue
+            if transaction["recommendation_id"] == recommendation_id and transaction["side"] == "BUY":
+                seen.add(transaction["transaction_id"])
+                quantity += int(transaction["quantity"])
+        return quantity
+
+    def _recommendation_lifecycle_state(self, recommendation_id: str) -> dict[str, Any]:
+        recommendation = self.get_recommendation(recommendation_id)
+        if recommendation is None:
+            raise ValueError(f"Unknown recommendation: {recommendation_id}")
+        history = self.recommendation_event_history(recommendation_id)
+        user_terminal = any(event["event_type"] in {"DECLINED", "CANCELLED", "EXPIRED"} for event in history)
+        latest_pending = next((event["payload"] for event in reversed(history) if event["event_type"] == "PENDING_ENTRY"), None)
+        fill_history_exists = any(event["event_type"] in {"PARTIALLY_FILLED", "FILLED"} for event in history)
+        active_fill_quantity = self._effective_fill_quantity(recommendation_id)
+        intended_quantity: int | None = None
+        reservation_price_basis: Any | None = None
+        if latest_pending is not None:
+            filled_at_reservation = int(latest_pending.get("filled_quantity_at_reservation", 0))
+            intended_quantity = int(latest_pending.get("intended_quantity", filled_at_reservation + int(latest_pending["reserved_quantity"])))
+            reservation_price_basis = latest_pending["reservation_price_basis"]
+        elif fill_history_exists:
+            intended_quantity = int(recommendation["recommended_quantity"])
+            reservation_price_basis = recommendation["sizing_entry_price"]
+        effective_filled = intended_quantity is not None and active_fill_quantity >= intended_quantity
+        remaining_quantity = 0 if intended_quantity is None else max(0, intended_quantity - active_fill_quantity)
+        active_pending = None
+        if not user_terminal and intended_quantity is not None and remaining_quantity > 0:
+            active_pending = {
+                "ticker": recommendation["ticker"], "reserved_quantity": intended_quantity,
+                "intended_quantity": intended_quantity, "remaining_quantity": remaining_quantity,
+                "reservation_price_basis": reservation_price_basis,
+                "reserved_capital_inr": Decimal(str(reservation_price_basis)) * remaining_quantity,
+                "source_recommendation_id": recommendation_id, "source_signal_id": recommendation["signal_id"],
+            }
+        return {
+            "recommendation": recommendation, "active_fill_quantity": active_fill_quantity,
+            "intended_quantity": intended_quantity, "remaining_quantity": remaining_quantity,
+            "active_pending": active_pending, "user_terminal": user_terminal,
+            "effective_filled": effective_filled, "terminal": user_terminal or effective_filled,
+        }
+
+    def _active_pending_state(self, recommendation_id: str) -> tuple[dict[str, Any] | None, bool]:
+        state = self._recommendation_lifecycle_state(recommendation_id)
+        return state["active_pending"], bool(state["terminal"])
 
     def get_active_pending_reservations(self) -> tuple[PendingEntryReservation, ...]:
         recommendation_ids = [row[0] for row in self.connection.execute("SELECT DISTINCT recommendation_id FROM recommendation_events")]
@@ -510,13 +580,18 @@ class Stage5DLedger:
             raise ValueError(f"Unknown recommendation: {recommendation_id}")
         if recommendation["portfolio_action_status"] != "ACTIONABLE_BUY":
             raise ValueError("Recommendation is not ACTIONABLE_BUY")
-        active_pending, terminal = self._active_pending_state(recommendation_id)
+        lifecycle = self._recommendation_lifecycle_state(recommendation_id)
+        active_pending = lifecycle["active_pending"]
+        terminal = bool(lifecycle["terminal"])
         known_fill = self.connection.execute("SELECT transaction_id FROM user_transactions WHERE idempotency_key=?", (idempotency_key,)).fetchone()
         if terminal and known_fill is None:
             raise ValueError("Cannot record a fill after a terminal recommendation lifecycle event")
         checked_quantity = whole_share_quantity(quantity)
-        already_filled = self.connection.execute("""SELECT COALESCE(SUM(t.quantity),0) FROM user_transactions t LEFT JOIN transaction_voids v ON v.transaction_id=t.transaction_id WHERE t.recommendation_id=? AND t.side='BUY' AND v.void_id IS NULL""", (recommendation_id,)).fetchone()[0]
-        remaining_before = int(recommendation["recommended_quantity"]) - int(already_filled)
+        active_fill_quantity = int(lifecycle["active_fill_quantity"])
+        intended_quantity = lifecycle["intended_quantity"]
+        if intended_quantity is None:
+            intended_quantity = int(recommendation["recommended_quantity"])
+        remaining_before = int(intended_quantity) - active_fill_quantity
         existing = known_fill
         if existing is None and checked_quantity > remaining_before:
             raise ValueError("Fill quantity exceeds still-unfilled intended quantity")
@@ -536,7 +611,8 @@ class Stage5DLedger:
         try:
             with self.connection:
                 tx_result = self._append_transaction_no_commit(ticker=recommendation["ticker"], trade_date=normalized_date, side="BUY", quantity=checked_quantity, price_inr=actual_price, fees_inr=fees, idempotency_key=idempotency_key, recommendation_id=recommendation_id, signal_id=recommendation["signal_id"])
-                remaining_after = max(0, remaining_before - checked_quantity) if tx_result.status == "CREATED" else max(0, int(recommendation["recommended_quantity"]) - int(already_filled))
+                active_fill_after = active_fill_quantity + checked_quantity
+                remaining_after = max(0, int(intended_quantity) - active_fill_after)
                 event_type = "FILLED" if remaining_after == 0 else "PARTIALLY_FILLED"
                 reservation_basis = (
                     active_pending.get("reservation_price_basis")
@@ -546,10 +622,13 @@ class Stage5DLedger:
                 payload = {
                     "recommendation_id": recommendation_id, "event_type": event_type,
                     "effective_date": normalized_date, "filled_quantity": checked_quantity,
-                    "remaining_quantity": remaining_after, "reserved_quantity": int(recommendation["recommended_quantity"]),
+                    "active_fill_quantity_after": active_fill_after,
+                    "remaining_quantity": remaining_after, "reserved_quantity": int(intended_quantity),
+                    "intended_quantity": int(intended_quantity),
                     "ticker": recommendation["ticker"], "reservation_price_basis": reservation_basis,
                     "reserved_capital_inr": Decimal(str(reservation_basis)) * remaining_after,
                     "source_recommendation_id": recommendation_id, "source_signal_id": recommendation["signal_id"],
+                    "transaction_id": tx_result.identity, "transaction_idempotency_key": idempotency_key,
                 }
                 self._insert_event(recommendation_id, event_type, normalized_date, payload, event_key)
         except sqlite3.IntegrityError as exc:
@@ -820,6 +899,86 @@ class Stage5DLedger:
                 transaction_lineage = False
                 issues.append(f"recommendation lineage mismatch in transaction {row[0]}")
         checks["transaction_recommendation_lineage"] = transaction_lineage
+        fill_lineage_valid = True
+        fill_quantity_valid = True
+        pending_bounds_valid = True
+        effective_filled_valid = True
+        recommendation_ids = [row[0] for row in self.connection.execute("SELECT recommendation_id FROM recommendations")]
+        for recommendation_id in recommendation_ids:
+            recommendation = self.get_recommendation(recommendation_id)
+            assert recommendation is not None
+            lineage = self._fill_event_lineage(recommendation_id)
+            seen_fill_transactions: set[str] = set()
+            independently_summed_quantity = 0
+            for item in lineage:
+                payload = item["payload"]
+                transaction = item["transaction"]
+                event = item["event"]
+                explicit_linkage_matches = bool(
+                    transaction is not None
+                    and payload.get("transaction_id") == transaction["transaction_id"]
+                    and payload.get("transaction_idempotency_key") == transaction["idempotency_key"]
+                )
+                legacy_linkage_matches = bool(
+                    transaction is not None
+                    and item["legacy_lineage"]
+                    and payload.get("transaction_id") is None
+                    and payload.get("transaction_idempotency_key") is None
+                    and event["idempotency_key"] == f"FILL_EVENT:{transaction['idempotency_key']}"
+                )
+                if (
+                    transaction is None
+                    or payload.get("recommendation_id") != recommendation_id
+                    or payload.get("source_recommendation_id") != recommendation_id
+                    or payload.get("ticker") != recommendation["ticker"]
+                    or payload.get("source_signal_id") != recommendation["signal_id"]
+                    or not (explicit_linkage_matches or legacy_linkage_matches)
+                    or transaction["recommendation_id"] != recommendation_id
+                    or transaction["ticker"] != recommendation["ticker"]
+                    or transaction["signal_id"] != recommendation["signal_id"]
+                    or transaction["side"] != "BUY"
+                    or transaction["transaction_id"] in seen_fill_transactions
+                    or event["effective_date"] != transaction["trade_date"]
+                ):
+                    fill_lineage_valid = False
+                    issues.append(f"fill event transaction lineage mismatch for {recommendation_id}")
+                    continue
+                seen_fill_transactions.add(transaction["transaction_id"])
+                if not item["voided"]:
+                    independently_summed_quantity += int(transaction["quantity"])
+            try:
+                lifecycle = self._recommendation_lifecycle_state(recommendation_id)
+            except (ValueError, KeyError, TypeError, ArithmeticError) as exc:
+                fill_quantity_valid = pending_bounds_valid = effective_filled_valid = False
+                issues.append(f"invalid lifecycle state for {recommendation_id}: {exc}")
+                continue
+            if int(lifecycle["active_fill_quantity"]) != independently_summed_quantity:
+                fill_quantity_valid = False
+                issues.append(f"effective fill quantity mismatch for {recommendation_id}")
+            intended = lifecycle["intended_quantity"]
+            active_pending = lifecycle["active_pending"]
+            if intended is not None and (
+                int(intended) > int(recommendation["recommended_quantity"])
+                or int(lifecycle["active_fill_quantity"]) > int(intended)
+                or int(lifecycle["remaining_quantity"]) != max(0, int(intended) - int(lifecycle["active_fill_quantity"]))
+            ):
+                pending_bounds_valid = False
+                issues.append(f"pending or fill quantity exceeds intended quantity for {recommendation_id}")
+            if active_pending is not None and (
+                int(active_pending["remaining_quantity"]) <= 0
+                or int(active_pending["remaining_quantity"]) > int(active_pending["intended_quantity"])
+                or Decimal(str(active_pending["reserved_capital_inr"]))
+                != Decimal(str(active_pending["reservation_price_basis"])) * int(active_pending["remaining_quantity"])
+            ):
+                pending_bounds_valid = False
+                issues.append(f"active pending reservation is inconsistent for {recommendation_id}")
+            if lifecycle["effective_filled"] and (independently_summed_quantity <= 0 or intended is None or independently_summed_quantity < int(intended)):
+                effective_filled_valid = False
+                issues.append(f"effective FILLED state lacks sufficient non-void fill support for {recommendation_id}")
+        checks["fill_event_transaction_lineage"] = fill_lineage_valid
+        checks["effective_fill_quantity_consistency"] = fill_quantity_valid
+        checks["active_pending_quantity_bounds"] = pending_bounds_valid
+        checks["effective_filled_nonvoid_support"] = effective_filled_valid
         snapshot_lineage = True
         for row in self.connection.execute("""SELECT s.snapshot_id,s.ticker,s.source_signal_id,r.ticker,r.signal_id FROM position_state_snapshots s JOIN recommendations r ON r.recommendation_id=s.source_recommendation_id WHERE s.source_recommendation_id IS NOT NULL"""):
             if row[1] != row[3] or (row[2] is not None and row[2] != row[4]):

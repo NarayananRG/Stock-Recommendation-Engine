@@ -1,11 +1,12 @@
 {
   "engine": "SQLite via Python standard-library sqlite3",
   "foreign_keys": true,
-  "hardening_implementation": "Python transaction ownership, unified chronological replay, and integrity validation",
+  "hardening_implementation": "Python transaction ownership, unified chronological replay, lifecycle derivation, and integrity validation",
   "journal_mode_file_backed": "WAL",
   "money_storage": "canonical decimal strings",
   "runtime_database": "Stage 5D/data/stage5d.sqlite3 (gitignored)",
   "schema_change_for_stage5d2a": false,
+  "schema_change_for_stage5d2b": false,
   "schema_version": "STAGE5D2_SCHEMA_V1",
   "tables": [
     "ledger_meta",

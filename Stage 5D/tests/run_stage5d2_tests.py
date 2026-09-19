@@ -16,7 +16,7 @@ sys.path.insert(0, str(ROOT))
 
 from stage5d.allocator import AllocationResult, allocate_candidates
 from stage5d.horizon import HorizonPreference
-from stage5d.ledger import COST_BASIS_METHOD, Stage5DLedger, payload_sha256
+from stage5d.ledger import COST_BASIS_METHOD, Stage5DLedger, canonical_json, payload_sha256
 from stage5d.ledger_schema import SCHEMA_VERSION, TABLES
 from stage5d.portfolio_state import OpenPosition
 from stage5d.user_profile import InvestmentProfile
@@ -359,6 +359,90 @@ def main() -> int:
     check(102, "ML user-facing influence remains NO", allocate_candidates(profile(), [], [base_candidate]) == allocate_candidates(profile(), [], [ml_candidate]))
     check(103, "no runtime SQLite DB tracked by Git after hardening", not any(item.endswith((".sqlite3", ".sqlite3-wal", ".sqlite3-shm")) for item in tracked))
 
+    with tempfile.TemporaryDirectory() as tmp:
+        ledger = Stage5DLedger(Path(tmp) / "lifecycle-final.sqlite3")
+        protected_result = allocation("PROTECT.NS"); ledger.persist_allocation_result(protected_result)
+        protected_rec = str(protected_result.recommendations[0]["recommendation_id"])
+        check(104, "caller cannot override event recommendation_id", raises(lambda: ledger.append_recommendation_event(protected_rec, "DECLINED", "2026-09-15", {"recommendation_id": "OTHER"}, "protected-rec"), "protected"))
+        check(105, "caller cannot override event_type", raises(lambda: ledger.append_recommendation_event(protected_rec, "DECLINED", "2026-09-15", {"event_type": "FILLED"}, "protected-type"), "protected"))
+        check(106, "caller cannot override effective_date", raises(lambda: ledger.append_recommendation_event(protected_rec, "DECLINED", "2026-09-15", {"effective_date": "1999-01-01"}, "protected-date"), "protected"))
+
+        custom = allocation("SMALL.NS"); ledger.persist_allocation_result(custom); custom_rec = str(custom.recommendations[0]["recommendation_id"])
+        ledger.mark_pending(custom_rec, "2026-09-14", reserved_quantity=20, reservation_price_basis=95, idempotency_key="small-pending")
+        ledger.record_recommendation_fill(custom_rec, "2026-09-15", 10, 96, 0, "small-fill-10")
+        small_reservation = [item for item in ledger.get_active_pending_reservations() if item.source_recommendation_id == custom_rec][0]
+        check(107, "custom reserved quantity 20 then fill 10 leaves 10 pending", small_reservation.reserved_capital_inr == Decimal("950"))
+        small_state = ledger._recommendation_lifecycle_state(custom_rec)
+        check(108, "custom reserved quantity never expands after partial fill", small_state["intended_quantity"] == 20 and small_state["remaining_quantity"] == 10)
+        check(109, "fill greater than explicit remaining reservation rejected", raises(lambda: ledger.record_recommendation_fill(custom_rec, "2026-09-16", 11, 96, 0, "small-overfill"), "exceeds"))
+        ledger.record_recommendation_fill(custom_rec, "2026-09-16", 10, 96, 0, "small-fill-rest")
+        check(110, "full fill of explicit smaller reservation clears that reservation", all(item.source_recommendation_id != custom_rec for item in ledger.get_active_pending_reservations()) and ledger._recommendation_lifecycle_state(custom_rec)["effective_filled"])
+
+        partial = allocation("VOIDPART.NS"); ledger.persist_allocation_result(partial); partial_rec = str(partial.recommendations[0]["recommendation_id"])
+        ledger.mark_pending(partial_rec, "2026-09-14", reserved_quantity=20, reservation_price_basis=95, idempotency_key="voidpart-pending")
+        partial_fill = ledger.record_recommendation_fill(partial_rec, "2026-09-15", 10, 96, 0, "voidpart-fill")
+        ledger.void_transaction(partial_fill.identity, idempotency_key="voidpart-void", reason="incorrect fill")
+        restored = ledger._recommendation_lifecycle_state(partial_rec)
+        check(111, "void partial recommendation fill restores its reserved quantity", restored["active_fill_quantity"] == 0 and restored["remaining_quantity"] == 20)
+        corrected_partial = ledger.record_recommendation_fill(partial_rec, "2026-09-16", 10, 97, 0, "voidpart-corrected")
+        check(112, "corrected partial fill can be recorded after void", corrected_partial.status == "CREATED" and ledger._recommendation_lifecycle_state(partial_rec)["remaining_quantity"] == 10)
+
+        full = allocation("VOIDFULL.NS"); ledger.persist_allocation_result(full); full_rec = str(full.recommendations[0]["recommendation_id"])
+        ledger.mark_pending(full_rec, "2026-09-14", reserved_quantity=20, reservation_price_basis=95, idempotency_key="voidfull-pending")
+        full_fill = ledger.record_recommendation_fill(full_rec, "2026-09-15", 20, 96, 0, "voidfull-fill")
+        ledger.void_transaction(full_fill.identity, idempotency_key="voidfull-void", reason="incorrect full fill")
+        full_state_after_void = ledger._recommendation_lifecycle_state(full_rec)
+        check(113, "void full recommendation fill removes effective FILLED terminal state", not full_state_after_void["effective_filled"] and not full_state_after_void["terminal"] and full_state_after_void["remaining_quantity"] == 20)
+        corrected_full = ledger.record_recommendation_fill(full_rec, "2026-09-16", 20, 97, 0, "voidfull-corrected")
+        check(114, "corrected full fill can be recorded after void", corrected_full.status == "CREATED" and ledger._recommendation_lifecycle_state(full_rec)["effective_filled"])
+        historical_types = [event["event_type"] for event in ledger.recommendation_event_history(full_rec)]
+        check(115, "voided recommendation fill remains preserved in historical evidence", historical_types.count("FILLED") == 2 and len(ledger.transaction_void_history(full_fill.identity)) == 1)
+
+        terminal_checks: dict[str, bool] = {}
+        for terminal_type, ticker in (("CANCELLED", "VCANCEL.NS"), ("DECLINED", "VDECLINE.NS"), ("EXPIRED", "VEXPIRE.NS")):
+            result = allocation(ticker); ledger.persist_allocation_result(result); recommendation_id = str(result.recommendations[0]["recommendation_id"])
+            ledger.mark_pending(recommendation_id, "2026-09-14", reserved_quantity=20, idempotency_key=f"{terminal_type}-pending")
+            fill = ledger.record_recommendation_fill(recommendation_id, "2026-09-15", 10, 100, 0, f"{terminal_type}-fill")
+            if terminal_type == "CANCELLED": ledger.mark_cancelled(recommendation_id, "2026-09-16", idempotency_key=f"{terminal_type}-terminal")
+            elif terminal_type == "DECLINED": ledger.mark_declined(recommendation_id, "2026-09-16", idempotency_key=f"{terminal_type}-terminal")
+            else: ledger.mark_expired(recommendation_id, "2026-09-16", idempotency_key=f"{terminal_type}-terminal")
+            ledger.void_transaction(fill.identity, idempotency_key=f"{terminal_type}-void", reason="void after independent terminal")
+            state = ledger._recommendation_lifecycle_state(recommendation_id)
+            terminal_checks[terminal_type] = state["terminal"] and state["active_pending"] is None and raises(lambda recommendation_id=recommendation_id, terminal_type=terminal_type: ledger.record_recommendation_fill(recommendation_id, "2026-09-17", 10, 100, 0, f"{terminal_type}-corrected"), "terminal")
+        check(116, "independently CANCELLED recommendation does not reopen after fill void", terminal_checks["CANCELLED"])
+        check(117, "independently DECLINED recommendation does not reopen after fill void", terminal_checks["DECLINED"])
+        check(118, "independently EXPIRED recommendation does not reopen after fill void", terminal_checks["EXPIRED"])
+
+        corrected_event = [event for event in ledger.recommendation_event_history(full_rec) if event["payload"].get("transaction_id") == corrected_full.identity][0]
+        corrected_transaction = [item for item in ledger.transactions_for_recommendation(full_rec) if item["transaction_id"] == corrected_full.identity][0]
+        check(119, "fill event links to correct transaction", corrected_event["payload"]["transaction_idempotency_key"] == "voidfull-corrected" and corrected_transaction["recommendation_id"] == full_rec)
+        lifecycle_report = ledger.integrity_check()
+        lifecycle_integrity_pass = lifecycle_report["checks"]["fill_event_transaction_lineage"] and lifecycle_report["checks"]["effective_fill_quantity_consistency"] and lifecycle_report["checks"]["active_pending_quantity_bounds"] and lifecycle_report["checks"]["effective_filled_nonvoid_support"]
+        check(121, "voided fill does not count toward effective active fill quantity", ledger._recommendation_lifecycle_state(partial_rec)["active_fill_quantity"] == 10 and lifecycle_report["checks"]["effective_fill_quantity_consistency"])
+        check(122, "stale FILLED state based only on voided transaction detected", not full_state_after_void["effective_filled"] and full_state_after_void["active_fill_quantity"] == 0 and lifecycle_integrity_pass)
+        ledger.close()
+
+    with tempfile.TemporaryDirectory() as tmp:
+        ledger = Stage5DLedger(Path(tmp) / "wrong-fill-link.sqlite3")
+        result = allocation("BADLINK.NS"); ledger.persist_allocation_result(result); rec_id = str(result.recommendations[0]["recommendation_id"])
+        fill = ledger.record_recommendation_fill(rec_id, "2026-09-15", 10, 100, 0, "badlink-fill")
+        other = ledger.append_transaction(ticker="BADLINK.NS", trade_date="2026-09-15", side="BUY", quantity=1, price_inr=100, recommendation_id=rec_id, idempotency_key="badlink-other")
+        event_row = ledger.connection.execute("SELECT event_id,payload_json FROM recommendation_events WHERE idempotency_key='FILL_EVENT:badlink-fill'").fetchone()
+        bad_payload = json.loads(event_row["payload_json"]); bad_payload["transaction_id"] = other.identity
+        bad_json = canonical_json(bad_payload)
+        with ledger.connection:
+            ledger.connection.execute("UPDATE recommendation_events SET payload_json=?,payload_sha256=? WHERE event_id=?", (bad_json, payload_sha256(bad_json), event_row["event_id"]))
+        check(120, "wrong fill-event transaction linkage detected by integrity check", not ledger.integrity_check()["checks"]["fill_event_transaction_lineage"])
+        ledger.close()
+
+    check(123, "Stage 4A.3 changes = 0 after final lifecycle hardening", changed_4a3 == "", changed_4a3)
+    check(124, "Stage 2.2.2 changes = 0 after final lifecycle hardening", changed_222 == "", changed_222)
+    check(125, "Stage 2B.1 changes = 0 after final lifecycle hardening", changed_2b1 == "", changed_2b1)
+    check(126, "frozen Stage 5D.1 semantic changes = 0 after final lifecycle hardening", semantic_changes == "", semantic_changes)
+    check(127, "frozen Stage 5D.1 regression = 80/80", regression.returncode == 0 and '"FAIL": 0' in regression.stdout and '"PASS": 80' in regression.stdout, (regression.stdout + regression.stderr).strip())
+    check(128, "ML user-facing influence = NO", allocate_candidates(profile(), [], [base_candidate]) == allocate_candidates(profile(), [], [ml_candidate]))
+    check(129, "no runtime SQLite database tracked after final lifecycle hardening", not any(item.endswith((".sqlite3", ".sqlite3-wal", ".sqlite3-shm")) for item in tracked))
+
     results = ROOT / "results"
     results.mkdir(parents=True, exist_ok=True)
     ordered = sorted(rows, key=lambda row: int(row["Test Number"]))
@@ -370,7 +454,8 @@ def main() -> int:
         "journal_mode_file_backed": "WAL", "foreign_keys": True, "tables": list(TABLES),
         "money_storage": "canonical decimal strings", "runtime_database": "Stage 5D/data/stage5d.sqlite3 (gitignored)",
         "schema_change_for_stage5d2a": False,
-        "hardening_implementation": "Python transaction ownership, unified chronological replay, and integrity validation",
+        "schema_change_for_stage5d2b": False,
+        "hardening_implementation": "Python transaction ownership, unified chronological replay, lifecycle derivation, and integrity validation",
     }
     (results / "stage5d2_schema.json").write_text(json.dumps(schema, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     contract = {
@@ -385,13 +470,20 @@ def main() -> int:
         "void_chronology_safety": "STAGE_VOID_THEN_REPLAY_COMPLETE_HISTORY_OR_ROLLBACK",
         "one_effective_void_per_transaction": True,
         "recommendation_linkage": "TICKER_AND_SIGNAL_ID_MUST_MATCH; OMITTED_SIGNAL_ID_INHERITED",
+        "event_protected_fields": ["recommendation_id", "event_type", "effective_date"],
+        "generic_event_api_restriction": "PROPOSED_PENDING_ENTRY_PARTIALLY_FILLED_FILLED_REQUIRE_DEDICATED_API",
         "pending_terminal_states": ["DECLINED", "CANCELLED", "EXPIRED", "FILLED"],
         "partial_fill_without_pending": "CREATES_REMAINING_RESERVATION_AT_RECOMMENDATION_SIZING_PRICE",
         "custom_pending_price_basis_preserved": True,
+        "custom_reserved_quantity": "AUTHORITATIVE_INTENDED_QUANTITY; FILLS_CANNOT_EXPAND_OR_EXCEED_IT",
+        "fill_void_reconciliation": "CURRENT_STATE_DERIVED_FROM_NON_VOID_EXPLICITLY_LINKED_FILL_TRANSACTIONS; HISTORICAL_EVENTS_RETAINED",
+        "fill_event_transaction_lineage_fields": ["transaction_id", "transaction_idempotency_key"],
+        "legacy_fill_lineage_compatibility": "PRE_5D2B FILL_EVENT:<transaction_idempotency_key> EVENTS ARE RESOLVED WITHOUT MUTATION",
+        "filled_terminal_semantics": "EFFECTIVE_ONLY_WHILE_NON_VOID_LINKED_FILL_QUANTITY_SATISFIES_INTENDED_QUANTITY",
         "position_source_of_truth": "opening positions plus non-void BUY minus non-void SELL",
         "cost_basis_method": COST_BASIS_METHOD, "tax_accounting": False,
         "outcome_versions": "strictly monotonic per recommendation; exact duplicates idempotent",
-        "integrity_checks": ["PRAGMA integrity_check", "PRAGMA foreign_key_check", "payload hashes", "typed-column-to-payload binding", "derived identities", "recommendation lineage", "allocation child counts and embedded evidence", "nonnegative chronological positions", "single effective void", "outcome version continuity"],
+        "integrity_checks": ["PRAGMA integrity_check", "PRAGMA foreign_key_check", "payload hashes", "typed-column-to-payload binding", "derived identities", "recommendation lineage", "fill event transaction lineage", "effective non-void fill quantities", "active pending quantity bounds", "effective FILLED non-void support", "allocation child counts and embedded evidence", "nonnegative chronological positions", "single effective void", "outcome version continuity"],
         "outcome_input_validation": "ALLOWLISTED_FIELDS_CANONICAL_DATES_STRICT_BOOLEANS_NONNEGATIVE_SESSION_COUNTS_FINITE_DECIMALS",
         "broker_integration": False, "automatic_execution": False, "ml_user_facing_influence": False,
     }
