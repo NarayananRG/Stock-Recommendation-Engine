@@ -9,8 +9,10 @@
   "automatic_execution": false,
   "broker_integration": false,
   "canonical_json": "sort_keys=true,separators=(',', ':'),ensure_ascii=false,UTF-8",
+  "chronological_replay": "DATE_ASC_OPENING_BEFORE_TRANSACTION_SAME_DAY_THEN_STABLE_SEQUENCE",
   "contract": "STAGE5D2_INTEGRITY_CONTRACT_V1",
   "cost_basis_method": "WEIGHTED_AVERAGE_NON_TAX_COST_BASIS",
+  "custom_pending_price_basis_preserved": true,
   "hash": "SHA256",
   "immutable_entities": [
     "allocation_runs",
@@ -22,14 +24,31 @@
     "PRAGMA integrity_check",
     "PRAGMA foreign_key_check",
     "payload hashes",
-    "recommendation allocation links",
-    "nonnegative positions",
+    "typed-column-to-payload binding",
+    "derived identities",
+    "recommendation lineage",
+    "allocation child counts and embedded evidence",
+    "nonnegative chronological positions",
+    "single effective void",
     "outcome version continuity"
   ],
   "ml_user_facing_influence": false,
+  "one_effective_void_per_transaction": true,
+  "outcome_input_validation": "ALLOWLISTED_FIELDS_CANONICAL_DATES_STRICT_BOOLEANS_NONNEGATIVE_SESSION_COUNTS_FINITE_DECIMALS",
   "outcome_versions": "strictly monotonic per recommendation; exact duplicates idempotent",
+  "partial_fill_without_pending": "CREATES_REMAINING_RESERVATION_AT_RECOMMENDATION_SIZING_PRICE",
+  "pending_terminal_states": [
+    "DECLINED",
+    "CANCELLED",
+    "EXPIRED",
+    "FILLED"
+  ],
   "position_source_of_truth": "opening positions plus non-void BUY minus non-void SELL",
   "recommendation_fill_atomicity": true,
+  "recommendation_linkage": "TICKER_AND_SIGNAL_ID_MUST_MATCH; OMITTED_SIGNAL_ID_INHERITED",
+  "retroactive_transaction_safety": "INSERT_THEN_REPLAY_COMPLETE_HISTORY_OR_ROLLBACK",
   "schema_version": "STAGE5D2_SCHEMA_V1",
-  "tax_accounting": false
+  "standalone_transaction_durability": "PUBLIC_APPEND_TRANSACTION_OWNS_AND_COMMITS_ATOMIC_TRANSACTION",
+  "tax_accounting": false,
+  "void_chronology_safety": "STAGE_VOID_THEN_REPLAY_COMPLETE_HISTORY_OR_ROLLBACK"
 }
