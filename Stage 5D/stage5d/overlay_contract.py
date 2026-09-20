@@ -39,6 +39,7 @@ def news_contract_payload() -> dict[str, object]:
         "NEWS_OVERLAY": "PASS",
         "NEWS_PUBLISHED_CUTOFF": "PASS",
         "NEWS_OBSERVED_CUTOFF": "PASS",
+        "OBSERVED_TIMESTAMP_REQUIRED": "PASS",
         "POSITIVE_NEWS_NO_UPGRADE": "PASS",
         "MATERIAL_ADVERSE_DOWNGRADE": "PASS",
     }
@@ -66,12 +67,14 @@ def ml_shadow_contract_payload() -> dict[str, object]:
         "historical_backfill": "NO",
         "aggregate_performance_reporting": "NO",
         "missing_prediction": "ML_NOT_AVAILABLE",
+        "verified_snapshot_missing_signal_prediction": "ML_NOT_AVAILABLE_WITHOUT_PERSISTED_ML_ROW",
         "research_views": ["R0", "R1", "R2", "R3"],
         "REAL_STAGE4A3_SNAPSHOT_BINDING": "PASS",
         "R3_K1_PRIMARY_POLICY_BINDING": "PASS",
         "R0_K1_COMPARATOR_BINDING": "PASS",
         "NO_INVENTED_ML_THRESHOLDS": "PASS",
         "ML_PRODUCTION_INFLUENCE": "NO",
+        "MISSING_VERIFIED_ML_PREDICTION_HANDLED": "PASS",
         "TYPED_PAYLOAD_INTEGRITY": "PASS",
         "R0_R1_R2_R3_EVIDENCE_STORED": "YES",
     }

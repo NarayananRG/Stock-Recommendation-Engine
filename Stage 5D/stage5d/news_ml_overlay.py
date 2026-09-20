@@ -15,6 +15,7 @@ from .stage4a3_shadow_adapter import (
     PRIMARY_COMPARATOR,
     PRIMARY_POLICY,
     Stage4A3ShadowAdapter,
+    Stage4A3PredictionNotAvailable,
 )
 
 STAGE5D4_SCHEMA_VERSION = "STAGE5D4_SCHEMA_V2"
@@ -110,7 +111,7 @@ def _probability(value: Any, name: str = "confidence") -> Decimal:
 
 def normalize_news_event(event: Mapping[str, Any]) -> dict[str, Any]:
     published = _utc_timestamp(event.get("published_at_utc"), "published_at_utc")
-    observed = _utc_timestamp(event.get("observed_at_utc", published), "observed_at_utc")
+    observed = _utc_timestamp(event.get("observed_at_utc"), "observed_at_utc")
     if observed < published:
         raise ValueError("observed_at_utc cannot precede published_at_utc")
     category = _required_text(event.get("category"), "category").upper()
@@ -246,8 +247,14 @@ class Stage5D4Overlay:
         self.persist_news_events(supplied)
         eligible = [item for item in map(normalize_news_event, supplied) if item["ticker"] == str(recommendation["ticker"]) and item["published_at_utc"] <= cutoff and item["observed_at_utc"] <= cutoff]
         news = evaluate_news_overlay(str(recommendation["deterministic_signal"]), eligible)
-        ml = self._missing_ml() if ml_snapshot_adapter is None else ml_snapshot_adapter.load_verified_prediction(recommendation, cutoff, ml_snapshot_dir)
-        if ml_snapshot_adapter is not None:
+        if ml_snapshot_adapter is None:
+            ml = self._missing_ml()
+        else:
+            try:
+                ml = ml_snapshot_adapter.load_verified_prediction(recommendation, cutoff, ml_snapshot_dir)
+            except Stage4A3PredictionNotAvailable:
+                ml = self._missing_ml()
+        if ml_snapshot_adapter is not None and ml["ml_prediction_id"] is not None:
             self._persist_ml_prediction(ml)
         views = {
             "R0": {"action": recommendation["deterministic_signal"], "source": "FROZEN_DETERMINISTIC"},

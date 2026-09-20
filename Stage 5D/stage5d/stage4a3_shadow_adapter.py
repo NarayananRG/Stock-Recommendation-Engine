@@ -24,6 +24,10 @@ REQUIRED_SNAPSHOT_FILES = frozenset({
 })
 
 
+class Stage4A3PredictionNotAvailable(ValueError):
+    """A verified snapshot has no prediction row for the requested signal."""
+
+
 def _utc(value: Any, name: str) -> str:
     text = str(value or "").strip()
     if not text:
@@ -181,8 +185,12 @@ class Stage4A3ShadowAdapter:
             raise ValueError("Stage 4A.3 snapshot hash-chain mismatch")
 
         matches = predictions.loc[predictions["Signal ID"].astype(str).eq(signal_id)]
-        if len(matches) != 1:
-            raise ValueError("Stage 4A.3 snapshot must contain one unique matching Signal ID row")
+        if len(matches) == 0:
+            raise Stage4A3PredictionNotAvailable(
+                "Verified Stage 4A.3 snapshot has no matching Signal ID prediction"
+            )
+        if len(matches) > 1:
+            raise ValueError("Stage 4A.3 snapshot contains duplicate matching Signal ID rows")
         row = matches.iloc[0]
         if str(row["Signal Date"]) != signal_date:
             raise ValueError("Stage 4A.3 row signal-date lineage mismatch")
