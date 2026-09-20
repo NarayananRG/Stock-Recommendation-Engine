@@ -4,7 +4,7 @@
 - Commit SHA: the immutable pushed branch-head SHA is reported at delivery
 - Frozen base tag: `stage5d3-daily-position-monitor-baseline`
 - Frozen base commit: `edf48ec2d606b290faab23fae0139d702846f808`
-- Stage 5D.4 schema: `STAGE5D4_SCHEMA_V1`
+- Stage 5D.4 schema: `STAGE5D4_SCHEMA_V2`
 
 ## Scope
 
@@ -24,13 +24,18 @@ No Stage 5D.2 or Stage 5D.3 schema table was changed.
 | Gate | Result |
 |---|---|
 | News overlay | PASS |
-| Point-in-time news cutoff | PASS |
+| NEWS_PUBLISHED_CUTOFF | PASS |
+| NEWS_OBSERVED_CUTOFF | PASS |
 | Positive-news no-upgrade | PASS |
 | Material adverse downgrade | PASS |
 | Conservative multiple-event aggregation | PASS |
 | Immutable news replay/conflict handling | PASS |
-| Stage 4A.3 frozen protocol integration | PASS |
-| ML production influence | NO |
+| REAL_STAGE4A3_SNAPSHOT_BINDING | PASS |
+| R3_K1_PRIMARY_POLICY_BINDING | PASS |
+| R0_K1_COMPARATOR_BINDING | PASS |
+| NO_INVENTED_ML_THRESHOLDS | PASS |
+| ML_PRODUCTION_INFLUENCE | NO |
+| TYPED_PAYLOAD_INTEGRITY | PASS |
 | Model refit | NO |
 | Model training | NO |
 | Historical ML backfill | NO |
@@ -44,9 +49,13 @@ No Stage 5D.2 or Stage 5D.3 schema table was changed.
 
 The official paper decision is the frozen deterministic recommendation plus a conservative news/event risk overlay. Positive news remains visible as supportive context but cannot create or strengthen a BUY. Material MEDIUM adverse evidence produces `REVIEW`; HIGH or CRITICAL adverse evidence produces `WAIT` for BUY candidates. For an existing HOLD, the corresponding severe state is `RISK_HOLD`.
 
-Every included article must have a timezone-aware publication timestamp at or before `decision_cutoff_utc`. The persisted overlay retains event IDs, headlines, sources, timestamps, categories, severities, materiality, deterministic reason codes, and immutable hashes.
+Every included article must have both a timezone-aware publication timestamp and a timezone-aware observation timestamp at or before `decision_cutoff_utc`. An article first observed after a historical cutoff remains immutable evidence but cannot influence that historical overlay. The persisted overlay retains event IDs, headlines, sources, timestamps, categories, severities, materiality, deterministic reason codes, and immutable hashes.
 
-ML input is accepted only when it carries the exact frozen Stage 4A.3 protocol ID, protocol commit, model-bundle hash, and snapshot signal-date/content-hash lineage; passes its prospective eligibility flag; matches recommendation/signal/ticker lineage; and was produced no later than the decision cutoff. ML classifications and experimental `KEEP`/`FILTER`/`PROMOTE` views are stored for research only. `ml_influence` is always `NONE`.
+ML evidence is accepted only through the Stage 5D-owned read-only snapshot adapter. The adapter loads the real seven-file Stage 4A.3 prospective snapshot, invokes the frozen verification utilities, checks the manifest file hashes and byte counts, recomputes the content and chain hashes, binds the exact protocol commit and model bundle, requires one Signal ID match, validates signal date and ticker lineage, and rejects snapshots created after the decision cutoff.
+
+The stored shadow evidence uses the frozen policies exactly: `R3_K1` is primary and `R0_K1` is the comparator. Scores, same-date ranks, and K1 selections are retained without calling the scores calibrated probabilities. `R3_K1_SELECTED`, `R3_K1_NOT_SELECTED`, and `ML_NOT_AVAILABLE` are display states only. The former generic 0.60/0.40 thresholds and caller-supplied prediction dictionaries have been removed. `ml_influence` is always `NONE`.
+
+Integrity checks now include SQLite `PRAGMA integrity_check`, `PRAGMA foreign_key_check`, typed-column-to-canonical-payload binding for all three Stage 5D.4 evidence tables, official-action binding, ML snapshot/rank/selection binding, and both news cutoffs.
 
 ## Research views
 
@@ -61,7 +70,7 @@ Stage 5D.4 does not aggregate prospective win rates, CAGR, or claims of ML effec
 
 | Suite | Result |
 |---|---|
-| Stage 5D.4 | PASS — 80/80 |
+| Stage 5D.4 | PASS — 100/100 |
 | Frozen Stage 5D.3 | PASS — 130/130 |
 | Frozen Stage 5D.2 | PASS — 129/129 |
 | Frozen Stage 5D.1 | PASS — 80/80 |
