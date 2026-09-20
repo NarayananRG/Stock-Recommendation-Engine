@@ -2,12 +2,14 @@ from __future__ import annotations
 
 import csv
 import json
+import shutil
 import subprocess
 import sys
 import tempfile
-from copy import deepcopy
 from decimal import Decimal
 from pathlib import Path
+
+import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
 REPO = ROOT.parent
@@ -30,7 +32,13 @@ from stage5d.news_ml_overlay import (
     normalize_news_event,
 )
 from stage5d.overlay_contract import ml_shadow_contract_payload, news_contract_payload, schema_payload
+from stage5d.stage4a3_shadow_adapter import Stage4A3ShadowAdapter
 from stage5d.user_profile import InvestmentProfile
+
+STAGE4A3_ROOT = REPO / "Stage 4A.3"
+sys.path.insert(0, str(STAGE4A3_ROOT))
+from stage4a3.immutable_ledger import write_snapshot
+from stage4a3.snapshot_contract import PREDICTION_COLUMNS
 
 
 def profile() -> InvestmentProfile:
@@ -54,35 +62,64 @@ def candidate(ticker: str = "AAA.NS", signal: str = "BUY") -> dict[str, object]:
 def news(
     event_id: str = "NEWS_1", *, ticker: str = "AAA.NS", category: str = "REGULATORY",
     sentiment: str = "NEGATIVE", severity: str = "HIGH", materiality: str = "MATERIAL",
-    published: str = "2026-09-14T10:00:00Z",
+    published: str = "2026-09-14T10:00:00Z", observed: str | None = None,
 ) -> dict[str, object]:
     return {
         "event_id": event_id, "ticker": ticker, "headline": f"{category} event {event_id}",
         "source": "TEST_WIRE", "source_url": None, "published_at_utc": published,
-        "observed_at_utc": published, "event_date": published[:10], "category": category,
+        "observed_at_utc": observed or published, "event_date": published[:10], "category": category,
         "sentiment": sentiment, "severity": severity, "materiality": materiality,
         "confidence": "0.90", "summary": f"Explicit {category.lower()} evidence.", "source_hash": None,
     }
 
 
-def ml(rec: dict[str, object], prediction_id: str = "ML_1", probability: str = "0.79", **changes: object) -> dict[str, object]:
-    value: dict[str, object] = {
-        "ml_prediction_id": prediction_id, "recommendation_id": rec["recommendation_id"],
-        "signal_id": rec["signal_id"], "ticker": rec["ticker"],
-        "protocol_id": FROZEN_ML_PROTOCOL_ID, "model_bundle_hash": FROZEN_ML_MODEL_BUNDLE_HASH,
-        "protocol_commit": FROZEN_ML_PROTOCOL_COMMIT, "snapshot_signal_date": rec["signal_date"],
-        "snapshot_content_hash": "a" * 64,
-        "prediction_at_utc": "2026-09-14T15:00:00Z", "probability": probability,
-        "eligibility_status": "ELIGIBLE",
-    }
-    value.update(changes)
-    return value
+def snapshot_fixture(
+    case_root: Path, recommendations: list[dict[str, object]], *,
+    r3_selected: list[bool] | None = None, r0_selected: list[bool] | None = None,
+    created: str = "2026-09-14T15:00:00Z", protocol_commit: str = FROZEN_ML_PROTOCOL_COMMIT,
+    model_bundle_hash: str = FROZEN_ML_MODEL_BUNDLE_HASH, signal_ids: list[str] | None = None,
+    tickers: list[str] | None = None,
+) -> tuple[Stage4A3ShadowAdapter, Path]:
+    selected3 = r3_selected or [True] * len(recommendations)
+    selected0 = r0_selected or [False] * len(recommendations)
+    ids = signal_ids or [str(item["signal_id"]) for item in recommendations]
+    names = tickers or [str(item["ticker"]) for item in recommendations]
+    snapshot_id = "SNAP_" + case_root.name.upper()
+    rows: list[dict[str, object]] = []
+    for index, rec in enumerate(recommendations):
+        row: dict[str, object] = {
+            "Protocol Version": "STAGE4A3A_V1", "Protocol Commit": protocol_commit,
+            "Protocol Tag": "stage4a3-prospective-shadow-protocol-baseline", "Snapshot ID": snapshot_id,
+            "Signal Date": rec["signal_date"], "Snapshot Created UTC": created,
+            "Snapshot Created Asia/Kolkata": "2026-09-14T20:30:00+05:30", "Signal ID": ids[index],
+            "Ticker": names[index], "Original Signal": rec["deterministic_signal"], "Signal": rec["deterministic_signal"],
+            "Setup": "PULLBACK", "Market Regime": "BULLISH", "Trade Quality": "GOOD",
+            "Actionability Score": 85, "Technical Score": 80, "Planned Entry": 100,
+            "Initial Stop": 90, "Original T1": 110, "Original T2": 120, "Dataset Cohort": "BASELINE_PRIMARY",
+            "Feature Row Hash": (str(index + 1) * 64)[:64], "Model Bundle Hash": model_bundle_hash,
+            "Prediction Semantics": "SHADOW_ONLY_NO_TRADING_EFFECT",
+        }
+        for code in range(6):
+            row[f"R{code} Score"] = 0.51 + code * 0.01 + index * 0.001
+            row[f"R{code} Same-Date Rank"] = index + 1
+            row[f"R{code}_K1 Selected"] = selected0[index] if code == 0 else (selected3[index] if code == 3 else False)
+            row[f"R{code}_K2 Selected"] = index < 2
+        rows.append(row)
+    predictions = pd.DataFrame(rows, columns=PREDICTION_COLUMNS)
+    features = pd.DataFrame([{"Signal ID": ids[i], "Ticker": names[i], "Feature Row Hash": rows[i]["Feature Row Hash"]} for i in range(len(rows))])
+    metadata = {"Snapshot ID": snapshot_id, "Snapshot Created UTC": created, "Signal Date": recommendations[0]["signal_date"], "Candidate Count": len(rows)}
+    snapshot_root, audit_root = case_root / "snapshots", case_root / "audit"
+    write_snapshot(snapshot_root, audit_root, str(recommendations[0]["signal_date"]), metadata, predictions, features,
+                   {"source": "TEMP_TEST_FIXTURE"}, "0" * 64, protocol_commit, model_bundle_hash,
+                   candidate_input_manifest={"source": "TEMP_TEST_FIXTURE"})
+    directory = snapshot_root / str(recommendations[0]["signal_date"])[:4] / str(recommendations[0]["signal_date"])
+    return Stage4A3ShadowAdapter(STAGE4A3_ROOT, snapshot_root), directory
 
 
 def raises(call, text: str = "") -> bool:
     try:
         call()
-    except (ValueError, RuntimeError) as exc:
+    except (TypeError, ValueError, RuntimeError) as exc:
         return text.lower() in str(exc).lower()
     return False
 
@@ -177,33 +214,35 @@ def main() -> int:
         event_payload = json.loads(event_row[0])
         check(38, "news source traceability persisted", all(event_payload.get(key) for key in ("event_id","headline","source","published_at_utc","category","severity")))
 
-        with_ml = overlay.evaluate_recommendation_overlay(rec_id, "2026-09-14T16:00:00Z", [], ml(rec))
-        check(39, "ML prediction persisted", ledger.connection.execute("SELECT COUNT(*) FROM stage5d4_ml_predictions WHERE ml_prediction_id='ML_1'").fetchone()[0] == 1)
+        adapter_high, snapshot_high = snapshot_fixture(Path(tmp) / "high", [rec], r3_selected=[True], r0_selected=[False])
+        with_ml = overlay.evaluate_recommendation_overlay(rec_id, "2026-09-14T16:00:00Z", [], adapter_high, snapshot_high)
+        check(39, "verified Stage 4A.3 prediction persisted", ledger.connection.execute("SELECT COUNT(*) FROM stage5d4_ml_predictions").fetchone()[0] == 1)
         missing_ml = overlay.evaluate_recommendation_overlay(rec_id, "2026-09-14T16:01:00Z", [])
         check(40, "ML unavailable handled", missing_ml["ml_shadow_classification"] == "ML_NOT_AVAILABLE" and missing_ml["official_paper_action"] == "BUY")
         high_ml = with_ml
-        low_ml = overlay.evaluate_recommendation_overlay(rec_id, "2026-09-14T16:02:00Z", [], ml(rec, "ML_LOW", "0.10"))
-        check(41, "ML high score cannot change official action", high_ml["official_paper_action"] == high_ml["deterministic_action"] == "BUY")
-        check(42, "ML low score cannot change official action", low_ml["official_paper_action"] == low_ml["deterministic_action"] == "BUY")
+        adapter_low, snapshot_low = snapshot_fixture(Path(tmp) / "low", [rec], r3_selected=[False], r0_selected=[True])
+        low_ml = overlay.evaluate_recommendation_overlay(rec_id, "2026-09-14T16:02:00Z", [], adapter_low, snapshot_low)
+        check(41, "R3_K1 selected cannot change official action", high_ml["official_paper_action"] == high_ml["deterministic_action"] == "BUY")
+        check(42, "R3_K1 not selected cannot change official action", low_ml["official_paper_action"] == low_ml["deterministic_action"] == "BUY")
         check(43, "ML cannot change quantity", high_ml["official_quantity"] == low_ml["official_quantity"] == rec["recommended_quantity"])
         check(44, "ML cannot change stop", Decimal(str(high_ml["official_stop"])) == Decimal(str(low_ml["official_stop"])) == Decimal(str(rec["stop"])))
         check(45, "ML cannot change target", Decimal(str(high_ml["official_target_1"])) == Decimal(str(low_ml["official_target_1"])) == Decimal(str(rec["target_1"])) and Decimal(str(high_ml["official_target_2"])) == Decimal(str(low_ml["official_target_2"])) == Decimal(str(rec["target_2"])))
         check(46, "ML cannot change horizon", high_ml["official_horizon"] == low_ml["official_horizon"] == rec["selected_horizon"])
         check(47, "ML cannot change ranking identity", high_ml["official_ranking_identity"] == low_ml["official_ranking_identity"] == rec["allocation_run_id"])
-        stored_ml = json.loads(ledger.connection.execute("SELECT canonical_payload_json FROM stage5d4_ml_predictions WHERE ml_prediction_id='ML_1'").fetchone()[0])
-        check(48, "frozen Stage 4A.3 identity persisted", high_ml["ml_protocol_id"] == FROZEN_ML_PROTOCOL_ID and stored_ml["model_bundle_hash"] == FROZEN_ML_MODEL_BUNDLE_HASH and stored_ml["protocol_commit"] == FROZEN_ML_PROTOCOL_COMMIT and stored_ml["snapshot_content_hash"] == "a" * 64)
-        wrong_protocol = ml(rec, "ML_BAD", protocol_id="OTHER")
-        check(49, "non-frozen ML protocol rejected", raises(lambda: overlay.evaluate_recommendation_overlay(rec_id, "2026-09-14T16:03:00Z", [], wrong_protocol), "not from the frozen"))
-        future_ml = ml(rec, "ML_FUTURE", prediction_at_utc="2026-09-15T00:00:00Z")
-        check(50, "future ML prediction rejected", raises(lambda: overlay.evaluate_recommendation_overlay(rec_id, "2026-09-14T16:03:00Z", [], future_ml), "later than"))
+        stored_ml = json.loads(ledger.connection.execute("SELECT canonical_payload_json FROM stage5d4_ml_predictions ORDER BY persisted_at_utc LIMIT 1").fetchone()[0])
+        check(48, "frozen Stage 4A.3 identity persisted", high_ml["ml_protocol_id"] == FROZEN_ML_PROTOCOL_ID and stored_ml["model_bundle_hash"] == FROZEN_ML_MODEL_BUNDLE_HASH and stored_ml["protocol_commit"] == FROZEN_ML_PROTOCOL_COMMIT and len(stored_ml["snapshot_content_hash"]) == 64)
+        fake = {"protocol_id": FROZEN_ML_PROTOCOL_ID, "probability": "0.99", "snapshot_content_hash": "a" * 64}
+        check(49, "caller-invented ML dictionary rejected", raises(lambda: overlay.evaluate_recommendation_overlay(rec_id, "2026-09-14T16:03:00Z", [], fake), "Stage4A3ShadowAdapter"))
+        adapter_future, snapshot_future = snapshot_fixture(Path(tmp) / "futureml", [rec], created="2026-09-15T00:00:00Z")
+        check(50, "future-created snapshot rejected", raises(lambda: overlay.evaluate_recommendation_overlay(rec_id, "2026-09-14T16:03:00Z", [], adapter_future, snapshot_future), "after the decision cutoff"))
 
         combined_event = news("COMBINED", category="REGULATORY")
-        combined = overlay.evaluate_recommendation_overlay(rec_id, "2026-09-14T17:00:00Z", [combined_event], ml(rec, "ML_COMBINED"))
-        check(51, "deterministic news and ML record persisted", combined["official_paper_action"] == "WAIT" and combined["ml_shadow_classification"] == "ML_SUPPORTS")
-        repeated = overlay.evaluate_recommendation_overlay(rec_id, "2026-09-14T17:00:00Z", [combined_event], ml(rec, "ML_COMBINED"))
+        combined = overlay.evaluate_recommendation_overlay(rec_id, "2026-09-14T17:00:00Z", [combined_event], adapter_high, snapshot_high)
+        check(51, "deterministic news and ML record persisted", combined["official_paper_action"] == "WAIT" and combined["ml_shadow_classification"] == "R3_K1_SELECTED")
+        repeated = overlay.evaluate_recommendation_overlay(rec_id, "2026-09-14T17:00:00Z", [combined_event], adapter_high, snapshot_high)
         check(52, "exact overlay rerun idempotent", repeated["status"] == "IDEMPOTENT_SUCCESS" and repeated["overlay_id"] == combined["overlay_id"])
         altered = news("ALTERED", severity="MEDIUM")
-        check(53, "conflicting overlay rejected", raises(lambda: overlay.evaluate_recommendation_overlay(rec_id, "2026-09-14T17:00:00Z", [altered], ml(rec, "ML_COMBINED")), "conflicting immutable Stage 5D.4 overlay"))
+        check(53, "conflicting overlay rejected", raises(lambda: overlay.evaluate_recommendation_overlay(rec_id, "2026-09-14T17:00:00Z", [altered], adapter_high, snapshot_high), "conflicting immutable Stage 5D.4 overlay"))
         stored = overlay.get_overlay(combined["overlay_id"])
         check(54, "overlay recommendation lineage verified", stored["recommendation_id"] == rec_id)
         check(55, "overlay signal lineage verified", stored["signal_id"] == rec["signal_id"])
@@ -211,20 +250,65 @@ def main() -> int:
         check(57, "overlay cutoff binding verified", stored["decision_cutoff_utc"] == "2026-09-14T17:00:00.000000Z")
         check(58, "R0 evidence preserved", stored["research_views"]["R0"]["action"] == "BUY")
         check(59, "R1 evidence preserved", stored["research_views"]["R1"]["action"] == "WAIT")
-        check(60, "R2 shadow evidence preserved", stored["research_views"]["R2"]["research_only"] and stored["research_views"]["R2"]["ml_shadow"] == "ML_SUPPORTS")
+        check(60, "R2 shadow evidence preserved", stored["research_views"]["R2"]["research_only"] and stored["research_views"]["R2"]["ml_shadow"] == "R3_K1_SELECTED")
         check(61, "R3 shadow evidence preserved", stored["research_views"]["R3"]["research_only"] and stored["research_views"]["R3"]["action"] == "WAIT")
 
         second_allocation = allocate_candidates(profile(), [], [candidate("BBB.NS")])
         ledger.persist_allocation_result(second_allocation)
         rec2 = dict(second_allocation.recommendations[0])
+        adapter_batch, snapshot_batch = snapshot_fixture(Path(tmp) / "batch", [rec, rec2], r3_selected=[True, False], r0_selected=[False, True])
         batch = overlay.evaluate_daily_overlays(
             [rec_id, str(rec2["recommendation_id"])], "2026-09-14T18:00:00Z",
             {"AAA.NS": [news("BATCH_A")], "BBB.NS": [news("BATCH_B", ticker="BBB.NS", sentiment="POSITIVE", category="LARGE_ORDER")]},
-            {rec_id: ml(rec, "ML_BATCH_A"), str(rec2["recommendation_id"]): ml(rec2, "ML_BATCH_B", "0.50")},
+            adapter_batch, {rec_id: snapshot_batch, str(rec2["recommendation_id"]): snapshot_batch},
         )
         check(62, "batch API evaluates multiple recommendations", len(batch) == 2 and {item["ticker"] for item in batch} == {"AAA.NS", "BBB.NS"})
         integrity = overlay.integrity_check()
         check(63, "Stage 5D.4 immutable integrity checks pass", integrity["ok"], json.dumps(integrity, sort_keys=True))
+
+        observed_future = news("OBS_FUTURE", published="2026-09-14T10:00:00Z", observed="2026-09-14T19:00:00Z")
+        observed_future_result = overlay.evaluate_recommendation_overlay(rec_id, "2026-09-14T18:30:00Z", [observed_future])
+        check(81, "published before cutoff observed after cutoff excluded", observed_future_result["news_event_ids"] == [])
+        check(82, "future-observed event cannot downgrade BUY", observed_future_result["official_paper_action"] == "BUY")
+        observed_exact = news("OBS_EXACT", published="2026-09-14T10:00:00Z", observed="2026-09-14T18:31:00Z")
+        observed_exact_result = overlay.evaluate_recommendation_overlay(rec_id, "2026-09-14T18:31:00Z", [observed_exact])
+        check(83, "published before cutoff observed exactly at cutoff included", observed_exact_result["news_event_ids"] == ["OBS_EXACT"])
+        both_exact = news("BOTH_EXACT", published="2026-09-14T18:32:00Z", observed="2026-09-14T18:32:00Z")
+        both_exact_result = overlay.evaluate_recommendation_overlay(rec_id, "2026-09-14T18:32:00Z", [both_exact])
+        check(84, "published and observed exactly at cutoff included", both_exact_result["news_event_ids"] == ["BOTH_EXACT"])
+        check(85, "real R3 score read", high_ml["r3_score"] == format(0.54, ".17g"))
+        check(86, "real R3 same-date rank read", high_ml["r3_same_date_rank"] == 1)
+        check(87, "real R3_K1 selection read", high_ml["r3_k1_selected"] is True and high_ml["ml_primary_selected"] is True)
+        check(88, "real R0 comparator selection read", high_ml["r0_k1_selected"] is False and high_ml["ml_comparator_selected"] is False)
+        check(89, "frozen policy and comparator persisted", stored_ml["primary_policy"] == "R3_K1" and stored_ml["primary_comparator"] == "R0_K1")
+        check(90, "no invented probability persisted", "probability" not in stored_ml and "ml_probability" not in with_ml)
+
+        tampered_candidate_root = Path(tmp) / "tampered_candidate"
+        adapter_tampered_candidate, dir_tampered_candidate = snapshot_fixture(tampered_candidate_root, [rec])
+        with (dir_tampered_candidate / "candidate_predictions.csv.gz").open("ab") as handle:
+            handle.write(b"TAMPER")
+        check(91, "tampered candidate_predictions rejected", raises(lambda: adapter_tampered_candidate.load_verified_prediction(rec, "2026-09-14T16:00:00Z", dir_tampered_candidate), "SHA-256"))
+
+        tampered_manifest_root = Path(tmp) / "tampered_manifest"
+        adapter_tampered_manifest, dir_tampered_manifest = snapshot_fixture(tampered_manifest_root, [rec])
+        manifest_path = dir_tampered_manifest / "snapshot_manifest.json"
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8")); manifest["files"][0]["sha256"] = "f" * 64
+        write_json(manifest_path, manifest)
+        check(92, "tampered snapshot manifest rejected", raises(lambda: adapter_tampered_manifest.load_verified_prediction(rec, "2026-09-14T16:00:00Z", dir_tampered_manifest), "SHA-256"))
+
+        bad_commit_adapter, bad_commit_dir = snapshot_fixture(Path(tmp) / "bad_commit", [rec], protocol_commit="b" * 40)
+        check(93, "wrong protocol commit rejected", raises(lambda: bad_commit_adapter.load_verified_prediction(rec, "2026-09-14T16:00:00Z", bad_commit_dir), "protocol commit"))
+        bad_bundle_adapter, bad_bundle_dir = snapshot_fixture(Path(tmp) / "bad_bundle", [rec], model_bundle_hash="c" * 64)
+        check(94, "wrong model bundle rejected", raises(lambda: bad_bundle_adapter.load_verified_prediction(rec, "2026-09-14T16:00:00Z", bad_bundle_dir), "model bundle"))
+        bad_signal_adapter, bad_signal_dir = snapshot_fixture(Path(tmp) / "bad_signal", [rec], signal_ids=["WRONG_SIGNAL"])
+        check(95, "wrong Signal ID rejected", raises(lambda: bad_signal_adapter.load_verified_prediction(rec, "2026-09-14T16:00:00Z", bad_signal_dir), "unique matching Signal ID"))
+        bad_ticker_adapter, bad_ticker_dir = snapshot_fixture(Path(tmp) / "bad_ticker", [rec], tickers=["WRONG.NS"])
+        check(96, "wrong ticker rejected", raises(lambda: bad_ticker_adapter.load_verified_prediction(rec, "2026-09-14T16:00:00Z", bad_ticker_dir), "ticker lineage"))
+        check(97, "snapshot content and chain hashes persisted", len(stored_ml["snapshot_content_hash"]) == 64 and len(stored_ml["snapshot_chain_hash"]) == 64)
+        check(98, "R3 selection maps only to frozen shadow classification", high_ml["ml_shadow_classification"] == "R3_K1_SELECTED" and low_ml["ml_shadow_classification"] == "R3_K1_NOT_SELECTED")
+        check(99, "R3 selection maps only to experimental action", high_ml["ml_experimental_action"] == "SELECT" and low_ml["ml_experimental_action"] == "NOT_SELECT")
+        final_integrity = overlay.integrity_check()
+        check(100, "typed payload and dual-cutoff integrity pass", final_integrity["ok"] and all(final_integrity["checks"].get(name) for name in ("pragma_integrity_check", "pragma_foreign_key_check", "news_typed_payload_binding", "ml_typed_payload_binding", "overlay_typed_payload_binding", "news_cutoff_binding")), json.dumps(final_integrity, sort_keys=True))
         ledger.close()
         reopened = Stage5DLedger(db); reopened_overlay = Stage5D4Overlay(reopened)
         check(80, "Stage 5D.4 evidence survives close and reopen", reopened_overlay.get_overlay(combined["overlay_id"])["official_paper_action"] == "WAIT")
