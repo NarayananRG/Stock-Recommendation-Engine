@@ -1,7 +1,8 @@
 {
   "MATERIAL_ADVERSE_DOWNGRADE": "PASS",
+  "NEWS_OBSERVED_CUTOFF": "PASS",
   "NEWS_OVERLAY": "PASS",
-  "POINT_IN_TIME_NEWS_CUTOFF": "PASS",
+  "NEWS_PUBLISHED_CUTOFF": "PASS",
   "POSITIVE_NEWS_NO_UPGRADE": "PASS",
   "aggregation": "HIGHEST_MATERIAL_ADVERSE_SEVERITY_WINS",
   "categories": [
@@ -24,10 +25,11 @@
     "PROMOTER",
     "REGULATORY"
   ],
-  "contract_version": "STAGE5D4_NEWS_OVERLAY_V1",
-  "decision_cutoff_rule": "PUBLISHED_AT_UTC_LESS_THAN_OR_EQUAL_TO_DECISION_CUTOFF_UTC",
+  "contract_version": "STAGE5D4_NEWS_OVERLAY_V2",
+  "decision_cutoff_rule": "PUBLISHED_AND_OBSERVED_AT_UTC_LESS_THAN_OR_EQUAL_TO_DECISION_CUTOFF_UTC",
   "generative_free_text_dependency": "NONE",
   "network_downloads": "NONE",
+  "observation_timestamp_required": true,
   "official_effect": "CONSERVATIVE_DOWNGRADE_ONLY",
   "positive_news_rule": "NO_UPGRADE_TO_ALPHA_DECISION",
   "publication_timestamp_required": true,
