@@ -1,0 +1,22 @@
+{
+  "ML_PRODUCTION_INFLUENCE": "NO",
+  "ML_STAGE4A3_INTEGRATION": "PASS",
+  "R0_R1_R2_R3_EVIDENCE_STORED": "YES",
+  "aggregate_performance_reporting": "NO",
+  "contract_version": "STAGE5D4_ML_SHADOW_V1",
+  "frozen_model_bundle_hash": "4631eb8a1d0b34212252df3b1aae180f64ec98ba5e7955a84729df0a471c62da",
+  "frozen_protocol_commit": "3ff3c0283174589d43883ce75b1dfd87a33613ce",
+  "frozen_protocol_id": "S4A3_PROTOCOL_ee14ae516b33deac",
+  "historical_backfill": "NO",
+  "missing_prediction": "ML_NOT_AVAILABLE",
+  "model_refit": "NO",
+  "model_training": "NO",
+  "official_influence": "NONE",
+  "research_views": [
+    "R0",
+    "R1",
+    "R2",
+    "R3"
+  ],
+  "snapshot_lineage_required": true
+}

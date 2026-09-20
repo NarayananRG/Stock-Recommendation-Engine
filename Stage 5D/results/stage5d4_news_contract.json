@@ -1,0 +1,41 @@
+{
+  "MATERIAL_ADVERSE_DOWNGRADE": "PASS",
+  "NEWS_OVERLAY": "PASS",
+  "POINT_IN_TIME_NEWS_CUTOFF": "PASS",
+  "POSITIVE_NEWS_NO_UPGRADE": "PASS",
+  "aggregation": "HIGHEST_MATERIAL_ADVERSE_SEVERITY_WINS",
+  "categories": [
+    "CAPITAL_RAISE",
+    "CORPORATE_ACTION",
+    "CREDIT_RATING",
+    "DEBT_LIQUIDITY",
+    "EARNINGS",
+    "FRAUD_ALLEGATION",
+    "GOVERNANCE",
+    "GUIDANCE",
+    "LARGE_ORDER",
+    "LEGAL",
+    "MACRO_SECTOR",
+    "MANAGEMENT_CHANGE",
+    "M_AND_A",
+    "ORDER_CANCELLATION",
+    "OTHER",
+    "PRODUCT",
+    "PROMOTER",
+    "REGULATORY"
+  ],
+  "contract_version": "STAGE5D4_NEWS_OVERLAY_V1",
+  "decision_cutoff_rule": "PUBLISHED_AT_UTC_LESS_THAN_OR_EQUAL_TO_DECISION_CUTOFF_UTC",
+  "generative_free_text_dependency": "NONE",
+  "network_downloads": "NONE",
+  "official_effect": "CONSERVATIVE_DOWNGRADE_ONLY",
+  "positive_news_rule": "NO_UPGRADE_TO_ALPHA_DECISION",
+  "publication_timestamp_required": true,
+  "severity_order": [
+    "NONE",
+    "LOW",
+    "MEDIUM",
+    "HIGH",
+    "CRITICAL"
+  ]
+}

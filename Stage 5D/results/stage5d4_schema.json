@@ -1,0 +1,13 @@
+{
+  "base_ledger_schema_version": "STAGE5D2_SCHEMA_V1",
+  "base_management_schema_version": "STAGE5D3_SCHEMA_V1",
+  "frozen_schema_tables_modified": false,
+  "same_sqlite_database": true,
+  "schema_version": "STAGE5D4_SCHEMA_V1",
+  "tables": [
+    "stage5d4_meta",
+    "stage5d4_news_events",
+    "stage5d4_ml_predictions",
+    "stage5d4_decision_overlays"
+  ]
+}
