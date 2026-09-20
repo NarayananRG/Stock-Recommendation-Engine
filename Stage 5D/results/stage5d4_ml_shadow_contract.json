@@ -1,4 +1,5 @@
 {
+  "MISSING_VERIFIED_ML_PREDICTION_HANDLED": "PASS",
   "ML_PRODUCTION_INFLUENCE": "NO",
   "NO_INVENTED_ML_THRESHOLDS": "PASS",
   "R0_K1_COMPARATOR_BINDING": "PASS",
@@ -40,5 +41,6 @@
     "ML_NOT_AVAILABLE"
   ],
   "snapshot_adapter": "READ_ONLY_VERIFIED_STAGE4A3_SNAPSHOT",
-  "snapshot_lineage_required": true
+  "snapshot_lineage_required": true,
+  "verified_snapshot_missing_signal_prediction": "ML_NOT_AVAILABLE_WITHOUT_PERSISTED_ML_ROW"
 }
