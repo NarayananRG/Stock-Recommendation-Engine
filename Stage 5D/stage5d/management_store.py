@@ -89,23 +89,50 @@ class Stage5D3Manager:
     def schema_version(self) -> str:
         return str(self.connection.execute("SELECT schema_version FROM stage5d3_meta WHERE singleton=1").fetchone()[0])
 
-    def _nonvoid_transactions(self) -> list[sqlite3.Row]:
-        return list(self.connection.execute(
-            """SELECT t.* FROM user_transactions t WHERE NOT EXISTS
-               (SELECT 1 FROM transaction_voids v WHERE v.transaction_id=t.transaction_id)
-               ORDER BY t.trade_date,t.transaction_sequence"""
-        ))
+    def _nonvoid_transactions(
+        self, as_of_date: str | None = None, *, recorded_at_cutoff: str | None = None,
+    ) -> list[sqlite3.Row]:
+        rows = self.connection.execute(
+            """SELECT t.* FROM user_transactions t
+               WHERE (? IS NULL OR t.trade_date <= ?)
+                 AND (? IS NULL OR t.recorded_at_utc <= ?)
+               ORDER BY t.trade_date,t.transaction_sequence""",
+            (as_of_date, as_of_date, recorded_at_cutoff, recorded_at_cutoff),
+        ).fetchall()
+        result: list[sqlite3.Row] = []
+        for row in rows:
+            void = self.connection.execute(
+                "SELECT voided_at_utc FROM transaction_voids WHERE transaction_id=?", (row["transaction_id"],)
+            ).fetchone()
+            if void is None or (recorded_at_cutoff is not None and str(void[0]) > recorded_at_cutoff):
+                result.append(row)
+        return result
 
-    def _fill_evidence(self, recommendation_id: str) -> tuple[list[sqlite3.Row], bool]:
+    def _fill_evidence(
+        self, recommendation_id: str, as_of_date: str | None = None, *, recorded_at_cutoff: str | None = None,
+    ) -> tuple[list[sqlite3.Row], bool]:
         valid: list[sqlite3.Row] = []
         bad = False
         seen: set[str] = set()
         for item in self.ledger._fill_event_lineage(recommendation_id):
+            event = item["event"]
+            if as_of_date is not None and str(event["effective_date"]) > as_of_date:
+                continue
+            if recorded_at_cutoff is not None and str(event["recorded_at_utc"]) > recorded_at_cutoff:
+                continue
             tx = item["transaction"]
             if tx is None:
                 bad = True
                 continue
-            if item["voided"]:
+            if as_of_date is not None and str(tx["trade_date"]) > as_of_date:
+                continue
+            if recorded_at_cutoff is not None and str(tx["recorded_at_utc"]) > recorded_at_cutoff:
+                continue
+            void = self.connection.execute(
+                "SELECT voided_at_utc FROM transaction_voids WHERE transaction_id=?", (tx["transaction_id"],)
+            ).fetchone()
+            voided_at_cutoff = void is not None and (recorded_at_cutoff is None or str(void[0]) <= recorded_at_cutoff)
+            if voided_at_cutoff:
                 continue
             if tx["recommendation_id"] != recommendation_id or tx["side"] != "BUY":
                 bad = True
@@ -114,13 +141,13 @@ class Stage5D3Manager:
                 valid.append(tx); seen.add(tx["transaction_id"])
         return valid, bad
 
-    def _sync_episodes(self) -> None:
+    def _sync_episodes(self, as_of_date: str) -> None:
         rows = self.connection.execute("SELECT canonical_payload_json FROM recommendations ORDER BY recommendation_id").fetchall()
         for row in rows:
             rec = json.loads(row[0])
             if rec.get("portfolio_action_status") != "ACTIONABLE_BUY" or rec.get("management_policy_id") not in SUPPORTED_POLICIES:
                 continue
-            fills, bad = self._fill_evidence(str(rec["recommendation_id"]))
+            fills, bad = self._fill_evidence(str(rec["recommendation_id"]), as_of_date)
             existing = self.connection.execute("SELECT canonical_payload_json,payload_sha256 FROM management_episodes WHERE recommendation_id=?", (rec["recommendation_id"],)).fetchone()
             if existing:
                 # An episode's original clock remains immutable even when a later
@@ -128,9 +155,9 @@ class Stage5D3Manager:
                 continue
             if bad and not fills:
                 fills = list(self.connection.execute(
-                    """SELECT t.* FROM user_transactions t WHERE t.recommendation_id=? AND t.side='BUY'
+                    """SELECT t.* FROM user_transactions t WHERE t.recommendation_id=? AND t.side='BUY' AND t.trade_date<=?
                        AND NOT EXISTS(SELECT 1 FROM transaction_voids v WHERE v.transaction_id=t.transaction_id)
-                       ORDER BY t.trade_date,t.transaction_sequence""", (rec["recommendation_id"],)
+                       ORDER BY t.trade_date,t.transaction_sequence""", (rec["recommendation_id"], as_of_date)
                 ))
             if not fills:
                 continue
@@ -154,31 +181,45 @@ class Stage5D3Manager:
                  str(payload["original_target_2"]), first_date, payload["entry_execution_context_status"], _now(), canonical, digest),
             )
 
-    def _episode_quantity_and_issue(self, episode: sqlite3.Row) -> tuple[int, Decimal | None, str | None]:
+    def _episode_quantity_and_issue(
+        self, episode: sqlite3.Row, as_of_date: str, *, recorded_at_cutoff: str | None = None,
+    ) -> tuple[int, Decimal | None, str | None]:
         rec_id, ticker = str(episode["recommendation_id"]), str(episode["ticker"])
-        fills, bad = self._fill_evidence(rec_id)
+        fills, bad = self._fill_evidence(rec_id, as_of_date, recorded_at_cutoff=recorded_at_cutoff)
         if bad:
             return 0, None, "INCONSISTENT_FILL_LINEAGE"
         if not fills:
-            return 0, None, "NO_EFFECTIVE_BUY_AFTER_EPISODE_CREATED"
+            return 0, None, "FIRST_EFFECTIVE_FILL_INVALIDATED"
+        if not any(str(tx["trade_date"]) == str(episode["first_effective_fill_date"]) for tx in fills):
+            return 0, None, "FIRST_EFFECTIVE_FILL_INVALIDATED"
         buys = sum(int(tx["quantity"]) for tx in fills)
         buy_value = sum(Decimal(tx["price_inr"]) * int(tx["quantity"]) for tx in fills)
-        transactions = self._nonvoid_transactions()
+        transactions = self._nonvoid_transactions(as_of_date, recorded_at_cutoff=recorded_at_cutoff)
         linked = [tx for tx in transactions if tx["recommendation_id"] == rec_id]
         if any(tx["ticker"] != ticker or tx["signal_id"] != episode["signal_id"] for tx in linked):
             return 0, None, "INCONSISTENT_TRANSACTION_LINEAGE"
         sells = sum(int(tx["quantity"]) for tx in linked if tx["side"] == "SELL")
         if sells > buys:
             return buys - sells, None, "LINKED_SELL_EXCEEDS_MANAGED_BUY"
-        if self.connection.execute("SELECT 1 FROM opening_positions WHERE ticker=? LIMIT 1", (ticker,)).fetchone():
+        if self.connection.execute(
+            """SELECT 1 FROM opening_positions WHERE ticker=? AND effective_date<=?
+               AND (? IS NULL OR recorded_at_utc<=?) LIMIT 1""",
+            (ticker, as_of_date, recorded_at_cutoff, recorded_at_cutoff),
+        ).fetchone():
             return buys - sells, None, "OPENING_POSITION_OVERLAP"
         if any(tx["side"] == "SELL" and tx["recommendation_id"] is None and tx["ticker"] == ticker and tx["trade_date"] >= episode["first_effective_fill_date"] for tx in transactions):
             return buys - sells, None, "UNLINKED_SELL_AFTER_MANAGED_ENTRY"
-        overlap = self.connection.execute(
-            "SELECT COUNT(*) FROM management_episodes WHERE ticker=?", (ticker,)
-        ).fetchone()[0]
-        if overlap > 1:
-            return buys - sells, None, "OVERLAPPING_MANAGED_EPISODES"
+        for other in self.connection.execute(
+            "SELECT * FROM management_episodes WHERE ticker=? AND episode_id<>? AND first_effective_fill_date<=?",
+            (ticker, episode["episode_id"], as_of_date),
+        ):
+            other_fills, _ = self._fill_evidence(str(other["recommendation_id"]), as_of_date, recorded_at_cutoff=recorded_at_cutoff)
+            other_sells = sum(
+                int(tx["quantity"]) for tx in transactions
+                if tx["recommendation_id"] == other["recommendation_id"] and tx["side"] == "SELL"
+            )
+            if sum(int(tx["quantity"]) for tx in other_fills) - other_sells > 0:
+                return buys - sells, None, "OVERLAPPING_MANAGED_EPISODES"
         return buys - sells, (buy_value / buys if buys else None), None
 
     def _persist_observation(self, observation: MarketObservation) -> OperationResult:
@@ -203,9 +244,11 @@ class Stage5D3Manager:
 
     def process_completed_session(
         self, session_date: Any, observations: Iterable[Mapping[str, Any] | MarketObservation],
-        *, execution_contexts: Mapping[str, str] | None = None,
+        *, previous_market_session_date: Any | None = None,
+        execution_contexts: Mapping[str, str] | None = None,
     ) -> dict[str, Any]:
         session = canonical_date(session_date, "session_date")
+        predecessor = None if previous_market_session_date is None else canonical_date(previous_market_session_date, "previous_market_session_date")
         context = dict(execution_contexts or {})
         parsed = [item if isinstance(item, MarketObservation) else MarketObservation.from_mapping(item) for item in observations]
         if any(item.session_date != session for item in parsed):
@@ -215,22 +258,48 @@ class Stage5D3Manager:
             if item.ticker in by_ticker:
                 raise ValueError(f"duplicate observation for {item.ticker}")
             by_ticker[item.ticker] = item
-        evidence = [dict(row) for row in self.connection.execute(
-            """SELECT t.transaction_id,t.ticker,t.trade_date,t.side,t.quantity,t.price_inr,t.recommendation_id,t.signal_id,
-                      EXISTS(SELECT 1 FROM transaction_voids v WHERE v.transaction_id=t.transaction_id) AS voided
-               FROM user_transactions t ORDER BY t.transaction_sequence"""
-        )]
-        canonical_input = canonical_json({"session_date": session, "observations": [item.payload() for item in sorted(parsed, key=lambda x: x.ticker)], "execution_contexts": context, "ledger_evidence": evidence})
+        caller_input = {
+            "session_date": session,
+            "previous_market_session_date": predecessor,
+            "observations": [item.payload() for item in sorted(parsed, key=lambda x: x.ticker)],
+            "execution_contexts": context,
+        }
         existing = self.connection.execute("SELECT canonical_input_json,canonical_output_json FROM management_session_runs WHERE session_date=?", (session,)).fetchone()
         if existing:
-            if existing[0] != canonical_input:
+            stored_input = json.loads(existing[0])
+            if any(stored_input.get(key) != json.loads(canonical_json(value)) for key, value in caller_input.items()):
                 raise ValueError(f"Conflicting immutable management session run: {session}")
             return json.loads(existing[1]) | {"status": "IDEMPOTENT_SUCCESS"}
+
+        latest_run = self.connection.execute(
+            "SELECT session_date FROM management_session_runs ORDER BY session_date DESC LIMIT 1"
+        ).fetchone()
+        if latest_run is None:
+            if predecessor is not None:
+                raise ValueError("MISSING_COMPLETED_MARKET_SESSION: first run must not claim an unpersisted predecessor")
+        else:
+            latest_session = str(latest_run["session_date"])
+            if session <= latest_session:
+                raise ValueError(f"Earlier-session backfill prohibited; latest processed session is {latest_session}")
+            if predecessor != latest_session:
+                raise ValueError(
+                    f"MISSING_COMPLETED_MARKET_SESSION: expected previous_market_session_date={latest_session}, got {predecessor}"
+                )
+
+        evidence = [
+            {
+                "transaction_id": row["transaction_id"], "ticker": row["ticker"], "trade_date": row["trade_date"],
+                "side": row["side"], "quantity": row["quantity"], "price_inr": row["price_inr"],
+                "recommendation_id": row["recommendation_id"], "signal_id": row["signal_id"], "voided": False,
+            }
+            for row in self._nonvoid_transactions(session)
+        ]
+        canonical_input = canonical_json(caller_input | {"ledger_evidence": evidence})
 
         run_id = _id("S5D3_RUN_", session)
         states: list[dict[str, Any]] = []
         with self.connection:
-            self._sync_episodes()
+            self._sync_episodes(session)
             for observation in parsed:
                 self._persist_observation(observation)
             episodes = self.connection.execute("SELECT * FROM management_episodes ORDER BY episode_id").fetchall()
@@ -245,13 +314,24 @@ class Stage5D3Manager:
                 latest = self.connection.execute("SELECT * FROM management_state_versions WHERE episode_id=? ORDER BY session_date DESC LIMIT 1", (episode["episode_id"],)).fetchone()
                 if latest and session < latest["session_date"]:
                     raise ValueError(f"Earlier-session backfill prohibited for episode {episode['episode_id']}")
-                quantity, avg_entry, issue = self._episode_quantity_and_issue(episode)
+                quantity, avg_entry, issue = self._episode_quantity_and_issue(episode, session)
                 stop = Decimal(latest["next_session_stop"] or latest["effective_stop"]) if latest else Decimal(episode["original_stop"])
                 target = Decimal(episode["original_target_2"])
                 bars = (int(latest["bars_held"]) + 1) if latest else 1
                 observation = by_ticker.get(episode["ticker"])
                 decision = "HOLD"; reason = "HOLD_NO_CHANGE"; exit_reason = None; ref = None; proposed = None; next_stop = None
                 episode_status = "ACTIVE"; exit_triggered = 0
+                if latest is None and session != episode["first_effective_fill_date"]:
+                    issue = "MISSING_ENTRY_SESSION_MANAGEMENT_HISTORY"
+                elif latest is not None and latest["reason"] == "MISSING_ENTRY_SESSION_MANAGEMENT_HISTORY":
+                    issue = "MISSING_ENTRY_SESSION_MANAGEMENT_HISTORY"
+                same_day_linked = [
+                    tx for tx in self._nonvoid_transactions(session)
+                    if tx["recommendation_id"] == episode["recommendation_id"] and tx["trade_date"] == session
+                ]
+                if latest is not None and not bool(latest["exit_triggered"]):
+                    if any(tx["side"] == "SELL" for tx in same_day_linked) or any(tx["side"] == "BUY" for tx in same_day_linked):
+                        issue = "SAME_DAY_EXECUTION_ORDER_UNRESOLVED"
                 if issue:
                     decision = episode_status = "RECONCILIATION_REQUIRED"; reason = issue
                 elif avg_entry is None or Decimal(episode["original_stop"]) >= avg_entry or avg_entry >= target:
@@ -320,7 +400,10 @@ class Stage5D3Manager:
                 "session_run_id": run_id, "session_date": session, "managed_episode_count": len(states),
                 "closed_episode_count": sum(s["decision"] == "CLOSED_RECORDED" for s in states),
                 "exit_trigger_count": sum(bool(s["exit_triggered"]) and s["decision"] != "EXIT_OVERDUE_AWAITING_USER_ACTION" for s in states),
-                "stop_revision_count": sum(s["decision"] == "RAISE_STOP_NEXT_SESSION" for s in states),
+                "stop_revision_count": sum(
+                    s["next_session_stop"] is not None and Decimal(str(s["next_session_stop"])) > Decimal(str(s["effective_stop"]))
+                    for s in states
+                ),
                 "hold_count": sum(s["decision"] in {"HOLD", "ENTRY_BAR_EXECUTION_ORDER_UNRESOLVED"} for s in states),
                 "reconciliation_required_count": sum(s["decision"] == "RECONCILIATION_REQUIRED" for s in states),
                 "states": states, "unmanaged_positions": unmanaged_positions,
@@ -362,6 +445,12 @@ class Stage5D3Manager:
             and int(row["reconciliation_required_count"]) == int(json.loads(row["canonical_output_json"])["reconciliation_required_count"])
             for row in run_rows
         )
+        ordered_runs = sorted(run_rows, key=lambda row: str(row["session_date"]))
+        checks["market_session_predecessor_chain"] = all(
+            json.loads(row["canonical_input_json"]).get("previous_market_session_date")
+            == (None if index == 0 else str(ordered_runs[index - 1]["session_date"]))
+            for index, row in enumerate(ordered_runs)
+        )
         typed = True
         for row in self.connection.execute("SELECT * FROM management_episodes"):
             payload = json.loads(row["canonical_payload_json"])
@@ -400,13 +489,15 @@ class Stage5D3Manager:
         checks.update({"session_chronology": chronology,"bars_held_monotonic": bars,"policy_stop_rules": stops,"target_original_t2": targets,"sticky_exit": sticky,"state_observation_linkage": linkage})
         quantity_reconciliation = True
         for episode_id, episode in episodes.items():
-            latest = self.connection.execute("SELECT * FROM management_state_versions WHERE episode_id=? ORDER BY session_date DESC LIMIT 1", (episode_id,)).fetchone()
-            if latest is None:
-                continue
-            quantity, _, issue = self._episode_quantity_and_issue(episode)
-            quantity_reconciliation = quantity_reconciliation and int(latest["managed_quantity"]) == quantity
-            if issue:
-                quantity_reconciliation = quantity_reconciliation and latest["decision"] == "RECONCILIATION_REQUIRED"
+            for state in self.connection.execute(
+                "SELECT * FROM management_state_versions WHERE episode_id=? ORDER BY session_date", (episode_id,)
+            ):
+                quantity, _, issue = self._episode_quantity_and_issue(
+                    episode, str(state["session_date"]), recorded_at_cutoff=str(state["persisted_at_utc"])
+                )
+                quantity_reconciliation = quantity_reconciliation and int(state["managed_quantity"]) == quantity
+                if issue:
+                    quantity_reconciliation = quantity_reconciliation and state["decision"] == "RECONCILIATION_REQUIRED"
         checks["management_episode_quantity_reconciliation"] = quantity_reconciliation
         checks["source_parity_artifact_available"] = parity_artifact is None or Path(parity_artifact).is_file()
         return {"ok": all(checks.values()), "checks": checks}
