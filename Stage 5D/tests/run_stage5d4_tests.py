@@ -301,7 +301,7 @@ def main() -> int:
         bad_bundle_adapter, bad_bundle_dir = snapshot_fixture(Path(tmp) / "bad_bundle", [rec], model_bundle_hash="c" * 64)
         check(94, "wrong model bundle rejected", raises(lambda: bad_bundle_adapter.load_verified_prediction(rec, "2026-09-14T16:00:00Z", bad_bundle_dir), "model bundle"))
         bad_signal_adapter, bad_signal_dir = snapshot_fixture(Path(tmp) / "bad_signal", [rec], signal_ids=["WRONG_SIGNAL"])
-        check(95, "wrong Signal ID rejected", raises(lambda: bad_signal_adapter.load_verified_prediction(rec, "2026-09-14T16:00:00Z", bad_signal_dir), "unique matching Signal ID"))
+        check(95, "direct adapter reports missing Signal ID prediction", raises(lambda: bad_signal_adapter.load_verified_prediction(rec, "2026-09-14T16:00:00Z", bad_signal_dir), "no matching Signal ID prediction"))
         bad_ticker_adapter, bad_ticker_dir = snapshot_fixture(Path(tmp) / "bad_ticker", [rec], tickers=["WRONG.NS"])
         check(96, "wrong ticker rejected", raises(lambda: bad_ticker_adapter.load_verified_prediction(rec, "2026-09-14T16:00:00Z", bad_ticker_dir), "ticker lineage"))
         check(97, "snapshot content and chain hashes persisted", len(stored_ml["snapshot_content_hash"]) == 64 and len(stored_ml["snapshot_chain_hash"]) == 64)
@@ -309,6 +309,26 @@ def main() -> int:
         check(99, "R3 selection maps only to experimental action", high_ml["ml_experimental_action"] == "SELECT" and low_ml["ml_experimental_action"] == "NOT_SELECT")
         final_integrity = overlay.integrity_check()
         check(100, "typed payload and dual-cutoff integrity pass", final_integrity["ok"] and all(final_integrity["checks"].get(name) for name in ("pragma_integrity_check", "pragma_foreign_key_check", "news_typed_payload_binding", "ml_typed_payload_binding", "overlay_typed_payload_binding", "news_cutoff_binding")), json.dumps(final_integrity, sort_keys=True))
+
+        missing_observed = news("MISSING_OBSERVED")
+        missing_observed.pop("observed_at_utc")
+        check(101, "missing observed_at_utc rejected", raises(lambda: normalize_news_event(missing_observed), "observed_at_utc is required"))
+        check(102, "missing observed timestamp cannot inherit publication timestamp", "observed_at_utc" not in missing_observed and raises(lambda: normalize_news_event(missing_observed), "observed_at_utc is required"))
+
+        unavailable_adapter, unavailable_dir = snapshot_fixture(Path(tmp) / "unavailable", [rec], signal_ids=["OTHER_SIGNAL"])
+        ml_rows_before = ledger.connection.execute("SELECT COUNT(*) FROM stage5d4_ml_predictions").fetchone()[0]
+        unavailable = overlay.evaluate_recommendation_overlay(rec_id, "2026-09-14T18:33:00Z", [], unavailable_adapter, unavailable_dir)
+        check(103, "verified snapshot with no matching Signal ID is ML_NOT_AVAILABLE", unavailable["ml_shadow_classification"] == "ML_NOT_AVAILABLE" and unavailable["ml_experimental_action"] == "NOT_AVAILABLE" and unavailable["ml_influence"] == "NONE")
+        check(104, "missing ML row does not alter official paper action", unavailable["official_paper_action"] == unavailable["deterministic_action"] == "BUY")
+        check(105, "missing ML row creates no ML prediction record", ledger.connection.execute("SELECT COUNT(*) FROM stage5d4_ml_predictions").fetchone()[0] == ml_rows_before)
+
+        duplicate_adapter, duplicate_dir = snapshot_fixture(Path(tmp) / "duplicate", [rec, rec])
+        check(106, "duplicate matching Signal ID still fails", raises(lambda: overlay.evaluate_recommendation_overlay(rec_id, "2026-09-14T18:34:00Z", [], duplicate_adapter, duplicate_dir), "duplicate matching Signal ID"))
+
+        corrupt_absent_adapter, corrupt_absent_dir = snapshot_fixture(Path(tmp) / "corrupt_absent", [rec], signal_ids=["OTHER_SIGNAL"])
+        with (corrupt_absent_dir / "candidate_predictions.csv.gz").open("ab") as handle:
+            handle.write(b"TAMPER")
+        check(107, "corrupted snapshot with absent Signal ID fails before unavailable handling", raises(lambda: overlay.evaluate_recommendation_overlay(rec_id, "2026-09-14T18:35:00Z", [], corrupt_absent_adapter, corrupt_absent_dir), "SHA-256"))
         ledger.close()
         reopened = Stage5DLedger(db); reopened_overlay = Stage5D4Overlay(reopened)
         check(80, "Stage 5D.4 evidence survives close and reopen", reopened_overlay.get_overlay(combined["overlay_id"])["official_paper_action"] == "WAIT")
