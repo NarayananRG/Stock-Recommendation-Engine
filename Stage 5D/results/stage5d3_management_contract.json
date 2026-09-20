@@ -1,0 +1,31 @@
+{
+  "broker_integration": "NONE",
+  "collision_rule": "STOP_FIRST",
+  "contract_version": "STAGE5D3_MANAGEMENT_V1",
+  "entry_day_live_limitation": "Stage 5D.2 lacks intraday fill ordering; full-day entry-bar stop/target outcomes remain ENTRY_BAR_EXECUTION_ORDER_UNRESOLVED.",
+  "exit_semantics": "DECISION_ONLY_NO_AUTOMATIC_SELL",
+  "managed_quantity_source": "STAGE5D2_EFFECTIVE_NONVOID_RECOMMENDATION_LINKED_TRANSACTIONS",
+  "ml_influence": "NONE",
+  "news_influence": "NONE",
+  "observation_contract": "EXTERNALLY_SUPPLIED_COMPLETED_DAILY_OHLC_ONLY",
+  "schema_version": "STAGE5D3_SCHEMA_V1",
+  "supported_policies": {
+    "D1_TRAIL_ONLY_63D": {
+      "maximum_market_sessions": 63,
+      "stop": "NEXT_SESSION_RAISE_ONLY",
+      "target": "ORIGINAL_TARGET_2"
+    },
+    "STATIC_T2_20D": {
+      "maximum_market_sessions": 20,
+      "stop": "ORIGINAL_FIXED",
+      "target": "ORIGINAL_TARGET_2"
+    }
+  },
+  "tables": [
+    "stage5d3_meta",
+    "management_session_runs",
+    "management_episodes",
+    "daily_market_observations",
+    "management_state_versions"
+  ]
+}

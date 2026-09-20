@@ -1,0 +1,64 @@
+{
+  "artifact": "STAGE5D3_POLICY_PARITY_V1",
+  "representative_parity_cases": [
+    {
+      "case": "open-gap stop",
+      "status": "PASS"
+    },
+    {
+      "case": "open-gap target",
+      "status": "PASS"
+    },
+    {
+      "case": "ordinary stop",
+      "status": "PASS"
+    },
+    {
+      "case": "ordinary target",
+      "status": "PASS"
+    },
+    {
+      "case": "collision",
+      "status": "PASS"
+    },
+    {
+      "case": "20-session timing",
+      "status": "PASS"
+    },
+    {
+      "case": "D1 ST only",
+      "status": "PASS"
+    },
+    {
+      "case": "D1 SwingLow10 only",
+      "status": "PASS"
+    },
+    {
+      "case": "D1 both",
+      "status": "PASS"
+    },
+    {
+      "case": "D1 no change",
+      "status": "PASS"
+    },
+    {
+      "case": "D1 target unchanged",
+      "status": "PASS"
+    }
+  ],
+  "sources": {
+    "D1_CONFIG": {
+      "canonical_git_blob_sha256": "1830639ace2e2ddcdb24a899b52e44e3305b3ec297b74a6e620a5ee1d1d93e28",
+      "path": "Stage 2B.1/config/stage2b_1_policy_config.json"
+    },
+    "D1_TRAIL_ONLY_63D": {
+      "canonical_git_blob_sha256": "387db0262eee23e5a9e3887da858ff5bbfd7b8a28e4783e141d2d34edc83dd94",
+      "path": "Stage 2B.1/stage2b/policies.py"
+    },
+    "STATIC_T2_20D": {
+      "canonical_git_blob_sha256": "8e6514353cc32a5b8bed1212df0c12d76de11d0624e4931fda4028f0be3ed31f",
+      "path": "Stage 2.2.2 Final/stage2_2_1/Stock_Alert_Stage2_2_1_Reproducible_Benchmark.py"
+    }
+  },
+  "status": "PASS"
+}

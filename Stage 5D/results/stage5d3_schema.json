@@ -1,0 +1,13 @@
+{
+  "base_schema_version": "STAGE5D2_SCHEMA_V1",
+  "same_sqlite_database": true,
+  "schema_version": "STAGE5D3_SCHEMA_V1",
+  "stage5d2_tables_modified": false,
+  "tables": [
+    "stage5d3_meta",
+    "management_session_runs",
+    "management_episodes",
+    "daily_market_observations",
+    "management_state_versions"
+  ]
+}
