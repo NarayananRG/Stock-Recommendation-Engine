@@ -18,6 +18,8 @@ Stage 5D.3 uses the same SQLite database as Stage 5D.2 without changing any Stag
 
 Historical observations, episode identities, daily states, and session runs are immutable and content-hashed. Processing a completed session is atomic. Exact reruns are idempotent; conflicting evidence and earlier-session backfills fail loudly.
 
+Stage 5D.3A keeps `STAGE5D3_SCHEMA_V1`; no structural change was required. `previous_market_session_date` is stored inside each session run's immutable canonical input rather than in a new column.
+
 ## Policy and operational results
 
 | Gate | Result |
@@ -33,16 +35,28 @@ Historical observations, episode identities, daily states, and session runs are 
 | Management/transaction separation | PASS |
 | Reconciliation detection | PASS |
 | Persistence and reopen | PASS |
+| Point-in-time transaction/fill/opening-position filtering | PASS |
+| Caller-supplied market-session predecessor chain | PASS |
+| Missed-session protection and atomic rollback | PASS |
+| Same-day BUY/SELL execution-order ambiguity | PASS |
+| As-of integrity reconciliation | PASS |
+| Entry-day D1 stop-revision accounting | PASS |
+| Real paired-input ML non-influence | PASS |
+| Frozen source real 20-session execution parity | PASS |
 
 The live ledger does not contain trustworthy intraday fill ordering. Therefore, an actual user's entry-day full OHLC bar cannot be used to fabricate a same-day stop or target outcome. The entry session counts as bar 1 and is recorded as `ENTRY_BAR_EXECUTION_ORDER_UNRESOLVED`; a D1 after-close trail may still be proposed for the next available processed market session. Synthetic execution contexts exist only in tests to prove frozen research parity.
 
 An exit trigger is strategy evidence, not a user transaction. Stage 5D.3 never writes an automatic `SELL`. A trigger remains `EXIT_TRIGGERED_AWAITING_USER_ACTION`; subsequent sessions remain overdue until recommendation-linked, non-void user sells close the managed quantity. Partial user exits leave the remainder awaiting action.
 
+Stage 5D.3A filters fills, transactions, transaction void evidence, and opening positions to the management session being adjudicated. Future executions cannot alter an earlier state. A void that removes the immutable first effective fill produces `FIRST_EFFECTIVE_FILL_INVALIDATED` on future sessions without rewriting history. A new same-day linked BUY or SELL on an active, non-sticky episode produces `SAME_DAY_EXECUTION_ORDER_UNRESOLVED`; a prior-session sticky exit may still be closed by an explicit same-day linked SELL.
+
+Every new session after the first must identify the latest persisted completed market session as its predecessor. A mismatch fails with `MISSING_COMPLETED_MARKET_SESSION` before any observation, state, or run is written. Zero-position sessions participate in the same chain.
+
 ## Validation
 
 | Suite | Result |
 |---|---|
-| Stage 5D.3 | PASS — 97/97 |
+| Stage 5D.3 / 5D.3A | PASS — 130/130 |
 | Frozen Stage 5D.2 | PASS — 129/129 |
 | Frozen Stage 5D.1 | PASS — 80/80 |
 
