@@ -44,6 +44,10 @@
     {
       "case": "D1 target unchanged",
       "status": "PASS"
+    },
+    {
+      "case": "frozen PortfolioBacktester real 20-session execution",
+      "status": "PASS"
     }
   ],
   "sources": {

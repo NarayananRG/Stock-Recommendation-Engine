@@ -1,6 +1,8 @@
 {
   "base_schema_version": "STAGE5D2_SCHEMA_V1",
+  "hardening_storage": "PREDECESSOR_LINEAGE_IN_IMMUTABLE_SESSION_RUN_CANONICAL_INPUT",
   "same_sqlite_database": true,
+  "schema_change_for_stage5d3a": false,
   "schema_version": "STAGE5D3_SCHEMA_V1",
   "stage5d2_tables_modified": false,
   "tables": [
