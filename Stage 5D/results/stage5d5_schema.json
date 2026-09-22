@@ -15,7 +15,8 @@
         "recommendation_count", "news_status", "canonical_payload_json", "payload_sha256"
       ],
       "payload_hash": "SHA-256 of Stage 5D.2 canonical_json(report)",
-      "write_semantics": "one immutable run per completed market session; conflicting evidence fails"
+      "write_semantics": "one immutable run per completed market session; conflicting evidence fails",
+      "integrity": "verify every row's canonical JSON SHA-256 and all 13 typed-column bindings; unique ordered ISO market-session dates; Stage 5D.5 schema marker; PRAGMA integrity_check and foreign_key_check; any failure LIVE_RUN_INTEGRITY_FAILURE"
     }
   },
   "frozen_tables_modified": false,

@@ -14,7 +14,7 @@ if str(_STAGE) not in sys.path:
     sys.path.insert(0, str(_STAGE))
 
 from live_paper.admission import admission_status, available_slots
-from live_paper.run_after_close import STAGE_ROOT, _config, _database_path, _existing_run, _initialize_runs
+from live_paper.run_after_close import STAGE_ROOT, _config, _database_path, _existing_run, _initialize_runs, verify_live_run_integrity
 from stage5d.ledger import Stage5DLedger
 from stage5d.management_store import Stage5D3Manager
 from stage5d.news_ml_overlay import Stage5D4Overlay
@@ -58,6 +58,7 @@ def record_action(ledger: Stage5DLedger, action: str, recommendation_id: str,
     if recommendation is None:
         raise ValueError("Unknown recommendation")
     manager, overlay = Stage5D3Manager(ledger), Stage5D4Overlay(ledger)
+    verify_live_run_integrity(ledger)
     if not ledger.integrity_check()["ok"] or not manager.integrity_check()["ok"] or not overlay.integrity_check()["ok"]:
         raise RuntimeError("DATABASE_INTEGRITY_FAILURE")
     today = datetime.now(ZoneInfo("Asia/Kolkata")).date().isoformat()
@@ -82,6 +83,10 @@ def record_action(ledger: Stage5DLedger, action: str, recommendation_id: str,
     elif action == "fill":
         if quantity is None or price is None:
             raise ValueError("fill requires --qty and --price")
+        if today <= max(str(recommendation["signal_date"]), str(recommendation["decision_date"])):
+            raise ValueError("FILL_REQUIRES_FUTURE_ENTRY_SESSION")
+        if manager.connection.execute("SELECT 1 FROM management_session_runs WHERE session_date=?", (today,)).fetchone():
+            raise ValueError("FILL_SESSION_ALREADY_PROCESSED")
         pending = ledger.get_active_pending_reservations()
         if not any(item.source_recommendation_id == recommendation_id for item in pending):
             raise ValueError("Recommendation must be explicitly PENDING before a fill")

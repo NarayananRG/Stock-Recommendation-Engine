@@ -10,7 +10,7 @@ import json
 import os
 import subprocess
 import sys
-from datetime import datetime, time, timezone
+from datetime import date, datetime, time, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -112,10 +112,48 @@ def _initialize_runs(ledger: Stage5DLedger) -> None:
             management_session_run_id TEXT NOT NULL, recommendation_count INTEGER NOT NULL,
             news_status TEXT NOT NULL, canonical_payload_json TEXT NOT NULL,
             payload_sha256 TEXT NOT NULL)""")
-        ledger.connection.execute("INSERT OR IGNORE INTO stage5d5_meta VALUES(1,?)", (SCHEMA_VERSION,))
+        existing_runs = ledger.connection.execute("SELECT count(*) FROM stage5d5_live_runs").fetchone()[0]
         row = ledger.connection.execute("SELECT schema_version FROM stage5d5_meta WHERE singleton=1").fetchone()
-        if row[0] != SCHEMA_VERSION:
-            raise RuntimeError("Unsupported Stage 5D.5 schema")
+        if row is None:
+            if existing_runs:
+                raise RuntimeError("LIVE_RUN_INTEGRITY_FAILURE: missing Stage 5D.5 schema marker")
+            ledger.connection.execute("INSERT INTO stage5d5_meta VALUES(1,?)", (SCHEMA_VERSION,))
+        elif row[0] != SCHEMA_VERSION:
+            raise RuntimeError("LIVE_RUN_INTEGRITY_FAILURE: unsupported Stage 5D.5 schema")
+
+
+def verify_live_run_integrity(ledger: Stage5DLedger) -> None:
+    """Verify every persisted Stage 5D.5 row, including its typed bindings."""
+    fields = ("run_id", "market_session_date", "run_started_utc", "run_completed_utc",
+              "data_provider", "market_data_hash", "candidate_input_hash", "candidate_count",
+              "stage4a3_snapshot_id", "allocation_run_id", "management_session_run_id",
+              "recommendation_count", "news_status")
+    try:
+        marker = ledger.connection.execute("SELECT schema_version FROM stage5d5_meta WHERE singleton=1").fetchone()
+        if marker is None or marker[0] != SCHEMA_VERSION:
+            raise ValueError("schema marker")
+        if ledger.connection.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
+            raise ValueError("SQLite integrity")
+        if ledger.connection.execute("PRAGMA foreign_key_check").fetchone() is not None:
+            raise ValueError("foreign key integrity")
+        previous = None
+        seen = set()
+        for row in ledger.connection.execute("SELECT * FROM stage5d5_live_runs ORDER BY market_session_date"):
+            canonical = row["canonical_payload_json"]
+            payload = json.loads(canonical)
+            if (not isinstance(payload, dict) or canonical_json(payload) != canonical
+                    or payload_sha256(canonical) != row["payload_sha256"]):
+                raise ValueError("payload identity")
+            for field in fields:
+                if payload.get(field) != row[field]:
+                    raise ValueError(f"typed binding: {field}")
+            session = row["market_session_date"]
+            if date.fromisoformat(session).isoformat() != session or session in seen or (previous and session <= previous):
+                raise ValueError("ordered unique market sessions")
+            seen.add(session)
+            previous = session
+    except Exception as exc:
+        raise RuntimeError("LIVE_RUN_INTEGRITY_FAILURE") from exc
 
 
 def _existing_run(ledger: Stage5DLedger, session: str):
@@ -132,6 +170,23 @@ def _existing_run(ledger: Stage5DLedger, session: str):
         if str(report[key]) != str(row[column]):
             raise RuntimeError("LIVE_RUN_TYPED_PAYLOAD_MISMATCH")
     return report
+
+
+def _collect_news(ticker: str) -> tuple[list[dict], list[str], str]:
+    """Keep provider failure separate from quarantine of individual articles."""
+    try:
+        articles, quarantined = fetch_yfinance_news(ticker)
+        events = []
+        for article in articles:
+            try:
+                events.append(normalize_article(article))
+            except (ValueError, TypeError, KeyError) as exc:
+                quarantined.append(f"NORMALIZATION_REJECTED:{type(exc).__name__}:{exc}")
+        if not events:
+            return events, quarantined, "NEWS_DATA_UNAVAILABLE"
+        return events, quarantined, "AVAILABLE_WITH_QUARANTINE" if quarantined else "AVAILABLE"
+    except Exception as exc:
+        return [], [f"PROVIDER_FAILURE:{type(exc).__name__}:{exc}"], "NEWS_DATA_UNAVAILABLE"
 
 
 def _persist_report_file(report: dict, runtime: Path) -> None:
@@ -271,6 +326,7 @@ def _run_with_clock(config_path: Path, *, db_override: str | None = None, now: d
     with Stage5DLedger(database) as ledger:
         manager, overlay = Stage5D3Manager(ledger), Stage5D4Overlay(ledger)
         _initialize_runs(ledger)
+        verify_live_run_integrity(ledger)
         _assert_integrity(ledger, manager, overlay)
         protocol_repo = Path(config.get("stage4a3_runtime_repo") or REPO)
         snapshot_dir, snapshot_metadata = _snapshot(session, datetime.now(timezone.utc), protocol_repo)
@@ -302,17 +358,7 @@ def _run_with_clock(config_path: Path, *, db_override: str | None = None, now: d
         recommendation_rows = []
         for recommendation in allocation.recommendations:
             ticker = str(recommendation["ticker"])
-            try:
-                articles, quarantined = fetch_yfinance_news(ticker)
-                events = []
-                for article in articles:
-                    try:
-                        events.append(normalize_article(article))
-                    except (ValueError, TypeError, KeyError) as exc:
-                        quarantined.append(f"NORMALIZATION_REJECTED:{type(exc).__name__}:{exc}")
-                news_status = "AVAILABLE" if not quarantined else "NEWS_DATA_UNAVAILABLE"
-            except Exception as exc:
-                events, quarantined, news_status = [], [f"PROVIDER_FAILURE:{type(exc).__name__}:{exc}"], "NEWS_DATA_UNAVAILABLE"
+            events, quarantined, news_status = _collect_news(ticker)
             decision_cutoff = _utc(datetime.now(timezone.utc))
             result = overlay.evaluate_recommendation_overlay(
                 str(recommendation["recommendation_id"]), decision_cutoff, events, adapter, snapshot_dir)
@@ -344,7 +390,9 @@ def _run_with_clock(config_path: Path, *, db_override: str | None = None, now: d
             "management_session_run_id": management["session_run_id"],
             "management": management, "recommendations": recommendation_rows,
             "recommendation_count": len(recommendation_rows),
-            "news_status": "AVAILABLE" if all(row["news_status"] == "AVAILABLE" for row in recommendation_rows) else "NEWS_DATA_UNAVAILABLE",
+            "news_status": ("NEWS_DATA_UNAVAILABLE" if any(row["news_status"] == "NEWS_DATA_UNAVAILABLE" for row in recommendation_rows)
+                            else "AVAILABLE_WITH_QUARANTINE" if any(row["news_status"] == "AVAILABLE_WITH_QUARANTINE" for row in recommendation_rows)
+                            else "AVAILABLE"),
             "portfolio": {"open_positions": len(positions), "active_pending": len(pending),
                           "available_slots": available_slots((item.ticker for item in positions), pending),
                           "capital_ceiling_inr": str(profile.capital_ceiling_inr),

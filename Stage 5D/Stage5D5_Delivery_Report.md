@@ -4,6 +4,7 @@
 - Frozen base: `stage5d4-news-ml-shadow-baseline` (`fe899cfdb382bc8dd97b112a29ac929106b37ef2`)
 - Final pushed commit SHA: provided in the handoff (a commit cannot contain its own SHA).
 - Schema: `STAGE5D5_SCHEMA_V1`
+- Stage 5D.5A hardening: allocator admission binding, safe fill session ordering, partial news quarantine, and full prior-run integrity verification. Final pushed commit SHA is provided in the handoff.
 
 ## Operational command
 
@@ -16,6 +17,8 @@
 The live runner has no production `--as-of` and no broker API. It will fail on incomplete or misaligned market data, a broken Stage 4A.3 snapshot/protocol, a missing holding observation, a broken session chain, or ledger integrity failure. A news-provider outage is reported as `NEWS_DATA_UNAVAILABLE` and blocks *new* paper admission while position management still completes.
 
 For explicit paper actions, run `python "Stage 5D/live_paper/paper_action.py" pending <recommendation_id>`, or `fill`, `cancel`, `decline`, `sell` with `--qty` and `--price` where required. These record paper events only. The ordinary daily runner never marks pending or executes a buy/sell.
+
+An after-close recommendation can become PENDING, but its fill must be dated strictly after the signal/decision session and recorded before the fill date's Stage 5D.3 after-close management run. A later fill for an already processed session fails with `FILL_SESSION_ALREADY_PROCESSED`, leaving transactions and lifecycle events untouched.
 
 Daily order: clock gate → completed session → frozen Stage 4A.3 collection/verification → frozen scanner → ledger holdings and reservations → frozen holding observations → Stage 5D.3 management → Stage 5D.1 allocation and persistence → timestamped news → Stage 5D.4 overlay/ML shadow → admission assessment → immutable run row and JSON/human report.
 
@@ -30,13 +33,17 @@ Daily order: clock gate → completed session → frozen Stage 4A.3 collection/v
 | STAGE5D3_POSITION_MANAGEMENT | PASS (fixture) | zero-position session and frozen holding feature path |
 | MAX_FIVE_SLOT_ADMISSION_GUARD | PASS | 0+0, 4+1, 5+0, 3+1, duplicate, held, cancellation tests |
 | RECOMMENDATION_BUY_LIFECYCLE_GUARD | PASS | `record_recommendation_fill` and overfill tests; no generic linked BUY path |
+| ALLOCATOR_ADMISSION_BINDING | PASS | `ACTIONABLE_BUY` and positive quantity required; watch/blocked allocator outcomes rejected |
+| SAFE_FILL_SESSION_ORDERING | PASS | same-date and post-management fills rejected; next-session pre-management fill permitted; no rejected-fill transaction/event |
+| PARTIAL_NEWS_QUARANTINE_HANDLED | PASS | usable feed remains `AVAILABLE_WITH_QUARANTINE`; malformed article excluded; zero usable evidence/outage blocks admission |
+| STAGE5D5_RUN_INTEGRITY | PASS | every prior row payload/hash/typed binding, ordered dates, schema, SQLite and foreign key checks before production continuation |
 | ML_PRODUCTION_INFLUENCE | NO | frozen overlay; admission ignores ML selection |
 | BROKER_EXECUTION | NO | no broker client |
 | AUTOMATIC_BUY | NO | ordinary runner does not call `mark_pending` or fill |
 | AUTOMATIC_SELL | NO | SELL requires explicit paper-action invocation |
 | UI | NO | CLI only |
 
-Tests: Stage 5D.5 **69/69 PASS**; Stage 5D.4 **107/107 PASS**; Stage 5D.3 **130/130 PASS**; Stage 5D.2 **129/129 PASS**; Stage 5D.1 **80/80 PASS**. Frozen tracked changes: **0**. Runtime SQLite, WAL/SHM, profile config, and reports are gitignored.
+Tests: Stage 5D.5 **96/96 PASS**; Stage 5D.4 **107/107 PASS**; Stage 5D.3 **130/130 PASS**; Stage 5D.2 **129/129 PASS**; Stage 5D.1 **80/80 PASS**. Frozen tracked changes: **0**. Runtime SQLite, WAL/SHM, profile config, and reports are gitignored.
 
 The **production live smoke was not run**: no real capital config was supplied. The default bundled Python lacks some pinned production packages; the read-only TCS.NS news check used an existing local yfinance installation. The first live report remains contingent on installing the pinned requirements, supplying the real config, and a valid after-close session. The no-key provider is Yahoo Finance via yfinance; its news API returns a list, but article availability and relevance can vary. Ambiguous/malformed evidence is quarantined or neutral, never silently treated as a verified absence of risk. See [yfinance's `get_news` implementation](https://github.com/ranaroussi/yfinance/blob/main/yfinance/base.py).
 

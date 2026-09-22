@@ -23,10 +23,13 @@ def admission_status(
     recommendation_id = str(recommendation["recommendation_id"])
     held = {str(item).upper() for item in open_tickers}
     reservations = tuple(pending)
-    if news_status != "AVAILABLE":
+    if news_status not in {"AVAILABLE", "AVAILABLE_WITH_QUARANTINE"}:
         return "BLOCKED_NEWS_DATA_UNAVAILABLE"
     if str(overlay["official_paper_action"]) not in {"BUY", "STRONG BUY"}:
         return "BLOCKED_OFFICIAL_ACTION_NOT_BUY"
+    if (recommendation.get("portfolio_action_status") != "ACTIONABLE_BUY"
+            or int(recommendation.get("recommended_quantity", 0)) <= 0):
+        return "BLOCKED_ALLOCATOR_NOT_ACTIONABLE"
     if ticker in held:
         return "BLOCKED_EXISTING_POSITION"
     if any(str(item.source_recommendation_id) == recommendation_id for item in reservations):
