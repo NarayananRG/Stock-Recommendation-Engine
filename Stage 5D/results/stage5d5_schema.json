@@ -1,0 +1,24 @@
+{
+  "schema_version": "STAGE5D5_SCHEMA_V1",
+  "owned_tables": {
+    "stage5d5_meta": {
+      "primary_key": "singleton",
+      "columns": ["singleton", "schema_version"]
+    },
+    "stage5d5_live_runs": {
+      "primary_key": "run_id",
+      "unique": ["market_session_date"],
+      "columns": [
+        "run_id", "market_session_date", "run_started_utc", "run_completed_utc",
+        "data_provider", "market_data_hash", "candidate_input_hash", "candidate_count",
+        "stage4a3_snapshot_id", "allocation_run_id", "management_session_run_id",
+        "recommendation_count", "news_status", "canonical_payload_json", "payload_sha256"
+      ],
+      "payload_hash": "SHA-256 of Stage 5D.2 canonical_json(report)",
+      "write_semantics": "one immutable run per completed market session; conflicting evidence fails"
+    }
+  },
+  "frozen_tables_modified": false,
+  "runtime_database_gitignored": true,
+  "runtime_reports_gitignored": true
+}

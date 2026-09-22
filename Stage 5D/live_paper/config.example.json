@@ -1,0 +1,8 @@
+{
+  "capital_ceiling_inr": "SET_YOUR_ACTUAL_CAPITAL_INR",
+  "preferred_horizon": "THREE_MONTHS",
+  "news_provider": "yfinance",
+  "timezone": "Asia/Kolkata",
+  "stage4a3_runtime_repo": "SET_ABSOLUTE_PATH_TO_ALREADY_ACTIVATED_STAGE4A3_REPOSITORY",
+  "database_path": "Stage 5D/runtime/live_paper.sqlite3"
+}
