@@ -5,6 +5,7 @@
 - Final pushed commit SHA: provided in the handoff (a commit cannot contain its own SHA).
 - Schema: `STAGE5D5_SCHEMA_V1`
 - Stage 5D.5A hardening: allocator admission binding, safe fill session ordering, partial news quarantine, and full prior-run integrity verification. Final pushed commit SHA is provided in the handoff.
+- Stage 5D.5B: post-collection UTC verification and exact immutable Stage 4A.3 input-cache reuse. Final pushed commit SHA is provided in the handoff.
 
 ## Operational command
 
@@ -22,6 +23,8 @@ An after-close recommendation can become PENDING, but its fill must be dated str
 
 Daily order: clock gate → completed session → frozen Stage 4A.3 collection/verification → frozen scanner → ledger holdings and reservations → frozen holding observations → Stage 5D.3 management → Stage 5D.1 allocation and persistence → timestamped news → Stage 5D.4 overlay/ML shadow → admission assessment → immutable run row and JSON/human report.
 
+After collection, the runner derives the exact Stage 4A.3 cache directory from the verified `Snapshot Created UTC`. It requires the frozen universe and NIFTY CSVs to be present and non-empty before rebuilding candidates with the frozen builder. The complete candidate manifest and stable market-data fields must match the immutable snapshot; the reported market provider is the original snapshot provider. A missing/incomplete cache fails closed, never triggers a replacement download. A newly collected snapshot uses a fresh UTC verification clock after the frozen subprocess returns; existing snapshots retain the entry-time verification cutoff.
+
 ## Acceptance gates
 
 | Gate | Result | Evidence |
@@ -37,17 +40,27 @@ Daily order: clock gate → completed session → frozen Stage 4A.3 collection/v
 | SAFE_FILL_SESSION_ORDERING | PASS | same-date and post-management fills rejected; next-session pre-management fill permitted; no rejected-fill transaction/event |
 | PARTIAL_NEWS_QUARANTINE_HANDLED | PASS | usable feed remains `AVAILABLE_WITH_QUARANTINE`; malformed article excluded; zero usable evidence/outage blocks admission |
 | STAGE5D5_RUN_INTEGRITY | PASS | every prior row payload/hash/typed binding, ordered dates, schema, SQLite and foreign key checks before production continuation |
+| POST_SNAPSHOT_CLOCK_VERIFICATION | PASS | newly created snapshot accepted at post-subprocess clock; genuinely future snapshot rejected; existing snapshot cutoff unchanged |
+| EXACT_STAGE4A3_INPUT_CACHE_REUSE | PASS | timestamp-derived cache under external activated checkout, all expected CSVs preflighted |
+| SECOND_MARKET_REFRESH_PROHIBITED | PASS | complete-cache frozen builder fixture with download patched to hard-fail; missing/empty files fail before builder |
+| SNAPSHOT_CANDIDATE_PROVENANCE | PASS | exact candidate manifest, raw/NIFTY/per-ticker hashes, stable original market manifest fields |
+| ZERO_CANDIDATE_LIVE_SESSION_SUPPORTED | PASS | frozen zero-candidate cohort reconstruction and daily zero-position report fixture |
 | ML_PRODUCTION_INFLUENCE | NO | frozen overlay; admission ignores ML selection |
 | BROKER_EXECUTION | NO | no broker client |
 | AUTOMATIC_BUY | NO | ordinary runner does not call `mark_pending` or fill |
 | AUTOMATIC_SELL | NO | SELL requires explicit paper-action invocation |
 | UI | NO | CLI only |
 
-Tests: Stage 5D.5 **96/96 PASS**; Stage 5D.4 **107/107 PASS**; Stage 5D.3 **130/130 PASS**; Stage 5D.2 **129/129 PASS**; Stage 5D.1 **80/80 PASS**. Frozen tracked changes: **0**. Runtime SQLite, WAL/SHM, profile config, and reports are gitignored.
+Tests: Stage 5D.5 **118/118 PASS**; Stage 5D.4 **107/107 PASS**; Stage 5D.3 **130/130 PASS**; Stage 5D.2 **129/129 PASS**; Stage 5D.1 **80/80 PASS**. Frozen tracked changes: **0**. Runtime SQLite, WAL/SHM, profile config, and reports are gitignored.
 
-The **production live smoke was not run**: no real capital config was supplied. The default bundled Python lacks some pinned production packages; the read-only TCS.NS news check used an existing local yfinance installation. The first live report remains contingent on installing the pinned requirements, supplying the real config, and a valid after-close session. The no-key provider is Yahoo Finance via yfinance; its news API returns a list, but article availability and relevance can vary. Ambiguous/malformed evidence is quarantined or neutral, never silently treated as a verified absence of risk. See [yfinance's `get_news` implementation](https://github.com/ranaroussi/yfinance/blob/main/yfinance/base.py).
+`production_smoke_status = "RETRY_REQUIRED_AFTER_STAGE5D5B"`.
 
-The existing Stage 4A.3 activation record was found in the earlier `work/stage4a` checkout, not in this new worktree. Its activation date is 2026-09-13; no prospective snapshot was found there at this audit. The frozen protocol identity check passed (commit `3ff3c0283174589d43883ce75b1dfd87a33613ce`). The frozen collector will mark intervening eligible sessions **MISSED** when first run and must never backfill them. Stage 5D.5 requires an explicit path to that activated checkout and verifies its protocol identity before collection.
+- `REAL_SMOKE_ATTEMPT_1`: Per supplied operational evidence, immutable Stage 4A.3 snapshot `S4A3_20260922_3b84e2cd8198` (zero candidates) was **CAPTURED**; Stage 5D.5 then false-failed `FUTURE_CREATED_SNAPSHOT` because its comparison clock preceded collection.
+- `REAL_SMOKE_ATTEMPT_2`: The existing snapshot was verified; an independent market refresh then caused `CANDIDATE_PROVENANCE_MISMATCH`.
+
+These are fixed orchestration defects, **not** a completed production smoke. This patch did not rerun production or modify that snapshot/cache; retry follows independent audit. The no-key news provider is Yahoo Finance via yfinance; ambiguous/malformed evidence is quarantined or neutral, never silently treated as verified absence of risk.
+
+Stage 5D.5 requires an explicit path to the activated Stage 4A.3 checkout and verifies its frozen protocol identity before collection. The snapshot and its timestamp-derived input cache are resolved there, not assumed to be in the Stage 5D.5 development checkout. The real snapshot/cache cited above were described in the supplied smoke evidence; they were not opened or changed during this patch.
 
 ## Audit boundary
 

@@ -212,39 +212,91 @@ def _snapshot(session: str, now: datetime, protocol_repo: Path | None = None) ->
     activation = json.loads(activation_file.read_text(encoding="utf-8"))
     verify_runtime_protocol_integrity(protocol_repo, root, activation)
     directory = root / "prospective" / "snapshots" / session[:4] / session
+    verification_time = now.astimezone(timezone.utc)
     if not directory.exists():
         env = os.environ.copy()
         env["PYTHONPATH"] = str(root)
         subprocess.run([sys.executable, "-m", "stage4a3.prospective_runner", "--repo-root", str(protocol_repo)],
                        cwd=protocol_repo, env=env, check=True)
+        verification_time = datetime.now(timezone.utc)
+    metadata = json.loads((directory / "snapshot_metadata.json").read_text(encoding="utf-8"))
+    created = datetime.fromisoformat(metadata["Snapshot Created UTC"].replace("Z", "+00:00"))
+    if created > verification_time:
+        raise RuntimeError("FUTURE_CREATED_SNAPSHOT")
+    if metadata["Signal Date"] != session:
+        raise RuntimeError("SNAPSHOT_MARKET_DATE_MISMATCH")
     adapter = Stage4A3ShadowAdapter(root)
     try:
         adapter.load_verified_prediction(
             {"signal_date": session, "signal_id": "S5D5_NONMATCHING_VERIFICATION_SENTINEL", "ticker": "SENTINEL.NS"},
-            _utc(now), directory)
+            _utc(verification_time), directory)
     except Stage4A3PredictionNotAvailable:
         pass
     else:
         raise RuntimeError("SNAPSHOT_SENTINEL_COLLISION")
-    metadata = json.loads((directory / "snapshot_metadata.json").read_text(encoding="utf-8"))
-    created = datetime.fromisoformat(metadata["Snapshot Created UTC"].replace("Z", "+00:00"))
-    if created > now.astimezone(timezone.utc):
-        raise RuntimeError("FUTURE_CREATED_SNAPSHOT")
-    if metadata["Signal Date"] != session:
-        raise RuntimeError("SNAPSHOT_MARKET_DATE_MISMATCH")
     return directory, metadata
 
 
-def _build_candidates(session: str, scratch: Path, snapshot_dir: Path):
+def resolve_snapshot_input_cache(protocol_repo: Path, snapshot_dir: Path, metadata: dict) -> tuple[Path, dict]:
+    """Bind a verified snapshot to its exact complete, read-only market CSV cache."""
+    import pandas as pd
+
+    root = protocol_repo / "Stage 4A.3"
+    created = datetime.fromisoformat(metadata["Snapshot Created UTC"].replace("Z", "+00:00"))
+    if created.tzinfo is None or created.utcoffset() is None:
+        raise RuntimeError("SNAPSHOT_INPUT_CACHE_INCOMPLETE: creation timestamp has no timezone")
+    cache = root / "prospective/input_cache" / created.astimezone(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    raw = cache / "raw_market_data"
+    if not raw.is_dir():
+        raise RuntimeError("SNAPSHOT_INPUT_CACHE_MISSING")
+    snapshot_manifest = json.loads((snapshot_dir / "candidate_input_manifest.json").read_text(encoding="utf-8"))
+    universe = pd.read_csv(root / "prospective_universe.csv")
+    expected = {"^NSEI", *universe["Ticker"].astype(str).tolist()}
+    if set(snapshot_manifest["Per-Ticker Raw Hashes"]) != expected:
+        raise RuntimeError("SNAPSHOT_INPUT_CACHE_INCOMPLETE: snapshot ticker set differs from frozen universe")
+    # The frozen REFRESH loader first reads these files, then downloads only
+    # when a cache frame is missing or empty. Prove that branch is unreachable.
+    if not (raw / "yfinance_internal").is_dir():
+        raise RuntimeError("SNAPSHOT_INPUT_CACHE_INCOMPLETE: yfinance cache directory missing")
+    for ticker in expected:
+        filename = ticker.replace("^", "INDEX_").replace("&", "AND") + ".csv"
+        path = raw / filename
+        if not path.is_file() or path.stat().st_size == 0:
+            raise RuntimeError(f"SNAPSHOT_INPUT_CACHE_INCOMPLETE: {ticker}")
+        try:
+            frame = pd.read_csv(path, usecols=["Date"], parse_dates=["Date"])
+            if frame.empty or frame["Date"].isna().all():
+                raise ValueError("empty or invalid market dates")
+        except (ValueError, KeyError, pd.errors.ParserError) as exc:
+            raise RuntimeError(f"SNAPSHOT_INPUT_CACHE_INCOMPLETE: {ticker}") from exc
+    return cache, snapshot_manifest
+
+
+def _build_candidates(session: str, snapshot_dir: Path, protocol_repo: Path, metadata: dict):
+    from unittest.mock import patch
+
     from stage4a3.candidate_input_builder import build_signal_close_input, verify_candidate_input
     from stage4a3.hashing import canonical_json_hash
-    frame, manifest, market = build_signal_close_input(REPO, session, scratch, "REFRESH")
-    frozen_universe = json.loads((REPO / "Stage 4A.3/results/stage4a3_frozen_universe_hash.json").read_text())
+    cache, snapshot_manifest = resolve_snapshot_input_cache(protocol_repo, snapshot_dir, metadata)
+    import yfinance as yf
+    with patch.object(yf, "download", side_effect=RuntimeError("SECOND_MARKET_REFRESH_PROHIBITED")) as forbidden:
+        frame, manifest, market = build_signal_close_input(protocol_repo, session, cache, "REFRESH")
+    if forbidden.call_count:
+        raise RuntimeError("SECOND_MARKET_REFRESH_PROHIBITED")
+    frozen_universe = json.loads((protocol_repo / "Stage 4A.3/results/stage4a3_frozen_universe_hash.json").read_text())
     verify_candidate_input(frame, manifest, frozen_universe["FROZEN_UNIVERSE_HASH"])
-    snapshot_manifest = json.loads((snapshot_dir / "candidate_input_manifest.json").read_text(encoding="utf-8"))
-    if manifest != snapshot_manifest or canonical_json_hash(manifest) != json.loads(
-            (snapshot_dir / "snapshot_metadata.json").read_text(encoding="utf-8"))["Candidate Input Manifest Hash"]:
+    if (manifest != snapshot_manifest or canonical_json_hash(manifest) != json.loads(
+            (snapshot_dir / "snapshot_metadata.json").read_text(encoding="utf-8"))["Candidate Input Manifest Hash"]):
         raise RuntimeError("CANDIDATE_PROVENANCE_MISMATCH")
+    snapshot_market = json.loads((snapshot_dir / "market_data_manifest.json").read_text(encoding="utf-8"))
+    stable_fields = ("maximum_market_data_date", "nifty_maximum_date", "ticker_count_requested",
+                     "ticker_count_received", "missing_tickers", "raw_data_logical_hash")
+    if any(market[field] != snapshot_market[field] for field in stable_fields):
+        raise RuntimeError("CANDIDATE_PROVENANCE_MISMATCH: market data manifest")
+    if (manifest["Signal Date"] != session or manifest["Candidate Count"] != len(frame)
+            or manifest["Candidate Count"] != metadata["Candidate Count"]
+            or manifest["Raw Market Data Hash"] != snapshot_market["raw_data_logical_hash"]):
+        raise RuntimeError("CANDIDATE_PROVENANCE_MISMATCH: snapshot identity")
     if (manifest["Signal Date"] != session or market["maximum_market_data_date"] != session
             or market["nifty_maximum_date"] != session):
         raise RuntimeError("MARKET_DATE_MISMATCH")
@@ -258,7 +310,7 @@ def _build_candidates(session: str, scratch: Path, snapshot_dir: Path):
         raise RuntimeError("SCANNER_DATE_MISMATCH")
     if len({row["signal_id"] for row in candidates}) != len(candidates):
         raise RuntimeError("DUPLICATE_SCANNER_SIGNAL_ID")
-    return candidates, manifest, market, sessions[-2]
+    return candidates, manifest, snapshot_market, sessions[-2]
 
 
 def _holding_observations(ledger: Stage5DLedger, session: str, scratch: Path):
@@ -331,7 +383,7 @@ def _run_with_clock(config_path: Path, *, db_override: str | None = None, now: d
         protocol_repo = Path(config.get("stage4a3_runtime_repo") or REPO)
         snapshot_dir, snapshot_metadata = _snapshot(session, datetime.now(timezone.utc), protocol_repo)
         scratch = runtime / "market_cache" / session
-        candidates, candidate_manifest, market_manifest, actual_previous = _build_candidates(session, scratch, snapshot_dir)
+        candidates, candidate_manifest, market_manifest, actual_previous = _build_candidates(session, snapshot_dir, protocol_repo, snapshot_metadata)
         existing = _existing_run(ledger, session)
         if existing:
             if (existing["market_data_hash"] != market_manifest["raw_data_logical_hash"]

@@ -20,6 +20,7 @@
     }
   },
   "frozen_tables_modified": false,
+  "snapshot_source_evidence": "No new Stage 5D.5 table: immutable Stage 4A.3 candidate_input_manifest.json and market_data_manifest.json are verified against reconstruction from the exact timestamp-derived source cache; original provider and raw hash persist in the existing Stage 5D.5 run payload/typed columns",
   "runtime_database_gitignored": true,
   "runtime_reports_gitignored": true
 }

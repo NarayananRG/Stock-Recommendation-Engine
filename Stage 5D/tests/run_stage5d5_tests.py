@@ -2,16 +2,18 @@
 from __future__ import annotations
 
 import csv
+import io
 import json
 import shutil
 import subprocess
 import sys
 import tempfile
 import types
+from contextlib import redirect_stdout
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -23,7 +25,7 @@ from live_paper.admission import admission_status, available_slots
 from live_paper.news_normalizer import normalize_article
 from live_paper.news_provider import _publication, fetch_yfinance_news
 from live_paper.paper_action import record_action
-from live_paper.run_after_close import _build_candidates, _collect_news, _existing_run, _holding_observations, _initialize_runs, _run_with_clock, render_report, require_after_close, verify_live_run_integrity
+from live_paper.run_after_close import _build_candidates, _collect_news, _existing_run, _holding_observations, _initialize_runs, _run_with_clock, _snapshot, render_report, require_after_close, resolve_snapshot_input_cache, verify_live_run_integrity
 from stage5d.allocator import allocate_candidates
 from stage5d.horizon import HorizonPreference
 from stage5d.ledger import Stage5DLedger, canonical_json, payload_sha256
@@ -156,21 +158,126 @@ def main():
         scanner_manifest = {"Signal Date": "2026-09-22", "Full Input Logical Hash": "FROZEN_CANDIDATES"}
         scanner_market = {"maximum_market_data_date": "2026-09-22", "nifty_maximum_date": "2026-09-22",
                           "missing_tickers": [], "ticker_count_received": 1, "ticker_count_requested": 1,
-                          "nifty_valid_sessions": ["2026-09-21", "2026-09-22"]}
+                          "nifty_valid_sessions": ["2026-09-21", "2026-09-22"], "raw_data_logical_hash": "RAW"}
+        scanner_manifest.update({"Candidate Count": 1, "Raw Market Data Hash": "RAW"})
         (snapshot / "candidate_input_manifest.json").write_text(json.dumps(scanner_manifest))
         (snapshot / "snapshot_metadata.json").write_text(json.dumps({"Candidate Input Manifest Hash": canonical_json_hash(scanner_manifest)}))
-        with patch("stage4a3.candidate_input_builder.build_signal_close_input", return_value=(pd.DataFrame([candidate()]), scanner_manifest, scanner_market)), \
-             patch("stage4a3.candidate_input_builder.verify_candidate_input"):
-            scanned, _, _, prior = _build_candidates("2026-09-22", snapshot, snapshot)
+        (snapshot / "market_data_manifest.json").write_text(json.dumps(scanner_market))
+        fake_market_api = types.ModuleType("yfinance")
+        fake_market_api.download = Mock(side_effect=RuntimeError("SECOND_MARKET_REFRESH_PROHIBITED"))
+        with patch.dict(sys.modules, {"yfinance": fake_market_api}), \
+             patch("stage4a3.candidate_input_builder.build_signal_close_input", return_value=(pd.DataFrame([candidate()]), scanner_manifest, scanner_market)), \
+             patch("stage4a3.candidate_input_builder.verify_candidate_input"), \
+             patch("live_paper.run_after_close.resolve_snapshot_input_cache", return_value=(snapshot, scanner_manifest)):
+            scanned, _, _, prior = _build_candidates("2026-09-22", snapshot, ROOT.parent, {"Candidate Count": 1})
             check("scanner_source_normalization_parity", scanned[0] == normalize_source_candidate(candidate()))
             check("scanner_signal_id_parity", scanned[0]["signal_id"] == derive_signal_id(ticker="TEST.NS", signal_date="2026-09-22", signal="BUY", setup="PULLBACK"))
             check("actual_market_predecessor", prior == "2026-09-21")
-        with patch("stage4a3.candidate_input_builder.build_signal_close_input", return_value=(pd.DataFrame([candidate()]), scanner_manifest, scanner_market | {"nifty_maximum_date": "2026-09-21"})), \
-             patch("stage4a3.candidate_input_builder.verify_candidate_input"):
-            check("market_date_mismatch_rejected", raises("MARKET_DATE_MISMATCH", lambda: _build_candidates("2026-09-22", snapshot, snapshot)))
-        with patch("stage4a3.candidate_input_builder.build_signal_close_input", return_value=(pd.DataFrame([candidate()]), scanner_manifest, scanner_market | {"missing_tickers": ["OTHER.NS"]})), \
-             patch("stage4a3.candidate_input_builder.verify_candidate_input"):
-            check("incomplete_market_data_rejected", raises("INCOMPLETE_MARKET_DATA", lambda: _build_candidates("2026-09-22", snapshot, snapshot)))
+        with patch.dict(sys.modules, {"yfinance": fake_market_api}), \
+             patch("stage4a3.candidate_input_builder.build_signal_close_input", return_value=(pd.DataFrame([candidate()]), scanner_manifest, scanner_market | {"nifty_maximum_date": "2026-09-21"})), \
+             patch("stage4a3.candidate_input_builder.verify_candidate_input"), \
+             patch("live_paper.run_after_close.resolve_snapshot_input_cache", return_value=(snapshot, scanner_manifest)):
+            check("market_date_mismatch_rejected", raises("CANDIDATE_PROVENANCE_MISMATCH", lambda: _build_candidates("2026-09-22", snapshot, ROOT.parent, {"Candidate Count": 1})))
+        with patch.dict(sys.modules, {"yfinance": fake_market_api}), \
+             patch("stage4a3.candidate_input_builder.build_signal_close_input", return_value=(pd.DataFrame([candidate()]), scanner_manifest, scanner_market | {"missing_tickers": ["OTHER.NS"]})), \
+             patch("stage4a3.candidate_input_builder.verify_candidate_input"), \
+             patch("live_paper.run_after_close.resolve_snapshot_input_cache", return_value=(snapshot, scanner_manifest)):
+            check("incomplete_market_data_rejected", raises("CANDIDATE_PROVENANCE_MISMATCH", lambda: _build_candidates("2026-09-22", snapshot, ROOT.parent, {"Candidate Count": 1})))
+
+    with tempfile.TemporaryDirectory() as tmp:
+        activated = Path(tmp) / "activated"
+        root = activated / "Stage 4A.3"
+        (root / "prospective/audit").mkdir(parents=True)
+        (root / "prospective/audit/activation_record.json").write_text("{}", encoding="utf-8")
+        directory = root / "prospective/snapshots/2026/2026-09-22"
+        start = datetime.now(timezone.utc) - timedelta(seconds=3)
+        created = start + timedelta(seconds=1)
+        metadata = {"Snapshot Created UTC": created.isoformat(), "Signal Date": "2026-09-22"}
+        observed_cutoffs = []
+        def fake_verify_prediction(_signal, cutoff, _directory):
+            observed_cutoffs.append(cutoff)
+            raise Stage4A3PredictionNotAvailable("fixture has no signal")
+        def create_snapshot(*_args, **_kwargs):
+            directory.mkdir(parents=True)
+            (directory / "snapshot_metadata.json").write_text(json.dumps(metadata), encoding="utf-8")
+        protocol_stub = types.ModuleType("stage4a3.protocol_integrity")
+        protocol_stub.verify_runtime_protocol_integrity = lambda *_args: None
+        with patch.dict(sys.modules, {"stage4a3.protocol_integrity": protocol_stub}), \
+             patch("live_paper.run_after_close.Stage4A3ShadowAdapter", return_value=types.SimpleNamespace(load_verified_prediction=fake_verify_prediction)), \
+             patch("live_paper.run_after_close.subprocess.run", side_effect=create_snapshot) as collector:
+            found, received = _snapshot("2026-09-22", start, activated)
+            check("post_subprocess_snapshot_clock_accepts_new_capture", found == directory.resolve() and received == metadata)
+            check("new_snapshot_uses_post_subprocess_cutoff", datetime.fromisoformat(observed_cutoffs[-1].replace("Z", "+00:00")) > created)
+            check("new_snapshot_collected_once", collector.call_count == 1 and "--as-of" not in collector.call_args.args[0])
+            original_bytes = (directory / "snapshot_metadata.json").read_bytes()
+            with patch("live_paper.run_after_close.subprocess.run", side_effect=AssertionError("IMMUTABLE_SNAPSHOT_REWRITTEN")) as forbidden:
+                _snapshot("2026-09-22", start + timedelta(seconds=2), activated)
+                check("existing_snapshot_reused_without_subprocess", forbidden.call_count == 0 and (directory / "snapshot_metadata.json").read_bytes() == original_bytes)
+                check("existing_snapshot_uses_original_verification_cutoff", observed_cutoffs[-1] == (start + timedelta(seconds=2)).isoformat(timespec="microseconds").replace("+00:00", "Z"))
+            future = {**metadata, "Snapshot Created UTC": (datetime.now(timezone.utc) + timedelta(days=1)).isoformat()}
+            (directory / "snapshot_metadata.json").write_text(json.dumps(future), encoding="utf-8")
+            check("genuine_future_snapshot_rejected", raises("FUTURE_CREATED_SNAPSHOT", lambda: _snapshot("2026-09-22", datetime.now(timezone.utc), activated)))
+
+    # Clone only the frozen builder's read dependencies into a disposable
+    # external checkout. The snapshot/source cache under the real repo is never
+    # written or refreshed by this regression fixture.
+    from stage4a3.candidate_input_builder import BUILDER_FILES, build_signal_close_input
+    from stage4a3.hashing import sha256_file
+    with tempfile.TemporaryDirectory() as tmp:
+        activated = Path(tmp) / "activated"
+        for relative in (*BUILDER_FILES, "Stage 3/stage3/hashing.py", "Stage 4A.3/prospective_universe.csv",
+                         "Stage 4A.3/models/frozen_2026/model_bundle_manifest.json",
+                         "Stage 4A.3/results/stage4a3_frozen_universe_hash.json"):
+            target = activated / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(ROOT.parent / relative, target)
+        created = "2026-08-28T15:56:37.469844+00:00"
+        metadata = {"Snapshot Created UTC": created, "Signal Date": "2026-08-28", "Candidate Count": 0}
+        cache = activated / "Stage 4A.3/prospective/input_cache/20260828T155637Z"
+        raw = cache / "raw_market_data"
+        (raw / "yfinance_internal").mkdir(parents=True)
+        universe = pd.read_csv(activated / "Stage 4A.3/prospective_universe.csv")
+        tickers = ["^NSEI", *universe["Ticker"].astype(str)]
+        for ticker in tickers:
+            name = ticker.replace("^", "INDEX_").replace("&", "AND") + ".csv"
+            shutil.copyfile(ROOT.parent / "Stage 2.2.2 Final/stage2_2_1/data/frozen" / name, raw / name)
+        snapshot = activated / "Stage 4A.3/prospective/snapshots/2026/2026-08-28"
+        snapshot.mkdir(parents=True)
+        download = Mock(side_effect=RuntimeError("SECOND_MARKET_REFRESH_PROHIBITED"))
+        fake_yfinance = types.ModuleType("yfinance")
+        fake_yfinance.__version__ = "NO_NETWORK_FIXTURE"
+        fake_yfinance.download = download
+        fake_yfinance.set_tz_cache_location = lambda *_args: None
+        before_hashes = {ticker: sha256_file(raw / (ticker.replace("^", "INDEX_").replace("&", "AND") + ".csv")) for ticker in tickers}
+        with patch.dict(sys.modules, {"yfinance": fake_yfinance}), redirect_stdout(io.StringIO()):
+            source_frame, source_manifest, source_market = build_signal_close_input(activated, "2026-08-28", cache, "REFRESH")
+        check("fixture_zero_candidate_cohort", len(source_frame) == 0 and source_manifest["Candidate Count"] == 0)
+        check("fixture_initial_builder_no_network", download.call_count == 0)
+        (snapshot / "candidate_input_manifest.json").write_text(json.dumps(source_manifest), encoding="utf-8")
+        original_market = source_market | {"provider_identifier": "ORIGINAL_STAGE4A3_CAPTURE", "download_timestamp_utc": "SNAPSHOT_ORIGINAL_TIME"}
+        (snapshot / "market_data_manifest.json").write_text(json.dumps(original_market), encoding="utf-8")
+        (snapshot / "snapshot_metadata.json").write_text(json.dumps(metadata | {"Candidate Input Manifest Hash": canonical_json_hash(source_manifest)}), encoding="utf-8")
+        check("snapshot_timestamp_resolves_exact_external_cache", resolve_snapshot_input_cache(activated, snapshot, metadata)[0] == cache)
+        download.reset_mock()
+        with patch.dict(sys.modules, {"yfinance": fake_yfinance}), redirect_stdout(io.StringIO()):
+            reconstructed, rebuilt, market, predecessor = _build_candidates("2026-08-28", snapshot, activated, metadata)
+        check("complete_snapshot_cache_reconstruction", reconstructed == [] and predecessor == source_market["nifty_valid_sessions"][-2])
+        check("second_market_refresh_prohibited", download.call_count == 0)
+        check("snapshot_candidate_manifest_exact_equality", rebuilt == source_manifest)
+        check("snapshot_universe_nifty_signal_and_full_hashes", all(rebuilt[key] == source_manifest[key] for key in ("Frozen Universe Hash", "NIFTY Data Hash", "Candidate Signal-ID Logical Hash", "Full Input Logical Hash")))
+        check("snapshot_raw_hash_matches", rebuilt["Raw Market Data Hash"] == source_manifest["Raw Market Data Hash"] == original_market["raw_data_logical_hash"])
+        check("snapshot_per_ticker_hashes_match", rebuilt["Per-Ticker Raw Hashes"] == source_manifest["Per-Ticker Raw Hashes"])
+        check("snapshot_stable_market_manifest_fields", all(market[key] == source_market[key] for key in ("maximum_market_data_date", "nifty_maximum_date", "ticker_count_requested", "ticker_count_received", "missing_tickers", "raw_data_logical_hash")))
+        check("original_snapshot_provider_identity_reported", market["provider_identifier"] == "ORIGINAL_STAGE4A3_CAPTURE")
+        check("external_checkout_cache_not_modified", before_hashes == {ticker: sha256_file(raw / (ticker.replace("^", "INDEX_").replace("&", "AND") + ".csv")) for ticker in tickers})
+        check("zero_candidate_snapshot_valid", not reconstructed and rebuilt["Candidate Count"] == metadata["Candidate Count"])
+        check("missing_exact_cache_directory_fails", raises("SNAPSHOT_INPUT_CACHE_MISSING", lambda: resolve_snapshot_input_cache(activated, snapshot, metadata | {"Snapshot Created UTC": "2026-08-28T15:56:38+00:00"})))
+        ticker_path = raw / "TCS.NS.csv"
+        ticker_path.unlink()
+        download.reset_mock()
+        check("missing_ticker_cache_fails_before_download", raises("SNAPSHOT_INPUT_CACHE_INCOMPLETE", lambda: _build_candidates("2026-08-28", snapshot, activated, metadata)) and download.call_count == 0)
+        ticker_path.write_bytes(b"")
+        check("empty_ticker_cache_fails_before_download", raises("SNAPSHOT_INPUT_CACHE_INCOMPLETE", lambda: _build_candidates("2026-08-28", snapshot, activated, metadata)) and download.call_count == 0)
 
     # Reuse the frozen indicator engine on a historical *fixture* only. No
     # current-market network call or historical production run occurs here.
