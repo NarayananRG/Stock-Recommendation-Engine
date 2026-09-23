@@ -7,6 +7,7 @@
 - Stage 5D.5A hardening: allocator admission binding, safe fill session ordering, partial news quarantine, and full prior-run integrity verification. Final pushed commit SHA is provided in the handoff.
 - Stage 5D.5B: post-collection UTC verification and exact immutable Stage 4A.3 input-cache reuse. Final pushed commit SHA is provided in the handoff.
 - Stage 5D.5C: exact CSV round-trip reconstruction and holding-data provenance hardening. Final pushed commit SHA is provided in the handoff.
+- Stage 5D.5D: explicit FILL/SELL market-session evidence guard. Final pushed commit SHA is provided in the handoff.
 
 ## Operational command
 
@@ -21,6 +22,8 @@ The live runner has no production `--as-of` and no broker API. It will fail on i
 For explicit paper actions, run `python "Stage 5D/live_paper/paper_action.py" pending <recommendation_id>`, or `fill`, `cancel`, `decline`, `sell` with `--qty` and `--price` where required. These record paper events only. The ordinary daily runner never marks pending or executes a buy/sell.
 
 An after-close recommendation can become PENDING, but its fill must be dated strictly after the signal/decision session and recorded before the fill date's Stage 5D.3 after-close management run. A later fill for an already processed session fails with `FILL_SESSION_ALREADY_PROCESSED`, leaving transactions and lifecycle events untouched.
+
+Explicit FILL and SELL actions also require an already-existing, fully verified Stage 4A.3 snapshot for the transaction date. The snapshot must bind its Signal Date, NIFTY date, market-data date, complete universe coverage, and raw-data hash to that date. Validation is read-only and network-free; absent or inconsistent evidence fails `PAPER_ACTION_REQUIRES_VALID_MARKET_SESSION`. PENDING, CANCEL, and DECLINE remain administrative lifecycle actions and do not require an exchange session.
 
 Daily order: clock gate → completed session → frozen Stage 4A.3 collection/verification → frozen scanner → ledger holdings and reservations → frozen holding observations → Stage 5D.3 management → Stage 5D.1 allocation and persistence → timestamped news → Stage 5D.4 overlay/ML shadow → admission assessment → immutable run row and JSON/human report.
 
@@ -53,21 +56,34 @@ Candidate reconstruction temporarily injects pandas `float_precision="round_trip
 | HOLDING_SNAPSHOT_CACHE_REUSE | PASS | holding observation sourced from the same verified session cache and frozen Stage 2.1 feature engine |
 | HOLDING_MARKET_REFRESH_PROHIBITED | PASS | no fallback download; missing and empty holding cache files fail before network access |
 | HOLDING_RAW_HASH_PROVENANCE | PASS | holding dataframe hash must equal immutable manifest per-ticker hash; mismatch and latest-date mismatch fail closed |
+| PAPER_ACTION_VALID_MARKET_SESSION | PASS | verified snapshot evidence required for FILL/SELL; Saturday, Sunday, holiday-equivalent and absent evidence rejected without transaction/lifecycle mutation or network use |
 | ML_PRODUCTION_INFLUENCE | NO | frozen overlay; admission ignores ML selection |
 | BROKER_EXECUTION | NO | no broker client |
 | AUTOMATIC_BUY | NO | ordinary runner does not call `mark_pending` or fill |
 | AUTOMATIC_SELL | NO | SELL requires explicit paper-action invocation |
 | UI | NO | CLI only |
 
-Tests: Stage 5D.5 **129/129 PASS**; Stage 5D.4 **107/107 PASS**; Stage 5D.3 **130/130 PASS**; Stage 5D.2 **129/129 PASS**; Stage 5D.1 **80/80 PASS**. Frozen tracked changes: **0**. Runtime SQLite, WAL/SHM, profile config, and reports are gitignored.
+Tests: Stage 5D.5 **141/141 PASS**; Stage 5D.4 **107/107 PASS**; Stage 5D.3 **130/130 PASS**; Stage 5D.2 **129/129 PASS**; Stage 5D.1 **80/80 PASS**. Frozen tracked changes: **0**. Runtime SQLite, WAL/SHM, profile config, and reports are gitignored.
 
-`production_smoke_status = "RETRY_REQUIRED_AFTER_STAGE5D5C"`.
+`production_smoke_status = "PRODUCTION_SMOKE_PASS_2026_09_23"`.
 
 - `REAL_SMOKE_ATTEMPT_1`: Per supplied operational evidence, immutable Stage 4A.3 snapshot `S4A3_20260922_3b84e2cd8198` (zero candidates) was **CAPTURED**; Stage 5D.5 then false-failed `FUTURE_CREATED_SNAPSHOT` because its comparison clock preceded collection.
 - `REAL_SMOKE_ATTEMPT_2`: The existing snapshot was verified; an independent market refresh then caused `CANDIDATE_PROVENANCE_MISMATCH`.
 - `REAL_SMOKE_ATTEMPT_3`: Stage 5D.5B reused the exact immutable cache with zero network downloads and rebuilt zero candidates, but ordinary pandas CSV float parsing changed the exact per-ticker and aggregate raw hashes. Per supplied read-only diagnostic evidence, `float_precision="round_trip"` reproduced all 20/20 per-ticker hashes, Raw Market Data Hash, Full Input Logical Hash, and Candidate Count exactly. This was a CSV deserialization reproducibility defect, not market-data drift.
 
-These are fixed orchestration defects, **not** a completed production smoke. This patch did not rerun production or modify that snapshot/cache; retry follows independent audit. The no-key news provider is Yahoo Finance via yfinance; ambiguous/malformed evidence is quarantined or neutral, never silently treated as verified absence of risk.
+Those three attempts exposed and fixed orchestration defects; none was itself a completed production smoke. A later production smoke succeeded as recorded below. The no-key news provider is Yahoo Finance via yfinance; ambiguous/malformed evidence is quarantined or neutral, never silently treated as verified absence of risk.
+
+`REAL_PRODUCTION_SMOKE_2026_09_23 = PASS`, per supplied production evidence:
+
+- Snapshot: `S4A3_20260923_a1a5473b996a`
+- Stage 5D.5 run: `S5D5_RUN_942b9d417e1b126e902ecee0`
+- Candidate count: `0`
+- Stage 5D.3 management: `S5D3_RUN_e39095f3e0511fd9d7d25108`
+- Stage 5D.1 allocation: `S5D1_RUN_91679586adea218bc948890c`
+- ML production influence: **NO**
+- Second independent market refresh: **NO**
+
+This was a real zero-candidate live-paper session. It validated the production runner but did not exercise a real recommendation, PENDING, FILL, or SELL lifecycle. This patch did not replay or alter that runtime evidence and did not rerun the smoke.
 
 Stage 5D.5 requires an explicit path to the activated Stage 4A.3 checkout and verifies its frozen protocol identity before collection. The snapshot and its timestamp-derived input cache are resolved there, not assumed to be in the Stage 5D.5 development checkout. The real snapshot/cache cited above were described in the supplied smoke evidence; they were not opened or changed during this patch.
 

@@ -14,11 +14,49 @@ if str(_STAGE) not in sys.path:
     sys.path.insert(0, str(_STAGE))
 
 from live_paper.admission import admission_status, available_slots
-from live_paper.run_after_close import STAGE_ROOT, _config, _database_path, _existing_run, _initialize_runs, verify_live_run_integrity
+from live_paper.run_after_close import REPO, STAGE_ROOT, _config, _database_path, _existing_run, _initialize_runs, _utc, verify_live_run_integrity
 from stage5d.ledger import Stage5DLedger
 from stage5d.management_store import Stage5D3Manager
 from stage5d.news_ml_overlay import Stage5D4Overlay
 from stage5d.portfolio_state import whole_share_quantity
+from stage5d.stage4a3_shadow_adapter import Stage4A3PredictionNotAvailable, Stage4A3ShadowAdapter
+
+
+def verified_market_session(protocol_repo: Path, session_date: str, cutoff: datetime) -> str:
+    """Prove a transaction date using an existing immutable Stage 4A.3 snapshot."""
+    root = protocol_repo.resolve() / "Stage 4A.3"
+    activation_file = root / "prospective/audit/activation_record.json"
+    directory = root / "prospective/snapshots" / session_date[:4] / session_date
+    try:
+        from stage4a3.protocol_integrity import verify_runtime_protocol_integrity
+
+        activation = json.loads(activation_file.read_text(encoding="utf-8"))
+        verify_runtime_protocol_integrity(protocol_repo.resolve(), root, activation)
+        if not directory.is_dir():
+            raise ValueError("snapshot missing")
+        metadata = json.loads((directory / "snapshot_metadata.json").read_text(encoding="utf-8"))
+        market = json.loads((directory / "market_data_manifest.json").read_text(encoding="utf-8"))
+        candidates = json.loads((directory / "candidate_input_manifest.json").read_text(encoding="utf-8"))
+        if (metadata["Signal Date"] != session_date
+                or market["maximum_market_data_date"] != session_date
+                or market["nifty_maximum_date"] != session_date
+                or market["missing_tickers"]
+                or market["ticker_count_received"] != market["ticker_count_requested"]
+                or candidates["Signal Date"] != session_date
+                or candidates["Raw Market Data Hash"] != market["raw_data_logical_hash"]):
+            raise ValueError("market-session identity mismatch")
+        adapter = Stage4A3ShadowAdapter(root)
+        try:
+            adapter.load_verified_prediction(
+                {"signal_date": session_date, "signal_id": "S5D5_PAPER_ACTION_SESSION_SENTINEL",
+                 "ticker": "SENTINEL.NS"}, _utc(cutoff), directory)
+        except Stage4A3PredictionNotAvailable:
+            pass
+        else:
+            raise ValueError("snapshot sentinel collision")
+    except Exception as exc:
+        raise RuntimeError("PAPER_ACTION_REQUIRES_VALID_MARKET_SESSION") from exc
+    return session_date
 
 
 def _latest_report(ledger: Stage5DLedger) -> dict:
@@ -53,7 +91,8 @@ def _linked_managed_quantity(ledger: Stage5DLedger, recommendation: dict) -> int
 
 def record_action(ledger: Stage5DLedger, action: str, recommendation_id: str,
                   *, quantity: int | None = None, price: str | None = None,
-                  idempotency_key: str | None = None) -> dict:
+                  idempotency_key: str | None = None,
+                  verified_market_session_date: str | None = None) -> dict:
     recommendation = ledger.get_recommendation(recommendation_id)
     if recommendation is None:
         raise ValueError("Unknown recommendation")
@@ -83,6 +122,8 @@ def record_action(ledger: Stage5DLedger, action: str, recommendation_id: str,
     elif action == "fill":
         if quantity is None or price is None:
             raise ValueError("fill requires --qty and --price")
+        if verified_market_session_date != today:
+            raise ValueError("PAPER_ACTION_REQUIRES_VALID_MARKET_SESSION")
         if today <= max(str(recommendation["signal_date"]), str(recommendation["decision_date"])):
             raise ValueError("FILL_REQUIRES_FUTURE_ENTRY_SESSION")
         if manager.connection.execute("SELECT 1 FROM management_session_runs WHERE session_date=?", (today,)).fetchone():
@@ -104,6 +145,8 @@ def record_action(ledger: Stage5DLedger, action: str, recommendation_id: str,
     elif action == "sell":
         if quantity is None or price is None:
             raise ValueError("sell requires --qty and --price")
+        if verified_market_session_date != today:
+            raise ValueError("PAPER_ACTION_REQUIRES_VALID_MARKET_SESSION")
         checked = whole_share_quantity(quantity)
         managed = _linked_managed_quantity(ledger, recommendation)
         current = next((item.quantity for item in ledger.derive_positions()
@@ -140,9 +183,15 @@ def main() -> None:
     try:
         with Stage5DLedger(database) as ledger:
             _initialize_runs(ledger)
+            session_evidence = None
+            if args.action in {"fill", "sell"}:
+                now = datetime.now(ZoneInfo("Asia/Kolkata"))
+                protocol_repo = Path(config.get("stage4a3_runtime_repo") or REPO)
+                session_evidence = verified_market_session(protocol_repo, now.date().isoformat(), now)
             print(json.dumps(record_action(ledger, args.action, args.recommendation_id,
                                            quantity=args.qty, price=args.price,
-                                           idempotency_key=args.idempotency_key), indent=2))
+                                           idempotency_key=args.idempotency_key,
+                                           verified_market_session_date=session_evidence), indent=2))
     except Exception as exc:
         print(f"PAPER_ACTION_FAILED: {exc}", file=sys.stderr)
         raise SystemExit(1) from exc

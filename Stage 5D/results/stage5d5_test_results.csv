@@ -54,6 +54,9 @@ new_snapshot_collected_once,PASS
 existing_snapshot_reused_without_subprocess,PASS
 existing_snapshot_uses_original_verification_cutoff,PASS
 genuine_future_snapshot_rejected,PASS
+verified_snapshot_proves_market_session,PASS
+market_session_validation_requires_no_network,PASS
+missing_session_snapshot_fails_closed,PASS
 fixture_zero_candidate_cohort,PASS
 fixture_initial_builder_no_network,PASS
 snapshot_timestamp_resolves_exact_external_cache,PASS
@@ -87,6 +90,11 @@ explicit_pending_created,PASS
 duplicate_pending_rejected,PASS
 same_signal_date_fill_rejected,PASS
 same_date_fill_no_transaction,PASS
+saturday_fill_rejected,PASS
+sunday_fill_rejected,PASS
+holiday_equivalent_fill_rejected,PASS
+invalid_session_fill_no_transaction,PASS
+invalid_session_fill_no_lifecycle_mutation,PASS
 next_session_fill_before_management_allowed,PASS
 fill_uses_lifecycle,PASS
 recommendation_buy_lineage,PASS
@@ -97,7 +105,11 @@ rejected_fill_no_lifecycle_event,PASS
 cancel_frees_pending_slot,PASS
 cancel_prevents_new_fill,PASS
 sell_over_managed_quantity_rejected,PASS
+invalid_session_sell_rejected,PASS
+invalid_session_sell_no_transaction,PASS
 linked_paper_sell_recorded,PASS
+valid_session_sell_succeeds,PASS
+decline_admin_action_unchanged,PASS
 ledger_integrity,PASS
 overlay_integrity,PASS
 management_integrity,PASS

@@ -18,8 +18,9 @@
   "news_usable_statuses": ["AVAILABLE", "AVAILABLE_WITH_QUARANTINE"],
   "news_unavailable_admission": "BLOCKED_NEWS_DATA_UNAVAILABLE",
   "ml_production_influence": "NONE",
-  "paper_buy": "explicit paper_action only, through record_recommendation_fill; fill date strictly after signal and decision dates and before that date's Stage 5D.3 management session",
-  "paper_sell": "explicit user-recorded linked SELL only",
+  "paper_action_market_session": "FILL and SELL require a fully verified existing Stage 4A.3 snapshot binding the transaction date to complete NIFTY/market evidence and exact raw hash; fail PAPER_ACTION_REQUIRES_VALID_MARKET_SESSION; no network or weekday/holiday inference; PENDING/CANCEL/DECLINE remain administrative",
+  "paper_buy": "explicit paper_action only, through record_recommendation_fill; verified market-session fill date strictly after signal and decision dates and before that date's Stage 5D.3 management session",
+  "paper_sell": "explicit user-recorded linked SELL only on a verified market session",
   "broker_execution": false,
   "automatic_buy": false,
   "automatic_sell": false,
@@ -27,6 +28,6 @@
   "same_session_successful_rerun": "IDEMPOTENT_SUCCESS when scanner evidence hashes agree",
   "conflicting_same_session_evidence": "hard failure",
   "historical_run_integrity": "every Stage 5D.5 run row hash, canonical payload, all typed columns, unique ordered session dates, schema marker, SQLite integrity and foreign keys verified before a new production session; failure is LIVE_RUN_INTEGRITY_FAILURE",
-  "production_smoke_status": "RETRY_REQUIRED_AFTER_STAGE5D5C",
+  "production_smoke_status": "PRODUCTION_SMOKE_PASS_2026_09_23",
   "one_ticker_live_news_check": "TCS.NS 10 timestamped articles, 0 quarantined"
 }
