@@ -4,11 +4,11 @@
   "production_historical_as_of": false,
   "stage4a3_collection": "frozen prospective_runner production path; existing snapshot never overwritten; a newly created snapshot is checked with a fresh post-subprocess UTC verification time",
   "stage4a3_runtime_repo": "explicit path to already activated checkout when current worktree lacks ignored prospective state; frozen integrity verified there",
-  "scanner": "frozen build_signal_close_input(data_mode=REFRESH) reading the verified Stage 4A.3 snapshot's exact complete source cache, followed by frozen normalize_source_candidate; a missing/empty source file fails before the builder can download",
+  "scanner": "frozen build_signal_close_input(data_mode=REFRESH) reading the verified Stage 4A.3 snapshot's exact complete source cache with pandas float_precision=round_trip scoped only to its raw_market_data CSVs, followed by frozen normalize_source_candidate; a missing/empty source file fails before the builder can download",
   "snapshot_input_cache": "derive prospective/input_cache/YYYYMMDDTHHMMSSZ from verified Snapshot Created UTC under stage4a3_runtime_repo; no independent market refresh or fallback",
   "candidate_provenance": "exact immutable candidate manifest equality, including universe, raw/NIFTY/per-ticker hashes, candidate count, Signal-ID hash and full input hash; stable original market_data_manifest fields must match reconstructed values; report original provider identity",
   "position_source": "Stage 5D.2 derived positions and active pending reservations",
-  "management": "Stage 5D.3 process_completed_session with actual NIFTY predecessor and frozen Stage 2.1 stock features",
+  "management": "Stage 5D.3 process_completed_session with actual NIFTY predecessor; holding observations reuse the same immutable Stage 4A.3 cache with round-trip CSV parsing, exact per-ticker raw-hash binding and frozen Stage 2.1 features; no holding-data download fallback",
   "allocation": "Stage 5D.1 allocate_candidates",
   "news": "yfinance with explicit publication and acquisition timestamps; unusable articles quarantined, usable feed with quarantine remains AVAILABLE_WITH_QUARANTINE, zero usable evidence or provider failure is NEWS_DATA_UNAVAILABLE",
   "overlay": "Stage 5D.4 frozen overlay and read-only Stage 4A.3 shadow adapter",
@@ -27,6 +27,6 @@
   "same_session_successful_rerun": "IDEMPOTENT_SUCCESS when scanner evidence hashes agree",
   "conflicting_same_session_evidence": "hard failure",
   "historical_run_integrity": "every Stage 5D.5 run row hash, canonical payload, all typed columns, unique ordered session dates, schema marker, SQLite integrity and foreign keys verified before a new production session; failure is LIVE_RUN_INTEGRITY_FAILURE",
-  "production_smoke_status": "RETRY_REQUIRED_AFTER_STAGE5D5B",
+  "production_smoke_status": "RETRY_REQUIRED_AFTER_STAGE5D5C",
   "one_ticker_live_news_check": "TCS.NS 10 timestamped articles, 0 quarantined"
 }

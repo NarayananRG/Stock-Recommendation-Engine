@@ -6,6 +6,7 @@
 - Schema: `STAGE5D5_SCHEMA_V1`
 - Stage 5D.5A hardening: allocator admission binding, safe fill session ordering, partial news quarantine, and full prior-run integrity verification. Final pushed commit SHA is provided in the handoff.
 - Stage 5D.5B: post-collection UTC verification and exact immutable Stage 4A.3 input-cache reuse. Final pushed commit SHA is provided in the handoff.
+- Stage 5D.5C: exact CSV round-trip reconstruction and holding-data provenance hardening. Final pushed commit SHA is provided in the handoff.
 
 ## Operational command
 
@@ -24,6 +25,8 @@ An after-close recommendation can become PENDING, but its fill must be dated str
 Daily order: clock gate → completed session → frozen Stage 4A.3 collection/verification → frozen scanner → ledger holdings and reservations → frozen holding observations → Stage 5D.3 management → Stage 5D.1 allocation and persistence → timestamped news → Stage 5D.4 overlay/ML shadow → admission assessment → immutable run row and JSON/human report.
 
 After collection, the runner derives the exact Stage 4A.3 cache directory from the verified `Snapshot Created UTC`. It requires the frozen universe and NIFTY CSVs to be present and non-empty before rebuilding candidates with the frozen builder. The complete candidate manifest and stable market-data fields must match the immutable snapshot; the reported market provider is the original snapshot provider. A missing/incomplete cache fails closed, never triggers a replacement download. A newly collected snapshot uses a fresh UTC verification clock after the frozen subprocess returns; existing snapshots retain the entry-time verification cutoff.
+
+Candidate reconstruction temporarily injects pandas `float_precision="round_trip"` only for `.csv` reads underneath that exact cache's `raw_market_data` directory. All unrelated reads are unchanged, and `pandas.read_csv` is restored immediately after the frozen builder returns. Open-position observations use the same cache and parser, require exact per-ticker raw-hash equality with the immutable candidate manifest, and compute Close, Supertrend, and SwingLow10 through the frozen Stage 2.1 feature engine. There is no holding-data download fallback.
 
 ## Acceptance gates
 
@@ -45,18 +48,24 @@ After collection, the runner derives the exact Stage 4A.3 cache directory from t
 | SECOND_MARKET_REFRESH_PROHIBITED | PASS | complete-cache frozen builder fixture with download patched to hard-fail; missing/empty files fail before builder |
 | SNAPSHOT_CANDIDATE_PROVENANCE | PASS | exact candidate manifest, raw/NIFTY/per-ticker hashes, stable original market manifest fields |
 | ZERO_CANDIDATE_LIVE_SESSION_SUPPORTED | PASS | frozen zero-candidate cohort reconstruction and daily zero-position report fixture |
+| ROUND_TRIP_CSV_RECONSTRUCTION | PASS | pinned precision-sensitive CSV differs under ordinary parsing and exactly reproduces the pre-serialization hash with round-trip parsing; scope/restoration verified |
+| EXACT_RAW_HASH_RECONSTRUCTION | PASS | exact raw, NIFTY, per-ticker, Signal-ID and full input hashes retained; no tolerance or bypass |
+| HOLDING_SNAPSHOT_CACHE_REUSE | PASS | holding observation sourced from the same verified session cache and frozen Stage 2.1 feature engine |
+| HOLDING_MARKET_REFRESH_PROHIBITED | PASS | no fallback download; missing and empty holding cache files fail before network access |
+| HOLDING_RAW_HASH_PROVENANCE | PASS | holding dataframe hash must equal immutable manifest per-ticker hash; mismatch and latest-date mismatch fail closed |
 | ML_PRODUCTION_INFLUENCE | NO | frozen overlay; admission ignores ML selection |
 | BROKER_EXECUTION | NO | no broker client |
 | AUTOMATIC_BUY | NO | ordinary runner does not call `mark_pending` or fill |
 | AUTOMATIC_SELL | NO | SELL requires explicit paper-action invocation |
 | UI | NO | CLI only |
 
-Tests: Stage 5D.5 **118/118 PASS**; Stage 5D.4 **107/107 PASS**; Stage 5D.3 **130/130 PASS**; Stage 5D.2 **129/129 PASS**; Stage 5D.1 **80/80 PASS**. Frozen tracked changes: **0**. Runtime SQLite, WAL/SHM, profile config, and reports are gitignored.
+Tests: Stage 5D.5 **129/129 PASS**; Stage 5D.4 **107/107 PASS**; Stage 5D.3 **130/130 PASS**; Stage 5D.2 **129/129 PASS**; Stage 5D.1 **80/80 PASS**. Frozen tracked changes: **0**. Runtime SQLite, WAL/SHM, profile config, and reports are gitignored.
 
-`production_smoke_status = "RETRY_REQUIRED_AFTER_STAGE5D5B"`.
+`production_smoke_status = "RETRY_REQUIRED_AFTER_STAGE5D5C"`.
 
 - `REAL_SMOKE_ATTEMPT_1`: Per supplied operational evidence, immutable Stage 4A.3 snapshot `S4A3_20260922_3b84e2cd8198` (zero candidates) was **CAPTURED**; Stage 5D.5 then false-failed `FUTURE_CREATED_SNAPSHOT` because its comparison clock preceded collection.
 - `REAL_SMOKE_ATTEMPT_2`: The existing snapshot was verified; an independent market refresh then caused `CANDIDATE_PROVENANCE_MISMATCH`.
+- `REAL_SMOKE_ATTEMPT_3`: Stage 5D.5B reused the exact immutable cache with zero network downloads and rebuilt zero candidates, but ordinary pandas CSV float parsing changed the exact per-ticker and aggregate raw hashes. Per supplied read-only diagnostic evidence, `float_precision="round_trip"` reproduced all 20/20 per-ticker hashes, Raw Market Data Hash, Full Input Logical Hash, and Candidate Count exactly. This was a CSV deserialization reproducibility defect, not market-data drift.
 
 These are fixed orchestration defects, **not** a completed production smoke. This patch did not rerun production or modify that snapshot/cache; retry follows independent audit. The no-key news provider is Yahoo Finance via yfinance; ambiguous/malformed evidence is quarantined or neutral, never silently treated as verified absence of risk.
 

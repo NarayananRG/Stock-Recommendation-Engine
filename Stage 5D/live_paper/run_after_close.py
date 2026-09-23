@@ -10,6 +10,7 @@ import json
 import os
 import subprocess
 import sys
+from contextlib import contextmanager
 from datetime import date, datetime, time, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -272,17 +273,51 @@ def resolve_snapshot_input_cache(protocol_repo: Path, snapshot_dir: Path, metada
     return cache, snapshot_manifest
 
 
-def _build_candidates(session: str, snapshot_dir: Path, protocol_repo: Path, metadata: dict):
-    from unittest.mock import patch
+@contextmanager
+def round_trip_market_csv_reads(snapshot_cache: Path):
+    """Scope lossless float parsing to one verified raw-market cache only."""
+    import pandas as pd
 
+    raw_root = (snapshot_cache / "raw_market_data").resolve()
+    original = pd.read_csv
+
+    def scoped_read_csv(source, *args, **kwargs):
+        if isinstance(source, (str, os.PathLike)):
+            path = Path(source).resolve()
+            if path.suffix.lower() == ".csv" and path.parent == raw_root:
+                kwargs.setdefault("float_precision", "round_trip")
+        return original(source, *args, **kwargs)
+
+    pd.read_csv = scoped_read_csv
+    try:
+        yield
+    finally:
+        pd.read_csv = original
+
+
+@contextmanager
+def prohibit_market_downloads():
+    """Make any reconstruction-time yfinance download attempt a hard failure."""
+    import yfinance as yf
+
+    original = yf.download
+
+    def prohibited(*_args, **_kwargs):
+        raise RuntimeError("SECOND_MARKET_REFRESH_PROHIBITED")
+
+    yf.download = prohibited
+    try:
+        yield
+    finally:
+        yf.download = original
+
+
+def _build_candidates(session: str, snapshot_dir: Path, protocol_repo: Path, metadata: dict):
     from stage4a3.candidate_input_builder import build_signal_close_input, verify_candidate_input
     from stage4a3.hashing import canonical_json_hash
     cache, snapshot_manifest = resolve_snapshot_input_cache(protocol_repo, snapshot_dir, metadata)
-    import yfinance as yf
-    with patch.object(yf, "download", side_effect=RuntimeError("SECOND_MARKET_REFRESH_PROHIBITED")) as forbidden:
+    with round_trip_market_csv_reads(cache), prohibit_market_downloads():
         frame, manifest, market = build_signal_close_input(protocol_repo, session, cache, "REFRESH")
-    if forbidden.call_count:
-        raise RuntimeError("SECOND_MARKET_REFRESH_PROHIBITED")
     frozen_universe = json.loads((protocol_repo / "Stage 4A.3/results/stage4a3_frozen_universe_hash.json").read_text())
     verify_candidate_input(frame, manifest, frozen_universe["FROZEN_UNIVERSE_HASH"])
     if (manifest != snapshot_manifest or canonical_json_hash(manifest) != json.loads(
@@ -310,10 +345,11 @@ def _build_candidates(session: str, snapshot_dir: Path, protocol_repo: Path, met
         raise RuntimeError("SCANNER_DATE_MISMATCH")
     if len({row["signal_id"] for row in candidates}) != len(candidates):
         raise RuntimeError("DUPLICATE_SCANNER_SIGNAL_ID")
-    return candidates, manifest, snapshot_market, sessions[-2]
+    return candidates, manifest, snapshot_market, sessions[-2], cache
 
 
-def _holding_observations(ledger: Stage5DLedger, session: str, scratch: Path):
+def _holding_observations(ledger: Stage5DLedger, session: str, snapshot_cache: Path,
+                          candidate_manifest: dict):
     import pandas as pd
     from stage4a3.candidate_input_builder import BUILDER_FILES, _module
     from stage4a3.hashing import dataframe_content_hash
@@ -325,17 +361,21 @@ def _holding_observations(ledger: Stage5DLedger, session: str, scratch: Path):
     prices, observations = {}, []
     for position in ledger.derive_positions():
         ticker = position.ticker
-        cache = scratch / "raw_market_data" / stage221.CandidateSignalEngine._cache_name(ticker)
-        if cache.is_file():
-            frame = pd.read_csv(cache, parse_dates=["Date"], index_col="Date")
+        cache = snapshot_cache / "raw_market_data" / stage221.CandidateSignalEngine._cache_name(ticker)
+        if not cache.is_file() or cache.stat().st_size == 0:
+            raise RuntimeError(f"MISSING_REQUIRED_HOLDING_PRICE_CACHE: {ticker}")
+        try:
+            with round_trip_market_csv_reads(snapshot_cache):
+                frame = pd.read_csv(cache, parse_dates=["Date"], index_col="Date")
             frame = stage21.normalize_index(frame)
-        else:
-            loader = stage21.HistoricalDataLoader(config)
-            loader.test_end = pd.Timestamp(session)
-            loader.warmup_start = pd.Timestamp(session) - pd.Timedelta(days=500)
-            frame = loader.download(ticker)
+        except Exception as exc:
+            raise RuntimeError(f"MISSING_REQUIRED_HOLDING_PRICE_CACHE: {ticker}") from exc
+        expected_hash = candidate_manifest.get("Per-Ticker Raw Hashes", {}).get(ticker)
+        actual_hash = dataframe_content_hash(frame.reset_index()) if not frame.empty else None
+        if expected_hash is None or actual_hash != expected_hash:
+            raise RuntimeError(f"HOLDING_MARKET_DATA_PROVENANCE_MISMATCH: {ticker}")
         if frame.empty or pd.Timestamp(frame.index.max()).date().isoformat() != session:
-            raise RuntimeError(f"MISSING_REQUIRED_HOLDING_PRICE: {ticker}")
+            raise RuntimeError(f"MISSING_REQUIRED_HOLDING_PRICE_CACHE: {ticker}")
         if len(frame) < config.min_daily_history:
             raise RuntimeError(f"INCOMPLETE_HOLDING_HISTORY: {ticker}")
         features = feature_engine.add_stock_features(frame)
@@ -347,8 +387,8 @@ def _holding_observations(ledger: Stage5DLedger, session: str, scratch: Path):
                              "open": str(row["Open"]), "high": str(row["High"]),
                              "low": str(row["Low"]), "close": str(row["Close"]),
                              "daily_supertrend": str(row["ST"]), "swing_low_10": str(row["SwingLow10"]),
-                             "source_name": "FROZEN_STAGE2_1_FEATURE_ENGINE_YFINANCE_REFRESH",
-                             "source_data_hash": dataframe_content_hash(frame.reset_index())})
+                             "source_name": "STAGE4A3_SNAPSHOT_CACHE_FROZEN_STAGE2_1_FEATURE_ENGINE",
+                             "source_data_hash": actual_hash})
     return prices, observations
 
 
@@ -382,8 +422,8 @@ def _run_with_clock(config_path: Path, *, db_override: str | None = None, now: d
         _assert_integrity(ledger, manager, overlay)
         protocol_repo = Path(config.get("stage4a3_runtime_repo") or REPO)
         snapshot_dir, snapshot_metadata = _snapshot(session, datetime.now(timezone.utc), protocol_repo)
-        scratch = runtime / "market_cache" / session
-        candidates, candidate_manifest, market_manifest, actual_previous = _build_candidates(session, snapshot_dir, protocol_repo, snapshot_metadata)
+        candidates, candidate_manifest, market_manifest, actual_previous, snapshot_cache = _build_candidates(
+            session, snapshot_dir, protocol_repo, snapshot_metadata)
         existing = _existing_run(ledger, session)
         if existing:
             if (existing["market_data_hash"] != market_manifest["raw_data_logical_hash"]
@@ -398,7 +438,7 @@ def _run_with_clock(config_path: Path, *, db_override: str | None = None, now: d
                 raise RuntimeError("CONFLICTING_SAME_SESSION_EVIDENCE")
             _persist_report_file(existing, runtime)
             return existing | {"status": "IDEMPOTENT_SUCCESS"}
-        prices, observations = _holding_observations(ledger, session, scratch)
+        prices, observations = _holding_observations(ledger, session, snapshot_cache, candidate_manifest)
         positions = ledger.build_allocator_open_positions(prices, as_of_date=session)
         pending = ledger.get_active_pending_reservations()
         predecessor = _previous_management_date(manager, actual_previous, session)

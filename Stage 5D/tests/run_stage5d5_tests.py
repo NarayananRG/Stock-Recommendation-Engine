@@ -25,7 +25,7 @@ from live_paper.admission import admission_status, available_slots
 from live_paper.news_normalizer import normalize_article
 from live_paper.news_provider import _publication, fetch_yfinance_news
 from live_paper.paper_action import record_action
-from live_paper.run_after_close import _build_candidates, _collect_news, _existing_run, _holding_observations, _initialize_runs, _run_with_clock, _snapshot, render_report, require_after_close, resolve_snapshot_input_cache, verify_live_run_integrity
+from live_paper.run_after_close import _build_candidates, _collect_news, _existing_run, _holding_observations, _initialize_runs, _run_with_clock, _snapshot, render_report, require_after_close, resolve_snapshot_input_cache, round_trip_market_csv_reads, verify_live_run_integrity
 from stage5d.allocator import allocate_candidates
 from stage5d.horizon import HorizonPreference
 from stage5d.ledger import Stage5DLedger, canonical_json, payload_sha256
@@ -152,7 +152,7 @@ def main():
     check("complete_provider_failure_blocks", feed_down[2] == "NEWS_DATA_UNAVAILABLE" and admission_status(dummy_rec, buy, feed_down[2], [], []) == "BLOCKED_NEWS_DATA_UNAVAILABLE")
 
     import pandas as pd
-    from stage4a3.hashing import canonical_json_hash
+    from stage4a3.hashing import canonical_json_hash, dataframe_content_hash
     with tempfile.TemporaryDirectory() as tmp:
         snapshot = Path(tmp)
         scanner_manifest = {"Signal Date": "2026-09-22", "Full Input Logical Hash": "FROZEN_CANDIDATES"}
@@ -169,7 +169,7 @@ def main():
              patch("stage4a3.candidate_input_builder.build_signal_close_input", return_value=(pd.DataFrame([candidate()]), scanner_manifest, scanner_market)), \
              patch("stage4a3.candidate_input_builder.verify_candidate_input"), \
              patch("live_paper.run_after_close.resolve_snapshot_input_cache", return_value=(snapshot, scanner_manifest)):
-            scanned, _, _, prior = _build_candidates("2026-09-22", snapshot, ROOT.parent, {"Candidate Count": 1})
+            scanned, _, _, prior, _ = _build_candidates("2026-09-22", snapshot, ROOT.parent, {"Candidate Count": 1})
             check("scanner_source_normalization_parity", scanned[0] == normalize_source_candidate(candidate()))
             check("scanner_signal_id_parity", scanned[0]["signal_id"] == derive_signal_id(ticker="TEST.NS", signal_date="2026-09-22", signal="BUY", setup="PULLBACK"))
             check("actual_market_predecessor", prior == "2026-09-21")
@@ -183,6 +183,25 @@ def main():
              patch("stage4a3.candidate_input_builder.verify_candidate_input"), \
              patch("live_paper.run_after_close.resolve_snapshot_input_cache", return_value=(snapshot, scanner_manifest)):
             check("incomplete_market_data_rejected", raises("CANDIDATE_PROVENANCE_MISMATCH", lambda: _build_candidates("2026-09-22", snapshot, ROOT.parent, {"Candidate Count": 1})))
+
+    with tempfile.TemporaryDirectory() as tmp:
+        precision_root = Path(tmp)
+        raw_root = precision_root / "raw_market_data"
+        raw_root.mkdir()
+        original_precision = pd.DataFrame({"Date": ["2026-09-22"], "Close": [123456789.12345679]})
+        market_csv = raw_root / "TCS.NS.csv"
+        unrelated_csv = precision_root / "prospective_universe.csv"
+        original_precision.to_csv(market_csv, index=False)
+        original_precision.to_csv(unrelated_csv, index=False)
+        original_reader = pd.read_csv
+        ordinary = pd.read_csv(market_csv)
+        with round_trip_market_csv_reads(precision_root):
+            lossless = pd.read_csv(market_csv)
+            unrelated = pd.read_csv(unrelated_csv)
+            check("round_trip_scoped_only_to_exact_market_cache", lossless.iloc[0]["Close"] == original_precision.iloc[0]["Close"] and unrelated.iloc[0]["Close"] == ordinary.iloc[0]["Close"])
+        check("ordinary_csv_hash_can_differ", dataframe_content_hash(ordinary) != dataframe_content_hash(original_precision))
+        check("round_trip_csv_hash_reproduces_original", dataframe_content_hash(lossless) == dataframe_content_hash(original_precision))
+        check("pandas_read_csv_restored_after_scope", pd.read_csv is original_reader)
 
     with tempfile.TemporaryDirectory() as tmp:
         activated = Path(tmp) / "activated"
@@ -249,7 +268,7 @@ def main():
         fake_yfinance.download = download
         fake_yfinance.set_tz_cache_location = lambda *_args: None
         before_hashes = {ticker: sha256_file(raw / (ticker.replace("^", "INDEX_").replace("&", "AND") + ".csv")) for ticker in tickers}
-        with patch.dict(sys.modules, {"yfinance": fake_yfinance}), redirect_stdout(io.StringIO()):
+        with patch.dict(sys.modules, {"yfinance": fake_yfinance}), round_trip_market_csv_reads(cache), redirect_stdout(io.StringIO()):
             source_frame, source_manifest, source_market = build_signal_close_input(activated, "2026-08-28", cache, "REFRESH")
         check("fixture_zero_candidate_cohort", len(source_frame) == 0 and source_manifest["Candidate Count"] == 0)
         check("fixture_initial_builder_no_network", download.call_count == 0)
@@ -260,8 +279,9 @@ def main():
         check("snapshot_timestamp_resolves_exact_external_cache", resolve_snapshot_input_cache(activated, snapshot, metadata)[0] == cache)
         download.reset_mock()
         with patch.dict(sys.modules, {"yfinance": fake_yfinance}), redirect_stdout(io.StringIO()):
-            reconstructed, rebuilt, market, predecessor = _build_candidates("2026-08-28", snapshot, activated, metadata)
+            reconstructed, rebuilt, market, predecessor, returned_cache = _build_candidates("2026-08-28", snapshot, activated, metadata)
         check("complete_snapshot_cache_reconstruction", reconstructed == [] and predecessor == source_market["nifty_valid_sessions"][-2])
+        check("candidate_reconstruction_returns_verified_cache", returned_cache == cache)
         check("second_market_refresh_prohibited", download.call_count == 0)
         check("snapshot_candidate_manifest_exact_equality", rebuilt == source_manifest)
         check("snapshot_universe_nifty_signal_and_full_hashes", all(rebuilt[key] == source_manifest[key] for key in ("Frozen Universe Hash", "NIFTY Data Hash", "Candidate Signal-ID Logical Hash", "Full Input Logical Hash")))
@@ -286,13 +306,28 @@ def main():
         cache = scratch / "raw_market_data"
         cache.mkdir()
         shutil.copyfile(ROOT.parent / "Stage 2.2.2 Final/stage2_2_1/data/frozen/TCS.NS.csv", cache / "TCS.NS.csv")
-        fake_ledger = type("FixtureLedger", (), {"derive_positions": lambda self: [type("P", (), {"ticker": "TCS.NS"})()]})()
-        with patch.dict(sys.modules, {"yfinance": types.ModuleType("yfinance")}):
-            prices, observations = _holding_observations(fake_ledger, "2026-08-28", scratch)
-            missing_session = raises("MISSING_REQUIRED_HOLDING_PRICE", lambda: _holding_observations(fake_ledger, "2026-08-27", scratch))
+        def ledger_for(ticker):
+            return type("FixtureLedger", (), {"derive_positions": lambda self: [type("P", (), {"ticker": ticker})()]})()
+        fake_ledger = ledger_for("TCS.NS")
+        frozen_frame = pd.read_csv(cache / "TCS.NS.csv", parse_dates=["Date"], index_col="Date", float_precision="round_trip")
+        holding_manifest = {"Per-Ticker Raw Hashes": {"TCS.NS": dataframe_content_hash(frozen_frame.reset_index())}}
+        holding_download = Mock(side_effect=RuntimeError("HOLDING_MARKET_REFRESH_PROHIBITED"))
+        holding_yf = types.ModuleType("yfinance")
+        holding_yf.download = holding_download
+        with patch.dict(sys.modules, {"yfinance": holding_yf}):
+            prices, observations = _holding_observations(fake_ledger, "2026-08-28", scratch, holding_manifest)
+            missing_session = raises("MISSING_REQUIRED_HOLDING_PRICE_CACHE", lambda: _holding_observations(fake_ledger, "2026-08-27", scratch, holding_manifest))
         check("frozen_holding_price_observation", prices["TCS.NS"] == observations[0]["close"])
         check("frozen_supertrend_and_swing_low", observations[0]["daily_supertrend"] and observations[0]["swing_low_10"])
         check("missing_holding_session_rejected", missing_session)
+        check("holding_uses_snapshot_cache_source", observations[0]["source_name"] == "STAGE4A3_SNAPSHOT_CACHE_FROZEN_STAGE2_1_FEATURE_ENGINE")
+        check("holding_round_trip_hash_matches_manifest", observations[0]["source_data_hash"] == holding_manifest["Per-Ticker Raw Hashes"]["TCS.NS"])
+        check("holding_market_refresh_prohibited", holding_download.call_count == 0)
+        (cache / "EMPTY.NS.csv").write_bytes(b"")
+        with patch.dict(sys.modules, {"yfinance": holding_yf}):
+            check("missing_holding_csv_fails_before_download", raises("MISSING_REQUIRED_HOLDING_PRICE_CACHE", lambda: _holding_observations(ledger_for("MISSING.NS"), "2026-08-28", scratch, {"Per-Ticker Raw Hashes": {"MISSING.NS": "X"}})) and holding_download.call_count == 0)
+            check("empty_holding_csv_fails_before_download", raises("MISSING_REQUIRED_HOLDING_PRICE_CACHE", lambda: _holding_observations(ledger_for("EMPTY.NS"), "2026-08-28", scratch, {"Per-Ticker Raw Hashes": {"EMPTY.NS": "X"}})) and holding_download.call_count == 0)
+            check("holding_hash_mismatch_fails_closed", raises("HOLDING_MARKET_DATA_PROVENANCE_MISMATCH", lambda: _holding_observations(fake_ledger, "2026-08-28", scratch, {"Per-Ticker Raw Hashes": {"TCS.NS": "WRONG"}})))
 
     with tempfile.TemporaryDirectory() as tmp:
         db = Path(tmp) / "paper.sqlite3"
@@ -400,7 +435,7 @@ def main():
         with patch("live_paper.run_after_close.REPO", fixture_repo), \
              patch("live_paper.run_after_close._profile", return_value=fixed_profile), \
              patch("live_paper.run_after_close._snapshot", return_value=(snapshot, {"Snapshot ID": "SNAP"})), \
-             patch("live_paper.run_after_close._build_candidates", return_value=([], manifest, market, "2026-09-21")), \
+             patch("live_paper.run_after_close._build_candidates", return_value=([], manifest, market, "2026-09-21", snapshot)), \
              patch("live_paper.run_after_close._holding_observations", return_value=({}, [])), \
              patch("live_paper.run_after_close.Stage4A3ShadowAdapter"):
             now = datetime(2026, 9, 22, 16, 0, tzinfo=ZoneInfo("Asia/Kolkata"))
@@ -412,12 +447,12 @@ def main():
             second = _run_with_clock(config, now=now)
             check("same_session_idempotent", second["status"] == "IDEMPOTENT_SUCCESS" and second["run_id"] == first["run_id"])
             check("human_report_rendered", "LIVE PAPER REPORT" in render_report(second) and "PORTFOLIO" in render_report(second))
-            with patch("live_paper.run_after_close._build_candidates", return_value=([], manifest | {"Full Input Logical Hash": "CHANGED"}, market, "2026-09-21")):
+            with patch("live_paper.run_after_close._build_candidates", return_value=([], manifest | {"Full Input Logical Hash": "CHANGED"}, market, "2026-09-21", snapshot)):
                 check("conflicting_same_session_rejected", raises("CONFLICTING_SAME_SESSION_EVIDENCE", lambda: _run_with_clock(config, now=now)))
             changed_profile = InvestmentProfile(2, "2026-09-22T12:00:00Z", Decimal("100000"), HorizonPreference.THREE_MONTHS)
             with patch("live_paper.run_after_close._profile", return_value=changed_profile):
                 check("same_session_profile_change_rejected", raises("CONFLICTING_SAME_SESSION_EVIDENCE", lambda: _run_with_clock(config, now=now)))
-            with patch("live_paper.run_after_close._build_candidates", return_value=([], manifest, market, "2026-09-23")):
+            with patch("live_paper.run_after_close._build_candidates", return_value=([], manifest, market, "2026-09-23", snapshot)):
                 skipped = datetime(2026, 9, 24, 16, 0, tzinfo=ZoneInfo("Asia/Kolkata"))
                 check("skipped_market_session_rejected", raises("MISSING_COMPLETED_MARKET_SESSION", lambda: _run_with_clock(config, now=skipped)))
             with Stage5DLedger(fixture_repo / "Stage 5D/runtime/test.sqlite3") as ledger:
@@ -441,7 +476,7 @@ def main():
              patch("live_paper.run_after_close._profile", return_value=profile()), \
              patch("live_paper.run_after_close._snapshot", return_value=(snapshot, {"Snapshot ID": "SNAP"})), \
              patch("live_paper.run_after_close._build_candidates", return_value=([candidate()], {"Full Input Logical Hash": "CANDIDATES"},
-                                                                                  {"raw_data_logical_hash": "MARKET", "provider_identifier": "FIXTURE"}, "2026-09-21")), \
+                                                                                  {"raw_data_logical_hash": "MARKET", "provider_identifier": "FIXTURE"}, "2026-09-21", snapshot)), \
              patch("live_paper.run_after_close._holding_observations", return_value=({}, [])), \
              patch("live_paper.run_after_close.Stage4A3ShadowAdapter", return_value=adapter), \
              patch.object(Stage4A3ShadowAdapter, "load_verified_prediction", side_effect=Stage4A3PredictionNotAvailable("no row")), \
