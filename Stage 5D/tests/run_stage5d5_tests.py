@@ -24,7 +24,8 @@ from live_paper import SCHEMA_VERSION
 from live_paper.admission import admission_status, available_slots
 from live_paper.news_normalizer import normalize_article
 from live_paper.news_provider import _publication, fetch_yfinance_news
-from live_paper.paper_action import record_action, verified_market_session
+from live_paper.nse_session_calendar import DEFAULT_CALENDAR_PATH, load_verified_calendar, verify_scheduled_session
+from live_paper.paper_action import record_action, verify_paper_action_market_session
 from live_paper.run_after_close import _build_candidates, _collect_news, _existing_run, _holding_observations, _initialize_runs, _run_with_clock, _snapshot, render_report, require_after_close, resolve_snapshot_input_cache, round_trip_market_csv_reads, verify_live_run_integrity
 from stage5d.allocator import allocate_candidates
 from stage5d.horizon import HorizonPreference
@@ -258,10 +259,40 @@ def main():
         with patch.dict(sys.modules, {"stage4a3.protocol_integrity": protocol_stub}), \
              patch("live_paper.paper_action.Stage4A3ShadowAdapter", return_value=session_adapter), \
              patch("socket.create_connection", network):
-            proved_session = verified_market_session(activated, "2026-09-23", datetime(2026, 9, 23, 16, 0, tzinfo=ZoneInfo("Asia/Kolkata")))
-        check("verified_snapshot_proves_market_session", proved_session == "2026-09-23")
+            proved_session = verify_paper_action_market_session(activated, "2026-09-23", datetime(2026, 9, 23, 16, 0, tzinfo=ZoneInfo("Asia/Kolkata")))
+        check("verified_snapshot_proves_market_session", proved_session["session_date"] == "2026-09-23" and proved_session["evidence_type"] == "STAGE4A3_COMPLETED_SESSION")
         check("market_session_validation_requires_no_network", network.call_count == 0)
-        check("missing_session_snapshot_fails_closed", raises("PAPER_ACTION_REQUIRES_VALID_MARKET_SESSION", lambda: verified_market_session(activated, "2026-09-24", datetime(2026, 9, 24, 16, 0, tzinfo=ZoneInfo("Asia/Kolkata")))))
+        scheduled = verify_paper_action_market_session(activated, "2026-09-24", datetime(2026, 9, 24, 9, 30, tzinfo=ZoneInfo("Asia/Kolkata")))
+        check("missing_snapshot_uses_official_schedule", scheduled["evidence_type"] == "NSE_OFFICIAL_SCHEDULED_SESSION")
+        check("scheduled_evidence_auditable", scheduled["source_download_ref"] == "NSE/CMTR/71775" and scheduled["source_circular_ref"] == "172/2025" and len(scheduled["calendar_payload_hash"]) == 64)
+        (root / "prospective/snapshots/2026/2026-09-24").mkdir(parents=True)
+        check("existing_corrupt_snapshot_fails_closed", raises("PAPER_ACTION_REQUIRES_VALID_MARKET_SESSION", lambda: verify_paper_action_market_session(activated, "2026-09-24", datetime(2026, 9, 24, 16, 0, tzinfo=ZoneInfo("Asia/Kolkata")))))
+        check("corrupt_snapshot_no_calendar_fallback", raises("PAPER_ACTION_REQUIRES_VALID_MARKET_SESSION", lambda: verify_paper_action_market_session(activated, "2026-09-24", datetime(2026, 9, 24, 16, 0, tzinfo=ZoneInfo("Asia/Kolkata")))))
+
+    calendar = load_verified_calendar()
+    check("official_calendar_identity", calendar["source"]["authority"] == "National Stock Exchange of India Limited" and calendar["segment"] == "CAPITAL MARKET SEGMENT")
+    check("official_calendar_integrity", len(calendar["calendar_payload_hash"]) == 64)
+    check("calendar_weekday_session", verify_scheduled_session("2026-09-24")["evidence_type"] == "NSE_OFFICIAL_SCHEDULED_SESSION")
+    check("calendar_saturday_rejected", raises("PAPER_ACTION_REQUIRES_VALID_MARKET_SESSION", lambda: verify_scheduled_session("2026-09-26")))
+    check("calendar_sunday_rejected", raises("PAPER_ACTION_REQUIRES_VALID_MARKET_SESSION", lambda: verify_scheduled_session("2026-09-27")))
+    check("official_weekday_holiday_rejected", raises("PAPER_ACTION_REQUIRES_VALID_MARKET_SESSION", lambda: verify_scheduled_session("2026-10-02")))
+    check("muhurat_not_guessed", raises("PAPER_ACTION_SPECIAL_SESSION_UNSUPPORTED", lambda: verify_scheduled_session("2026-11-08")))
+    check("unsupported_calendar_year_rejected", raises("PAPER_ACTION_MARKET_CALENDAR_UNAVAILABLE", lambda: verify_scheduled_session("2027-01-04")))
+    with tempfile.TemporaryDirectory() as tmp:
+        tampered = Path(tmp) / "calendar.json"
+        value = json.loads(DEFAULT_CALENDAR_PATH.read_text(encoding="utf-8"))
+        value["closed_dates"].remove("2026-10-02")
+        tampered.write_text(json.dumps(value), encoding="utf-8")
+        check("tampered_calendar_rejected", raises("PAPER_ACTION_MARKET_CALENDAR_INTEGRITY_FAILURE", lambda: verify_scheduled_session("2026-09-24", tampered)))
+        check("missing_calendar_rejected", raises("PAPER_ACTION_MARKET_CALENDAR_INTEGRITY_FAILURE", lambda: verify_scheduled_session("2026-09-24", Path(tmp) / "missing.json")))
+    calendar_network = Mock(side_effect=AssertionError("CALENDAR_NETWORK_PROHIBITED"))
+    calendar_download = Mock(side_effect=AssertionError("CALENDAR_YFINANCE_PROHIBITED"))
+    calendar_yfinance = types.ModuleType("yfinance")
+    calendar_yfinance.download = calendar_download
+    with patch("socket.create_connection", calendar_network), patch.dict(sys.modules, {"yfinance": calendar_yfinance}):
+        verify_scheduled_session("2026-09-24")
+    check("calendar_validation_zero_network_calls", calendar_network.call_count == 0)
+    check("calendar_validation_zero_yfinance_downloads", calendar_download.call_count == 0)
 
     # Clone only the frozen builder's read dependencies into a disposable
     # external checkout. The snapshot/source cache under the real repo is never
@@ -384,45 +415,50 @@ def main():
                 check("explicit_pending_created", pending_action["status"] == "CREATED" and len(ledger.get_active_pending_reservations()) == 1)
                 check("duplicate_pending_rejected", raises("BLOCKED_DUPLICATE_PENDING_RECOMMENDATION", lambda: record_action(ledger, "pending", rec["recommendation_id"])))
                 quantity = min(2, int(rec["recommended_quantity"]))
-                check("same_signal_date_fill_rejected", raises("FILL_REQUIRES_FUTURE_ENTRY_SESSION", lambda: record_action(ledger, "fill", rec["recommendation_id"], quantity=1, price="100", verified_market_session_date="2026-09-22")))
+                check("same_signal_date_fill_rejected", raises("FILL_REQUIRES_FUTURE_ENTRY_SESSION", lambda: record_action(ledger, "fill", rec["recommendation_id"], quantity=1, price="100")))
                 check("same_date_fill_no_transaction", not ledger.transactions_for_recommendation(rec["recommendation_id"]))
                 before_invalid_transactions = len(ledger.transactions_for_recommendation(rec["recommendation_id"]))
                 before_invalid_events = ledger.connection.execute("SELECT count(*) FROM recommendation_events WHERE recommendation_id=?", (rec["recommendation_id"],)).fetchone()[0]
-                for invalid_day, name in (("2026-09-26", "saturday_fill_rejected"),
-                                          ("2026-09-27", "sunday_fill_rejected"),
-                                          ("2026-09-24", "holiday_equivalent_fill_rejected")):
+                for invalid_day, name, error in (("2026-09-26", "saturday_fill_rejected", "PAPER_ACTION_REQUIRES_VALID_MARKET_SESSION"),
+                                                 ("2026-09-27", "sunday_fill_rejected", "PAPER_ACTION_REQUIRES_VALID_MARKET_SESSION"),
+                                                 ("2026-10-02", "official_holiday_fill_rejected", "PAPER_ACTION_REQUIRES_VALID_MARKET_SESSION"),
+                                                 ("2027-01-04", "unsupported_year_fill_rejected", "PAPER_ACTION_MARKET_CALENDAR_UNAVAILABLE")):
                     PaperClock.day = invalid_day
-                    check(name, raises("PAPER_ACTION_REQUIRES_VALID_MARKET_SESSION", lambda: record_action(ledger, "fill", rec["recommendation_id"], quantity=1, price="100")))
+                    check(name, raises(error, lambda: record_action(ledger, "fill", rec["recommendation_id"], quantity=1, price="100")))
                 check("invalid_session_fill_no_transaction", len(ledger.transactions_for_recommendation(rec["recommendation_id"])) == before_invalid_transactions)
                 check("invalid_session_fill_no_lifecycle_mutation", ledger.connection.execute("SELECT count(*) FROM recommendation_events WHERE recommendation_id=?", (rec["recommendation_id"],)).fetchone()[0] == before_invalid_events)
                 PaperClock.day = "2026-09-23"
-                fill = record_action(ledger, "fill", rec["recommendation_id"], quantity=quantity, price="100", verified_market_session_date="2026-09-23")
-                check("next_session_fill_before_management_allowed", fill["status"] == "CREATED")
+                fill = record_action(ledger, "fill", rec["recommendation_id"], quantity=quantity, price="100")
+                check("next_session_fill_before_management_allowed", fill["status"] == "CREATED" and fill["market_session_evidence"]["evidence_type"] == "NSE_OFFICIAL_SCHEDULED_SESSION")
+                check("morning_fill_before_snapshot", fill["market_session_evidence"]["session_date"] == "2026-09-23")
                 check("fill_uses_lifecycle", ledger._effective_fill_quantity(rec["recommendation_id"]) == quantity)
                 check("recommendation_buy_lineage", all(tx["side"] == "BUY" and tx["signal_id"] == rec["signal_id"] for tx in ledger.transactions_for_recommendation(rec["recommendation_id"])))
-                check("overfill_rejected", raises("exceeds", lambda: record_action(ledger, "fill", rec["recommendation_id"], quantity=int(rec["recommended_quantity"]) + 1, price="100", verified_market_session_date="2026-09-23")))
+                check("overfill_rejected", raises("exceeds", lambda: record_action(ledger, "fill", rec["recommendation_id"], quantity=int(rec["recommended_quantity"]) + 1, price="100")))
                 today = PaperClock.day
                 manager.process_completed_session(today, [{"ticker": "TEST.NS", "session_date": today,
                                                           "open": 100, "high": 105, "low": 95, "close": 100,
                                                           "daily_supertrend": 90, "swing_low_10": 95,
                                                           "source_name": "SYNTHETIC_TEST", "source_data_hash": "TEST"}])
+                check("morning_fill_visible_to_after_close_management", manager.states(rec["recommendation_id"])[-1]["session_date"] == today)
                 before_transactions = len(ledger.transactions_for_recommendation(rec["recommendation_id"]))
                 before_events = ledger.connection.execute("SELECT count(*) FROM recommendation_events WHERE recommendation_id=?", (rec["recommendation_id"],)).fetchone()[0]
-                check("fill_after_management_rejected", raises("FILL_SESSION_ALREADY_PROCESSED", lambda: record_action(ledger, "fill", rec["recommendation_id"], quantity=1, price="100", verified_market_session_date="2026-09-23")))
+                check("fill_after_management_rejected", raises("FILL_SESSION_ALREADY_PROCESSED", lambda: record_action(ledger, "fill", rec["recommendation_id"], quantity=1, price="100")))
                 check("rejected_fill_no_transaction", len(ledger.transactions_for_recommendation(rec["recommendation_id"])) == before_transactions)
                 check("rejected_fill_no_lifecycle_event", ledger.connection.execute("SELECT count(*) FROM recommendation_events WHERE recommendation_id=?", (rec["recommendation_id"],)).fetchone()[0] == before_events)
                 cancelled = record_action(ledger, "cancel", rec["recommendation_id"])
                 check("cancel_frees_pending_slot", cancelled["status"] == "CREATED" and not ledger.get_active_pending_reservations())
-                check("cancel_prevents_new_fill", raises("FILL_SESSION_ALREADY_PROCESSED", lambda: record_action(ledger, "fill", rec["recommendation_id"], quantity=1, price="100", verified_market_session_date="2026-09-23")))
-                check("sell_over_managed_quantity_rejected", raises("exceeds", lambda: record_action(ledger, "sell", rec["recommendation_id"], quantity=quantity + 1, price="101", verified_market_session_date="2026-09-23")))
+                check("cancel_prevents_new_fill", raises("FILL_SESSION_ALREADY_PROCESSED", lambda: record_action(ledger, "fill", rec["recommendation_id"], quantity=1, price="100")))
+                check("sell_over_managed_quantity_rejected", raises("exceeds", lambda: record_action(ledger, "sell", rec["recommendation_id"], quantity=quantity + 1, price="101")))
                 PaperClock.day = "2026-09-26"
                 before_invalid_sell = len(ledger.transactions_for_recommendation(rec["recommendation_id"]))
                 check("invalid_session_sell_rejected", raises("PAPER_ACTION_REQUIRES_VALID_MARKET_SESSION", lambda: record_action(ledger, "sell", rec["recommendation_id"], quantity=1, price="101")))
                 check("invalid_session_sell_no_transaction", len(ledger.transactions_for_recommendation(rec["recommendation_id"])) == before_invalid_sell)
-                PaperClock.day = "2026-09-23"
-                sold = record_action(ledger, "sell", rec["recommendation_id"], quantity=1, price="101", verified_market_session_date="2026-09-23")
+                PaperClock.day = "2026-10-02"
+                check("official_holiday_sell_rejected", raises("PAPER_ACTION_REQUIRES_VALID_MARKET_SESSION", lambda: record_action(ledger, "sell", rec["recommendation_id"], quantity=1, price="101")))
+                PaperClock.day = "2026-09-24"
+                sold = record_action(ledger, "sell", rec["recommendation_id"], quantity=1, price="101")
                 check("linked_paper_sell_recorded", sold["status"] == "CREATED" and any(tx["side"] == "SELL" and tx["signal_id"] == rec["signal_id"] for tx in ledger.transactions_for_recommendation(rec["recommendation_id"])))
-                check("valid_session_sell_succeeds", sold["status"] == "CREATED")
+                check("valid_session_sell_succeeds", sold["status"] == "CREATED" and sold["market_session_evidence"]["evidence_type"] == "NSE_OFFICIAL_SCHEDULED_SESSION")
                 admin_rec = recommendation(ledger, "ADMIN.NS")
                 declined = record_action(ledger, "decline", admin_rec["recommendation_id"])
                 check("decline_admin_action_unchanged", declined["status"] == "CREATED")

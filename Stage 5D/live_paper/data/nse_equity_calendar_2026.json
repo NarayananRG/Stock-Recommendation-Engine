@@ -1,0 +1,31 @@
+{
+  "schema_version": "NSE_EQUITY_CALENDAR_V1",
+  "exchange": "NSE",
+  "segment": "CAPITAL MARKET SEGMENT",
+  "calendar_year": 2026,
+  "timezone": "Asia/Kolkata",
+  "source": {
+    "authority": "National Stock Exchange of India Limited",
+    "department": "CAPITAL MARKET SEGMENT",
+    "download_ref": "NSE/CMTR/71775",
+    "circular_ref": "172/2025",
+    "circular_date": "2025-12-12",
+    "subject": "Trading holidays for the calendar year 2026",
+    "source_payload_hash": "f9f1fee7885f51544424d79c3b4e5a3eb941155baf412c3ee5cb07ed2f6ac7b6"
+  },
+  "regular_weekend_days": ["SATURDAY", "SUNDAY"],
+  "closed_dates": [
+    "2026-01-26", "2026-03-03", "2026-03-26", "2026-03-31", "2026-04-03",
+    "2026-04-14", "2026-05-01", "2026-05-28", "2026-06-26", "2026-09-14",
+    "2026-10-02", "2026-10-20", "2026-11-10", "2026-11-24", "2026-12-25"
+  ],
+  "weekend_holiday_dates": ["2026-02-15", "2026-03-21", "2026-08-15", "2026-11-08"],
+  "special_sessions": {
+    "2026-11-08": {
+      "name": "Diwali Laxmi Pujan Muhurat Trading",
+      "ordinary_paper_action_supported": false,
+      "status": "TIMINGS_SEPARATELY_ANNOUNCED_FAIL_CLOSED"
+    }
+  },
+  "calendar_payload_hash": "c93f0340ca55ace9650b4c68e85836d01303f35f8abd7dc22cad5ef34800a656"
+}

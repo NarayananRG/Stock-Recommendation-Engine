@@ -14,19 +14,20 @@ if str(_STAGE) not in sys.path:
     sys.path.insert(0, str(_STAGE))
 
 from live_paper.admission import admission_status, available_slots
+from live_paper.nse_session_calendar import DEFAULT_CALENDAR_PATH, verify_scheduled_session
 from live_paper.run_after_close import REPO, STAGE_ROOT, _config, _database_path, _existing_run, _initialize_runs, _utc, verify_live_run_integrity
-from stage5d.ledger import Stage5DLedger
+from stage5d.ledger import Stage5DLedger, canonical_json, payload_sha256
 from stage5d.management_store import Stage5D3Manager
 from stage5d.news_ml_overlay import Stage5D4Overlay
 from stage5d.portfolio_state import whole_share_quantity
 from stage5d.stage4a3_shadow_adapter import Stage4A3PredictionNotAvailable, Stage4A3ShadowAdapter
 
 
-def verified_market_session(protocol_repo: Path, session_date: str, cutoff: datetime) -> str:
-    """Prove a transaction date using an existing immutable Stage 4A.3 snapshot."""
+def _verified_completed_session(protocol_repo: Path, session_date: str, cutoff: datetime,
+                                directory: Path) -> dict:
+    """Verify stronger completed-session evidence without a calendar fallback."""
     root = protocol_repo.resolve() / "Stage 4A.3"
     activation_file = root / "prospective/audit/activation_record.json"
-    directory = root / "prospective/snapshots" / session_date[:4] / session_date
     try:
         from stage4a3.protocol_integrity import verify_runtime_protocol_integrity
 
@@ -56,7 +57,52 @@ def verified_market_session(protocol_repo: Path, session_date: str, cutoff: date
             raise ValueError("snapshot sentinel collision")
     except Exception as exc:
         raise RuntimeError("PAPER_ACTION_REQUIRES_VALID_MARKET_SESSION") from exc
-    return session_date
+    manifest_file = directory / "snapshot_manifest.json"
+    manifest = json.loads(manifest_file.read_text(encoding="utf-8")) if manifest_file.is_file() else {}
+    snapshot_id = (metadata.get("Snapshot ID") or metadata.get("snapshot_id")
+                   or manifest.get("Snapshot ID") or directory.name)
+    snapshot_hash = (manifest.get("Snapshot Content Hash") or manifest.get("snapshot_content_hash")
+                     or metadata.get("Snapshot Content Hash") or metadata.get("snapshot_content_hash"))
+    if not snapshot_hash:
+        # The frozen adapter has verified all files. This deterministic composite
+        # identifies the exact session evidence for older verified snapshots.
+        snapshot_hash = payload_sha256(canonical_json({
+            "snapshot_metadata": metadata,
+            "market_data_manifest": market,
+            "candidate_input_manifest": candidates,
+        }))
+    return {
+        "session_date": session_date,
+        "evidence_type": "STAGE4A3_COMPLETED_SESSION",
+        "calendar_year": int(session_date[:4]),
+        "exchange": "NSE",
+        "segment": "CAPITAL MARKET SEGMENT",
+        "source_download_ref": None,
+        "source_circular_ref": None,
+        "calendar_payload_hash": None,
+        "snapshot_id": snapshot_id,
+        "snapshot_content_hash": snapshot_hash,
+    }
+
+
+def verify_paper_action_market_session(protocol_repo: Path, session_date: str, cutoff: datetime,
+                                       calendar_path: Path = DEFAULT_CALENDAR_PATH) -> dict:
+    """Prove a paper-action date from completed evidence or the pinned schedule."""
+    if cutoff.tzinfo is None or cutoff.utcoffset() is None:
+        raise RuntimeError("PAPER_ACTION_REQUIRES_VALID_MARKET_SESSION")
+    if cutoff.astimezone(ZoneInfo("Asia/Kolkata")).date().isoformat() != session_date:
+        raise RuntimeError("PAPER_ACTION_REQUIRES_VALID_MARKET_SESSION")
+    root = protocol_repo.resolve() / "Stage 4A.3"
+    directory = root / "prospective/snapshots" / session_date[:4] / session_date
+    if directory.exists():
+        if not directory.is_dir():
+            raise RuntimeError("PAPER_ACTION_REQUIRES_VALID_MARKET_SESSION")
+        return _verified_completed_session(protocol_repo, session_date, cutoff, directory)
+    return verify_scheduled_session(session_date, Path(calendar_path))
+
+
+# Backward-compatible name for read-only callers; now returns structured evidence.
+verified_market_session = verify_paper_action_market_session
 
 
 def _latest_report(ledger: Stage5DLedger) -> dict:
@@ -92,7 +138,8 @@ def _linked_managed_quantity(ledger: Stage5DLedger, recommendation: dict) -> int
 def record_action(ledger: Stage5DLedger, action: str, recommendation_id: str,
                   *, quantity: int | None = None, price: str | None = None,
                   idempotency_key: str | None = None,
-                  verified_market_session_date: str | None = None) -> dict:
+                  protocol_repo: Path | None = None,
+                  calendar_path: Path = DEFAULT_CALENDAR_PATH) -> dict:
     recommendation = ledger.get_recommendation(recommendation_id)
     if recommendation is None:
         raise ValueError("Unknown recommendation")
@@ -100,7 +147,12 @@ def record_action(ledger: Stage5DLedger, action: str, recommendation_id: str,
     verify_live_run_integrity(ledger)
     if not ledger.integrity_check()["ok"] or not manager.integrity_check()["ok"] or not overlay.integrity_check()["ok"]:
         raise RuntimeError("DATABASE_INTEGRITY_FAILURE")
-    today = datetime.now(ZoneInfo("Asia/Kolkata")).date().isoformat()
+    local_now = datetime.now(ZoneInfo("Asia/Kolkata"))
+    today = local_now.date().isoformat()
+    session_evidence = None
+    if action in {"fill", "sell"}:
+        session_evidence = verify_paper_action_market_session(
+            Path(protocol_repo or REPO), today, local_now, Path(calendar_path))
     key = idempotency_key or f"S5D5:{action}:{recommendation_id}:{today}:{quantity}:{price}"
     if action == "pending":
         ledger.connection.execute("BEGIN IMMEDIATE")
@@ -122,8 +174,6 @@ def record_action(ledger: Stage5DLedger, action: str, recommendation_id: str,
     elif action == "fill":
         if quantity is None or price is None:
             raise ValueError("fill requires --qty and --price")
-        if verified_market_session_date != today:
-            raise ValueError("PAPER_ACTION_REQUIRES_VALID_MARKET_SESSION")
         if today <= max(str(recommendation["signal_date"]), str(recommendation["decision_date"])):
             raise ValueError("FILL_REQUIRES_FUTURE_ENTRY_SESSION")
         if manager.connection.execute("SELECT 1 FROM management_session_runs WHERE session_date=?", (today,)).fetchone():
@@ -145,8 +195,6 @@ def record_action(ledger: Stage5DLedger, action: str, recommendation_id: str,
     elif action == "sell":
         if quantity is None or price is None:
             raise ValueError("sell requires --qty and --price")
-        if verified_market_session_date != today:
-            raise ValueError("PAPER_ACTION_REQUIRES_VALID_MARKET_SESSION")
         checked = whole_share_quantity(quantity)
         managed = _linked_managed_quantity(ledger, recommendation)
         current = next((item.quantity for item in ledger.derive_positions()
@@ -162,8 +210,11 @@ def record_action(ledger: Stage5DLedger, action: str, recommendation_id: str,
                                            signal_id=recommendation["signal_id"])
     else:
         raise ValueError("Unsupported paper action")
-    return {"status": result.status, "identity": result.identity, "action": action,
-            "recommendation_id": recommendation_id, "paper_only": True}
+    response = {"status": result.status, "identity": result.identity, "action": action,
+                "recommendation_id": recommendation_id, "paper_only": True}
+    if session_evidence is not None:
+        response["market_session_evidence"] = session_evidence
+    return response
 
 
 def main() -> None:
@@ -183,15 +234,10 @@ def main() -> None:
     try:
         with Stage5DLedger(database) as ledger:
             _initialize_runs(ledger)
-            session_evidence = None
-            if args.action in {"fill", "sell"}:
-                now = datetime.now(ZoneInfo("Asia/Kolkata"))
-                protocol_repo = Path(config.get("stage4a3_runtime_repo") or REPO)
-                session_evidence = verified_market_session(protocol_repo, now.date().isoformat(), now)
             print(json.dumps(record_action(ledger, args.action, args.recommendation_id,
                                            quantity=args.qty, price=args.price,
                                            idempotency_key=args.idempotency_key,
-                                           verified_market_session_date=session_evidence), indent=2))
+                                           protocol_repo=Path(config.get("stage4a3_runtime_repo") or REPO)), indent=2))
     except Exception as exc:
         print(f"PAPER_ACTION_FAILED: {exc}", file=sys.stderr)
         raise SystemExit(1) from exc

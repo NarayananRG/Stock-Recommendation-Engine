@@ -8,6 +8,7 @@
 - Stage 5D.5B: post-collection UTC verification and exact immutable Stage 4A.3 input-cache reuse. Final pushed commit SHA is provided in the handoff.
 - Stage 5D.5C: exact CSV round-trip reconstruction and holding-data provenance hardening. Final pushed commit SHA is provided in the handoff.
 - Stage 5D.5D: explicit FILL/SELL market-session evidence guard. Final pushed commit SHA is provided in the handoff.
+- Stage 5D.5E: `MORNING_PAPER_ACTION_SESSION_GUARD` using a versioned, code-pinned official NSE equity calendar before the same-day completed snapshot exists. Final pushed commit SHA is provided in the handoff.
 
 ## Operational command
 
@@ -23,7 +24,9 @@ For explicit paper actions, run `python "Stage 5D/live_paper/paper_action.py" pe
 
 An after-close recommendation can become PENDING, but its fill must be dated strictly after the signal/decision session and recorded before the fill date's Stage 5D.3 after-close management run. A later fill for an already processed session fails with `FILL_SESSION_ALREADY_PROCESSED`, leaving transactions and lifecycle events untouched.
 
-Explicit FILL and SELL actions also require an already-existing, fully verified Stage 4A.3 snapshot for the transaction date. The snapshot must bind its Signal Date, NIFTY date, market-data date, complete universe coverage, and raw-data hash to that date. Validation is read-only and network-free; absent or inconsistent evidence fails `PAPER_ACTION_REQUIRES_VALID_MARKET_SESSION`. PENDING, CANCEL, and DECLINE remain administrative lifecycle actions and do not require an exchange session.
+Explicit FILL and SELL actions validate the transaction date inside the production action path. If a same-day Stage 4A.3 snapshot exists, it is the stronger evidence and must fully verify its Signal Date, NIFTY date, market-data date, complete universe coverage, and raw-data hash. A corrupt or inconsistent existing snapshot fails closed and cannot fall back to the calendar. Before that completed-session snapshot exists, the checked-in `NSE_EQUITY_CALENDAR_V1` artifact proves an ordinary scheduled NSE Capital Market session using circular `NSE/CMTR/71775`, `172/2025`; its canonical hash is pinned in code. Weekends, official holidays, unsupported years, missing/tampered artifacts, and unimplemented special sessions fail closed. Validation is local and network-free. PENDING, CANCEL, and DECLINE remain administrative lifecycle actions and do not require an exchange session.
+
+This removes the morning deadlock: a recommendation created on D can be filled or sold on a valid D+1 morning before the D+1 snapshot exists, provided the action precedes that date's Stage 5D.3 management run. The normal after-close runner then captures and verifies completed-session evidence before managing the position. It retains its existing fail-closed snapshot/provenance chain and does not invent intraday OHLC ordering.
 
 Daily order: clock gate → completed session → frozen Stage 4A.3 collection/verification → frozen scanner → ledger holdings and reservations → frozen holding observations → Stage 5D.3 management → Stage 5D.1 allocation and persistence → timestamped news → Stage 5D.4 overlay/ML shadow → admission assessment → immutable run row and JSON/human report.
 
@@ -56,14 +59,21 @@ Candidate reconstruction temporarily injects pandas `float_precision="round_trip
 | HOLDING_SNAPSHOT_CACHE_REUSE | PASS | holding observation sourced from the same verified session cache and frozen Stage 2.1 feature engine |
 | HOLDING_MARKET_REFRESH_PROHIBITED | PASS | no fallback download; missing and empty holding cache files fail before network access |
 | HOLDING_RAW_HASH_PROVENANCE | PASS | holding dataframe hash must equal immutable manifest per-ticker hash; mismatch and latest-date mismatch fail closed |
-| PAPER_ACTION_VALID_MARKET_SESSION | PASS | verified snapshot evidence required for FILL/SELL; Saturday, Sunday, holiday-equivalent and absent evidence rejected without transaction/lifecycle mutation or network use |
+| OFFICIAL_NSE_CALENDAR_INTEGRITY | PASS | source identity, source hash, canonical calendar hash and code-pinned expected hash verified |
+| MORNING_FILL_BEFORE_SNAPSHOT | PASS | valid D+1 scheduled-session FILL succeeds before same-day snapshot and management |
+| MORNING_SELL_BEFORE_SNAPSHOT | PASS | valid scheduled-session linked SELL succeeds without same-day snapshot |
+| HOLIDAY_TRANSACTION_REJECTION | PASS | Saturday, Sunday and official weekday holiday FILL/SELL rejected without mutation |
+| UNSUPPORTED_CALENDAR_YEAR_FAIL_CLOSED | PASS | no weekday inference for years without a verified artifact |
+| CORRUPT_SNAPSHOT_NO_CALENDAR_FALLBACK | PASS | existing malformed snapshot fails before scheduled-calendar handling |
+| MARKET_SESSION_VALIDATION_NETWORK_FREE | PASS | socket and yfinance download sentinels remain unused |
+| PAPER_ACTION_VALID_MARKET_SESSION | PASS | internal two-level verifier; no caller-supplied self-certified date bypass |
 | ML_PRODUCTION_INFLUENCE | NO | frozen overlay; admission ignores ML selection |
 | BROKER_EXECUTION | NO | no broker client |
 | AUTOMATIC_BUY | NO | ordinary runner does not call `mark_pending` or fill |
 | AUTOMATIC_SELL | NO | SELL requires explicit paper-action invocation |
 | UI | NO | CLI only |
 
-Tests: Stage 5D.5 **141/141 PASS**; Stage 5D.4 **107/107 PASS**; Stage 5D.3 **130/130 PASS**; Stage 5D.2 **129/129 PASS**; Stage 5D.1 **80/80 PASS**. Frozen tracked changes: **0**. Runtime SQLite, WAL/SHM, profile config, and reports are gitignored.
+Tests: Stage 5D.5 **160/160 PASS**; Stage 5D.4 **107/107 PASS**; Stage 5D.3 **130/130 PASS**; Stage 5D.2 **129/129 PASS**; Stage 5D.1 **80/80 PASS**. Frozen tracked changes: **0**. Runtime SQLite, WAL/SHM, profile config, and reports are gitignored.
 
 `production_smoke_status = "PRODUCTION_SMOKE_PASS_2026_09_23"`.
 
@@ -84,6 +94,8 @@ Those three attempts exposed and fixed orchestration defects; none was itself a 
 - Second independent market refresh: **NO**
 
 This was a real zero-candidate live-paper session. It validated the production runner but did not exercise a real recommendation, PENDING, FILL, or SELL lifecycle. This patch did not replay or alter that runtime evidence and did not rerun the smoke.
+
+Stage 5D.5E does not replay or alter the successful 2026-09-23 production smoke. Morning FILL/SELL no longer require an impossible same-day completed snapshot: the official scheduled-session artifact is used only when the stronger same-day Stage 4A.3 evidence is absent. Special sessions are never guessed.
 
 Stage 5D.5 requires an explicit path to the activated Stage 4A.3 checkout and verifies its frozen protocol identity before collection. The snapshot and its timestamp-derived input cache are resolved there, not assumed to be in the Stage 5D.5 development checkout. The real snapshot/cache cited above were described in the supplied smoke evidence; they were not opened or changed during this patch.
 
