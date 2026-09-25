@@ -20,6 +20,15 @@ class RawPayloadStore:
     def path_for(self, digest: str) -> Path:
         return self.root / digest[:2] / digest
 
+    @staticmethod
+    def _verify_existing(target: Path, payload: bytes, digest: str) -> None:
+        try:
+            existing = target.read_bytes()
+        except FileNotFoundError as exc:
+            raise IntegrityFailure("RAW_PAYLOAD_RACE_TARGET_MISSING") from exc
+        if sha256_bytes(existing) != digest or existing != payload:
+            raise IntegrityFailure("RAW_PAYLOAD_EXISTING_OBJECT_MISMATCH")
+
     def put(self, payload: bytes) -> tuple[str, str, int]:
         if not isinstance(payload, bytes):
             raise TypeError("RAW_PAYLOAD_MUST_BE_BYTES")
@@ -27,8 +36,7 @@ class RawPayloadStore:
         target = self.path_for(digest)
         target.parent.mkdir(parents=True, exist_ok=True)
         if target.exists():
-            if sha256_bytes(target.read_bytes()) != digest or target.read_bytes() != payload:
-                raise IntegrityFailure("RAW_PAYLOAD_EXISTING_OBJECT_MISMATCH")
+            self._verify_existing(target, payload, digest)
             return digest, self.relative_reference(digest), len(payload)
         descriptor, temporary = tempfile.mkstemp(prefix="stage6_raw_", dir=target.parent)
         try:
@@ -38,7 +46,12 @@ class RawPayloadStore:
                 os.fsync(handle.fileno())
             if sha256_bytes(Path(temporary).read_bytes()) != digest:
                 raise IntegrityFailure("RAW_PAYLOAD_ATOMIC_WRITE_MISMATCH")
-            os.replace(temporary, target)
+            try:
+                # Hard-link creation is atomic and fails if another writer already
+                # installed this content address. Unlike replace(), it never clobbers.
+                os.link(temporary, target)
+            except FileExistsError:
+                self._verify_existing(target, payload, digest)
         finally:
             if os.path.exists(temporary):
                 os.unlink(temporary)

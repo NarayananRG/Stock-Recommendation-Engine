@@ -8,7 +8,10 @@ from pathlib import Path
 from .canonical import canonical_hash, canonical_json, parse_utc, sha256_bytes, utc_timestamp, without
 from .errors import IdempotencyConflict, IntegrityFailure, Stage6IngestionError
 from .raw_store import RawPayloadStore
-from .registry import resolve_entity, resolve_source_record, verify_entity_registry, verify_source_registry
+from .registry import (
+    AUTHORITY_LEVELS, SHA256_PATTERN, assert_source_approved_for_automated_ingestion,
+    resolve_entity, resolve_source_record, verify_entity_registry, verify_source_registry,
+)
 
 
 STORE_SCHEMA_VERSION = "STAGE6_1A_STORE_V1"
@@ -125,10 +128,71 @@ class IngestionStore:
             raise IntegrityFailure("REGISTRY_TYPED_COLUMN_MISMATCH")
         return snapshot
 
+    def _verify_persisted_registry_chain(self, kind: str, target_snapshot_id: str) -> dict:
+        target = self.connection.execute(
+            "SELECT registry_version FROM registry_snapshots WHERE snapshot_id=? AND registry_kind=?",
+            (target_snapshot_id, kind),
+        ).fetchone()
+        if target is None:
+            raise IntegrityFailure("REFERENCED_REGISTRY_SNAPSHOT_MISSING")
+        rows = self.connection.execute(
+            "SELECT * FROM registry_snapshots WHERE registry_kind=? AND registry_version<=? ORDER BY registry_version",
+            (kind, target["registry_version"]),
+        ).fetchall()
+        if not rows or rows[0]["registry_version"] != 1 or len(rows) != target["registry_version"]:
+            raise IntegrityFailure("REGISTRY_CHAIN_PREDECESSOR_MISSING")
+        prior = None
+        exact = None
+        verifier = verify_entity_registry if kind == "ENTITY" else verify_source_registry
+        for row in rows:
+            snapshot = json.loads(row["canonical_json"])
+            if row["canonical_json"] != canonical_json(snapshot):
+                raise IntegrityFailure("REGISTRY_CANONICAL_JSON_MISMATCH")
+            verifier(snapshot, prior)
+            if (row["snapshot_id"], row["registry_version"], row["registry_hash"], row["previous_registry_hash"]) != (
+                    snapshot["registry_snapshot_id"], snapshot["registry_version"], snapshot["registry_hash"],
+                    snapshot["previous_registry_hash"]):
+                raise IntegrityFailure("REGISTRY_TYPED_COLUMN_MISMATCH")
+            if row["snapshot_id"] == target_snapshot_id:
+                exact = snapshot
+            prior = snapshot
+        if exact is None:
+            raise IntegrityFailure("REFERENCED_REGISTRY_SNAPSHOT_MISSING")
+        return exact
+
     @staticmethod
     def _verify_record_semantics(record: dict) -> None:
-        if set(record) != EVIDENCE_FIELDS or record.get("schema_version") != "STAGE6_EVIDENCE_V2":
+        if (not isinstance(record, dict) or set(record) != EVIDENCE_FIELDS
+                or record.get("schema_version") != "STAGE6_EVIDENCE_V2"):
             raise IntegrityFailure("EVIDENCE_ENVELOPE_FIELDS_MISMATCH")
+        for field in ("evidence_id", "source_id", "source_reference", "source_registry_snapshot_id",
+                      "entity_registry_snapshot_id"):
+            if not isinstance(record[field], str) or not record[field]:
+                raise IntegrityFailure(f"EVIDENCE_STRING_FIELD_INVALID:{field}")
+        for field in ("source_record_version", "source_registry_version", "entity_registry_version"):
+            if type(record[field]) is not int or record[field] < 1:
+                raise IntegrityFailure(f"EVIDENCE_VERSION_FIELD_INVALID:{field}")
+        for field in ("source_record_hash", "source_registry_hash", "entity_registry_hash", "record_hash"):
+            if not isinstance(record[field], str) or not SHA256_PATTERN.fullmatch(record[field]):
+                raise IntegrityFailure(f"EVIDENCE_HASH_FIELD_INVALID:{field}")
+        if record["authority_level"] not in AUTHORITY_LEVELS:
+            raise IntegrityFailure("EVIDENCE_AUTHORITY_INVALID")
+        for field in ("raw_title", "raw_document_reference", "content_type", "language", "document_version",
+                      "raw_payload_reference", "failure_reason", "failure_stage"):
+            if record[field] is not None and not isinstance(record[field], str):
+                raise IntegrityFailure(f"EVIDENCE_NULLABLE_STRING_INVALID:{field}")
+        for field in ("content_hash", "raw_payload_hash"):
+            if record[field] is not None and (not isinstance(record[field], str)
+                                              or not SHA256_PATTERN.fullmatch(record[field])):
+                raise IntegrityFailure(f"EVIDENCE_HASH_FIELD_INVALID:{field}")
+        for field in ("entity_ids", "event_candidate_ids"):
+            values = record[field]
+            if (not isinstance(values, list) or any(not isinstance(value, str) or not value for value in values)
+                    or len(values) != len(set(values))):
+                raise IntegrityFailure(f"EVIDENCE_ID_ARRAY_INVALID:{field}")
+        for field in ("parent_evidence_id", "correction_of_evidence_id", "retraction_of_evidence_id"):
+            if record[field] is not None and (not isinstance(record[field], str) or not record[field]):
+                raise IntegrityFailure(f"EVIDENCE_LINK_INVALID:{field}")
         status = record["retrieval_status"]
         if status in PAYLOAD_STATUSES:
             if record["record_kind"] != "EVIDENCE" or not str(record["evidence_id"]).startswith("S6EV_"):
@@ -149,6 +213,10 @@ class IngestionStore:
                     raise IntegrityFailure("TIMESTAMP_ORDER_FLAG_INVALID")
             if any(record[key] is not None for key in ("failure_reason", "failure_stage", "attempted_at_utc")):
                 raise IntegrityFailure("EVIDENCE_FAILURE_FIELDS_INVALID")
+            for field in ("content_hash", "raw_payload_reference", "raw_payload_hash", "content_type",
+                          "raw_document_reference"):
+                if not isinstance(record[field], str) or not record[field]:
+                    raise IntegrityFailure(f"EVIDENCE_PAYLOAD_FIELD_INVALID:{field}")
         elif status in FAILURE_STATUSES:
             if record["record_kind"] != "ACQUISITION_ATTEMPT" or not str(record["evidence_id"]).startswith("S6ACQ_"):
                 raise IntegrityFailure("ACQUISITION_KIND_OR_ID_INVALID")
@@ -158,6 +226,9 @@ class IngestionStore:
             if any(record[key] is not None for key in ("publication_timestamp_utc", "observed_timestamp_utc",
                                                        "retrieved_timestamp_utc", "timestamp_order_verified")):
                 raise IntegrityFailure("ACQUISITION_TIMESTAMP_FIELDS_INVALID")
+            if any(record[key] is not None for key in ("content_hash", "raw_payload_reference", "raw_payload_hash",
+                                                       "raw_document_reference", "content_type")):
+                raise IntegrityFailure("FAILURE_RECORD_FABRICATED_PAYLOAD")
         else:
             raise IntegrityFailure("RETRIEVAL_STATUS_INVALID")
 
@@ -206,9 +277,14 @@ class IngestionStore:
 
     def _bindings(self, source_snapshot_id: str, entity_snapshot_id: str, source_id: str,
                   entity_ids: list[str], cutoff: str) -> tuple[dict, dict, dict]:
-        source_registry = self._registry(source_snapshot_id, "SOURCE")
-        entity_registry = self._registry(entity_snapshot_id, "ENTITY")
-        source = resolve_source_record(source_registry, source_id, cutoff)
+        source_registry = self._verify_persisted_registry_chain("SOURCE", source_snapshot_id)
+        entity_registry = self._verify_persisted_registry_chain("ENTITY", entity_snapshot_id)
+        cutoff_value = parse_utc(cutoff, "acquisition_cutoff")
+        if (parse_utc(source_registry["as_of_timestamp"], "source_registry.as_of_timestamp") > cutoff_value
+                or parse_utc(entity_registry["as_of_timestamp"], "entity_registry.as_of_timestamp") > cutoff_value):
+            raise IntegrityFailure("REGISTRY_SNAPSHOT_FROM_FUTURE")
+        source = resolve_source_record(source_registry, source_id, cutoff, require_usable=False)
+        assert_source_approved_for_automated_ingestion(source)
         for entity_id in entity_ids:
             resolve_entity(entity_registry, entity_id, cutoff)
         return source_registry, entity_registry, source
@@ -229,6 +305,7 @@ class IngestionStore:
             return existing
         record_hash = canonical_hash(without(envelope, "record_hash"))
         envelope["record_hash"] = record_hash
+        self._verify_record_semantics(envelope)
         serialized = canonical_json(envelope)
         with self.connection:
             if raw:
@@ -254,6 +331,22 @@ class IngestionStore:
                          retraction_of_evidence_id: str | None = None) -> dict:
         if retrieval_status not in PAYLOAD_STATUSES:
             raise Stage6IngestionError("INVALID_PAYLOAD_RETRIEVAL_STATUS")
+        if not isinstance(source_reference, str) or not source_reference:
+            raise Stage6IngestionError("SOURCE_REFERENCE_REQUIRED")
+        if not isinstance(content_type, str) or not content_type:
+            raise Stage6IngestionError("CONTENT_TYPE_REQUIRED")
+        if not isinstance(raw_payload, bytes):
+            raise Stage6IngestionError("RAW_PAYLOAD_MUST_BE_BYTES")
+        events = event_candidate_ids or []
+        if (not isinstance(entity_ids, list) or any(not isinstance(value, str) or not value for value in entity_ids)
+                or len(entity_ids) != len(set(entity_ids))):
+            raise Stage6IngestionError("ENTITY_IDS_INVALID")
+        if (not isinstance(events, list) or any(not isinstance(value, str) or not value for value in events)
+                or len(events) != len(set(events))):
+            raise Stage6IngestionError("EVENT_CANDIDATE_IDS_INVALID")
+        for link in (parent_evidence_id, correction_of_evidence_id, retraction_of_evidence_id):
+            if link is not None and (not isinstance(link, str) or not link):
+                raise Stage6IngestionError("EVIDENCE_LINK_INVALID")
         observed = utc_timestamp(observed_timestamp_utc, "observed_timestamp_utc")
         retrieved = utc_timestamp(retrieved_timestamp_utc, "retrieved_timestamp_utc")
         published = (utc_timestamp(publication_timestamp_utc, "publication_timestamp_utc")
@@ -268,7 +361,7 @@ class IngestionStore:
                    "source_reference": source_reference, "raw_payload_hash": payload_hash, "content_type": content_type,
                    "publication": published, "observed": observed, "retrieved": retrieved, "entity_ids": entity_ids,
                    "retrieval_status": retrieval_status, "raw_title": raw_title, "language": language,
-                   "document_version": document_version, "event_candidate_ids": event_candidate_ids or [],
+                   "document_version": document_version, "event_candidate_ids": events,
                    "parent": parent_evidence_id, "correction": correction_of_evidence_id, "retraction": retraction_of_evidence_id}
         logical_json, logical_hash = canonical_json(logical), canonical_hash(logical)
         existing = self._idempotent_existing(idempotency_key, logical_json, logical_hash)
@@ -291,7 +384,7 @@ class IngestionStore:
             "timestamp_order_verified": True if published else None, "content_hash": raw_hash,
             "raw_title": raw_title, "raw_document_reference": source_reference, "content_type": content_type,
             "language": language, "document_version": document_version, "raw_payload_reference": raw_reference,
-            "raw_payload_hash": raw_hash, "entity_ids": list(entity_ids), "event_candidate_ids": event_candidate_ids or [],
+            "raw_payload_hash": raw_hash, "entity_ids": list(entity_ids), "event_candidate_ids": events,
             "retrieval_status": retrieval_status, "failure_reason": None, "failure_stage": None, "attempted_at_utc": None,
             **links, "record_hash": ""
         }
@@ -305,8 +398,13 @@ class IngestionStore:
             raise Stage6IngestionError("INVALID_FAILURE_STATUS")
         if not failure_reason or not failure_stage:
             raise Stage6IngestionError("FAILURE_REASON_AND_STAGE_REQUIRED")
+        if not isinstance(source_reference, str) or not source_reference:
+            raise Stage6IngestionError("SOURCE_REFERENCE_REQUIRED")
         attempted = utc_timestamp(attempted_at_utc, "attempted_at_utc")
         entities = entity_ids or []
+        if (not isinstance(entities, list) or any(not isinstance(value, str) or not value for value in entities)
+                or len(entities) != len(set(entities))):
+            raise Stage6IngestionError("ENTITY_IDS_INVALID")
         source_registry, entity_registry, source = self._bindings(
             source_registry_snapshot_id, entity_registry_snapshot_id, source_id, entities, attempted)
         logical = {"operation": "ACQUISITION_ATTEMPT", "key": idempotency_key,
@@ -384,7 +482,12 @@ class IngestionStore:
                 if not source_registry or not entity_registry:
                     raise IntegrityFailure("REFERENCED_REGISTRY_SNAPSHOT_MISSING")
                 cutoff = record["observed_timestamp_utc"] or record["attempted_at_utc"]
-                source = resolve_source_record(source_registry, record["source_id"], cutoff)
+                cutoff_value = parse_utc(cutoff, "acquisition_cutoff")
+                if (parse_utc(source_registry["as_of_timestamp"], "source_registry.as_of_timestamp") > cutoff_value
+                        or parse_utc(entity_registry["as_of_timestamp"], "entity_registry.as_of_timestamp") > cutoff_value):
+                    raise IntegrityFailure("REGISTRY_SNAPSHOT_FROM_FUTURE")
+                source = resolve_source_record(source_registry, record["source_id"], cutoff, require_usable=False)
+                assert_source_approved_for_automated_ingestion(source)
                 if (source["source_record_version"], source["record_hash"], source["authority_level"]) != (
                         record["source_record_version"], record["source_record_hash"], record["authority_level"]):
                     raise IntegrityFailure("SOURCE_RECORD_BINDING_MISMATCH")

@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from datetime import date, datetime
+import re
 
 from .canonical import canonical_hash, parse_utc, utc_timestamp, without
 from .errors import IntegrityFailure, ResolutionError, Stage6IngestionError
@@ -29,6 +30,14 @@ ENTITY_TYPES = {"COMPANY", "INDEX", "SECTOR", "SUBSECTOR", "COMMODITY", "CURRENC
                 "COUNTRY", "REGULATOR", "GOVERNMENT_BODY", "PERSON", "CORPORATE_GROUP"}
 AUTHORITY_LEVELS = {"PRIMARY_OFFICIAL", "AUTHORITATIVE_INDEPENDENT", "DISCOVERY", "UNVERIFIED"}
 VERIFICATION_STATUSES = {"VERIFIED", "PENDING_REVIEW", "DISABLED", "REJECTED"}
+ALIAS_TYPES = {"LEGAL", "FORMER_NAME", "TRADE_NAME", "ABBREVIATION", "COMMON_NAME", "OTHER"}
+RELATIONSHIP_TYPES = {"PARENT", "SUBSIDIARY", "CORPORATE_GROUP_MEMBER"}
+COST_CLASSES = {"FREE", "FREEMIUM", "PAID", "UNKNOWN"}
+ACCESS_METHODS = {"MANUAL_DOWNLOAD", "PUBLIC_API", "MACHINE_FEED", "WEB_PUBLICATION", "OTHER", "NONE"}
+ENDPOINT_TYPES = {"REST", "RSS_ATOM", "BULK_FILE", "WEBSOCKET", "GRAPHQL", "HTML", "OTHER", "NONE"}
+LICENSING_STATUSES = {"REVIEWED_ALLOWED", "REVIEWED_RESTRICTED", "PENDING_REVIEW", "UNKNOWN"}
+AUTOMATION_STATUSES = {"ALLOWED", "RESTRICTED", "PROHIBITED", "UNKNOWN"}
+SHA256_PATTERN = re.compile(r"^[a-f0-9]{64}$")
 
 
 def _date(value: str, field: str) -> date:
@@ -58,10 +67,10 @@ def _prepare_records(records: list[dict], version_field: str) -> list[dict]:
     for raw in records:
         record = deepcopy(raw)
         record.pop("record_hash", None)
-        if not isinstance(record.get(version_field), int) or record[version_field] < 1:
+        if type(record.get(version_field)) is not int or record[version_field] < 1:
             raise Stage6IngestionError(f"INVALID_{version_field.upper()}")
         previous = record.get("previous_version_hash")
-        if previous is not None and (not isinstance(previous, str) or len(previous) != 64):
+        if previous is not None and (not isinstance(previous, str) or not SHA256_PATTERN.fullmatch(previous)):
             raise Stage6IngestionError("INVALID_PREVIOUS_VERSION_HASH")
         record["record_hash"] = _record_hash(record)
         prepared.append(record)
@@ -73,9 +82,33 @@ def _required_string(record: dict, field: str) -> None:
         raise IntegrityFailure(f"REGISTRY_FIELD_INVALID:{field}")
 
 
+def _nullable_string(record: dict, field: str) -> None:
+    if record.get(field) is not None and not isinstance(record[field], str):
+        raise IntegrityFailure(f"REGISTRY_FIELD_INVALID:{field}")
+
+
+def _hash_or_null(value: object, field: str) -> None:
+    if value is not None and (not isinstance(value, str) or not SHA256_PATTERN.fullmatch(value)):
+        raise IntegrityFailure(f"REGISTRY_HASH_FIELD_INVALID:{field}")
+
+
+def _unique_strings(value: object, field: str, *, non_empty: bool) -> None:
+    if not isinstance(value, list) or (non_empty and not value):
+        raise IntegrityFailure(f"REGISTRY_STRING_ARRAY_INVALID:{field}")
+    if any(not isinstance(item, str) or not item for item in value) or len(value) != len(set(value)):
+        raise IntegrityFailure(f"REGISTRY_STRING_ARRAY_INVALID:{field}")
+
+
+def _validate_period(item: dict, prefix: str) -> None:
+    start = _date(item["effective_from"], f"{prefix}.effective_from")
+    end = _date(item["effective_to"], f"{prefix}.effective_to") if item.get("effective_to") is not None else None
+    if end is not None and start > end:
+        raise IntegrityFailure("INVALID_EFFECTIVE_PERIOD")
+
+
 def _validate_record_shape(record: dict, records_key: str) -> None:
     expected = ENTITY_FIELDS if records_key == "entities" else SOURCE_FIELDS
-    if set(record) != expected:
+    if not isinstance(record, dict) or set(record) != expected:
         raise IntegrityFailure("REGISTRY_RECORD_FIELDS_MISMATCH")
     if records_key == "entities":
         for field in ("entity_id", "canonical_name", "entity_type", "effective_from", "reviewed_at"):
@@ -84,17 +117,39 @@ def _validate_record_shape(record: dict, records_key: str) -> None:
             raise IntegrityFailure("ENTITY_TYPE_INVALID")
         if record["entity_type"] == "COMPANY" and not record.get("legal_name"):
             raise IntegrityFailure("COMPANY_LEGAL_NAME_REQUIRED")
-        if not isinstance(record["ticker_mappings"], list) or not isinstance(record["aliases"], list):
+        for field in ("legal_name", "country", "isin", "sector_entity_id", "subsector_entity_id"):
+            _nullable_string(record, field)
+        if (not isinstance(record["ticker_mappings"], list)
+                or not isinstance(record["aliases"], list)
+                or not isinstance(record["relationships"], list)):
             raise IntegrityFailure("ENTITY_MAPPING_LIST_INVALID")
         for mapping in record["ticker_mappings"]:
+            if not isinstance(mapping, dict):
+                raise IntegrityFailure("TICKER_MAPPING_FIELDS_MISMATCH")
             if set(mapping) != {"exchange", "ticker", "effective_from", "effective_to"}:
                 raise IntegrityFailure("TICKER_MAPPING_FIELDS_MISMATCH")
             _required_string(mapping, "exchange")
             _required_string(mapping, "ticker")
+            _validate_period(mapping, "ticker")
         for alias in record["aliases"]:
+            if not isinstance(alias, dict):
+                raise IntegrityFailure("ALIAS_FIELDS_MISMATCH")
             if set(alias) != {"alias", "alias_type", "effective_from", "effective_to"}:
                 raise IntegrityFailure("ALIAS_FIELDS_MISMATCH")
             _required_string(alias, "alias")
+            if alias["alias_type"] not in ALIAS_TYPES:
+                raise IntegrityFailure("ALIAS_TYPE_INVALID")
+            _validate_period(alias, "alias")
+        for relationship in record["relationships"]:
+            if (not isinstance(relationship, dict)
+                    or set(relationship) != {"relationship_type", "related_entity_id", "effective_from",
+                                             "effective_to", "evidence_ids"}):
+                raise IntegrityFailure("RELATIONSHIP_FIELDS_MISMATCH")
+            if relationship["relationship_type"] not in RELATIONSHIP_TYPES:
+                raise IntegrityFailure("RELATIONSHIP_TYPE_INVALID")
+            _required_string(relationship, "related_entity_id")
+            _unique_strings(relationship["evidence_ids"], "relationship.evidence_ids", non_empty=False)
+            _validate_period(relationship, "relationship")
     else:
         for field in ("source_id", "source_name", "authority_level", "publisher_type",
                       "expected_latency", "cost_class", "effective_from", "reviewed_at_utc"):
@@ -103,8 +158,28 @@ def _validate_record_shape(record: dict, records_key: str) -> None:
             raise IntegrityFailure("SOURCE_AUTHORITY_INVALID")
         if record["verification_status"] not in VERIFICATION_STATUSES:
             raise IntegrityFailure("SOURCE_VERIFICATION_STATUS_INVALID")
-        if not isinstance(record["enabled"], bool):
-            raise IntegrityFailure("SOURCE_ENABLED_INVALID")
+        for field in ("enabled", "supports_machine_access", "requires_auth"):
+            if type(record[field]) is not bool:
+                raise IntegrityFailure(f"SOURCE_BOOLEAN_INVALID:{field}")
+        _unique_strings(record["jurisdiction"], "jurisdiction", non_empty=True)
+        _unique_strings(record["coverage"], "coverage", non_empty=True)
+        if record["cost_class"] not in COST_CLASSES:
+            raise IntegrityFailure("SOURCE_COST_CLASS_INVALID")
+        if record["access_method"] not in ACCESS_METHODS:
+            raise IntegrityFailure("SOURCE_ACCESS_METHOD_INVALID")
+        if record["machine_endpoint_type"] not in ENDPOINT_TYPES:
+            raise IntegrityFailure("SOURCE_ENDPOINT_TYPE_INVALID")
+        if record["licensing_or_terms_status"] not in LICENSING_STATUSES:
+            raise IntegrityFailure("SOURCE_LICENSING_STATUS_INVALID")
+        if record["automation_allowed_status"] not in AUTOMATION_STATUSES:
+            raise IntegrityFailure("SOURCE_AUTOMATION_STATUS_INVALID")
+        if not isinstance(record["terms_notes"], str):
+            raise IntegrityFailure("SOURCE_TERMS_NOTES_INVALID")
+        for field in ("historical_depth", "effective_to", "rate_limit_notes", "availability_notes"):
+            _nullable_string(record, field)
+    _hash_or_null(record["previous_version_hash"], "previous_version_hash")
+    if not isinstance(record["record_hash"], str) or not SHA256_PATTERN.fullmatch(record["record_hash"]):
+        raise IntegrityFailure("REGISTRY_RECORD_HASH_FORMAT_INVALID")
 
 
 def _build_registry(kind: str, schema_version: str, prefix: str, records_key: str,
@@ -141,7 +216,7 @@ def build_source_registry(records: list[dict], as_of_timestamp: str, prior: dict
 def _verify_chain(snapshot: dict, prior: dict | None) -> None:
     if prior is None and snapshot.get("registry_version") != 1:
         previous = snapshot.get("previous_registry_hash")
-        if not isinstance(previous, str) or len(previous) != 64:
+        if not isinstance(previous, str) or not SHA256_PATTERN.fullmatch(previous):
             raise IntegrityFailure("REGISTRY_PREVIOUS_HASH_MISMATCH")
         return
     expected_version = 1 if prior is None else int(prior["registry_version"]) + 1
@@ -150,16 +225,30 @@ def _verify_chain(snapshot: dict, prior: dict | None) -> None:
         raise IntegrityFailure("REGISTRY_VERSION_GAP")
     if snapshot.get("previous_registry_hash") != expected_previous:
         raise IntegrityFailure("REGISTRY_PREVIOUS_HASH_MISMATCH")
+    if prior is not None and parse_utc(snapshot["as_of_timestamp"], "as_of_timestamp") < parse_utc(prior["as_of_timestamp"], "prior.as_of_timestamp"):
+        raise IntegrityFailure("REGISTRY_ASOF_CHRONOLOGY_INVALID")
 
 
 def _verify_registry(snapshot: dict, schema: str, prefix: str, records_key: str,
                      id_key: str, version_field: str, prior: dict | None) -> dict:
+    expected_root = {"schema_version", "registry_snapshot_id", "registry_version", "as_of_timestamp",
+                     "previous_registry_hash", "registry_hash", records_key}
+    if not isinstance(snapshot, dict) or set(snapshot) != expected_root:
+        raise IntegrityFailure("REGISTRY_ROOT_FIELDS_MISMATCH")
     if snapshot.get("schema_version") != schema:
         raise IntegrityFailure("REGISTRY_SCHEMA_MISMATCH")
     _verify_chain(snapshot, prior)
-    parse_utc(snapshot["as_of_timestamp"], "as_of_timestamp")
+    as_of = parse_utc(snapshot["as_of_timestamp"], "as_of_timestamp")
+    _required_string(snapshot, "registry_snapshot_id")
+    if type(snapshot["registry_version"]) is not int or snapshot["registry_version"] < 1:
+        raise IntegrityFailure("REGISTRY_VERSION_INVALID")
+    _hash_or_null(snapshot["previous_registry_hash"], "previous_registry_hash")
+    if not isinstance(snapshot["registry_hash"], str) or not SHA256_PATTERN.fullmatch(snapshot["registry_hash"]):
+        raise IntegrityFailure("REGISTRY_HASH_FORMAT_INVALID")
     records = snapshot.get(records_key)
     if not isinstance(records, list):
+        raise IntegrityFailure("REGISTRY_RECORDS_INVALID")
+    if any(not isinstance(record, dict) for record in records):
         raise IntegrityFailure("REGISTRY_RECORDS_INVALID")
     identities = [record.get(id_key) for record in records]
     if None in identities or len(identities) != len(set(identities)):
@@ -168,11 +257,12 @@ def _verify_registry(snapshot: dict, schema: str, prefix: str, records_key: str,
         _validate_record_shape(record, records_key)
         if record.get("record_hash") != _record_hash(record):
             raise IntegrityFailure("REGISTRY_RECORD_HASH_MISMATCH")
-        if not isinstance(record.get(version_field), int) or record[version_field] < 1:
+        if type(record.get(version_field)) is not int or record[version_field] < 1:
             raise IntegrityFailure("REGISTRY_RECORD_VERSION_INVALID")
         parse_utc(record["effective_from"], "record.effective_from")
         reviewed_field = "reviewed_at" if records_key == "entities" else "reviewed_at_utc"
-        parse_utc(record[reviewed_field], reviewed_field)
+        if parse_utc(record[reviewed_field], reviewed_field) > as_of:
+            raise IntegrityFailure("REGISTRY_REVIEW_FROM_FUTURE")
         if records_key == "sources" and record.get("effective_to"):
             if parse_utc(record["effective_from"], "effective_from") > parse_utc(record["effective_to"], "effective_to"):
                 raise IntegrityFailure("INVALID_EFFECTIVE_PERIOD")
@@ -293,3 +383,12 @@ def resolve_source_record(snapshot: dict, source_id: str, cutoff_timestamp: str,
     if require_usable and (not item["enabled"] or item["verification_status"] != "VERIFIED"):
         raise ResolutionError("SOURCE_DISABLED_OR_UNVERIFIED")
     return item
+
+
+def assert_source_approved_for_automated_ingestion(source: dict) -> dict:
+    if (source["enabled"] is not True
+            or source["verification_status"] != "VERIFIED"
+            or source["automation_allowed_status"] != "ALLOWED"
+            or source["licensing_or_terms_status"] != "REVIEWED_ALLOWED"):
+        raise ResolutionError("SOURCE_NOT_APPROVED_FOR_AUTOMATION")
+    return source

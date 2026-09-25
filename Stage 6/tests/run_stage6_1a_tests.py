@@ -87,13 +87,15 @@ def capture(store: IngestionStore, key: str = "evidence-1", payload: bytes = b"f
             source_registry: str = "source_v1", entity_registry: str = "entity_v1",
             publication: str | None = "2026-05-01T09:00:00Z",
             observed: str = "2026-05-01T09:01:00Z", retrieved: str = "2026-05-01T09:02:00Z",
+            source_reference: str | None = None, content_type: str = "text/plain",
             **links) -> dict:
     return store.capture_evidence(
         idempotency_key=key,
         source_registry_snapshot_id=REGISTRIES[source_registry]["registry_snapshot_id"],
         entity_registry_snapshot_id=REGISTRIES[entity_registry]["registry_snapshot_id"],
         source_id=FIXTURE_SOURCE,
-        source_reference=f"fixture://{key}", raw_payload=payload, content_type="text/plain",
+        source_reference=f"fixture://{key}" if source_reference is None else source_reference,
+        raw_payload=payload, content_type=content_type,
         publication_timestamp_utc=publication, observed_timestamp_utc=observed,
         retrieved_timestamp_utc=retrieved, entity_ids=[FIXTURE_ENTITY], **links,
     )
@@ -562,6 +564,236 @@ def _(): require(git("ls-files", "Stage 6/runtime") == "")
 def _():
     tracked = git("ls-files", "Stage 6/stage6_ingestion", "Stage 6/tests", "Stage 6/fixtures")
     require("__pycache__" not in tracked and ".pyc" not in tracked)
+
+
+# Stage 6.1A.1 targeted pre-live hardening checks. Existing checks above remain intact.
+
+@check("REGISTRY_SNAPSHOT_PIT_CUTOFF", "V1 registry before acquisition accepted")
+def _():
+    with fresh_store() as (store, _): require(capture(store, key="pit-v1")["status"] == "CREATED")
+
+@check("REGISTRY_SNAPSHOT_PIT_CUTOFF", "future source snapshot rejected for old acquisition")
+def _():
+    with fresh_store(import_v2=True) as (store, _):
+        expect(IntegrityFailure, lambda: capture(store, key="pit-source", source_registry="source_v2"), "REGISTRY_SNAPSHOT_FROM_FUTURE")
+
+@check("REGISTRY_SNAPSHOT_PIT_CUTOFF", "future entity snapshot rejected for old acquisition")
+def _():
+    with fresh_store(import_v2=True) as (store, _):
+        expect(IntegrityFailure, lambda: capture(store, key="pit-entity", entity_registry="entity_v2"), "REGISTRY_SNAPSHOT_FROM_FUTURE")
+
+@check("REGISTRY_SNAPSHOT_PIT_CUTOFF", "both future snapshots rejected")
+def _():
+    with fresh_store(import_v2=True) as (store, _):
+        expect(IntegrityFailure, lambda: capture(store, key="pit-both", source_registry="source_v2", entity_registry="entity_v2"), "REGISTRY_SNAPSHOT_FROM_FUTURE")
+
+@check("REGISTRY_SNAPSHOT_PIT_CUTOFF", "snapshot cutoff exact equality accepted")
+def _():
+    with fresh_store() as (store, _):
+        result = capture(store, key="pit-equal", publication=None, observed="2026-01-02T00:00:00Z", retrieved="2026-01-02T00:00:00Z")
+        require(result["status"] == "CREATED")
+
+@check("REGISTRY_SNAPSHOT_PIT_CUTOFF", "failure path enforces snapshot cutoff")
+def _():
+    with fresh_store(import_v2=True) as (store, _):
+        expect(IntegrityFailure, lambda: failure(store, key="pit-failure", source_registry="source_v2"), "REGISTRY_SNAPSHOT_FROM_FUTURE")
+
+@check("REGISTRY_SNAPSHOT_PIT_CUTOFF", "known future-effective ticker does not leak before business date")
+def _():
+    require(resolve_ticker(REGISTRIES["entity_v1"], "FIXTURE_EXCHANGE", "FIXNEW", "2026-08-01T00:00:00Z")["entity_id"] == FIXTURE_ENTITY)
+    expect(ResolutionError, lambda: resolve_ticker(REGISTRIES["entity_v1"], "FIXTURE_EXCHANGE", "FIXNEW", "2026-05-01T00:00:00Z"))
+
+@check("REGISTRY_SNAPSHOT_PIT_CUTOFF", "system knowledge date blocks otherwise effective V2 mapping")
+def _():
+    with fresh_store(import_v2=True) as (store, _):
+        expect(IntegrityFailure, lambda: capture(store, key="knowledge-date", entity_registry="entity_v2"), "REGISTRY_SNAPSHOT_FROM_FUTURE")
+
+@check("REGISTRY_ASOF_CHAIN_CHRONOLOGY", "successor registry as-of cannot precede prior")
+def _():
+    records = deepcopy(REGISTRIES["source_v2"]["sources"])
+    expect(IntegrityFailure, lambda: build_source_registry(records, "2025-12-31T00:00:00Z", REGISTRIES["source_v1"]), "REGISTRY_ASOF_CHRONOLOGY_INVALID")
+
+@check("REGISTRY_ASOF_CHAIN_CHRONOLOGY", "entity review cannot be after registry as-of")
+def _():
+    records = json.loads((STAGE_ROOT / "fixtures/stage6_1a/entity_records_v1.json").read_text(encoding="utf-8")); records[0]["reviewed_at"] = "2026-01-03T00:00:00Z"
+    expect(IntegrityFailure, lambda: build_entity_registry(records, "2026-01-02T00:00:00Z"), "REGISTRY_REVIEW_FROM_FUTURE")
+
+@check("REGISTRY_ASOF_CHAIN_CHRONOLOGY", "source review cannot be after registry as-of")
+def _():
+    records = json.loads((STAGE_ROOT / "fixtures/stage6_1a/source_records_v1.json").read_text(encoding="utf-8")); records[0]["reviewed_at_utc"] = "2026-01-03T00:00:00Z"
+    expect(IntegrityFailure, lambda: build_source_registry(records, "2026-01-02T00:00:00Z"), "REGISTRY_REVIEW_FROM_FUTURE")
+
+
+def _source_records(**changes) -> list[dict]:
+    records = json.loads((STAGE_ROOT / "fixtures/stage6_1a/source_records_v1.json").read_text(encoding="utf-8"))
+    records[0].update(changes)
+    return records
+
+
+@check("FROZEN_SCHEMA_RUNTIME_CONFORMANCE", "source booleans enforce boolean type")
+def _():
+    expect(IntegrityFailure, lambda: build_source_registry(_source_records(supports_machine_access=1), "2026-01-02T00:00:00Z"), "SOURCE_BOOLEAN_INVALID")
+    expect(IntegrityFailure, lambda: build_source_registry(_source_records(requires_auth="false"), "2026-01-02T00:00:00Z"), "SOURCE_BOOLEAN_INVALID")
+
+@check("FROZEN_SCHEMA_RUNTIME_CONFORMANCE", "source jurisdiction and coverage are non-empty unique strings")
+def _():
+    expect(IntegrityFailure, lambda: build_source_registry(_source_records(jurisdiction=["IN", "IN"]), "2026-01-02T00:00:00Z"), "REGISTRY_STRING_ARRAY_INVALID")
+    expect(IntegrityFailure, lambda: build_source_registry(_source_records(coverage=[]), "2026-01-02T00:00:00Z"), "REGISTRY_STRING_ARRAY_INVALID")
+
+@check("FROZEN_SCHEMA_RUNTIME_CONFORMANCE", "source cost and access enums enforced")
+def _():
+    expect(IntegrityFailure, lambda: build_source_registry(_source_records(cost_class="INVALID"), "2026-01-02T00:00:00Z"), "SOURCE_COST_CLASS_INVALID")
+    expect(IntegrityFailure, lambda: build_source_registry(_source_records(access_method="INVALID"), "2026-01-02T00:00:00Z"), "SOURCE_ACCESS_METHOD_INVALID")
+
+@check("FROZEN_SCHEMA_RUNTIME_CONFORMANCE", "source endpoint and policy enums enforced")
+def _():
+    expect(IntegrityFailure, lambda: build_source_registry(_source_records(machine_endpoint_type="INVALID"), "2026-01-02T00:00:00Z"), "SOURCE_ENDPOINT_TYPE_INVALID")
+    expect(IntegrityFailure, lambda: build_source_registry(_source_records(licensing_or_terms_status="INVALID"), "2026-01-02T00:00:00Z"), "SOURCE_LICENSING_STATUS_INVALID")
+    expect(IntegrityFailure, lambda: build_source_registry(_source_records(automation_allowed_status="INVALID"), "2026-01-02T00:00:00Z"), "SOURCE_AUTOMATION_STATUS_INVALID")
+
+@check("FROZEN_SCHEMA_RUNTIME_CONFORMANCE", "source hash format is lowercase SHA-256")
+def _():
+    records = _source_records(previous_version_hash="A" * 64)
+    expect(Stage6IngestionError, lambda: build_source_registry(records, "2026-01-02T00:00:00Z"), "INVALID_PREVIOUS_VERSION_HASH")
+
+@check("FROZEN_SCHEMA_RUNTIME_CONFORMANCE", "entity alias type enum enforced")
+def _():
+    records = json.loads((STAGE_ROOT / "fixtures/stage6_1a/entity_records_v1.json").read_text(encoding="utf-8")); records[0]["aliases"][0]["alias_type"] = "INVALID"
+    expect(IntegrityFailure, lambda: build_entity_registry(records, "2026-01-02T00:00:00Z"), "ALIAS_TYPE_INVALID")
+
+@check("FROZEN_SCHEMA_RUNTIME_CONFORMANCE", "entity ticker and alias strings must be non-empty")
+def _():
+    records = json.loads((STAGE_ROOT / "fixtures/stage6_1a/entity_records_v1.json").read_text(encoding="utf-8")); records[0]["ticker_mappings"][0]["ticker"] = ""
+    expect(IntegrityFailure, lambda: build_entity_registry(records, "2026-01-02T00:00:00Z"), "REGISTRY_FIELD_INVALID")
+    records = json.loads((STAGE_ROOT / "fixtures/stage6_1a/entity_records_v1.json").read_text(encoding="utf-8")); records[0]["aliases"][0]["alias"] = ""
+    expect(IntegrityFailure, lambda: build_entity_registry(records, "2026-01-02T00:00:00Z"), "REGISTRY_FIELD_INVALID")
+
+@check("FROZEN_SCHEMA_RUNTIME_CONFORMANCE", "entity relationship structure and enum enforced")
+def _():
+    records = json.loads((STAGE_ROOT / "fixtures/stage6_1a/entity_records_v1.json").read_text(encoding="utf-8"))
+    records[0]["relationships"] = [{"relationship_type":"INVALID","related_entity_id":"S6FIX_SECTOR_TECH","effective_from":"2026-01-01","effective_to":None,"evidence_ids":[]}]
+    expect(IntegrityFailure, lambda: build_entity_registry(records, "2026-01-02T00:00:00Z"), "RELATIONSHIP_TYPE_INVALID")
+
+@check("FROZEN_SCHEMA_RUNTIME_CONFORMANCE", "relationship evidence IDs unique and non-empty")
+def _():
+    records = json.loads((STAGE_ROOT / "fixtures/stage6_1a/entity_records_v1.json").read_text(encoding="utf-8"))
+    records[0]["relationships"] = [{"relationship_type":"PARENT","related_entity_id":"S6FIX_SECTOR_TECH","effective_from":"2026-01-01","effective_to":None,"evidence_ids":["E1","E1"]}]
+    expect(IntegrityFailure, lambda: build_entity_registry(records, "2026-01-02T00:00:00Z"), "REGISTRY_STRING_ARRAY_INVALID")
+
+@check("FROZEN_SCHEMA_RUNTIME_CONFORMANCE", "entity nullable identity fields enforce string or null")
+def _():
+    records = json.loads((STAGE_ROOT / "fixtures/stage6_1a/entity_records_v1.json").read_text(encoding="utf-8")); records[0]["country"] = 123
+    expect(IntegrityFailure, lambda: build_entity_registry(records, "2026-01-02T00:00:00Z"), "REGISTRY_FIELD_INVALID")
+
+@check("FROZEN_SCHEMA_RUNTIME_CONFORMANCE", "evidence source reference and content type non-empty")
+def _():
+    with fresh_store() as (store, _):
+        expect(Stage6IngestionError, lambda: capture(store, key="empty-ref", source_reference=""), "SOURCE_REFERENCE_REQUIRED")
+        expect(Stage6IngestionError, lambda: capture(store, key="empty-type", content_type=""), "CONTENT_TYPE_REQUIRED")
+
+@check("FROZEN_SCHEMA_RUNTIME_CONFORMANCE", "evidence entity and event IDs unique")
+def _():
+    with fresh_store() as (store, _):
+        expect(Stage6IngestionError, lambda: store.capture_evidence(idempotency_key="dup-entity", source_registry_snapshot_id=REGISTRIES["source_v1"]["registry_snapshot_id"], entity_registry_snapshot_id=REGISTRIES["entity_v1"]["registry_snapshot_id"], source_id=FIXTURE_SOURCE, source_reference="fixture://dup", raw_payload=b"x", content_type="text/plain", publication_timestamp_utc=None, observed_timestamp_utc="2026-05-01T00:00:00Z", retrieved_timestamp_utc="2026-05-01T00:00:01Z", entity_ids=[FIXTURE_ENTITY, FIXTURE_ENTITY]), "ENTITY_IDS_INVALID")
+        expect(Stage6IngestionError, lambda: capture(store, key="dup-event", event_candidate_ids=["EV1", "EV1"]), "EVENT_CANDIDATE_IDS_INVALID")
+
+@check("FROZEN_SCHEMA_RUNTIME_CONFORMANCE", "evidence links null or non-empty strings")
+def _():
+    with fresh_store() as (store, _): expect(Stage6IngestionError, lambda: capture(store, key="empty-link", parent_evidence_id=""), "EVIDENCE_LINK_INVALID")
+
+@check("FROZEN_SCHEMA_RUNTIME_CONFORMANCE", "failure source reference non-empty")
+def _():
+    with fresh_store() as (store, _):
+        expect(Stage6IngestionError, lambda: store.capture_acquisition_failure(idempotency_key="bad-ref", source_registry_snapshot_id=REGISTRIES["source_v1"]["registry_snapshot_id"], entity_registry_snapshot_id=REGISTRIES["entity_v1"]["registry_snapshot_id"], source_id=FIXTURE_SOURCE, source_reference="", retrieval_status="FAILED", failure_reason="x", failure_stage="x", attempted_at_utc="2026-05-01T00:00:00Z"), "SOURCE_REFERENCE_REQUIRED")
+
+@check("FROZEN_SCHEMA_RUNTIME_CONFORMANCE", "successful and failure conditional fields enforced")
+def _():
+    with fresh_store() as (store, _):
+        success = capture(store, key="conditional-success")["record"]; bad = deepcopy(success); bad["content_type"] = None
+        expect(IntegrityFailure, lambda: store._verify_record_semantics(bad), "EVIDENCE_PAYLOAD_FIELD_INVALID")
+        failed = failure(store, key="conditional-failure")["record"]; bad = deepcopy(failed); bad["content_hash"] = "0" * 64
+        expect(IntegrityFailure, lambda: store._verify_record_semantics(bad), "FAILURE_RECORD_FABRICATED_PAYLOAD")
+
+
+def _automation_policy_rejected(field: str, value: object) -> None:
+    snapshot = build_source_registry(_source_records(**{field: value}), "2026-01-02T00:00:00Z")
+    with tempfile.TemporaryDirectory(prefix="stage6_policy_test_") as folder:
+        root = Path(folder)
+        with IngestionStore(root / "store.sqlite3", root / "raw") as store:
+            store.import_registry(REGISTRIES["entity_v1"]); store.import_registry(snapshot)
+            expect(ResolutionError, lambda: store.capture_acquisition_failure(idempotency_key=f"policy-{field}-{value}", source_registry_snapshot_id=snapshot["registry_snapshot_id"], entity_registry_snapshot_id=REGISTRIES["entity_v1"]["registry_snapshot_id"], source_id=FIXTURE_SOURCE, source_reference="fixture://policy", retrieval_status="FAILED", failure_reason="fixture", failure_stage="fixture", attempted_at_utc="2026-05-01T00:00:00Z"), "SOURCE_NOT_APPROVED_FOR_AUTOMATION")
+
+
+for _field, _value in [
+    ("enabled", False),
+    ("verification_status", "PENDING_REVIEW"), ("verification_status", "DISABLED"),
+    ("verification_status", "REJECTED"),
+    ("automation_allowed_status", "RESTRICTED"), ("automation_allowed_status", "PROHIBITED"),
+    ("automation_allowed_status", "UNKNOWN"),
+    ("licensing_or_terms_status", "REVIEWED_RESTRICTED"),
+    ("licensing_or_terms_status", "PENDING_REVIEW"), ("licensing_or_terms_status", "UNKNOWN"),
+]:
+    check("AUTOMATION_PERMISSION_FAIL_CLOSED", f"automation rejects {_field}={_value}")(
+        lambda field=_field, value=_value: _automation_policy_rejected(field, value))
+
+
+@check("CAPTURE_CHAIN_VERIFICATION", "persisted V1 chain verifies before capture")
+def _():
+    with fresh_store() as (store, _): require(store._verify_persisted_registry_chain("SOURCE", REGISTRIES["source_v1"]["registry_snapshot_id"])["registry_version"] == 1)
+
+@check("CAPTURE_CHAIN_VERIFICATION", "persisted V2 chain verifies before capture")
+def _():
+    with fresh_store(import_v2=True) as (store, _): require(store._verify_persisted_registry_chain("SOURCE", REGISTRIES["source_v2"]["registry_snapshot_id"])["registry_version"] == 2)
+
+@check("CAPTURE_CHAIN_VERIFICATION", "missing predecessor prevents capture")
+def _():
+    with tempfile.TemporaryDirectory(prefix="stage6_chain_test_") as folder:
+        root = Path(folder)
+        with IngestionStore(root / "store.sqlite3", root / "raw") as store:
+            store.import_registry(REGISTRIES["source_v2"])
+            expect(IntegrityFailure, lambda: store._verify_persisted_registry_chain("SOURCE", REGISTRIES["source_v2"]["registry_snapshot_id"]), "REGISTRY_CHAIN_PREDECESSOR_MISSING")
+
+@check("CAPTURE_CHAIN_VERIFICATION", "wrong predecessor hash prevents capture")
+def _():
+    with fresh_store(import_v2=True) as (store, _):
+        row = store.connection.execute("SELECT canonical_json FROM registry_snapshots WHERE registry_kind='SOURCE' AND registry_version=2").fetchone(); bad = json.loads(row[0]); bad["previous_registry_hash"] = "0" * 64
+        store.connection.execute("DROP TRIGGER protect_registry_snapshots_update"); store.connection.execute("UPDATE registry_snapshots SET canonical_json=? WHERE registry_kind='SOURCE' AND registry_version=2", (canonical_json(bad),)); store.connection.commit()
+        expect(IntegrityFailure, lambda: store._verify_persisted_registry_chain("SOURCE", REGISTRIES["source_v2"]["registry_snapshot_id"]), "REGISTRY_PREVIOUS_HASH_MISMATCH")
+
+@check("CAPTURE_CHAIN_VERIFICATION", "version gap prevents capture")
+def _():
+    with fresh_store(import_v2=True) as (store, _):
+        row = store.connection.execute("SELECT canonical_json FROM registry_snapshots WHERE registry_kind='SOURCE' AND registry_version=2").fetchone(); bad = json.loads(row[0]); bad["registry_version"] = 3
+        store.connection.execute("DROP TRIGGER protect_registry_snapshots_update"); store.connection.execute("UPDATE registry_snapshots SET registry_version=3, canonical_json=? WHERE registry_kind='SOURCE' AND registry_version=2", (canonical_json(bad),)); store.connection.commit()
+        expect(IntegrityFailure, lambda: store._verify_persisted_registry_chain("SOURCE", REGISTRIES["source_v2"]["registry_snapshot_id"]), "REGISTRY_CHAIN_PREDECESSOR_MISSING")
+
+@check("CAPTURE_CHAIN_VERIFICATION", "tampered prior snapshot prevents capture")
+def _():
+    with fresh_store(import_v2=True) as (store, _):
+        row = store.connection.execute("SELECT canonical_json FROM registry_snapshots WHERE registry_kind='SOURCE' AND registry_version=1").fetchone(); bad = json.loads(row[0]); bad["sources"][0]["source_name"] = "tampered"
+        store.connection.execute("DROP TRIGGER protect_registry_snapshots_update"); store.connection.execute("UPDATE registry_snapshots SET canonical_json=? WHERE registry_kind='SOURCE' AND registry_version=1", (canonical_json(bad),)); store.connection.commit()
+        expect(IntegrityFailure, lambda: capture(store, key="tampered-prior", source_registry="source_v2", entity_registry="entity_v2", publication="2026-08-03T09:00:00Z", observed="2026-08-03T09:01:00Z", retrieved="2026-08-03T09:02:00Z"), "REGISTRY_RECORD_HASH_MISMATCH")
+
+@check("RAW_STORE_NO_CLOBBER", "race winner with identical bytes deduplicates safely")
+def _():
+    with tempfile.TemporaryDirectory(prefix="stage6_raw_race_") as folder:
+        raw = RawPayloadStore(Path(folder)); payload = b"race-identical"
+        def winner(source, target): Path(target).write_bytes(payload); raise FileExistsError(target)
+        with mock.patch("stage6_ingestion.raw_store.os.link", side_effect=winner): result = raw.put(payload)
+        require(raw.path_for(result[0]).read_bytes() == payload)
+
+@check("RAW_STORE_NO_CLOBBER", "race winner with conflicting bytes fails closed without overwrite")
+def _():
+    with tempfile.TemporaryDirectory(prefix="stage6_raw_race_") as folder:
+        raw = RawPayloadStore(Path(folder)); payload = b"race-requested"; conflicting = b"race-conflict"
+        def winner(source, target): Path(target).write_bytes(conflicting); raise FileExistsError(target)
+        with mock.patch("stage6_ingestion.raw_store.os.link", side_effect=winner): expect(IntegrityFailure, lambda: raw.put(payload), "RAW_PAYLOAD_EXISTING_OBJECT_MISMATCH")
+        target = raw.path_for(sha256_bytes(payload)); require(target.read_bytes() == conflicting)
+
+@check("RAW_STORE_NO_CLOBBER", "raw store implementation never uses replace")
+def _():
+    source = (STAGE_ROOT / "stage6_ingestion/raw_store.py").read_text(encoding="utf-8")
+    require("os.replace" not in source and "os.link" in source)
 
 
 def main() -> int:

@@ -4,7 +4,7 @@
 
 Stage 6.1A implements the immutable ingestion foundation as fixture-only infrastructure. It builds and verifies point-in-time Entity and Source Registry snapshots, stores exact raw fixture bytes content-addressably, records successful evidence and failed acquisition attempts, enforces deterministic idempotency, and independently re-verifies the complete append-only store after restart.
 
-The result is **PASS**: 97 of 97 Stage 6.1A acceptance and adversarial tests passed. The unchanged Stage 6.0C architecture validator also passed, parsing all 10 frozen schemas.
+The Stage 6.1A.1 pre-live hardening result is **PASS**: 142 of 142 Stage 6.1A acceptance and adversarial tests passed. This retains all original 97 checks and adds 45 targeted checks. The unchanged Stage 6.0C architecture validator also passed, parsing all 10 frozen schemas.
 
 ## Frozen identities
 
@@ -26,9 +26,14 @@ Stage 6.1A has no production decision influence, BUY or SELL authority, stop or 
 
 - One canonical UTF-8 JSON and SHA-256 implementation is used for registries, evidence, idempotency inputs, and integrity checks.
 - Registry snapshot IDs, registry hashes, record hashes, evidence IDs, and acquisition-attempt IDs are deterministic.
+- Acquisition rejects any Source or Entity Registry snapshot whose `as_of_timestamp` is later than the evidence observation or failed-attempt cutoff.
+- Registry chains enforce non-decreasing as-of chronology, record lineage, and review timestamps no later than their containing snapshot.
+- Runtime validation enforces the applicable frozen Entity Registry, Source Registry, and Evidence contract semantics without changing those contracts.
+- Automated capture fails closed unless the source is enabled, verified, automation-allowed, and terms-reviewed as allowed.
+- Capture verifies the complete persisted registry chain through the referenced snapshot rather than trusting a standalone later version.
 - Historical ticker, alias, entity, and source resolution uses explicit effective periods.
 - Registry and record version chains are verified without rewriting earlier snapshots.
-- Exact raw bytes use the `STAGE6_1A_RAW_BYTES_CONTENT_HASH` rule and are written atomically to a content-addressed store.
+- Exact raw bytes use the `STAGE6_1A_RAW_BYTES_CONTENT_HASH` rule and are installed atomically with no-clobber semantics; a concurrent winner is verified and never overwritten.
 - Retrieval failures remain `ACQUISITION_ATTEMPT` records; they never become no-news, safe, or neutral evidence.
 - SQLite triggers reject updates and deletes from immutable tables.
 - A full restart-safe integrity check covers metadata, SQLite integrity, foreign keys, registry chains, canonical JSON, typed columns, raw bytes, evidence links, source/entity bindings, and idempotency coverage.
