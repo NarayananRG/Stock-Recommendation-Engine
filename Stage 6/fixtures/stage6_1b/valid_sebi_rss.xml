@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>SEBI Official RSS Fixture</title>
+    <link>https://www.sebi.gov.in/</link>
+    <description>Synthetic offline shape fixture; not copied SEBI content.</description>
+    <lastBuildDate>Fri, 25 Sep 2026 14:30:00 +0000</lastBuildDate>
+    <item>
+      <title>Synthetic regulatory publication</title>
+      <link>https://www.sebi.gov.in/synthetic-not-fetched</link>
+      <description>Connector tests must never fetch this link.</description>
+    </item>
+  </channel>
+</rss>

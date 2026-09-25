@@ -3,5 +3,6 @@ runtime/*.sqlite3-wal
 runtime/*.sqlite3-shm
 runtime/raw/
 runtime/demo_*/
+runtime/stage6_1b*/
 **/__pycache__/
 *.pyc

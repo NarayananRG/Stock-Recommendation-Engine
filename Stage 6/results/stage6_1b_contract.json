@@ -1,0 +1,81 @@
+{
+  "acceptance_gates": {
+    "ACQUISITION_FAILURE_SEMANTICS": "PASS",
+    "DEFAULT_TESTS_NETWORK_FREE": "PASS",
+    "EXACT_RAW_BYTE_PRESERVATION": "PASS",
+    "FROZEN_ARCHITECTURE_UNCHANGED": "PASS",
+    "FROZEN_STAGE5D5_UNCHANGED": "PASS",
+    "FULL_STORE_RESTART_INTEGRITY": "PASS",
+    "LIVE_SEBI_RSS_SMOKE": "PASS",
+    "NETWORK_ALLOWLIST_FAIL_CLOSED": "PASS",
+    "NO_LINK_FOLLOWING": "PASS",
+    "NO_TRADING_OR_ML_AUTHORITY": "PASS",
+    "RSS_FORMAT_AND_XML_SECURITY": "PASS",
+    "SOURCE_APPROVAL_BEFORE_NETWORK": "PASS",
+    "STAGE6_1A_REGRESSION": "PASS"
+  },
+  "allowed_network_hosts": [
+    "www.sebi.gov.in"
+  ],
+  "allowed_network_paths": [
+    "/sebirss.xml"
+  ],
+  "architecture_baseline_commit": "d5bc19c7c2341f56bcaa8c890e0d95979dca878b",
+  "architecture_baseline_tag": "stage6-decision-intelligence-architecture-baseline-v2",
+  "architecture_validator": {
+    "result": "PASS",
+    "schemas_parsed": 10,
+    "stage": "6.0C"
+  },
+  "authority": "SHADOW_ONLY",
+  "baseline_stage6_1a_commit": "d5012decd2ff92ab088648b651d6285be17e8cc3",
+  "baseline_stage6_1a_tag": "stage6-1a-ingestion-foundation-baseline",
+  "broker_execution": false,
+  "conditional_http_polling": "DEFERRED",
+  "fixture_tests": {
+    "failed": 0,
+    "network_calls": 0,
+    "passed": 68,
+    "result": "PASS",
+    "total": 68
+  },
+  "frozen_architecture_changed_files": 0,
+  "frozen_stage5d_changed_files": 0,
+  "implementation_stage": "6.1B",
+  "live_external_sources": true,
+  "live_smoke_test": {
+    "acquisition_attempt_ids": [],
+    "evidence_ids": [
+      "S6EV_e5916e819d23c98bf3e97c1a",
+      "S6EV_75818548cd4fc4d2aae1953f"
+    ],
+    "final_evidence_id": "S6EV_75818548cd4fc4d2aae1953f",
+    "final_raw_payload_hash": "b446c6731b6bbcd9dd872192e7cc20c3f2a57e0ca4631cc3390eb78c34e167f5",
+    "final_retrieval_status": "RETRIEVED",
+    "final_run_network_requests": 1,
+    "full_store_integrity": "PASS",
+    "hosts_contacted": [
+      "www.sebi.gov.in"
+    ],
+    "result": "PASS",
+    "total_validation_network_requests": 2
+  },
+  "live_smoke_test_status": "PASS",
+  "ml_production_influence": false,
+  "production_control_commit": "74b2710f0e19bd403978da81e87f25a3059ace06",
+  "production_control_tag": "stage5d5-live-paper-runner-baseline",
+  "production_decision_influence": false,
+  "result": "PASS",
+  "runtime_artifacts_committed": 0,
+  "source_authority": "PRIMARY_OFFICIAL",
+  "source_id": "SEBI_OFFICIAL_RSS",
+  "source_type": "REGULATOR_RSS",
+  "stage": "6.1B",
+  "stage6_1a_regression": {
+    "failed": 0,
+    "passed": 152,
+    "result": "PASS",
+    "total": 152
+  },
+  "trading_actions": false
+}
