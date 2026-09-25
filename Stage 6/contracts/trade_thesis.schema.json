@@ -4,7 +4,7 @@
   "title": "Stage 6 Reproducible Persistent Trade Thesis",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "thesis_id", "version", "thesis_engine_version", "code_commit", "decision_cutoff", "input_record_ids", "input_record_hashes", "recommendation_id", "ticker", "entry_date", "holding_horizon", "entry_rationale", "supporting_evidence", "known_risks", "initial_entry_range", "fill_references", "aggregate_fill", "initial_stop", "current_stop", "initial_target", "current_target", "invalidation_conditions", "thesis_status", "last_review_date", "change_history", "previous_version_hash", "record_hash", "authority_mode"],
+  "required": ["schema_version", "thesis_id", "version", "thesis_engine_version", "code_commit", "decision_cutoff", "input_records", "recommendation_id", "ticker", "entry_date", "holding_horizon", "entry_rationale", "supporting_evidence", "known_risks", "initial_entry_range", "fill_references", "aggregate_fill", "initial_stop", "current_stop", "initial_target", "current_target", "invalidation_conditions", "thesis_status", "last_review_date", "change_history", "previous_version_hash", "record_hash", "authority_mode"],
   "properties": {
     "schema_version": {"const": "STAGE6_TRADE_THESIS_V2"},
     "thesis_id": {"type": "string", "minLength": 1},
@@ -12,8 +12,7 @@
     "thesis_engine_version": {"type": "string", "minLength": 1},
     "code_commit": {"type": "string", "pattern": "^[a-f0-9]{40}$"},
     "decision_cutoff": {"type": "string", "format": "date-time"},
-    "input_record_ids": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
-    "input_record_hashes": {"type": "array", "items": {"type": "string", "pattern": "^[a-f0-9]{64}$"}, "minItems": 1, "uniqueItems": true},
+    "input_records": {"type": "array", "items": {"$ref": "#/$defs/input_record_binding"}, "minItems": 1},
     "recommendation_id": {"type": "string", "minLength": 1},
     "ticker": {"type": "string", "minLength": 1},
     "entry_date": {"type": ["string", "null"], "format": "date"},
@@ -31,7 +30,7 @@
     "invalidation_conditions": {"type": "array", "items": {"type": "string"}, "minItems": 1},
     "thesis_status": {"enum": ["THESIS_STRENGTHENED", "THESIS_UNCHANGED", "THESIS_WEAKENED", "THESIS_INVALIDATED", "CLOSED"]},
     "last_review_date": {"type": "string", "format": "date"},
-    "change_history": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["version", "changed_at_utc", "decision_cutoff", "change_type", "reason", "evidence_ids", "input_record_hashes"], "properties": {"version": {"type": "integer", "minimum": 1}, "changed_at_utc": {"type": "string", "format": "date-time"}, "decision_cutoff": {"type": "string", "format": "date-time"}, "change_type": {"type": "string"}, "reason": {"type": "string"}, "evidence_ids": {"type": "array", "items": {"type": "string"}}, "input_record_hashes": {"type": "array", "items": {"type": "string", "pattern": "^[a-f0-9]{64}$"}}}}},
+    "change_history": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["version", "changed_at_utc", "decision_cutoff", "change_type", "reason", "evidence_ids", "input_records"], "properties": {"version": {"type": "integer", "minimum": 1}, "changed_at_utc": {"type": "string", "format": "date-time"}, "decision_cutoff": {"type": "string", "format": "date-time"}, "change_type": {"type": "string"}, "reason": {"type": "string"}, "evidence_ids": {"type": "array", "items": {"type": "string"}}, "input_records": {"type": "array", "items": {"$ref": "#/$defs/input_record_binding"}, "minItems": 1}}}},
     "previous_version_hash": {"type": ["string", "null"], "pattern": "^[a-f0-9]{64}$"},
     "record_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
     "authority_mode": {"const": "SHADOW_ONLY"}
@@ -39,7 +38,8 @@
   "$defs": {
     "range": {"type": "object", "additionalProperties": false, "required": ["low", "high", "currency"], "properties": {"low": {"type": "number", "exclusiveMinimum": 0}, "high": {"type": "number", "exclusiveMinimum": 0}, "currency": {"const": "INR"}}},
     "nullable_price": {"oneOf": [{"type": "null"}, {"type": "object", "additionalProperties": false, "required": ["value", "currency"], "properties": {"value": {"type": "number", "exclusiveMinimum": 0}, "currency": {"const": "INR"}}}]},
-    "fill_reference": {"type": "object", "additionalProperties": false, "required": ["transaction_id", "fill_date", "quantity", "price", "currency", "source_system"], "properties": {"transaction_id": {"type": "string", "minLength": 1}, "fill_date": {"type": "string", "format": "date"}, "quantity": {"type": "integer", "minimum": 1}, "price": {"type": "number", "exclusiveMinimum": 0}, "currency": {"const": "INR"}, "source_system": {"const": "STAGE5D5_FROZEN_PRODUCTION_CONTROL"}}}
+    "fill_reference": {"type": "object", "additionalProperties": false, "required": ["transaction_id", "fill_date", "quantity", "price", "currency", "source_system"], "properties": {"transaction_id": {"type": "string", "minLength": 1}, "fill_date": {"type": "string", "format": "date"}, "quantity": {"type": "integer", "minimum": 1}, "price": {"type": "number", "exclusiveMinimum": 0}, "currency": {"const": "INR"}, "source_system": {"const": "STAGE5D5_FROZEN_PRODUCTION_CONTROL"}}},
+    "input_record_binding": {"type": "object", "additionalProperties": false, "required": ["record_id", "record_hash", "record_type"], "properties": {"record_id": {"type": "string", "minLength": 1}, "record_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"}, "record_type": {"type": "string", "minLength": 1}}}
   },
-  "x-stage6-invariants": ["Fill references are read-only identities owned by frozen Stage 5D.5; Stage 6 never rewrites transaction authority.", "aggregate_fill is a deterministic summary of fill_references and does not replace them.", "Each thesis version and review is reproducible from code identity, cutoff, input IDs, and hashes."]
+  "x-stage6-invariants": ["Fill references are read-only identities owned by frozen Stage 5D.5; Stage 6 never rewrites transaction authority.", "aggregate_fill is a deterministic summary of fill_references and does not replace them.", "Each input_records entry binds one dependency ID directly to its immutable hash and stable type.", "Each thesis version and review is reproducible from code identity, cutoff, directly bound inputs, and hashes."]
 }

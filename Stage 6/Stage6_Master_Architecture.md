@@ -38,11 +38,15 @@ Each module consumes only versioned contracts, emits immutable identified record
 10. Shadow decisions cite exact input IDs and hashes, code identity, registry versions, evidence, context, analogue, thesis, portfolio state, reason codes, and explanation. They cannot affect Stage 5D.5.
 11. Prospective validation compares frozen Stage 6 outputs to the official Stage 5D.5 control without rewriting either history.
 
-The foundational flow is:
+The pre-ingestion boundary is:
 
-`Entity Registry + Versioned Source Registry → Raw Evidence → Event Intelligence → Exposure Graph + Market Context → Historical Analogues → Persistent Thesis + Portfolio Context → Shadow Decision`
+`Immutable Entity Registry Snapshot + Immutable Source Registry Snapshot → Acquisition Attempt → Immutable Raw Evidence (if successful) → Event Intelligence → Exposure Graph + Market Context → Historical Analogues → Persistent Thesis + Portfolio Context → Shadow Decision`
 
-Stage 6.1 must not ingest evidence until an entity-registry identity is available, a source-registry version is frozen for the acquisition, and the raw evidence envelope can reference both versions. No connector may infer an undated alias, silently reuse a later ticker mapping, or retroactively rewrite source authority.
+Stage 6.1 must not ingest evidence until immutable entity- and source-registry snapshot IDs, versions, and canonical hashes are frozen for the acquisition, and the evidence or acquisition-attempt envelope can reference both snapshots plus the exact source-record version and hash. A changed record creates a new complete snapshot; historical acquisitions retain the old snapshot. No connector may infer an undated alias, silently reuse a later ticker mapping, or retroactively rewrite source authority.
+
+Future runtime referential invariants are fail-closed: `source_id`, source-record version, and source-record hash must match the referenced source snapshot; every attached `entity_id` must exist in the referenced entity snapshot; ticker aliases are resolved using the acquisition cutoff rather than today's mapping; registry hashes are immutable; and a missing referenced snapshot invalidates the acquisition. A failed or access-denied acquisition is an auditable `ACQUISITION_ATTEMPT`, **not evidence that an event or news is absent**.
+
+Every derived Stage 6 dependency uses a direct `record_id` ↔ `record_hash` ↔ `record_type` binding. Parallel unpaired ID and hash arrays are prohibited because they cannot prove which immutable payload was consumed.
 
 ## Evidence, PIT, and immutability
 
@@ -66,7 +70,7 @@ Existing holdings are not displaced merely because another candidate ranks sligh
 
 Missing source identity, failed hashes, invalid timestamp order, unsupported schema versions, ambiguous entity binding, stale exposures, PIT violations, unresolved required evidence, or missing dependency records fail closed for the affected shadow output. Discovery-only or unverified evidence cannot independently force an action. Failures are recorded; absence of evidence is never converted into reassuring evidence of absence.
 
-Every future shadow decision must be reconstructable from immutable input IDs and hashes, contract versions, code/model identity, as-of cutoff, reason codes, and output hash. Logs must distinguish acquisition failure, no evidence found, contradictory evidence, unavailable context, and intentionally withheld interpretation.
+Every future shadow decision must be reconstructable from directly bound immutable input IDs and hashes, contract versions, code/model identity, as-of cutoff, reason codes, and output hash. Logs must distinguish acquisition failure, no evidence found, contradictory evidence, unavailable context, and intentionally withheld interpretation. Failed acquisition never becomes reassuring evidence of absence.
 
 ## Production relationship
 

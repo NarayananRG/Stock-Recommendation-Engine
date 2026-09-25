@@ -1,42 +1,72 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "stage6/evidence.schema.json",
-  "title": "Stage 6 Evidence Envelope",
-  "x-stage6-invariants": ["When all are known: publication_timestamp_utc <= observed_timestamp_utc <= retrieved_timestamp_utc. JSON Schema cannot compare timestamps numerically; future ingestion runtime validation must enforce this chronology.", "Unknown publisher publication timestamps remain null and must never inherit observed or retrieved time."],
+  "title": "Stage 6 Evidence and Acquisition Attempt Envelope",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "evidence_id", "source_id", "authority_level", "source_reference", "publication_timestamp_utc", "observed_timestamp_utc", "retrieved_timestamp_utc", "content_hash", "raw_title", "raw_document_reference", "entity_ids", "event_candidate_ids", "retrieval_status", "entity_resolution_version", "source_registry_version", "content_type", "language", "document_version", "raw_payload_reference", "raw_payload_hash", "parent_evidence_id", "correction_of_evidence_id", "retraction_of_evidence_id", "record_hash"],
+  "required": ["schema_version", "record_kind", "evidence_id", "source_id", "source_record_version", "source_record_hash", "authority_level", "source_reference", "source_registry_snapshot_id", "source_registry_version", "source_registry_hash", "entity_registry_snapshot_id", "entity_registry_version", "entity_registry_hash", "publication_timestamp_utc", "observed_timestamp_utc", "retrieved_timestamp_utc", "timestamp_order_verified", "content_hash", "raw_title", "raw_document_reference", "content_type", "language", "document_version", "raw_payload_reference", "raw_payload_hash", "entity_ids", "event_candidate_ids", "retrieval_status", "failure_reason", "failure_stage", "attempted_at_utc", "parent_evidence_id", "correction_of_evidence_id", "retraction_of_evidence_id", "record_hash"],
   "properties": {
-    "schema_version": {"const": "STAGE6_EVIDENCE_V1"},
+    "schema_version": {"const": "STAGE6_EVIDENCE_V2"},
+    "record_kind": {"enum": ["EVIDENCE", "ACQUISITION_ATTEMPT"]},
     "evidence_id": {"type": "string", "minLength": 1},
     "source_id": {"type": "string", "minLength": 1},
+    "source_record_version": {"type": "integer", "minimum": 1},
+    "source_record_hash": {"$ref": "#/$defs/hash"},
     "authority_level": {"enum": ["PRIMARY_OFFICIAL", "AUTHORITATIVE_INDEPENDENT", "DISCOVERY", "UNVERIFIED"]},
-    "source_reference": {"type": "string", "minLength": 1, "description": "Original URL, circular reference, filing ID, or equivalent reference."},
+    "source_reference": {"type": "string", "minLength": 1},
+    "source_registry_snapshot_id": {"type": "string", "minLength": 1},
+    "source_registry_version": {"type": "integer", "minimum": 1},
+    "source_registry_hash": {"$ref": "#/$defs/hash"},
+    "entity_registry_snapshot_id": {"type": "string", "minLength": 1},
+    "entity_registry_version": {"type": "integer", "minimum": 1},
+    "entity_registry_hash": {"$ref": "#/$defs/hash"},
     "publication_timestamp_utc": {"$ref": "#/$defs/nullable_timestamp"},
     "observed_timestamp_utc": {"$ref": "#/$defs/nullable_timestamp"},
     "retrieved_timestamp_utc": {"$ref": "#/$defs/nullable_timestamp"},
-    "timestamp_order_verified": {"type": "boolean", "description": "True only when known timestamps satisfy publication <= observed <= retrieved."},
-    "content_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "timestamp_order_verified": {"type": ["boolean", "null"]},
+    "content_hash": {"$ref": "#/$defs/nullable_hash"},
     "raw_title": {"type": ["string", "null"]},
-    "raw_document_reference": {"type": "string", "minLength": 1},
+    "raw_document_reference": {"type": ["string", "null"]},
+    "content_type": {"type": ["string", "null"]},
+    "language": {"type": ["string", "null"]},
+    "document_version": {"type": ["string", "null"]},
+    "raw_payload_reference": {"type": ["string", "null"]},
+    "raw_payload_hash": {"$ref": "#/$defs/nullable_hash"},
     "entity_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
     "event_candidate_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
     "retrieval_status": {"enum": ["RETRIEVED", "PARTIAL", "NOT_FOUND", "ACCESS_DENIED", "FAILED", "QUARANTINED"]},
-    "supersedes_evidence_id": {"type": ["string", "null"]},
-    "entity_resolution_version": {"type": "string", "minLength": 1},
-    "source_registry_version": {"type": "string", "minLength": 1},
-    "content_type": {"type": "string", "minLength": 1},
-    "language": {"type": ["string", "null"]},
-    "document_version": {"type": ["string", "null"]},
-    "raw_payload_reference": {"type": "string", "minLength": 1},
-    "raw_payload_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "failure_reason": {"type": ["string", "null"]},
+    "failure_stage": {"type": ["string", "null"]},
+    "attempted_at_utc": {"$ref": "#/$defs/nullable_timestamp"},
     "parent_evidence_id": {"type": ["string", "null"]},
     "correction_of_evidence_id": {"type": ["string", "null"]},
     "retraction_of_evidence_id": {"type": ["string", "null"]},
-    "record_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+    "record_hash": {"$ref": "#/$defs/hash"}
   },
-  "$defs": {"nullable_timestamp": {"type": ["string", "null"], "format": "date-time"}},
+  "$defs": {
+    "hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "nullable_hash": {"type": ["string", "null"], "pattern": "^[a-f0-9]{64}$"},
+    "nullable_timestamp": {"type": ["string", "null"], "format": "date-time"}
+  },
   "allOf": [
-    {"if": {"properties": {"publication_timestamp_utc": {"type": "string"}, "observed_timestamp_utc": {"type": "string"}, "retrieved_timestamp_utc": {"type": "string"}}, "required": ["publication_timestamp_utc", "observed_timestamp_utc", "retrieved_timestamp_utc"]}, "then": {"required": ["timestamp_order_verified"], "properties": {"timestamp_order_verified": {"const": true}}}}
+    {
+      "if": {"properties": {"retrieval_status": {"enum": ["RETRIEVED", "PARTIAL", "QUARANTINED"]}}, "required": ["retrieval_status"]},
+      "then": {"properties": {"record_kind": {"const": "EVIDENCE"}, "content_hash": {"$ref": "#/$defs/hash"}, "raw_payload_reference": {"type": "string", "minLength": 1}, "raw_payload_hash": {"$ref": "#/$defs/hash"}, "content_type": {"type": "string", "minLength": 1}, "raw_document_reference": {"type": "string", "minLength": 1}, "failure_reason": {"const": null}, "failure_stage": {"const": null}, "attempted_at_utc": {"const": null}}}
+    },
+    {
+      "if": {"properties": {"retrieval_status": {"enum": ["NOT_FOUND", "ACCESS_DENIED", "FAILED"]}}, "required": ["retrieval_status"]},
+      "then": {"properties": {"record_kind": {"const": "ACQUISITION_ATTEMPT"}, "failure_reason": {"type": "string", "minLength": 1}, "failure_stage": {"type": "string", "minLength": 1}, "attempted_at_utc": {"type": "string", "format": "date-time"}}}
+    },
+    {
+      "if": {"properties": {"publication_timestamp_utc": {"type": "string"}, "observed_timestamp_utc": {"type": "string"}, "retrieved_timestamp_utc": {"type": "string"}}, "required": ["publication_timestamp_utc", "observed_timestamp_utc", "retrieved_timestamp_utc"]},
+      "then": {"properties": {"timestamp_order_verified": {"const": true}}}
+    }
+  ],
+  "x-stage6-invariants": [
+    "When all are known: publication_timestamp_utc <= observed_timestamp_utc <= retrieved_timestamp_utc. JSON Schema cannot compare timestamps numerically; future ingestion runtime validation must enforce this chronology.",
+    "Unknown publisher publication timestamps remain null and never inherit observed, retrieved, or attempted time.",
+    "source_id, source_record_version, and source_record_hash must match the exact record in the referenced immutable source-registry snapshot.",
+    "Every entity_id must exist in the referenced immutable entity-registry snapshot and aliases/tickers are resolved at the acquisition cutoff.",
+    "A no-payload failure is an ACQUISITION_ATTEMPT, not evidence that no event or news exists; missing referenced registry snapshots fail closed."
   ]
 }

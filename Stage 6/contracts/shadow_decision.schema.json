@@ -4,7 +4,7 @@
   "title": "Stage 6 Reproducible Shadow Decision",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "decision_id", "decision_engine_version", "code_commit", "as_of_timestamp", "decision_cutoff_timestamp", "ticker", "decision_scope", "original_thesis_id", "decision", "supporting_evidence_ids", "historical_analogue_id", "market_context_id", "portfolio_context_id", "input_record_ids", "input_record_hashes", "source_registry_version", "entity_registry_version", "previous_decision_id", "reason_codes", "human_readable_explanation", "confidence", "record_hash", "authority_mode"],
+  "required": ["schema_version", "decision_id", "decision_engine_version", "code_commit", "as_of_timestamp", "decision_cutoff_timestamp", "ticker", "decision_scope", "original_thesis_id", "decision", "supporting_evidence_ids", "historical_analogue_id", "market_context_id", "portfolio_context_id", "input_records", "source_registry_version", "entity_registry_version", "previous_decision_id", "reason_codes", "human_readable_explanation", "confidence", "record_hash", "authority_mode"],
   "properties": {
     "schema_version": {"const": "STAGE6_SHADOW_DECISION_V2"},
     "decision_id": {"type": "string", "minLength": 1},
@@ -20,8 +20,7 @@
     "historical_analogue_id": {"type": ["string", "null"]},
     "market_context_id": {"type": "string", "minLength": 1},
     "portfolio_context_id": {"type": "string", "minLength": 1},
-    "input_record_ids": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
-    "input_record_hashes": {"type": "array", "items": {"type": "string", "pattern": "^[a-f0-9]{64}$"}, "minItems": 1, "uniqueItems": true},
+    "input_records": {"type": "array", "items": {"$ref": "#/$defs/input_record_binding"}, "minItems": 1},
     "source_registry_version": {"type": "string", "minLength": 1},
     "entity_registry_version": {"type": "string", "minLength": 1},
     "previous_decision_id": {"type": ["string", "null"]},
@@ -31,9 +30,10 @@
     "record_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
     "authority_mode": {"const": "SHADOW_ONLY"}
   },
+  "$defs": {"input_record_binding": {"type": "object", "additionalProperties": false, "required": ["record_id", "record_hash", "record_type"], "properties": {"record_id": {"type": "string", "minLength": 1}, "record_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"}, "record_type": {"type": "string", "minLength": 1}}}},
   "allOf": [
     {"if": {"properties": {"decision_scope": {"const": "NEW_ENTRY"}}}, "then": {"properties": {"decision": {"enum": ["ENTRY_VALID", "WAIT", "CANCEL_ENTRY", "PRICE_OUTSIDE_ENTRY_RANGE", "NO_NEW_POSITION"]}}}},
     {"if": {"properties": {"decision_scope": {"const": "HOLDING"}}}, "then": {"properties": {"decision": {"enum": ["HOLD", "HOLD_RAISE_STOP", "HOLD_EXTEND_TARGET", "RISK_REVIEW", "REDUCE", "EXIT"]}, "original_thesis_id": {"type": "string", "minLength": 1}}}}
   ],
-  "x-stage6-invariants": ["decision_cutoff_timestamp is the latest permissible input time and must not be after as_of_timestamp.", "input_record_ids and input_record_hashes identify the exact immutable records used.", "All decisions remain SHADOW_ONLY and have zero production authority."]
+  "x-stage6-invariants": ["decision_cutoff_timestamp is the latest permissible input time and must not be after as_of_timestamp.", "Each input_records entry binds one dependency ID directly to its immutable hash and stable type.", "All decisions remain SHADOW_ONLY and have zero production authority."]
 }

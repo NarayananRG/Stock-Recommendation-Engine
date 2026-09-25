@@ -4,16 +4,21 @@
   "title": "Stage 6 Source Registry",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "sources"],
+  "required": ["schema_version", "registry_snapshot_id", "registry_version", "as_of_timestamp", "previous_registry_hash", "registry_hash", "sources"],
   "properties": {
     "schema_version": {"const": "STAGE6_SOURCE_REGISTRY_V1"},
+    "registry_snapshot_id": {"type": "string", "minLength": 1},
+    "registry_version": {"type": "integer", "minimum": 1},
+    "as_of_timestamp": {"type": "string", "format": "date-time"},
+    "previous_registry_hash": {"type": ["string", "null"], "pattern": "^[a-f0-9]{64}$"},
+    "registry_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
     "sources": {"type": "array", "items": {"$ref": "#/$defs/source"}}
   },
   "$defs": {
     "source": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["source_id", "source_name", "authority_level", "publisher_type", "jurisdiction", "coverage", "expected_latency", "supports_machine_access", "historical_depth", "requires_auth", "cost_class", "terms_notes", "enabled", "verification_status", "registry_version", "effective_from", "effective_to", "reviewed_at_utc", "access_method", "machine_endpoint_type", "licensing_or_terms_status", "automation_allowed_status", "rate_limit_notes", "availability_notes", "previous_version_hash", "record_hash"],
+      "required": ["source_id", "source_name", "authority_level", "publisher_type", "jurisdiction", "coverage", "expected_latency", "supports_machine_access", "historical_depth", "requires_auth", "cost_class", "terms_notes", "enabled", "verification_status", "source_record_version", "effective_from", "effective_to", "reviewed_at_utc", "access_method", "machine_endpoint_type", "licensing_or_terms_status", "automation_allowed_status", "rate_limit_notes", "availability_notes", "previous_version_hash", "record_hash"],
       "properties": {
         "source_id": {"type": "string", "minLength": 1},
         "source_name": {"type": "string", "minLength": 1},
@@ -29,7 +34,7 @@
         "terms_notes": {"type": "string"},
         "enabled": {"type": "boolean"},
         "verification_status": {"enum": ["VERIFIED", "PENDING_REVIEW", "DISABLED", "REJECTED"]},
-        "registry_version": {"type": "integer", "minimum": 1},
+        "source_record_version": {"type": "integer", "minimum": 1},
         "effective_from": {"type": "string", "format": "date-time"},
         "effective_to": {"type": ["string", "null"], "format": "date-time"},
         "reviewed_at_utc": {"type": "string", "format": "date-time"},
@@ -44,5 +49,5 @@
       }
     }
   },
-  "x-stage6-invariants": ["Authority, access, availability, licensing, and automation changes create new versions; historical records are never overwritten.", "No credentials are stored in the registry."]
+  "x-stage6-invariants": ["Authority, access, availability, licensing, and automation changes create new source-record and registry-snapshot versions; historical records and snapshots are never overwritten.", "Changing one source record changes registry_snapshot_id, registry_version, and registry_hash; historical acquisitions retain the exact prior snapshot binding.", "No credentials are stored in the registry."]
 }

@@ -4,9 +4,14 @@
   "title": "Stage 6 Point-in-Time Entity Registry",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "entities"],
+  "required": ["schema_version", "registry_snapshot_id", "registry_version", "as_of_timestamp", "previous_registry_hash", "registry_hash", "entities"],
   "properties": {
     "schema_version": {"const": "STAGE6_ENTITY_REGISTRY_V1"},
+    "registry_snapshot_id": {"type": "string", "minLength": 1},
+    "registry_version": {"type": "integer", "minimum": 1},
+    "as_of_timestamp": {"type": "string", "format": "date-time"},
+    "previous_registry_hash": {"type": ["string", "null"], "pattern": "^[a-f0-9]{64}$"},
+    "registry_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
     "entities": {"type": "array", "items": {"$ref": "#/$defs/entity"}}
   },
   "$defs": {
@@ -32,7 +37,7 @@
     },
     "entity": {
       "type": "object", "additionalProperties": false,
-      "required": ["entity_id", "canonical_name", "legal_name", "entity_type", "country", "ticker_mappings", "aliases", "isin", "sector_entity_id", "subsector_entity_id", "relationships", "registry_version", "effective_from", "reviewed_at", "previous_version_hash", "record_hash"],
+      "required": ["entity_id", "canonical_name", "legal_name", "entity_type", "country", "ticker_mappings", "aliases", "isin", "sector_entity_id", "subsector_entity_id", "relationships", "entity_record_version", "effective_from", "reviewed_at", "previous_version_hash", "record_hash"],
       "properties": {
         "entity_id": {"type": "string", "minLength": 1},
         "canonical_name": {"type": "string", "minLength": 1},
@@ -45,7 +50,7 @@
         "sector_entity_id": {"type": ["string", "null"]},
         "subsector_entity_id": {"type": ["string", "null"]},
         "relationships": {"type": "array", "items": {"$ref": "#/$defs/relationship"}},
-        "registry_version": {"type": "integer", "minimum": 1},
+        "entity_record_version": {"type": "integer", "minimum": 1},
         "effective_from": {"type": "string", "format": "date-time"},
         "reviewed_at": {"type": "string", "format": "date-time"},
         "previous_version_hash": {"type": ["string", "null"], "pattern": "^[a-f0-9]{64}$"},
@@ -57,6 +62,7 @@
   "x-stage6-invariants": [
     "Ticker mappings, aliases, and relationships are append-only versions and are resolved using the historical as-of cutoff.",
     "effective_from must not be after effective_to when effective_to is known.",
-    "previous_version_hash and record_hash form immutable entity-version lineage."
+    "previous_version_hash and record_hash form immutable entity-version lineage.",
+    "Changing any entity record produces a new immutable registry snapshot, registry_snapshot_id, registry_version, and registry_hash; historical acquisitions retain the prior snapshot binding."
   ]
 }
