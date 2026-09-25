@@ -1,0 +1,7 @@
+runtime/*.sqlite3
+runtime/*.sqlite3-wal
+runtime/*.sqlite3-shm
+runtime/raw/
+runtime/demo_*/
+**/__pycache__/
+*.pyc

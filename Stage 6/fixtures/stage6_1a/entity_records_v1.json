@@ -1,0 +1,59 @@
+[
+  {
+    "entity_id": "S6FIX_COMPANY_001",
+    "canonical_name": "Fixture Technologies Limited",
+    "legal_name": "Fixture Technologies Limited",
+    "entity_type": "COMPANY",
+    "country": "IN",
+    "ticker_mappings": [
+      {"exchange": "FIXTURE_EXCHANGE", "ticker": "FIXOLD", "effective_from": "2026-01-01", "effective_to": "2026-06-30"},
+      {"exchange": "FIXTURE_EXCHANGE", "ticker": "FIXNEW", "effective_from": "2026-07-01", "effective_to": null}
+    ],
+    "aliases": [
+      {"alias": "Fixture Legacy Tech", "alias_type": "FORMER_NAME", "effective_from": "2026-01-01", "effective_to": "2026-06-30"},
+      {"alias": "Fixture Technologies", "alias_type": "COMMON_NAME", "effective_from": "2026-07-01", "effective_to": null}
+    ],
+    "isin": "FIXTUREISIN001",
+    "sector_entity_id": "S6FIX_SECTOR_TECH",
+    "subsector_entity_id": null,
+    "relationships": [],
+    "entity_record_version": 1,
+    "effective_from": "2026-01-01T00:00:00Z",
+    "reviewed_at": "2026-01-01T00:00:00Z",
+    "previous_version_hash": null
+  },
+  {
+    "entity_id": "S6FIX_SECTOR_TECH",
+    "canonical_name": "Fixture Technology Sector",
+    "legal_name": null,
+    "entity_type": "SECTOR",
+    "country": "IN",
+    "ticker_mappings": [],
+    "aliases": [],
+    "isin": null,
+    "sector_entity_id": null,
+    "subsector_entity_id": null,
+    "relationships": [],
+    "entity_record_version": 1,
+    "effective_from": "2026-01-01T00:00:00Z",
+    "reviewed_at": "2026-01-01T00:00:00Z",
+    "previous_version_hash": null
+  },
+  {
+    "entity_id": "S6FIX_INDEX_001",
+    "canonical_name": "Fixture Broad Index",
+    "legal_name": null,
+    "entity_type": "INDEX",
+    "country": "IN",
+    "ticker_mappings": [{"exchange": "FIXTURE_EXCHANGE", "ticker": "FIXINDEX", "effective_from": "2026-01-01", "effective_to": null}],
+    "aliases": [],
+    "isin": null,
+    "sector_entity_id": null,
+    "subsector_entity_id": null,
+    "relationships": [],
+    "entity_record_version": 1,
+    "effective_from": "2026-01-01T00:00:00Z",
+    "reviewed_at": "2026-01-01T00:00:00Z",
+    "previous_version_hash": null
+  }
+]

@@ -1,0 +1,29 @@
+[
+  {
+    "source_id": "S6FIX_SOURCE_OFFICIAL_001",
+    "source_name": "Fixture Exchange Official Feed",
+    "authority_level": "PRIMARY_OFFICIAL",
+    "publisher_type": "SYNTHETIC_FIXTURE_EXCHANGE",
+    "jurisdiction": ["IN"],
+    "coverage": ["SYNTHETIC_COMPANY_FILINGS"],
+    "expected_latency": "FIXTURE_IMMEDIATE",
+    "supports_machine_access": true,
+    "historical_depth": "SYNTHETIC_ONLY",
+    "requires_auth": false,
+    "cost_class": "FREE",
+    "terms_notes": "Synthetic fixture; not a real source.",
+    "enabled": true,
+    "verification_status": "VERIFIED",
+    "source_record_version": 1,
+    "effective_from": "2026-01-01T00:00:00Z",
+    "effective_to": null,
+    "reviewed_at_utc": "2026-01-01T00:00:00Z",
+    "access_method": "NONE",
+    "machine_endpoint_type": "NONE",
+    "licensing_or_terms_status": "REVIEWED_ALLOWED",
+    "automation_allowed_status": "ALLOWED",
+    "rate_limit_notes": null,
+    "availability_notes": "Fixture V1 available.",
+    "previous_version_hash": null
+  }
+]
