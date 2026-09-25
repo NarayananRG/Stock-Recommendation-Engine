@@ -22,20 +22,27 @@ The immutable production reference is tag `stage5d5-live-paper-runner-baseline`,
 | 6.9 | Promotion gates | Component-specific evidence and authority review | NO AUTOMATIC PROMOTION |
 | 7 | User interface | Human review and audit presentation | Defined later |
 
-Each module consumes only versioned contracts, emits immutable identified records, and cannot reach around the boundary to mutate another module's records. Acquisition preserves raw evidence; interpretation links to evidence IDs; exposure mapping links to evidence; analogues consume PIT snapshots; thesis and portfolio modules consume those identified outputs; shadow decisions cite every dependency.
+Each module consumes only versioned contracts, emits immutable identified records, and cannot reach around the boundary to mutate another module's records. Two foundation registries precede all acquisition: the **Entity Registry** supplies PIT-effective company, instrument, sector, geography, commodity, currency, person, regulator, and group identities; the **Versioned Source Registry** supplies the authority, access, licensing, availability, and review state that applied at acquisition time. Acquisition preserves raw evidence; interpretation links to evidence IDs; exposure mapping links to evidence; analogues consume PIT snapshots; thesis and portfolio modules consume those identified outputs; shadow decisions cite every dependency.
 
 ## Data flow
 
-1. A versioned registry describes a source and its authority, access, latency, cost, and verification state.
-2. Ingestion eventually captures immutable evidence with separate publication, observation, and retrieval timestamps plus content hashes. Stage 6.0 does not perform ingestion.
-3. Event intelligence classifies evidence, retains contradictions, and uses `CONFIRMED_CAUSE`, `PLAUSIBLE_CONTRIBUTOR`, `CORRELATED_MARKET_MOVE`, or `NO_SUPPORTED_CAUSE_FOUND` rather than inventing causality.
-4. The exposure graph maps an event through macro, commodity, currency, rate, geography, sector, and company channels using dated, sourced assertions.
-5. PIT market context records timestamped stock, sector, NIFTY, volume, volatility, technical, commodity, currency, rate, and regime observations.
-6. The analogue engine finds only records knowable at the historical as-of time and produces distributions, not commands.
-7. Persistent theses retain the entry rationale, risks, initial/current levels, invalidation conditions, and immutable change history. Daily review asks: **What materially changed since entry or the prior session?**
-8. Portfolio intelligence evaluates holdings, pending entries, sector/subsector/correlation exposure, risk at stop, capital commitments, concentration, and explicit cash.
-9. Shadow decisions cite evidence, context, analogue, thesis, portfolio state, reason codes, and explanation. They cannot affect Stage 5D.5.
-10. Prospective validation compares frozen Stage 6 outputs to the official Stage 5D.5 control without rewriting either history.
+1. The Entity Registry resolves stable entities, dated aliases, ticker mappings, and corporate relationships at the historical cutoff without overwriting prior versions.
+2. The Versioned Source Registry describes the authority, access, licensing, automation permission, latency, availability, cost, and verification state that applied at the acquisition cutoff.
+3. Ingestion eventually captures immutable evidence with separate publication, observation, and retrieval timestamps plus raw-payload and record hashes. Each evidence envelope cites both the entity-resolution version and source-registry version. Stage 6.0/6.0A does not perform ingestion.
+4. Event intelligence classifies evidence, retains contradictions, and uses `CONFIRMED_CAUSE`, `PLAUSIBLE_CONTRIBUTOR`, `CORRELATED_MARKET_MOVE`, or `NO_SUPPORTED_CAUSE_FOUND` rather than inventing causality.
+5. The exposure graph maps an event through macro, commodity, currency, rate, geography, sector, and company channels using dated, sourced assertions.
+6. PIT market context records timestamped, explicitly unit-labelled stock, sector, NIFTY, volume, volatility, technical, commodity, currency, rate, and regime observations.
+7. The analogue engine freezes its code identity, feature contract, selection inputs, universe, dates, exclusions, weights, thresholds, similarity method, and selected analogue identities before attaching future outcome labels. Outcomes never participate in selection.
+8. Persistent theses retain the entry rationale, risks, initial/current levels, Stage 5D.5 fill references, invalidation conditions, reproducible input identities, and immutable change history. Daily review asks: **What materially changed since entry or the prior session?**
+9. Portfolio intelligence evaluates holdings, pending entries, sector/subsector/correlation exposure, risk at stop, capital commitments, concentration, and explicit cash with unambiguous measurement units.
+10. Shadow decisions cite exact input IDs and hashes, code identity, registry versions, evidence, context, analogue, thesis, portfolio state, reason codes, and explanation. They cannot affect Stage 5D.5.
+11. Prospective validation compares frozen Stage 6 outputs to the official Stage 5D.5 control without rewriting either history.
+
+The foundational flow is:
+
+`Entity Registry + Versioned Source Registry → Raw Evidence → Event Intelligence → Exposure Graph + Market Context → Historical Analogues → Persistent Thesis + Portfolio Context → Shadow Decision`
+
+Stage 6.1 must not ingest evidence until an entity-registry identity is available, a source-registry version is frozen for the acquisition, and the raw evidence envelope can reference both versions. No connector may infer an undated alias, silently reuse a later ticker mapping, or retroactively rewrite source authority.
 
 ## Evidence, PIT, and immutability
 

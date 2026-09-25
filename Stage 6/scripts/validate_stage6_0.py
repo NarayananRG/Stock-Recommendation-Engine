@@ -1,4 +1,4 @@
-"""Offline Stage 6.0 documentation/contract consistency validation only."""
+"""Offline Stage 6.0/6.0A documentation and contract validation only."""
 from __future__ import annotations
 
 import ast
@@ -11,7 +11,7 @@ CONTRACTS = ROOT / "contracts"
 EXPECTED_COMMIT = "74b2710f0e19bd403978da81e87f25a3059ace06"
 EXPECTED_CONTROL = "stage5d5-live-paper-runner-baseline"
 SCHEMAS = (
-    "source_registry.schema.json", "evidence.schema.json", "event.schema.json",
+    "entity_registry.schema.json", "source_registry.schema.json", "evidence.schema.json", "event.schema.json",
     "exposure.schema.json", "market_context.schema.json", "historical_analogue.schema.json",
     "trade_thesis.schema.json", "portfolio_context.schema.json", "shadow_decision.schema.json",
 )
@@ -32,10 +32,42 @@ def enum_at(document: dict, *path: str) -> set[str]:
     return set(value)
 
 
+def required_at(document: dict, *path: str) -> set[str]:
+    value: object = document
+    for key in path:
+        require(isinstance(value, dict) and key in value, "missing schema path: " + ".".join(path))
+        value = value[key]
+    require(isinstance(value, list), "required is not a list: " + ".".join(path))
+    return set(value)
+
+
+def validate_schema_structure(document: dict, name: str) -> None:
+    """Check local references and required/property consistency without I/O."""
+    def visit(value: object) -> None:
+        if isinstance(value, dict):
+            if "required" in value and "properties" in value:
+                require(set(value["required"]) <= set(value["properties"]), f"unknown required property: {name}")
+            reference = value.get("$ref")
+            if isinstance(reference, str) and reference.startswith("#/"):
+                target: object = document
+                for token in reference[2:].split("/"):
+                    token = token.replace("~1", "/").replace("~0", "~")
+                    require(isinstance(target, dict) and token in target, f"unresolved reference {reference}: {name}")
+                    target = target[token]
+            for child in value.values():
+                visit(child)
+        elif isinstance(value, list):
+            for child in value:
+                visit(child)
+    visit(document)
+
+
 def main() -> None:
     parsed = {}
     for name in (*SCHEMAS, "stage6_contract.json"):
         parsed[name] = json.loads((CONTRACTS / name).read_text(encoding="utf-8"))
+        if name.endswith(".schema.json"):
+            validate_schema_structure(parsed[name], name)
     result = json.loads((ROOT / "results/stage6_0_architecture_contract.json").read_text(encoding="utf-8"))
 
     contract = parsed["stage6_contract.json"]
@@ -48,20 +80,61 @@ def main() -> None:
     require(result["authority"] == "SHADOW_ONLY" and result["production_control_commit"] == EXPECTED_COMMIT, "result identity")
 
     authority = {"PRIMARY_OFFICIAL", "AUTHORITATIVE_INDEPENDENT", "DISCOVERY", "UNVERIFIED"}
+    entity = parsed["entity_registry.schema.json"]
+    entity_types = enum_at(entity, "$defs", "entity", "properties", "entity_type", "enum")
+    require({"COMPANY", "INDEX", "SECTOR", "SUBSECTOR", "COMMODITY", "CURRENCY", "COUNTRY", "REGULATOR", "GOVERNMENT_BODY", "PERSON", "CORPORATE_GROUP"} <= entity_types, "entity taxonomy")
+    require({"exchange", "ticker", "effective_from", "effective_to"} <= required_at(entity, "$defs", "ticker_mapping", "required"), "PIT ticker mapping")
+    require({"alias", "alias_type", "effective_from", "effective_to"} <= required_at(entity, "$defs", "alias", "required"), "PIT alias mapping")
+    require({"registry_version", "effective_from", "reviewed_at", "previous_version_hash", "record_hash"} <= required_at(entity, "$defs", "entity", "required"), "entity version identity")
+
+    source = parsed["source_registry.schema.json"]
     require(enum_at(parsed["source_registry.schema.json"], "$defs", "source", "properties", "authority_level", "enum") == authority, "source authority enum")
+    require({"registry_version", "effective_from", "effective_to", "reviewed_at_utc", "access_method", "machine_endpoint_type", "licensing_or_terms_status", "automation_allowed_status", "previous_version_hash", "record_hash"} <= required_at(source, "$defs", "source", "required"), "source version identity")
+
+    evidence = parsed["evidence.schema.json"]
     require(enum_at(parsed["evidence.schema.json"], "properties", "authority_level", "enum") == authority, "evidence authority enum")
+    require({"entity_resolution_version", "source_registry_version", "raw_payload_reference", "raw_payload_hash", "document_version", "record_hash"} <= set(evidence["required"]), "evidence version identity")
+    require("runtime validation" in evidence["x-stage6-invariants"][0], "timestamp runtime invariant")
+
     events = enum_at(parsed["event.schema.json"], "properties", "event_type", "enum")
-    require({"EARNINGS_BEAT", "FRAUD_ALLEGATION", "WAR_ESCALATION", "OIL_SHOCK", "RATE_HIKE", "SUPPLY_CHAIN_DISRUPTION", "OTHER"} <= events, "event taxonomy")
+    require({"EARNINGS_BEAT", "FRAUD_ALLEGATION", "SHORT_SELLER_ALLEGATION", "RATING_UPGRADE", "RATING_DOWNGRADE", "DEFAULT_EVENT", "INSOLVENCY_EVENT", "CYBERSECURITY_EVENT", "PRODUCT_RECALL", "TAX_OR_DUTY_CHANGE", "WAR_ESCALATION", "OIL_SHOCK", "RATE_HIKE", "SUPPLY_CHAIN_DISRUPTION", "OTHER"} <= events, "event taxonomy")
+    require({"event_version", "previous_event_version_hash", "record_hash", "last_updated_timestamp", "entity_resolution_version"} <= set(parsed["event.schema.json"]["required"]), "event version identity")
     causality = enum_at(parsed["event.schema.json"], "properties", "causality_assessment", "enum")
     require(causality == {"CONFIRMED_CAUSE", "PLAUSIBLE_CONTRIBUTOR", "CORRELATED_MARKET_MOVE", "NO_SUPPORTED_CAUSE_FOUND"}, "causality enum")
     decisions = enum_at(parsed["shadow_decision.schema.json"], "properties", "decision", "enum")
     require({"ENTRY_VALID", "CANCEL_ENTRY", "HOLD", "REDUCE", "EXIT"} <= decisions, "decision enum")
     require(parsed["shadow_decision.schema.json"]["properties"]["authority_mode"]["const"] == "SHADOW_ONLY", "shadow authority")
     require(parsed["historical_analogue.schema.json"]["properties"]["authority_mode"]["const"] == "SHADOW_ONLY", "analogue authority")
+    analogue = parsed["historical_analogue.schema.json"]
+    require({"analogue_engine_version", "code_commit", "feature_contract_version", "feature_snapshot_hash", "similarity_metric", "feature_weights", "selection_thresholds", "selected_analogues", "selection_input_hash", "outcome_unit", "record_hash"} <= set(analogue["required"]), "analogue reproducibility")
+    require({"analogue_id", "historical_as_of_timestamp", "entity_id", "event_id", "similarity_score", "distance", "input_snapshot_hash"} <= set(analogue["properties"]["selected_analogues"]["items"]["required"]), "selected analogue identity")
+    require("unit" in analogue["$defs"]["distribution"]["required"], "explicit analogue outcome units")
+    require(analogue["properties"]["recovery_time"]["allOf"][1]["properties"]["unit"]["const"] == "TRADING_SESSIONS", "recovery time unit")
+
+    thesis = parsed["trade_thesis.schema.json"]
+    require({"thesis_engine_version", "code_commit", "decision_cutoff", "input_record_ids", "input_record_hashes", "fill_references", "aggregate_fill", "previous_version_hash", "record_hash"} <= set(thesis["required"]), "thesis reproducibility")
+    require({"transaction_id", "fill_date", "quantity", "price", "source_system"} <= set(thesis["$defs"]["fill_reference"]["required"]), "multiple fill references")
+
+    shadow = parsed["shadow_decision.schema.json"]
+    require({"decision_engine_version", "code_commit", "decision_cutoff_timestamp", "input_record_ids", "input_record_hashes", "source_registry_version", "entity_registry_version", "record_hash"} <= set(shadow["required"]), "shadow reproducibility")
+
+    portfolio = parsed["portfolio_context.schema.json"]
     require(parsed["portfolio_context.schema.json"]["properties"]["cash_is_valid_allocation"]["const"] is True, "cash allocation")
+    require({"recommendation_id", "thesis_id", "transaction_or_fill_ids", "current_price", "average_cost", "sector_entity_id", "subsector_entity_id"} <= set(portfolio["$defs"]["position"]["required"]), "position provenance")
+    require({"method", "return_frequency", "lookback_window", "minimum_observations", "data_cutoff_timestamp"} <= set(portfolio["$defs"]["correlation"]["required"]), "correlation provenance")
+    require("unit" in portfolio["$defs"]["exposure"]["required"] and "denominator_definition" in portfolio["$defs"]["exposure"]["required"], "exposure units")
+
+    market = parsed["market_context.schema.json"]
+    require({"value", "unit", "observed_at_utc", "method"} <= set(market["$defs"]["measurement"]["required"]), "market measurement metadata")
     require("publication_timestamp_utc <= observed_timestamp_utc <= retrieved_timestamp_utc" in parsed["evidence.schema.json"]["x-stage6-invariants"][0], "timestamp invariant")
 
-    for python_file in ROOT.rglob("*.py"):
+    expected_gates = {"ENTITY_IDENTITY_CONTRACT", "VERSIONED_SOURCE_REGISTRY", "EVIDENCE_VERSION_IDENTITY", "ANALOGUE_REPRODUCIBILITY_CONTRACT", "EXPLICIT_MEASUREMENT_UNITS", "MULTI_FILL_THESIS_CONTRACT", "SHADOW_DECISION_REPRODUCIBILITY", "PORTFOLIO_CONTEXT_PROVENANCE"}
+    require(all(result["validation_gates"].get(gate) == "PASS" for gate in expected_gates), "6.0A result gates")
+    require(result["schema_count"] == len(SCHEMAS), "result schema count")
+
+    python_files = set(ROOT.rglob("*.py"))
+    require(python_files == {Path(__file__).resolve()}, "Stage 6.0A may contain only the offline contract validator Python file")
+    for python_file in python_files:
         tree = ast.parse(python_file.read_text(encoding="utf-8"), filename=str(python_file))
         imports = set()
         for node in ast.walk(tree):
@@ -72,7 +145,7 @@ def main() -> None:
         require(not imports & NETWORK_MODULES, f"network import prohibited: {python_file}")
 
     print(json.dumps({
-        "stage": "6.0", "result": "PASS", "schemas_parsed": len(SCHEMAS),
+        "stage": "6.0A", "result": "PASS", "schemas_parsed": len(SCHEMAS),
         "authority": "SHADOW_ONLY", "production_control_commit": EXPECTED_COMMIT,
         "network_imports": 0, "trading_implementation": False,
     }, sort_keys=True))

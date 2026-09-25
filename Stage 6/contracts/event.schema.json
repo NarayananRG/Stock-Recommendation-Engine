@@ -4,11 +4,14 @@
   "title": "Stage 6 Structured Event",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "event_id", "event_type", "event_status", "direction", "severity", "materiality", "confidence", "entities", "sectors", "geographies", "commodities", "currencies", "source_evidence_ids", "corroboration_status", "first_known_timestamp", "event_horizon", "transmission_channels", "causality_assessment", "evidence_conflicts"],
+  "required": ["schema_version", "event_id", "event_version", "previous_event_version_hash", "record_hash", "event_type", "event_status", "direction", "severity", "materiality", "confidence", "entities", "sectors", "geographies", "commodities", "currencies", "source_evidence_ids", "corroboration_status", "first_known_timestamp", "last_updated_timestamp", "entity_resolution_version", "event_horizon", "transmission_channels", "causality_assessment", "evidence_conflicts"],
   "properties": {
     "schema_version": {"const": "STAGE6_EVENT_V1"},
     "event_id": {"type": "string", "minLength": 1},
-    "event_type": {"enum": ["EARNINGS_BEAT", "EARNINGS_MISS", "GUIDANCE_RAISE", "GUIDANCE_CUT", "ORDER_WIN", "ORDER_LOSS", "CUSTOMER_LOSS", "MANAGEMENT_CHANGE", "PROMOTER_EVENT", "GOVERNANCE_ALLEGATION", "FRAUD_ALLEGATION", "REGULATORY_ACTION", "LEGAL_EVENT", "DEBT_STRESS", "CREDIT_DOWNGRADE", "CAPITAL_RAISE", "MERGER", "ACQUISITION", "DEMERGER", "TARIFF_INCREASE", "TARIFF_REDUCTION", "TRADE_RESTRICTION", "SANCTION", "WAR_ESCALATION", "WAR_DEESCALATION", "OIL_SHOCK", "GAS_SHOCK", "COMMODITY_SHOCK", "RATE_HIKE", "RATE_CUT", "LIQUIDITY_EVENT", "CURRENCY_SHOCK", "SUPPLY_CHAIN_DISRUPTION", "NATURAL_DISASTER", "GOVERNMENT_POLICY", "SECTOR_REGULATION", "OTHER"]},
+    "event_version": {"type": "integer", "minimum": 1},
+    "previous_event_version_hash": {"type": ["string", "null"], "pattern": "^[a-f0-9]{64}$"},
+    "record_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "event_type": {"enum": ["EARNINGS_BEAT", "EARNINGS_MISS", "GUIDANCE_RAISE", "GUIDANCE_CUT", "ORDER_WIN", "ORDER_LOSS", "CUSTOMER_LOSS", "MANAGEMENT_CHANGE", "PROMOTER_EVENT", "GOVERNANCE_ALLEGATION", "FRAUD_ALLEGATION", "SHORT_SELLER_ALLEGATION", "REGULATORY_ACTION", "LEGAL_EVENT", "DEBT_STRESS", "CREDIT_UPGRADE", "CREDIT_DOWNGRADE", "RATING_UPGRADE", "RATING_DOWNGRADE", "DEFAULT_EVENT", "INSOLVENCY_EVENT", "CYBERSECURITY_EVENT", "PRODUCT_RECALL", "CAPITAL_RAISE", "MERGER", "ACQUISITION", "DEMERGER", "TARIFF_INCREASE", "TARIFF_REDUCTION", "TAX_OR_DUTY_CHANGE", "TRADE_RESTRICTION", "SANCTION", "WAR_ESCALATION", "WAR_DEESCALATION", "OIL_SHOCK", "GAS_SHOCK", "COMMODITY_SHOCK", "RATE_HIKE", "RATE_CUT", "LIQUIDITY_EVENT", "CURRENCY_SHOCK", "SUPPLY_CHAIN_DISRUPTION", "NATURAL_DISASTER", "GOVERNMENT_POLICY", "SECTOR_REGULATION", "OTHER"]},
     "event_status": {"enum": ["CANDIDATE", "ACTIVE", "RESOLVED", "RETRACTED", "CONFLICTED"]},
     "direction": {"enum": ["POSITIVE", "NEGATIVE", "MIXED", "NEUTRAL", "UNKNOWN"]},
     "severity": {"enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL", "UNKNOWN"]},
@@ -22,9 +25,12 @@
     "source_evidence_ids": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
     "corroboration_status": {"enum": ["CONFIRMED", "CORROBORATED", "SINGLE_SOURCE_OFFICIAL", "SINGLE_SOURCE_INDEPENDENT", "DISCOVERY_ONLY", "UNVERIFIED", "CONFLICTING_EVIDENCE"]},
     "first_known_timestamp": {"type": "string", "format": "date-time"},
+    "last_updated_timestamp": {"type": "string", "format": "date-time"},
+    "entity_resolution_version": {"type": "string", "minLength": 1},
     "event_horizon": {"enum": ["INTRADAY", "DAYS", "WEEKS", "MONTHS", "LONG_TERM", "UNKNOWN"]},
     "transmission_channels": {"type": "array", "items": {"enum": ["MACRO", "COMMODITY", "CURRENCY", "RATE", "SECTOR", "COMPANY_EXPOSURE", "MARKET_REACTION", "THESIS"]}, "uniqueItems": true},
     "causality_assessment": {"enum": ["CONFIRMED_CAUSE", "PLAUSIBLE_CONTRIBUTOR", "CORRELATED_MARKET_MOVE", "NO_SUPPORTED_CAUSE_FOUND"]},
     "evidence_conflicts": {"type": "array", "items": {"type": "object", "required": ["evidence_ids", "description", "status"], "properties": {"evidence_ids": {"type": "array", "items": {"type": "string"}, "minItems": 2}, "description": {"type": "string"}, "status": {"enum": ["OPEN", "RESOLVED"]}}, "additionalProperties": false}}
-  }
+  },
+  "x-stage6-invariants": ["Event versions are append-only; changed classifications or conflicts create a new event_version linked by previous_event_version_hash.", "first_known_timestamp must not be after last_updated_timestamp; runtime validation must enforce chronology."]
 }

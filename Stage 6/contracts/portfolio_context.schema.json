@@ -1,26 +1,35 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "stage6/portfolio_context.schema.json",
-  "title": "Stage 6 Portfolio Context",
+  "title": "Stage 6 Provenance-Safe Portfolio Context",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "portfolio_context_id", "as_of_timestamp", "capital_ceiling", "cash", "open_positions", "pending_entries", "sector_exposure", "subsector_exposure", "correlated_exposure", "risk_at_stop", "committed_capital", "available_capital", "portfolio_concentration", "cash_is_valid_allocation"],
+  "required": ["schema_version", "portfolio_context_id", "as_of_timestamp", "data_cutoff_timestamp", "capital_ceiling", "cash", "open_positions", "pending_entries", "sector_exposure", "subsector_exposure", "correlated_exposure", "risk_at_stop", "committed_capital", "available_capital", "portfolio_concentration", "cash_is_valid_allocation", "record_hash"],
   "properties": {
-    "schema_version": {"const": "STAGE6_PORTFOLIO_CONTEXT_V1"},
+    "schema_version": {"const": "STAGE6_PORTFOLIO_CONTEXT_V2"},
     "portfolio_context_id": {"type": "string", "minLength": 1},
     "as_of_timestamp": {"type": "string", "format": "date-time"},
+    "data_cutoff_timestamp": {"type": "string", "format": "date-time"},
     "capital_ceiling": {"$ref": "#/$defs/money"},
     "cash": {"$ref": "#/$defs/money"},
-    "open_positions": {"type": "array", "items": {"type": "object", "required": ["ticker", "quantity", "market_value", "risk_at_stop"], "properties": {"ticker": {"type": "string"}, "quantity": {"type": "integer", "minimum": 1}, "market_value": {"$ref": "#/$defs/money"}, "risk_at_stop": {"$ref": "#/$defs/money"}}, "additionalProperties": false}},
-    "pending_entries": {"type": "array", "items": {"type": "object", "required": ["ticker", "recommendation_id", "committed_capital"], "properties": {"ticker": {"type": "string"}, "recommendation_id": {"type": "string"}, "committed_capital": {"$ref": "#/$defs/money"}}, "additionalProperties": false}},
-    "sector_exposure": {"type": "object", "additionalProperties": {"type": "number", "minimum": 0}},
-    "subsector_exposure": {"type": "object", "additionalProperties": {"type": "number", "minimum": 0}},
-    "correlated_exposure": {"type": "array", "items": {"type": "object", "required": ["members", "method", "value", "as_of_timestamp"], "properties": {"members": {"type": "array", "items": {"type": "string"}, "minItems": 2}, "method": {"type": "string"}, "value": {"type": ["number", "null"]}, "as_of_timestamp": {"type": "string", "format": "date-time"}}, "additionalProperties": false}},
+    "open_positions": {"type": "array", "items": {"$ref": "#/$defs/position"}},
+    "pending_entries": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["ticker", "recommendation_id", "thesis_id", "committed_capital"], "properties": {"ticker": {"type": "string"}, "recommendation_id": {"type": "string"}, "thesis_id": {"type": ["string", "null"]}, "committed_capital": {"$ref": "#/$defs/money"}}}},
+    "sector_exposure": {"type": "array", "items": {"$ref": "#/$defs/exposure"}},
+    "subsector_exposure": {"type": "array", "items": {"$ref": "#/$defs/exposure"}},
+    "correlated_exposure": {"type": "array", "items": {"$ref": "#/$defs/correlation"}},
     "risk_at_stop": {"$ref": "#/$defs/money"},
     "committed_capital": {"$ref": "#/$defs/money"},
     "available_capital": {"$ref": "#/$defs/money"},
-    "portfolio_concentration": {"type": "object"},
-    "cash_is_valid_allocation": {"const": true}
+    "portfolio_concentration": {"type": "array", "items": {"$ref": "#/$defs/exposure"}},
+    "cash_is_valid_allocation": {"const": true},
+    "record_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
   },
-  "$defs": {"money": {"type": "object", "additionalProperties": false, "required": ["amount", "currency"], "properties": {"amount": {"type": "number", "minimum": 0}, "currency": {"const": "INR"}}}}
+  "$defs": {
+    "money": {"type": "object", "additionalProperties": false, "required": ["value", "unit"], "properties": {"value": {"type": "number", "minimum": 0}, "unit": {"enum": ["INR", "USD"]}}},
+    "price": {"type": "object", "additionalProperties": false, "required": ["value", "unit", "observed_at_utc"], "properties": {"value": {"type": "number", "exclusiveMinimum": 0}, "unit": {"enum": ["INR", "USD"]}, "observed_at_utc": {"type": "string", "format": "date-time"}}},
+    "exposure": {"type": "object", "additionalProperties": false, "required": ["entity_id", "value", "unit", "denominator_definition"], "properties": {"entity_id": {"type": "string"}, "value": {"type": "number", "minimum": 0}, "unit": {"enum": ["INR", "USD", "FRACTION_OF_CAPITAL", "FRACTION_OF_INVESTED_CAPITAL"]}, "denominator_definition": {"enum": ["CURRENCY_AMOUNT", "CAPITAL_CEILING", "INVESTED_CAPITAL"]}}},
+    "position": {"type": "object", "additionalProperties": false, "required": ["ticker", "recommendation_id", "thesis_id", "transaction_or_fill_ids", "quantity", "current_price", "average_cost", "market_value", "risk_at_stop", "sector_entity_id", "subsector_entity_id"], "properties": {"ticker": {"type": "string"}, "recommendation_id": {"type": "string"}, "thesis_id": {"type": ["string", "null"]}, "transaction_or_fill_ids": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true}, "quantity": {"type": "integer", "minimum": 1}, "current_price": {"$ref": "#/$defs/price"}, "average_cost": {"$ref": "#/$defs/money"}, "market_value": {"$ref": "#/$defs/money"}, "risk_at_stop": {"$ref": "#/$defs/money"}, "sector_entity_id": {"type": "string"}, "subsector_entity_id": {"type": ["string", "null"]}}},
+    "correlation": {"type": "object", "additionalProperties": false, "required": ["members", "method", "value", "unit", "return_frequency", "lookback_window", "minimum_observations", "actual_observations", "data_cutoff_timestamp"], "properties": {"members": {"type": "array", "items": {"type": "string"}, "minItems": 2}, "method": {"type": "string", "minLength": 1}, "value": {"type": ["number", "null"], "minimum": -1, "maximum": 1}, "unit": {"const": "CORRELATION"}, "return_frequency": {"enum": ["DAILY", "WEEKLY", "MONTHLY"]}, "lookback_window": {"type": "object", "additionalProperties": false, "required": ["value", "unit"], "properties": {"value": {"type": "integer", "minimum": 1}, "unit": {"enum": ["DAYS", "TRADING_SESSIONS"]}}}, "minimum_observations": {"type": "integer", "minimum": 2}, "actual_observations": {"type": "integer", "minimum": 0}, "data_cutoff_timestamp": {"type": "string", "format": "date-time"}}}
+  },
+  "x-stage6-invariants": ["No production diversification threshold is defined by this schema.", "Exposure units and denominator definitions are explicit.", "Correlation is unavailable rather than assumed when actual_observations is below minimum_observations."]
 }

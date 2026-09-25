@@ -1,11 +1,12 @@
 {
-  "result_version": "STAGE6_0_ARCHITECTURE_RESULT_V1",
+  "result_version": "STAGE6_0A_ARCHITECTURE_RESULT_V1",
   "stage": "6.0",
   "result": "PASS",
   "authority": "SHADOW_ONLY",
   "production_control": "stage5d5-live-paper-runner-baseline",
   "production_control_commit": "74b2710f0e19bd403978da81e87f25a3059ace06",
   "scope": "DOCUMENTATION_AND_MACHINE_READABLE_CONTRACTS_ONLY",
+  "schema_count": 10,
   "network_calls": false,
   "trading_actions": false,
   "broker_execution": false,
@@ -18,7 +19,15 @@
     "FROZEN_STAGE5D5_IDENTITY_EXACT": "PASS",
     "STAGE6_NETWORK_IMPORTS_ABSENT": "PASS",
     "TRADING_IMPLEMENTATION_ABSENT": "PASS",
-    "FILES_OUTSIDE_STAGE6_MODIFIED": 0
+    "FILES_OUTSIDE_STAGE6_MODIFIED": 0,
+    "ENTITY_IDENTITY_CONTRACT": "PASS",
+    "VERSIONED_SOURCE_REGISTRY": "PASS",
+    "EVIDENCE_VERSION_IDENTITY": "PASS",
+    "ANALOGUE_REPRODUCIBILITY_CONTRACT": "PASS",
+    "EXPLICIT_MEASUREMENT_UNITS": "PASS",
+    "MULTI_FILL_THESIS_CONTRACT": "PASS",
+    "SHADOW_DECISION_REPRODUCIBILITY": "PASS",
+    "PORTFOLIO_CONTEXT_PROVENANCE": "PASS"
   },
   "notes": [
     "Stage 6.0 performs no acquisition and connects to no external source.",

@@ -13,7 +13,7 @@
     "source": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["source_id", "source_name", "authority_level", "publisher_type", "jurisdiction", "coverage", "expected_latency", "supports_machine_access", "historical_depth", "requires_auth", "cost_class", "terms_notes", "enabled", "verification_status"],
+      "required": ["source_id", "source_name", "authority_level", "publisher_type", "jurisdiction", "coverage", "expected_latency", "supports_machine_access", "historical_depth", "requires_auth", "cost_class", "terms_notes", "enabled", "verification_status", "registry_version", "effective_from", "effective_to", "reviewed_at_utc", "access_method", "machine_endpoint_type", "licensing_or_terms_status", "automation_allowed_status", "rate_limit_notes", "availability_notes", "previous_version_hash", "record_hash"],
       "properties": {
         "source_id": {"type": "string", "minLength": 1},
         "source_name": {"type": "string", "minLength": 1},
@@ -28,8 +28,21 @@
         "cost_class": {"enum": ["FREE", "FREEMIUM", "PAID", "UNKNOWN"]},
         "terms_notes": {"type": "string"},
         "enabled": {"type": "boolean"},
-        "verification_status": {"enum": ["VERIFIED", "PENDING_REVIEW", "DISABLED", "REJECTED"]}
+        "verification_status": {"enum": ["VERIFIED", "PENDING_REVIEW", "DISABLED", "REJECTED"]},
+        "registry_version": {"type": "integer", "minimum": 1},
+        "effective_from": {"type": "string", "format": "date-time"},
+        "effective_to": {"type": ["string", "null"], "format": "date-time"},
+        "reviewed_at_utc": {"type": "string", "format": "date-time"},
+        "access_method": {"enum": ["MANUAL_DOWNLOAD", "PUBLIC_API", "MACHINE_FEED", "WEB_PUBLICATION", "OTHER", "NONE"]},
+        "machine_endpoint_type": {"enum": ["REST", "RSS_ATOM", "BULK_FILE", "WEBSOCKET", "GRAPHQL", "HTML", "OTHER", "NONE"]},
+        "licensing_or_terms_status": {"enum": ["REVIEWED_ALLOWED", "REVIEWED_RESTRICTED", "PENDING_REVIEW", "UNKNOWN"]},
+        "automation_allowed_status": {"enum": ["ALLOWED", "RESTRICTED", "PROHIBITED", "UNKNOWN"]},
+        "rate_limit_notes": {"type": ["string", "null"]},
+        "availability_notes": {"type": ["string", "null"]},
+        "previous_version_hash": {"type": ["string", "null"], "pattern": "^[a-f0-9]{64}$"},
+        "record_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
       }
     }
-  }
+  },
+  "x-stage6-invariants": ["Authority, access, availability, licensing, and automation changes create new versions; historical records are never overwritten.", "No credentials are stored in the registry."]
 }

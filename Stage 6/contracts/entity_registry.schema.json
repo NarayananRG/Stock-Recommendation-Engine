@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "stage6/entity_registry.schema.json",
+  "title": "Stage 6 Point-in-Time Entity Registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "entities"],
+  "properties": {
+    "schema_version": {"const": "STAGE6_ENTITY_REGISTRY_V1"},
+    "entities": {"type": "array", "items": {"$ref": "#/$defs/entity"}}
+  },
+  "$defs": {
+    "effective_period": {
+      "type": "object", "additionalProperties": false,
+      "required": ["effective_from", "effective_to"],
+      "properties": {"effective_from": {"type": "string", "format": "date"}, "effective_to": {"type": ["string", "null"], "format": "date"}}
+    },
+    "ticker_mapping": {
+      "type": "object", "additionalProperties": false,
+      "required": ["exchange", "ticker", "effective_from", "effective_to"],
+      "properties": {"exchange": {"type": "string", "minLength": 1}, "ticker": {"type": "string", "minLength": 1}, "effective_from": {"type": "string", "format": "date"}, "effective_to": {"type": ["string", "null"], "format": "date"}}
+    },
+    "alias": {
+      "type": "object", "additionalProperties": false,
+      "required": ["alias", "alias_type", "effective_from", "effective_to"],
+      "properties": {"alias": {"type": "string", "minLength": 1}, "alias_type": {"enum": ["LEGAL", "FORMER_NAME", "TRADE_NAME", "ABBREVIATION", "COMMON_NAME", "OTHER"]}, "effective_from": {"type": "string", "format": "date"}, "effective_to": {"type": ["string", "null"], "format": "date"}}
+    },
+    "relationship": {
+      "type": "object", "additionalProperties": false,
+      "required": ["relationship_type", "related_entity_id", "effective_from", "effective_to", "evidence_ids"],
+      "properties": {"relationship_type": {"enum": ["PARENT", "SUBSIDIARY", "CORPORATE_GROUP_MEMBER"]}, "related_entity_id": {"type": "string", "minLength": 1}, "effective_from": {"type": "string", "format": "date"}, "effective_to": {"type": ["string", "null"], "format": "date"}, "evidence_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}}
+    },
+    "entity": {
+      "type": "object", "additionalProperties": false,
+      "required": ["entity_id", "canonical_name", "legal_name", "entity_type", "country", "ticker_mappings", "aliases", "isin", "sector_entity_id", "subsector_entity_id", "relationships", "registry_version", "effective_from", "reviewed_at", "previous_version_hash", "record_hash"],
+      "properties": {
+        "entity_id": {"type": "string", "minLength": 1},
+        "canonical_name": {"type": "string", "minLength": 1},
+        "legal_name": {"type": ["string", "null"]},
+        "entity_type": {"enum": ["COMPANY", "INDEX", "SECTOR", "SUBSECTOR", "COMMODITY", "CURRENCY", "COUNTRY", "REGULATOR", "GOVERNMENT_BODY", "PERSON", "CORPORATE_GROUP"]},
+        "country": {"type": ["string", "null"]},
+        "ticker_mappings": {"type": "array", "items": {"$ref": "#/$defs/ticker_mapping"}},
+        "aliases": {"type": "array", "items": {"$ref": "#/$defs/alias"}},
+        "isin": {"type": ["string", "null"]},
+        "sector_entity_id": {"type": ["string", "null"]},
+        "subsector_entity_id": {"type": ["string", "null"]},
+        "relationships": {"type": "array", "items": {"$ref": "#/$defs/relationship"}},
+        "registry_version": {"type": "integer", "minimum": 1},
+        "effective_from": {"type": "string", "format": "date-time"},
+        "reviewed_at": {"type": "string", "format": "date-time"},
+        "previous_version_hash": {"type": ["string", "null"], "pattern": "^[a-f0-9]{64}$"},
+        "record_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      },
+      "allOf": [{"if": {"properties": {"entity_type": {"const": "COMPANY"}}}, "then": {"properties": {"legal_name": {"type": "string", "minLength": 1}}}}]
+    }
+  },
+  "x-stage6-invariants": [
+    "Ticker mappings, aliases, and relationships are append-only versions and are resolved using the historical as-of cutoff.",
+    "effective_from must not be after effective_to when effective_to is known.",
+    "previous_version_hash and record_hash form immutable entity-version lineage."
+  ]
+}

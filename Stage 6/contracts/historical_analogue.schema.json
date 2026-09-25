@@ -1,39 +1,55 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "stage6/historical_analogue.schema.json",
-  "title": "Stage 6 Historical Analogue Result",
+  "title": "Stage 6 Reproducible Historical Analogue Result",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "historical_analogue_id", "as_of_timestamp", "input_snapshot", "selection_cutoff", "analogue_count", "outcomes", "maximum_adverse_excursion", "maximum_favourable_excursion", "recovery_time", "relative_return_vs_sector", "relative_return_vs_nifty", "pit_verified", "authority_mode"],
+  "required": ["schema_version", "historical_analogue_id", "as_of_timestamp", "selection_cutoff", "analogue_engine_version", "code_commit", "feature_contract_version", "feature_snapshot_hash", "similarity_metric", "feature_weights", "selection_thresholds", "eligible_universe_definition", "eligible_date_range", "exclusion_rules", "selection_input_snapshot", "selection_input_hash", "selected_analogues", "analogue_count", "minimum_required_analogue_count", "outcome_definition_version", "outcome_unit", "future_outcome_labels", "maximum_adverse_excursion", "maximum_favourable_excursion", "recovery_time", "relative_return_vs_sector", "relative_return_vs_nifty", "record_hash", "pit_verified", "authority_mode"],
   "properties": {
-    "schema_version": {"const": "STAGE6_HISTORICAL_ANALOGUE_V1"},
+    "schema_version": {"const": "STAGE6_HISTORICAL_ANALOGUE_V2"},
     "historical_analogue_id": {"type": "string", "minLength": 1},
     "as_of_timestamp": {"type": "string", "format": "date-time"},
     "selection_cutoff": {"type": "string", "format": "date-time"},
-    "input_snapshot": {
+    "analogue_engine_version": {"type": "string", "minLength": 1},
+    "code_commit": {"type": "string", "pattern": "^[a-f0-9]{40}$"},
+    "feature_contract_version": {"type": "string", "minLength": 1},
+    "feature_snapshot_hash": {"$ref": "#/$defs/hash"},
+    "similarity_metric": {"type": "string", "minLength": 1},
+    "feature_weights": {"type": "object", "minProperties": 1, "additionalProperties": {"type": "number", "minimum": 0}},
+    "selection_thresholds": {"type": "object", "minProperties": 1, "additionalProperties": {"$ref": "#/$defs/measurement"}},
+    "eligible_universe_definition": {"type": "string", "minLength": 1},
+    "eligible_date_range": {"type": "object", "additionalProperties": false, "required": ["start", "end"], "properties": {"start": {"type": "string", "format": "date"}, "end": {"type": "string", "format": "date"}}},
+    "exclusion_rules": {"type": "array", "items": {"type": "string"}},
+    "selection_input_snapshot": {
       "type": "object", "additionalProperties": false,
       "required": ["event_type", "severity", "materiality", "stock_return_state", "volume", "volatility", "technical_structure", "sector_behaviour", "market_regime", "commodity_context", "currency_context", "rate_context"],
-      "properties": {
-        "event_type": {"type": "string"}, "severity": {"type": "string"}, "materiality": {"type": "string"},
-        "stock_return_state": {}, "volume": {}, "volatility": {}, "technical_structure": {},
-        "sector_behaviour": {}, "market_regime": {}, "commodity_context": {}, "currency_context": {}, "rate_context": {}
-      }
+      "properties": {"event_type": {"type": "string"}, "severity": {"type": "string"}, "materiality": {"type": "string"}, "stock_return_state": {}, "volume": {}, "volatility": {}, "technical_structure": {}, "sector_behaviour": {}, "market_regime": {}, "commodity_context": {}, "currency_context": {}, "rate_context": {}}
+    },
+    "selection_input_hash": {"$ref": "#/$defs/hash"},
+    "selected_analogues": {
+      "type": "array",
+      "items": {"type": "object", "additionalProperties": false, "required": ["analogue_id", "historical_as_of_timestamp", "entity_id", "event_id", "similarity_score", "distance", "input_snapshot_hash"], "properties": {"analogue_id": {"type": "string"}, "historical_as_of_timestamp": {"type": "string", "format": "date-time"}, "entity_id": {"type": "string"}, "event_id": {"type": ["string", "null"]}, "similarity_score": {"$ref": "#/$defs/measurement"}, "distance": {"$ref": "#/$defs/measurement"}, "input_snapshot_hash": {"$ref": "#/$defs/hash"}}}
     },
     "analogue_count": {"type": "integer", "minimum": 0},
-    "outcomes": {
-      "type": "object", "additionalProperties": false, "required": ["D+1", "D+3", "D+5", "D+10", "D+20"],
-      "properties": {"D+1": {"$ref": "#/$defs/distribution"}, "D+3": {"$ref": "#/$defs/distribution"}, "D+5": {"$ref": "#/$defs/distribution"}, "D+10": {"$ref": "#/$defs/distribution"}, "D+20": {"$ref": "#/$defs/distribution"}}
-    },
+    "minimum_required_analogue_count": {"type": "integer", "minimum": 1},
+    "outcome_definition_version": {"type": "string", "minLength": 1},
+    "outcome_unit": {"$ref": "#/$defs/unit"},
+    "future_outcome_labels": {"type": "object", "additionalProperties": false, "required": ["D+1", "D+3", "D+5", "D+10", "D+20"], "properties": {"D+1": {"$ref": "#/$defs/distribution"}, "D+3": {"$ref": "#/$defs/distribution"}, "D+5": {"$ref": "#/$defs/distribution"}, "D+10": {"$ref": "#/$defs/distribution"}, "D+20": {"$ref": "#/$defs/distribution"}}},
     "maximum_adverse_excursion": {"$ref": "#/$defs/distribution"},
     "maximum_favourable_excursion": {"$ref": "#/$defs/distribution"},
-    "recovery_time": {"$ref": "#/$defs/distribution"},
-    "relative_return_vs_sector": {"$ref": "#/$defs/horizon_values"},
-    "relative_return_vs_nifty": {"$ref": "#/$defs/horizon_values"},
+    "recovery_time": {"allOf": [{"$ref": "#/$defs/distribution"}, {"properties": {"unit": {"const": "TRADING_SESSIONS"}}}]},
+    "relative_return_vs_sector": {"$ref": "#/$defs/horizon_measurements"},
+    "relative_return_vs_nifty": {"$ref": "#/$defs/horizon_measurements"},
+    "record_hash": {"$ref": "#/$defs/hash"},
     "pit_verified": {"const": true},
     "authority_mode": {"const": "SHADOW_ONLY"}
   },
   "$defs": {
-    "distribution": {"type": "object", "additionalProperties": false, "required": ["count", "median", "mean", "standard_deviation", "p10", "p25", "p75", "p90", "minimum", "maximum"], "properties": {"count": {"type": "integer", "minimum": 0}, "median": {"type": ["number", "null"]}, "mean": {"type": ["number", "null"]}, "standard_deviation": {"type": ["number", "null"]}, "p10": {"type": ["number", "null"]}, "p25": {"type": ["number", "null"]}, "p75": {"type": ["number", "null"]}, "p90": {"type": ["number", "null"]}, "minimum": {"type": ["number", "null"]}, "maximum": {"type": ["number", "null"]}}},
-    "horizon_values": {"type": "object", "additionalProperties": false, "required": ["D+1", "D+3", "D+5", "D+10", "D+20"], "properties": {"D+1": {"type": ["number", "null"]}, "D+3": {"type": ["number", "null"]}, "D+5": {"type": ["number", "null"]}, "D+10": {"type": ["number", "null"]}, "D+20": {"type": ["number", "null"]}}}
-  }
+    "hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "unit": {"enum": ["PERCENT_RETURN", "DECIMAL_RETURN", "INR", "USD", "BASIS_POINTS", "INDEX_POINTS", "VOLUME_RATIO", "DAYS", "TRADING_SESSIONS", "CORRELATION", "UNITLESS_DISTANCE", "UNITLESS_SCORE"]},
+    "measurement": {"type": "object", "additionalProperties": false, "required": ["value", "unit"], "properties": {"value": {"type": ["number", "null"]}, "unit": {"$ref": "#/$defs/unit"}}},
+    "distribution": {"type": "object", "additionalProperties": false, "required": ["unit", "count", "median", "mean", "standard_deviation", "p10", "p25", "p75", "p90", "minimum", "maximum"], "properties": {"unit": {"$ref": "#/$defs/unit"}, "count": {"type": "integer", "minimum": 0}, "median": {"type": ["number", "null"]}, "mean": {"type": ["number", "null"]}, "standard_deviation": {"type": ["number", "null"]}, "p10": {"type": ["number", "null"]}, "p25": {"type": ["number", "null"]}, "p75": {"type": ["number", "null"]}, "p90": {"type": ["number", "null"]}, "minimum": {"type": ["number", "null"]}, "maximum": {"type": ["number", "null"]}}},
+    "horizon_measurements": {"type": "object", "additionalProperties": false, "required": ["D+1", "D+3", "D+5", "D+10", "D+20"], "properties": {"D+1": {"$ref": "#/$defs/measurement"}, "D+3": {"$ref": "#/$defs/measurement"}, "D+5": {"$ref": "#/$defs/measurement"}, "D+10": {"$ref": "#/$defs/measurement"}, "D+20": {"$ref": "#/$defs/measurement"}}}
+  },
+  "x-stage6-invariants": ["selection_input_snapshot and selection_input_hash contain only information available by selection_cutoff.", "future_outcome_labels, MAE, MFE, recovery time, and relative outcomes are labels and must never participate in analogue selection.", "outcome_unit must match the unit of each future return distribution, MAE, MFE, and relative-return measurement; recovery time is always TRADING_SESSIONS.", "analogue_count equals the selected_analogues length and must meet minimum_required_analogue_count before interpretation."]
 }

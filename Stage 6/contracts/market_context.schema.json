@@ -6,7 +6,7 @@
   "additionalProperties": false,
   "required": ["schema_version", "market_context_id", "ticker", "as_of_timestamp", "data_cutoff_timestamp", "stock_returns", "sector_returns", "nifty_returns", "volume_anomaly", "volatility", "gap", "technical_context", "relative_strength", "commodity_context", "currency_context", "rate_context", "market_regime", "source_evidence_ids", "pit_verified"],
   "properties": {
-    "schema_version": {"const": "STAGE6_MARKET_CONTEXT_V1"},
+    "schema_version": {"const": "STAGE6_MARKET_CONTEXT_V2"},
     "market_context_id": {"type": "string", "minLength": 1},
     "ticker": {"type": "string", "minLength": 1},
     "as_of_timestamp": {"type": "string", "format": "date-time"},
@@ -14,20 +14,24 @@
     "stock_returns": {"$ref": "#/$defs/returns"},
     "sector_returns": {"$ref": "#/$defs/returns"},
     "nifty_returns": {"$ref": "#/$defs/returns"},
-    "volume_anomaly": {"$ref": "#/$defs/timestamped_value"},
-    "volatility": {"$ref": "#/$defs/timestamped_value"},
-    "gap": {"$ref": "#/$defs/timestamped_value"},
-    "technical_context": {"$ref": "#/$defs/timestamped_value"},
-    "relative_strength": {"$ref": "#/$defs/timestamped_value"},
-    "commodity_context": {"$ref": "#/$defs/timestamped_value"},
-    "currency_context": {"$ref": "#/$defs/timestamped_value"},
-    "rate_context": {"$ref": "#/$defs/timestamped_value"},
-    "market_regime": {"$ref": "#/$defs/timestamped_value"},
+    "volume_anomaly": {"$ref": "#/$defs/measurement"},
+    "volatility": {"$ref": "#/$defs/measurement"},
+    "gap": {"$ref": "#/$defs/measurement"},
+    "technical_context": {"$ref": "#/$defs/context_value"},
+    "relative_strength": {"$ref": "#/$defs/measurement"},
+    "commodity_context": {"type": "array", "items": {"$ref": "#/$defs/named_measurement"}},
+    "currency_context": {"type": "array", "items": {"$ref": "#/$defs/named_measurement"}},
+    "rate_context": {"type": "array", "items": {"$ref": "#/$defs/named_measurement"}},
+    "market_regime": {"$ref": "#/$defs/context_value"},
     "source_evidence_ids": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
     "pit_verified": {"const": true}
   },
   "$defs": {
-    "timestamped_value": {"type": "object", "required": ["value", "observed_at_utc"], "properties": {"value": {}, "observed_at_utc": {"type": "string", "format": "date-time"}}, "additionalProperties": false},
-    "returns": {"type": "object", "required": ["1D", "3D", "5D", "20D", "observed_at_utc"], "properties": {"1D": {"type": ["number", "null"]}, "3D": {"type": ["number", "null"]}, "5D": {"type": ["number", "null"]}, "20D": {"type": ["number", "null"]}, "observed_at_utc": {"type": "string", "format": "date-time"}}, "additionalProperties": false}
-  }
+    "unit": {"enum": ["PERCENT_RETURN", "DECIMAL_RETURN", "INR", "USD", "BASIS_POINTS", "INDEX_POINTS", "VOLUME_RATIO", "DAYS", "TRADING_SESSIONS", "CORRELATION"]},
+    "measurement": {"type": "object", "additionalProperties": false, "required": ["value", "unit", "observed_at_utc", "method"], "properties": {"value": {"type": ["number", "null"]}, "unit": {"$ref": "#/$defs/unit"}, "observed_at_utc": {"type": "string", "format": "date-time"}, "method": {"type": "string", "minLength": 1}}},
+    "named_measurement": {"type": "object", "additionalProperties": false, "required": ["name", "value", "unit", "observed_at_utc", "method"], "properties": {"name": {"type": "string", "minLength": 1}, "value": {"type": ["number", "null"]}, "unit": {"$ref": "#/$defs/unit"}, "observed_at_utc": {"type": "string", "format": "date-time"}, "method": {"type": "string", "minLength": 1}}},
+    "context_value": {"type": "object", "additionalProperties": false, "required": ["value", "observed_at_utc", "method"], "properties": {"value": {}, "observed_at_utc": {"type": "string", "format": "date-time"}, "method": {"type": "string", "minLength": 1}}},
+    "returns": {"type": "object", "additionalProperties": false, "required": ["unit", "1D", "3D", "5D", "20D", "observed_at_utc", "method"], "properties": {"unit": {"enum": ["PERCENT_RETURN", "DECIMAL_RETURN"]}, "1D": {"type": ["number", "null"]}, "3D": {"type": ["number", "null"]}, "5D": {"type": ["number", "null"]}, "20D": {"type": ["number", "null"]}, "observed_at_utc": {"type": "string", "format": "date-time"}, "method": {"type": "string", "minLength": 1}}}
+  },
+  "x-stage6-invariants": ["Every numeric context has an explicit unit, observation time, and measurement method.", "data_cutoff_timestamp must not be after as_of_timestamp; runtime validation must enforce chronology."]
 }
