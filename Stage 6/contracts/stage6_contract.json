@@ -1,5 +1,5 @@
 {
-  "contract_version": "STAGE6_0B_CONTRACT_V1",
+  "contract_version": "STAGE6_0C_CONTRACT_V1",
   "stage": "6.0",
   "authority": "SHADOW_ONLY",
   "production_control": "stage5d5-live-paper-runner-baseline",

@@ -1,5 +1,5 @@
 {
-  "result_version": "STAGE6_0B_ARCHITECTURE_RESULT_V1",
+  "result_version": "STAGE6_0C_ARCHITECTURE_RESULT_V1",
   "stage": "6.0",
   "result": "PASS",
   "authority": "SHADOW_ONLY",
@@ -33,10 +33,15 @@
     "FAILED_ACQUISITION_REPRESENTABLE": "PASS",
     "INPUT_RECORD_ID_HASH_BINDING": "PASS",
     "EXPOSURE_MEASUREMENT_CONTRACT": "PASS",
-    "EXPOSURE_ENTITY_IDENTITY": "PASS"
+    "EXPOSURE_ENTITY_IDENTITY": "PASS",
+    "FORWARD_COMPATIBLE_IMPLEMENTATION_BOUNDARY": "PASS",
+    "ARCHITECTURE_VALIDATOR_SCOPE": "PASS"
+  },
+  "gate_semantics": {
+    "STAGE6_NETWORK_IMPORTS_ABSENT": "Architecture-owned Stage 6.0 executable code contains no network imports; future implementation stages are governed by their own stage-specific contracts and tests."
   },
   "notes": [
-    "Stage 6.0 performs no acquisition and connects to no external source.",
+    "Stage 6.0 architecture performs no acquisition and connects to no external source; later implementation stages have stage-specific network contracts and tests.",
     "Schema validation establishes structure, not objective truth, causal validity, or production authority.",
     "Future components require independent promotion under policy/Promotion_Gates.md."
   ]

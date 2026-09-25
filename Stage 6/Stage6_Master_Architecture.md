@@ -4,6 +4,8 @@
 
 Stage 6 is a future, persistent decision-intelligence layer that observes and explains evidence around the frozen Stage 5D.5 production-control system. Stage 6.0 defines architecture, schemas, and policies only. It has no data acquisition, trading logic, broker connection, UI, or production decision authority. Every Stage 6 decision is `SHADOW_ONLY`.
 
+Stage 6.0 architecture contains no network or data-acquisition implementation. Future source-ingestion stages may introduce network access only under their own stage-specific contracts, source policies, allowlists, tests, and authority boundaries. The Stage 6.0 offline validator validates architecture-owned executable code and does not police future runtime modules.
+
 The immutable production reference is tag `stage5d5-live-paper-runner-baseline`, commit `74b2710f0e19bd403978da81e87f25a3059ace06`. Stage 6 may reference exported identifiers and outcomes from that baseline but must never import mutable state into, write to, or alter Stage 5D.5. A future integration must use an append-only boundary adapter with explicit identity and hash checks.
 
 ## Roadmap and module boundaries

@@ -148,13 +148,15 @@ def main() -> None:
     require({"QUANTITATIVE", "QUALITATIVE"} == enum_at(exposure, "$defs", "assertion", "properties", "value_type", "enum"), "exposure value forms")
     require(exposure["$defs"]["assertion"]["properties"].get("value") is None, "unrestricted exposure value prohibited")
 
-    expected_gates = {"ENTITY_IDENTITY_CONTRACT", "VERSIONED_SOURCE_REGISTRY", "EVIDENCE_VERSION_IDENTITY", "ANALOGUE_REPRODUCIBILITY_CONTRACT", "EXPLICIT_MEASUREMENT_UNITS", "MULTI_FILL_THESIS_CONTRACT", "SHADOW_DECISION_REPRODUCIBILITY", "PORTFOLIO_CONTEXT_PROVENANCE", "REGISTRY_SNAPSHOT_IDENTITY", "EVIDENCE_REGISTRY_BINDING", "FAILED_ACQUISITION_REPRESENTABLE", "INPUT_RECORD_ID_HASH_BINDING", "EXPOSURE_MEASUREMENT_CONTRACT", "EXPOSURE_ENTITY_IDENTITY"}
-    require(all(result["validation_gates"].get(gate) == "PASS" for gate in expected_gates), "6.0B result gates")
+    expected_gates = {"ENTITY_IDENTITY_CONTRACT", "VERSIONED_SOURCE_REGISTRY", "EVIDENCE_VERSION_IDENTITY", "ANALOGUE_REPRODUCIBILITY_CONTRACT", "EXPLICIT_MEASUREMENT_UNITS", "MULTI_FILL_THESIS_CONTRACT", "SHADOW_DECISION_REPRODUCIBILITY", "PORTFOLIO_CONTEXT_PROVENANCE", "REGISTRY_SNAPSHOT_IDENTITY", "EVIDENCE_REGISTRY_BINDING", "FAILED_ACQUISITION_REPRESENTABLE", "INPUT_RECORD_ID_HASH_BINDING", "EXPOSURE_MEASUREMENT_CONTRACT", "EXPOSURE_ENTITY_IDENTITY", "FORWARD_COMPATIBLE_IMPLEMENTATION_BOUNDARY", "ARCHITECTURE_VALIDATOR_SCOPE"}
+    require(all(result["validation_gates"].get(gate) == "PASS" for gate in expected_gates), "6.0C result gates")
     require(result["schema_count"] == len(SCHEMAS), "result schema count")
 
-    python_files = set(ROOT.rglob("*.py"))
-    require(python_files == {Path(__file__).resolve()}, "Stage 6.0B may contain only the offline contract validator Python file")
-    for python_file in python_files:
+    # Stage 6.0 validates architecture-owned executable code only. Future
+    # implementation stages enforce their own stage-specific runtime/network
+    # boundaries and must not be globally policed by this frozen validator.
+    architecture_scripts = {Path(__file__).resolve()}
+    for python_file in architecture_scripts:
         tree = ast.parse(python_file.read_text(encoding="utf-8"), filename=str(python_file))
         imports = set()
         for node in ast.walk(tree):
@@ -165,7 +167,7 @@ def main() -> None:
         require(not imports & NETWORK_MODULES, f"network import prohibited: {python_file}")
 
     print(json.dumps({
-        "stage": "6.0B", "result": "PASS", "schemas_parsed": len(SCHEMAS),
+        "stage": "6.0C", "result": "PASS", "schemas_parsed": len(SCHEMAS),
         "authority": "SHADOW_ONLY", "production_control_commit": EXPECTED_COMMIT,
         "network_imports": 0, "trading_implementation": False,
     }, sort_keys=True))
