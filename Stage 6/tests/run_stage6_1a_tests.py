@@ -42,6 +42,19 @@ RESULT_PATH = STAGE_ROOT / "results" / "stage6_1a_test_results.csv"
 FIXTURE_SOURCE = "S6FIX_SOURCE_OFFICIAL_001"
 FIXTURE_ENTITY = "S6FIX_COMPANY_001"
 REGISTRIES = build_fixture_registries()
+
+
+def _build_source_v3() -> dict:
+    records = deepcopy(REGISTRIES["source_v2"]["sources"])
+    source = records[0]
+    source["source_record_version"] = 3
+    source["previous_version_hash"] = source["record_hash"]
+    source["reviewed_at_utc"] = "2026-09-01T00:00:00Z"
+    source["availability_notes"] = "Fixture V3 availability note; still synthetic."
+    return build_source_registry(records, "2026-09-02T00:00:00Z", REGISTRIES["source_v2"])
+
+
+SOURCE_V3 = _build_source_v3()
 CHECKS: list[tuple[str, str, object]] = []
 
 
@@ -115,6 +128,14 @@ def failure(store: IngestionStore, key: str = "failure-1", status: str = "FAILED
 
 def git(*arguments: str) -> str:
     return subprocess.check_output(["git", *arguments], cwd=REPO_ROOT, text=True).strip()
+
+
+def inject_registry(store: IngestionStore, snapshot: dict, kind: str) -> None:
+    store.connection.execute("INSERT INTO registry_snapshots VALUES(?,?,?,?,?,?)", (
+        snapshot["registry_snapshot_id"], kind, snapshot["registry_version"],
+        snapshot["registry_hash"], snapshot["previous_registry_hash"], canonical_json(snapshot),
+    ))
+    store.connection.commit()
 
 
 @check("ARCHITECTURE_IDENTITY", "corrected frozen architecture tag pinned")
@@ -750,8 +771,7 @@ def _():
     with tempfile.TemporaryDirectory(prefix="stage6_chain_test_") as folder:
         root = Path(folder)
         with IngestionStore(root / "store.sqlite3", root / "raw") as store:
-            store.import_registry(REGISTRIES["source_v2"])
-            expect(IntegrityFailure, lambda: store._verify_persisted_registry_chain("SOURCE", REGISTRIES["source_v2"]["registry_snapshot_id"]), "REGISTRY_CHAIN_PREDECESSOR_MISSING")
+            expect(IntegrityFailure, lambda: store.import_registry(REGISTRIES["source_v2"]), "REGISTRY_CHAIN_GENESIS_REQUIRED")
 
 @check("CAPTURE_CHAIN_VERIFICATION", "wrong predecessor hash prevents capture")
 def _():
@@ -773,6 +793,79 @@ def _():
         row = store.connection.execute("SELECT canonical_json FROM registry_snapshots WHERE registry_kind='SOURCE' AND registry_version=1").fetchone(); bad = json.loads(row[0]); bad["sources"][0]["source_name"] = "tampered"
         store.connection.execute("DROP TRIGGER protect_registry_snapshots_update"); store.connection.execute("UPDATE registry_snapshots SET canonical_json=? WHERE registry_kind='SOURCE' AND registry_version=1", (canonical_json(bad),)); store.connection.commit()
         expect(IntegrityFailure, lambda: capture(store, key="tampered-prior", source_registry="source_v2", entity_registry="entity_v2", publication="2026-08-03T09:00:00Z", observed="2026-08-03T09:01:00Z", retrieved="2026-08-03T09:02:00Z"), "REGISTRY_RECORD_HASH_MISMATCH")
+
+@check("PERSISTED_REGISTRY_CHAIN_CLOSED", "empty store rejects Source Registry V2")
+def _():
+    with tempfile.TemporaryDirectory(prefix="stage6_registry_genesis_") as folder:
+        root = Path(folder)
+        with IngestionStore(root / "store.sqlite3", root / "raw") as store:
+            expect(IntegrityFailure, lambda: store.import_registry(REGISTRIES["source_v2"]), "REGISTRY_CHAIN_GENESIS_REQUIRED")
+
+@check("PERSISTED_REGISTRY_CHAIN_CLOSED", "empty store rejects Entity Registry V2")
+def _():
+    with tempfile.TemporaryDirectory(prefix="stage6_registry_genesis_") as folder:
+        root = Path(folder)
+        with IngestionStore(root / "store.sqlite3", root / "raw") as store:
+            expect(IntegrityFailure, lambda: store.import_registry(REGISTRIES["entity_v2"]), "REGISTRY_CHAIN_GENESIS_REQUIRED")
+
+@check("PERSISTED_REGISTRY_CHAIN_CLOSED", "empty store rejects registry V3")
+def _():
+    with tempfile.TemporaryDirectory(prefix="stage6_registry_genesis_") as folder:
+        root = Path(folder)
+        with IngestionStore(root / "store.sqlite3", root / "raw") as store:
+            expect(IntegrityFailure, lambda: store.import_registry(SOURCE_V3), "REGISTRY_CHAIN_GENESIS_REQUIRED")
+
+@check("PERSISTED_REGISTRY_CHAIN_CLOSED", "V1 then V3 rejects version gap")
+def _():
+    with tempfile.TemporaryDirectory(prefix="stage6_registry_gap_") as folder:
+        root = Path(folder)
+        with IngestionStore(root / "store.sqlite3", root / "raw") as store:
+            store.import_registry(REGISTRIES["source_v1"])
+            expect(IntegrityFailure, lambda: store.import_registry(SOURCE_V3), "REGISTRY_VERSION_GAP")
+
+@check("PERSISTED_REGISTRY_CHAIN_CLOSED", "V1 then V2 succeeds")
+def _():
+    with tempfile.TemporaryDirectory(prefix="stage6_registry_chain_") as folder:
+        root = Path(folder)
+        with IngestionStore(root / "store.sqlite3", root / "raw") as store:
+            store.import_registry(REGISTRIES["source_v1"])
+            require(store.import_registry(REGISTRIES["source_v2"])["status"] == "CREATED")
+
+@check("PERSISTED_REGISTRY_CHAIN_CLOSED", "V1 then valid V2 full integrity passes")
+def _():
+    with tempfile.TemporaryDirectory(prefix="stage6_registry_chain_") as folder:
+        root = Path(folder)
+        with IngestionStore(root / "store.sqlite3", root / "raw") as store:
+            store.import_registry(REGISTRIES["source_v1"])
+            store.import_registry(REGISTRIES["source_v2"])
+            require(store.integrity_check()["result"] == "PASS")
+
+@check("PERSISTED_REGISTRY_CHAIN_CLOSED", "injected orphan V2 fails full integrity")
+def _():
+    with tempfile.TemporaryDirectory(prefix="stage6_registry_orphan_") as folder:
+        root = Path(folder)
+        with IngestionStore(root / "store.sqlite3", root / "raw") as store:
+            inject_registry(store, REGISTRIES["source_v2"], "SOURCE")
+            expect(IntegrityFailure, store.integrity_check, "REGISTRY_CHAIN_GENESIS_REQUIRED")
+
+@check("PERSISTED_REGISTRY_CHAIN_CLOSED", "injected registry sequence 1,3 fails full integrity")
+def _():
+    with tempfile.TemporaryDirectory(prefix="stage6_registry_gap_") as folder:
+        root = Path(folder)
+        with IngestionStore(root / "store.sqlite3", root / "raw") as store:
+            store.import_registry(REGISTRIES["source_v1"])
+            inject_registry(store, SOURCE_V3, "SOURCE")
+            expect(IntegrityFailure, store.integrity_check, "REGISTRY_VERSION_GAP")
+
+@check("PERSISTED_REGISTRY_CHAIN_CLOSED", "exact V1 re-import remains idempotent")
+def _():
+    with fresh_store() as (store, _):
+        require(store.import_registry(REGISTRIES["source_v1"])["status"] == "IDEMPOTENT_SUCCESS")
+
+@check("PERSISTED_REGISTRY_CHAIN_CLOSED", "exact V2 re-import remains idempotent")
+def _():
+    with fresh_store(import_v2=True) as (store, _):
+        require(store.import_registry(REGISTRIES["source_v2"])["status"] == "IDEMPOTENT_SUCCESS")
 
 @check("RAW_STORE_NO_CLOBBER", "race winner with identical bytes deduplicates safely")
 def _():

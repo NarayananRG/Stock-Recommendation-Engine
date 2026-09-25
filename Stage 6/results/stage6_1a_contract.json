@@ -13,6 +13,7 @@
     "IDEMPOTENT_INGESTION": "PASS",
     "NETWORK_PROHIBITED": "PASS",
     "PIT_ENTITY_RESOLUTION": "PASS",
+    "PERSISTED_REGISTRY_CHAIN_CLOSED": "PASS",
     "RAW_PAYLOAD_IMMUTABILITY": "PASS",
     "RAW_STORE_NO_CLOBBER": "PASS",
     "REGISTRY_ASOF_CHAIN_CHRONOLOGY": "PASS",
@@ -35,7 +36,7 @@
   "broker_execution": false,
   "content_hash_contract": "STAGE6_1A_RAW_BYTES_CONTENT_HASH",
   "fixture_only": true,
-  "hardening_stage": "6.1A.1",
+  "hardening_stage": "6.1A.2",
   "live_external_sources": false,
   "ml_production_influence": false,
   "network_calls": false,
@@ -46,7 +47,7 @@
   "store_schema_version": "STAGE6_1A_STORE_V1",
   "test_evidence": "Stage 6/results/stage6_1a_test_results.csv",
   "tests_failed": 0,
-  "tests_passed": 142,
-  "tests_total": 142,
+  "tests_passed": 152,
+  "tests_total": 152,
   "trading_actions": false
 }

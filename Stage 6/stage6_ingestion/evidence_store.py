@@ -247,8 +247,19 @@ class IngestionStore:
                 raise IntegrityFailure("REGISTRY_SNAPSHOT_ID_COLLISION")
             return {"status": "IDEMPOTENT_SUCCESS", "snapshot_id": existing["snapshot_id"]}
         prior_row = self.connection.execute(
-            "SELECT canonical_json FROM registry_snapshots WHERE registry_kind=? ORDER BY registry_version DESC LIMIT 1", (kind,)).fetchone()
-        prior = json.loads(prior_row[0]) if prior_row else None
+            "SELECT snapshot_id FROM registry_snapshots WHERE registry_kind=? ORDER BY registry_version DESC LIMIT 1",
+            (kind,),
+        ).fetchone()
+        if prior_row is None:
+            if snapshot.get("registry_version") != 1 or snapshot.get("previous_registry_hash") is not None:
+                raise IntegrityFailure("REGISTRY_CHAIN_GENESIS_REQUIRED")
+            prior = None
+        else:
+            prior = self._verify_persisted_registry_chain(kind, prior_row["snapshot_id"])
+            if snapshot.get("registry_version") != prior["registry_version"] + 1:
+                raise IntegrityFailure("REGISTRY_VERSION_GAP")
+            if snapshot.get("previous_registry_hash") != prior["registry_hash"]:
+                raise IntegrityFailure("REGISTRY_PREVIOUS_HASH_MISMATCH")
         verifier(snapshot, prior)
         try:
             with self.connection:
@@ -444,10 +455,19 @@ class IngestionStore:
             for kind in ("ENTITY", "SOURCE"):
                 prior = None
                 rows = self.connection.execute("SELECT * FROM registry_snapshots WHERE registry_kind=? ORDER BY registry_version", (kind,)).fetchall()
-                for row in rows:
+                if rows and (rows[0]["registry_version"] != 1 or rows[0]["previous_registry_hash"] is not None):
+                    raise IntegrityFailure("REGISTRY_CHAIN_GENESIS_REQUIRED")
+                if [row["registry_version"] for row in rows] != list(range(1, len(rows) + 1)):
+                    raise IntegrityFailure("REGISTRY_VERSION_GAP")
+                for expected_version, row in enumerate(rows, 1):
                     snapshot = json.loads(row["canonical_json"])
                     if row["canonical_json"] != canonical_json(snapshot):
                         raise IntegrityFailure("REGISTRY_CANONICAL_JSON_MISMATCH")
+                    if snapshot.get("registry_version") != expected_version:
+                        raise IntegrityFailure("REGISTRY_VERSION_GAP")
+                    expected_previous = None if prior is None else prior["registry_hash"]
+                    if snapshot.get("previous_registry_hash") != expected_previous:
+                        raise IntegrityFailure("REGISTRY_PREVIOUS_HASH_MISMATCH")
                     verifier = verify_entity_registry if kind == "ENTITY" else verify_source_registry
                     verifier(snapshot, prior)
                     if (row["snapshot_id"], row["registry_version"], row["registry_hash"], row["previous_registry_hash"]) != (
