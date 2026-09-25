@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "stage6/event.schema.json",
+  "title": "Stage 6 Structured Event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "event_id", "event_type", "event_status", "direction", "severity", "materiality", "confidence", "entities", "sectors", "geographies", "commodities", "currencies", "source_evidence_ids", "corroboration_status", "first_known_timestamp", "event_horizon", "transmission_channels", "causality_assessment", "evidence_conflicts"],
+  "properties": {
+    "schema_version": {"const": "STAGE6_EVENT_V1"},
+    "event_id": {"type": "string", "minLength": 1},
+    "event_type": {"enum": ["EARNINGS_BEAT", "EARNINGS_MISS", "GUIDANCE_RAISE", "GUIDANCE_CUT", "ORDER_WIN", "ORDER_LOSS", "CUSTOMER_LOSS", "MANAGEMENT_CHANGE", "PROMOTER_EVENT", "GOVERNANCE_ALLEGATION", "FRAUD_ALLEGATION", "REGULATORY_ACTION", "LEGAL_EVENT", "DEBT_STRESS", "CREDIT_DOWNGRADE", "CAPITAL_RAISE", "MERGER", "ACQUISITION", "DEMERGER", "TARIFF_INCREASE", "TARIFF_REDUCTION", "TRADE_RESTRICTION", "SANCTION", "WAR_ESCALATION", "WAR_DEESCALATION", "OIL_SHOCK", "GAS_SHOCK", "COMMODITY_SHOCK", "RATE_HIKE", "RATE_CUT", "LIQUIDITY_EVENT", "CURRENCY_SHOCK", "SUPPLY_CHAIN_DISRUPTION", "NATURAL_DISASTER", "GOVERNMENT_POLICY", "SECTOR_REGULATION", "OTHER"]},
+    "event_status": {"enum": ["CANDIDATE", "ACTIVE", "RESOLVED", "RETRACTED", "CONFLICTED"]},
+    "direction": {"enum": ["POSITIVE", "NEGATIVE", "MIXED", "NEUTRAL", "UNKNOWN"]},
+    "severity": {"enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL", "UNKNOWN"]},
+    "materiality": {"enum": ["NON_MATERIAL", "MATERIAL", "HIGH", "CRITICAL", "UNKNOWN"]},
+    "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "entities": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "sectors": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "geographies": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "commodities": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "currencies": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "source_evidence_ids": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
+    "corroboration_status": {"enum": ["CONFIRMED", "CORROBORATED", "SINGLE_SOURCE_OFFICIAL", "SINGLE_SOURCE_INDEPENDENT", "DISCOVERY_ONLY", "UNVERIFIED", "CONFLICTING_EVIDENCE"]},
+    "first_known_timestamp": {"type": "string", "format": "date-time"},
+    "event_horizon": {"enum": ["INTRADAY", "DAYS", "WEEKS", "MONTHS", "LONG_TERM", "UNKNOWN"]},
+    "transmission_channels": {"type": "array", "items": {"enum": ["MACRO", "COMMODITY", "CURRENCY", "RATE", "SECTOR", "COMPANY_EXPOSURE", "MARKET_REACTION", "THESIS"]}, "uniqueItems": true},
+    "causality_assessment": {"enum": ["CONFIRMED_CAUSE", "PLAUSIBLE_CONTRIBUTOR", "CORRELATED_MARKET_MOVE", "NO_SUPPORTED_CAUSE_FOUND"]},
+    "evidence_conflicts": {"type": "array", "items": {"type": "object", "required": ["evidence_ids", "description", "status"], "properties": {"evidence_ids": {"type": "array", "items": {"type": "string"}, "minItems": 2}, "description": {"type": "string"}, "status": {"enum": ["OPEN", "RESOLVED"]}}, "additionalProperties": false}}
+  }
+}

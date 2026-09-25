@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "stage6/source_registry.schema.json",
+  "title": "Stage 6 Source Registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "sources"],
+  "properties": {
+    "schema_version": {"const": "STAGE6_SOURCE_REGISTRY_V1"},
+    "sources": {"type": "array", "items": {"$ref": "#/$defs/source"}}
+  },
+  "$defs": {
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_id", "source_name", "authority_level", "publisher_type", "jurisdiction", "coverage", "expected_latency", "supports_machine_access", "historical_depth", "requires_auth", "cost_class", "terms_notes", "enabled", "verification_status"],
+      "properties": {
+        "source_id": {"type": "string", "minLength": 1},
+        "source_name": {"type": "string", "minLength": 1},
+        "authority_level": {"enum": ["PRIMARY_OFFICIAL", "AUTHORITATIVE_INDEPENDENT", "DISCOVERY", "UNVERIFIED"]},
+        "publisher_type": {"type": "string", "minLength": 1},
+        "jurisdiction": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
+        "coverage": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
+        "expected_latency": {"type": "string", "minLength": 1},
+        "supports_machine_access": {"type": "boolean"},
+        "historical_depth": {"type": ["string", "null"]},
+        "requires_auth": {"type": "boolean"},
+        "cost_class": {"enum": ["FREE", "FREEMIUM", "PAID", "UNKNOWN"]},
+        "terms_notes": {"type": "string"},
+        "enabled": {"type": "boolean"},
+        "verification_status": {"enum": ["VERIFIED", "PENDING_REVIEW", "DISABLED", "REJECTED"]}
+      }
+    }
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "stage6/trade_thesis.schema.json",
+  "title": "Stage 6 Persistent Trade Thesis",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "thesis_id", "version", "recommendation_id", "ticker", "entry_date", "holding_horizon", "entry_rationale", "supporting_evidence", "known_risks", "initial_entry_range", "actual_fill_if_available", "initial_stop", "current_stop", "initial_target", "current_target", "invalidation_conditions", "thesis_status", "last_review_date", "change_history", "previous_version_hash", "record_hash"],
+  "properties": {
+    "schema_version": {"const": "STAGE6_TRADE_THESIS_V1"},
+    "thesis_id": {"type": "string", "minLength": 1},
+    "version": {"type": "integer", "minimum": 1},
+    "recommendation_id": {"type": "string", "minLength": 1},
+    "ticker": {"type": "string", "minLength": 1},
+    "entry_date": {"type": ["string", "null"], "format": "date"},
+    "holding_horizon": {"type": "string", "minLength": 1},
+    "entry_rationale": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "supporting_evidence": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "known_risks": {"type": "array", "items": {"type": "string"}},
+    "initial_entry_range": {"$ref": "#/$defs/range"},
+    "actual_fill_if_available": {"oneOf": [{"type": "null"}, {"type": "object", "additionalProperties": false, "required": ["date", "quantity", "price"], "properties": {"date": {"type": "string", "format": "date"}, "quantity": {"type": "integer", "minimum": 1}, "price": {"type": "number", "exclusiveMinimum": 0}}}]},
+    "initial_stop": {"type": ["number", "null"]},
+    "current_stop": {"type": ["number", "null"]},
+    "initial_target": {"type": ["number", "null"]},
+    "current_target": {"type": ["number", "null"]},
+    "invalidation_conditions": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "thesis_status": {"enum": ["THESIS_STRENGTHENED", "THESIS_UNCHANGED", "THESIS_WEAKENED", "THESIS_INVALIDATED", "CLOSED"]},
+    "last_review_date": {"type": "string", "format": "date"},
+    "change_history": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["version", "changed_at_utc", "change_type", "reason", "evidence_ids"], "properties": {"version": {"type": "integer", "minimum": 1}, "changed_at_utc": {"type": "string", "format": "date-time"}, "change_type": {"type": "string"}, "reason": {"type": "string"}, "evidence_ids": {"type": "array", "items": {"type": "string"}}}}},
+    "previous_version_hash": {"type": ["string", "null"], "pattern": "^[a-f0-9]{64}$"},
+    "record_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+  },
+  "$defs": {"range": {"type": "object", "additionalProperties": false, "required": ["low", "high", "currency"], "properties": {"low": {"type": "number", "exclusiveMinimum": 0}, "high": {"type": "number", "exclusiveMinimum": 0}, "currency": {"const": "INR"}}}}
+}

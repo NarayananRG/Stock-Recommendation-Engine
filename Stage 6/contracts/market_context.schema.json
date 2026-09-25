@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "stage6/market_context.schema.json",
+  "title": "Stage 6 Point-in-Time Market Context",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "market_context_id", "ticker", "as_of_timestamp", "data_cutoff_timestamp", "stock_returns", "sector_returns", "nifty_returns", "volume_anomaly", "volatility", "gap", "technical_context", "relative_strength", "commodity_context", "currency_context", "rate_context", "market_regime", "source_evidence_ids", "pit_verified"],
+  "properties": {
+    "schema_version": {"const": "STAGE6_MARKET_CONTEXT_V1"},
+    "market_context_id": {"type": "string", "minLength": 1},
+    "ticker": {"type": "string", "minLength": 1},
+    "as_of_timestamp": {"type": "string", "format": "date-time"},
+    "data_cutoff_timestamp": {"type": "string", "format": "date-time"},
+    "stock_returns": {"$ref": "#/$defs/returns"},
+    "sector_returns": {"$ref": "#/$defs/returns"},
+    "nifty_returns": {"$ref": "#/$defs/returns"},
+    "volume_anomaly": {"$ref": "#/$defs/timestamped_value"},
+    "volatility": {"$ref": "#/$defs/timestamped_value"},
+    "gap": {"$ref": "#/$defs/timestamped_value"},
+    "technical_context": {"$ref": "#/$defs/timestamped_value"},
+    "relative_strength": {"$ref": "#/$defs/timestamped_value"},
+    "commodity_context": {"$ref": "#/$defs/timestamped_value"},
+    "currency_context": {"$ref": "#/$defs/timestamped_value"},
+    "rate_context": {"$ref": "#/$defs/timestamped_value"},
+    "market_regime": {"$ref": "#/$defs/timestamped_value"},
+    "source_evidence_ids": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
+    "pit_verified": {"const": true}
+  },
+  "$defs": {
+    "timestamped_value": {"type": "object", "required": ["value", "observed_at_utc"], "properties": {"value": {}, "observed_at_utc": {"type": "string", "format": "date-time"}}, "additionalProperties": false},
+    "returns": {"type": "object", "required": ["1D", "3D", "5D", "20D", "observed_at_utc"], "properties": {"1D": {"type": ["number", "null"]}, "3D": {"type": ["number", "null"]}, "5D": {"type": ["number", "null"]}, "20D": {"type": ["number", "null"]}, "observed_at_utc": {"type": "string", "format": "date-time"}}, "additionalProperties": false}
+  }
+}

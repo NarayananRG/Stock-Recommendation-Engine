@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "stage6/portfolio_context.schema.json",
+  "title": "Stage 6 Portfolio Context",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "portfolio_context_id", "as_of_timestamp", "capital_ceiling", "cash", "open_positions", "pending_entries", "sector_exposure", "subsector_exposure", "correlated_exposure", "risk_at_stop", "committed_capital", "available_capital", "portfolio_concentration", "cash_is_valid_allocation"],
+  "properties": {
+    "schema_version": {"const": "STAGE6_PORTFOLIO_CONTEXT_V1"},
+    "portfolio_context_id": {"type": "string", "minLength": 1},
+    "as_of_timestamp": {"type": "string", "format": "date-time"},
+    "capital_ceiling": {"$ref": "#/$defs/money"},
+    "cash": {"$ref": "#/$defs/money"},
+    "open_positions": {"type": "array", "items": {"type": "object", "required": ["ticker", "quantity", "market_value", "risk_at_stop"], "properties": {"ticker": {"type": "string"}, "quantity": {"type": "integer", "minimum": 1}, "market_value": {"$ref": "#/$defs/money"}, "risk_at_stop": {"$ref": "#/$defs/money"}}, "additionalProperties": false}},
+    "pending_entries": {"type": "array", "items": {"type": "object", "required": ["ticker", "recommendation_id", "committed_capital"], "properties": {"ticker": {"type": "string"}, "recommendation_id": {"type": "string"}, "committed_capital": {"$ref": "#/$defs/money"}}, "additionalProperties": false}},
+    "sector_exposure": {"type": "object", "additionalProperties": {"type": "number", "minimum": 0}},
+    "subsector_exposure": {"type": "object", "additionalProperties": {"type": "number", "minimum": 0}},
+    "correlated_exposure": {"type": "array", "items": {"type": "object", "required": ["members", "method", "value", "as_of_timestamp"], "properties": {"members": {"type": "array", "items": {"type": "string"}, "minItems": 2}, "method": {"type": "string"}, "value": {"type": ["number", "null"]}, "as_of_timestamp": {"type": "string", "format": "date-time"}}, "additionalProperties": false}},
+    "risk_at_stop": {"$ref": "#/$defs/money"},
+    "committed_capital": {"$ref": "#/$defs/money"},
+    "available_capital": {"$ref": "#/$defs/money"},
+    "portfolio_concentration": {"type": "object"},
+    "cash_is_valid_allocation": {"const": true}
+  },
+  "$defs": {"money": {"type": "object", "additionalProperties": false, "required": ["amount", "currency"], "properties": {"amount": {"type": "number", "minimum": 0}, "currency": {"const": "INR"}}}}
+}

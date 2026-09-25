@@ -1,0 +1,31 @@
+{
+  "contract_version": "STAGE6_0_CONTRACT_V1",
+  "stage": "6.0",
+  "authority": "SHADOW_ONLY",
+  "production_control": "stage5d5-live-paper-runner-baseline",
+  "production_control_commit": "74b2710f0e19bd403978da81e87f25a3059ace06",
+  "network_calls": false,
+  "trading_actions": false,
+  "broker_execution": false,
+  "production_decision_influence": false,
+  "ui": false,
+  "data_acquisition_implemented": false,
+  "future_free_source_strategy": true,
+  "historical_analogue_planned": true,
+  "sector_diversification_planned": true,
+  "persistent_trade_thesis_planned": true,
+  "morning_revalidation_planned": true,
+  "cash_is_valid_position": true,
+  "stage5d5_mutation_allowed": false,
+  "schemas": [
+    "source_registry.schema.json",
+    "evidence.schema.json",
+    "event.schema.json",
+    "exposure.schema.json",
+    "market_context.schema.json",
+    "historical_analogue.schema.json",
+    "trade_thesis.schema.json",
+    "portfolio_context.schema.json",
+    "shadow_decision.schema.json"
+  ]
+}

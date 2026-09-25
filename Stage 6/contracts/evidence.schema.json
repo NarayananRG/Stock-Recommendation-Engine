@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "stage6/evidence.schema.json",
+  "title": "Stage 6 Evidence Envelope",
+  "x-stage6-invariants": ["When all are known: publication_timestamp_utc <= observed_timestamp_utc <= retrieved_timestamp_utc"],
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "evidence_id", "source_id", "authority_level", "source_reference", "publication_timestamp_utc", "observed_timestamp_utc", "retrieved_timestamp_utc", "content_hash", "raw_title", "raw_document_reference", "entity_ids", "event_candidate_ids", "retrieval_status"],
+  "properties": {
+    "schema_version": {"const": "STAGE6_EVIDENCE_V1"},
+    "evidence_id": {"type": "string", "minLength": 1},
+    "source_id": {"type": "string", "minLength": 1},
+    "authority_level": {"enum": ["PRIMARY_OFFICIAL", "AUTHORITATIVE_INDEPENDENT", "DISCOVERY", "UNVERIFIED"]},
+    "source_reference": {"type": "string", "minLength": 1, "description": "Original URL, circular reference, filing ID, or equivalent reference."},
+    "publication_timestamp_utc": {"$ref": "#/$defs/nullable_timestamp"},
+    "observed_timestamp_utc": {"$ref": "#/$defs/nullable_timestamp"},
+    "retrieved_timestamp_utc": {"$ref": "#/$defs/nullable_timestamp"},
+    "timestamp_order_verified": {"type": "boolean", "description": "True only when known timestamps satisfy publication <= observed <= retrieved."},
+    "content_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "raw_title": {"type": ["string", "null"]},
+    "raw_document_reference": {"type": "string", "minLength": 1},
+    "entity_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "event_candidate_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "retrieval_status": {"enum": ["RETRIEVED", "PARTIAL", "NOT_FOUND", "ACCESS_DENIED", "FAILED", "QUARANTINED"]},
+    "supersedes_evidence_id": {"type": ["string", "null"]}
+  },
+  "$defs": {"nullable_timestamp": {"type": ["string", "null"], "format": "date-time"}},
+  "allOf": [
+    {"if": {"properties": {"publication_timestamp_utc": {"type": "string"}, "observed_timestamp_utc": {"type": "string"}, "retrieved_timestamp_utc": {"type": "string"}}, "required": ["publication_timestamp_utc", "observed_timestamp_utc", "retrieved_timestamp_utc"]}, "then": {"required": ["timestamp_order_verified"], "properties": {"timestamp_order_verified": {"const": true}}}}
+  ]
+}

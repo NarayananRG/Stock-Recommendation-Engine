@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "stage6/historical_analogue.schema.json",
+  "title": "Stage 6 Historical Analogue Result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "historical_analogue_id", "as_of_timestamp", "input_snapshot", "selection_cutoff", "analogue_count", "outcomes", "maximum_adverse_excursion", "maximum_favourable_excursion", "recovery_time", "relative_return_vs_sector", "relative_return_vs_nifty", "pit_verified", "authority_mode"],
+  "properties": {
+    "schema_version": {"const": "STAGE6_HISTORICAL_ANALOGUE_V1"},
+    "historical_analogue_id": {"type": "string", "minLength": 1},
+    "as_of_timestamp": {"type": "string", "format": "date-time"},
+    "selection_cutoff": {"type": "string", "format": "date-time"},
+    "input_snapshot": {
+      "type": "object", "additionalProperties": false,
+      "required": ["event_type", "severity", "materiality", "stock_return_state", "volume", "volatility", "technical_structure", "sector_behaviour", "market_regime", "commodity_context", "currency_context", "rate_context"],
+      "properties": {
+        "event_type": {"type": "string"}, "severity": {"type": "string"}, "materiality": {"type": "string"},
+        "stock_return_state": {}, "volume": {}, "volatility": {}, "technical_structure": {},
+        "sector_behaviour": {}, "market_regime": {}, "commodity_context": {}, "currency_context": {}, "rate_context": {}
+      }
+    },
+    "analogue_count": {"type": "integer", "minimum": 0},
+    "outcomes": {
+      "type": "object", "additionalProperties": false, "required": ["D+1", "D+3", "D+5", "D+10", "D+20"],
+      "properties": {"D+1": {"$ref": "#/$defs/distribution"}, "D+3": {"$ref": "#/$defs/distribution"}, "D+5": {"$ref": "#/$defs/distribution"}, "D+10": {"$ref": "#/$defs/distribution"}, "D+20": {"$ref": "#/$defs/distribution"}}
+    },
+    "maximum_adverse_excursion": {"$ref": "#/$defs/distribution"},
+    "maximum_favourable_excursion": {"$ref": "#/$defs/distribution"},
+    "recovery_time": {"$ref": "#/$defs/distribution"},
+    "relative_return_vs_sector": {"$ref": "#/$defs/horizon_values"},
+    "relative_return_vs_nifty": {"$ref": "#/$defs/horizon_values"},
+    "pit_verified": {"const": true},
+    "authority_mode": {"const": "SHADOW_ONLY"}
+  },
+  "$defs": {
+    "distribution": {"type": "object", "additionalProperties": false, "required": ["count", "median", "mean", "standard_deviation", "p10", "p25", "p75", "p90", "minimum", "maximum"], "properties": {"count": {"type": "integer", "minimum": 0}, "median": {"type": ["number", "null"]}, "mean": {"type": ["number", "null"]}, "standard_deviation": {"type": ["number", "null"]}, "p10": {"type": ["number", "null"]}, "p25": {"type": ["number", "null"]}, "p75": {"type": ["number", "null"]}, "p90": {"type": ["number", "null"]}, "minimum": {"type": ["number", "null"]}, "maximum": {"type": ["number", "null"]}}},
+    "horizon_values": {"type": "object", "additionalProperties": false, "required": ["D+1", "D+3", "D+5", "D+10", "D+20"], "properties": {"D+1": {"type": ["number", "null"]}, "D+3": {"type": ["number", "null"]}, "D+5": {"type": ["number", "null"]}, "D+10": {"type": ["number", "null"]}, "D+20": {"type": ["number", "null"]}}}
+  }
+}
