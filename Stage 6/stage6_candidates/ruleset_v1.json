@@ -1,0 +1,40 @@
+{
+  "schema_version": "STAGE6_2C_RULESET_V1",
+  "ruleset_id": "S6RULESET_STAGE6_2C_V1",
+  "ruleset_version": 1,
+  "classifier_version": "STAGE6_2C_LITERAL_CLASSIFIER_V1",
+  "classification_method": "DETERMINISTIC_LITERAL_RULES",
+  "supported_sources": [
+    "RBI_OFFICIAL_PRESS_RELEASES_RSS",
+    "SEBI_OFFICIAL_RSS"
+  ],
+  "rules": [
+    {
+      "rule_id": "RBI_RATE_CUT_EXPLICIT_V1",
+      "source_id": "RBI_OFFICIAL_PRESS_RELEASES_RSS",
+      "candidate_event_type": "RATE_CUT",
+      "fields": ["description_text", "title_text"],
+      "required_all_phrases": ["repo rate"],
+      "required_any_phrases": ["cut", "lower", "lowered", "reduce", "reduced", "reduction"],
+      "excluded_phrases": []
+    },
+    {
+      "rule_id": "RBI_RATE_HIKE_EXPLICIT_V1",
+      "source_id": "RBI_OFFICIAL_PRESS_RELEASES_RSS",
+      "candidate_event_type": "RATE_HIKE",
+      "fields": ["description_text", "title_text"],
+      "required_all_phrases": ["repo rate"],
+      "required_any_phrases": ["hike", "hiked", "increase", "increased", "raise", "raised"],
+      "excluded_phrases": []
+    },
+    {
+      "rule_id": "SEBI_REGULATORY_ACTION_ORDER_V1",
+      "source_id": "SEBI_OFFICIAL_RSS",
+      "candidate_event_type": "REGULATORY_ACTION",
+      "fields": ["description_text", "title_text"],
+      "required_all_phrases": [],
+      "required_any_phrases": ["adjudication order", "final order", "interim order", "settlement order"],
+      "excluded_phrases": []
+    }
+  ]
+}

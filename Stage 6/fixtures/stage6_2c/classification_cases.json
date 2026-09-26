@@ -1,0 +1,21 @@
+[
+  {"case_id":"rbi_hike_increased","source_id":"RBI_OFFICIAL_PRESS_RELEASES_RSS","title":"Policy repo rate increased","description":"Synthetic bulletin.","expected_status":"MATCHED","expected_type":"RATE_HIKE"},
+  {"case_id":"rbi_hike_raise","source_id":"RBI_OFFICIAL_PRESS_RELEASES_RSS","title":"Increase in repo rate","description":"The repo rate was raised.","expected_status":"MATCHED","expected_type":"RATE_HIKE"},
+  {"case_id":"rbi_hike_hike","source_id":"RBI_OFFICIAL_PRESS_RELEASES_RSS","title":"Repo rate hike","description":null,"expected_status":"MATCHED","expected_type":"RATE_HIKE"},
+  {"case_id":"rbi_cut_reduced","source_id":"RBI_OFFICIAL_PRESS_RELEASES_RSS","title":"Policy repo rate reduced","description":"Synthetic bulletin.","expected_status":"MATCHED","expected_type":"RATE_CUT"},
+  {"case_id":"rbi_cut_cut","source_id":"RBI_OFFICIAL_PRESS_RELEASES_RSS","title":"Repo rate cut","description":null,"expected_status":"MATCHED","expected_type":"RATE_CUT"},
+  {"case_id":"rbi_cut_lowered","source_id":"RBI_OFFICIAL_PRESS_RELEASES_RSS","title":"Repo rate lowered","description":null,"expected_status":"MATCHED","expected_type":"RATE_CUT"},
+  {"case_id":"rbi_no_match_report","source_id":"RBI_OFFICIAL_PRESS_RELEASES_RSS","title":"RBI releases annual report","description":null,"expected_status":"NO_MATCH","expected_type":null},
+  {"case_id":"rbi_false_shortcut","source_id":"RBI_OFFICIAL_PRESS_RELEASES_RSS","title":"A shortcut for repo operations update","description":null,"expected_status":"NO_MATCH","expected_type":null},
+  {"case_id":"rbi_false_growth","source_id":"RBI_OFFICIAL_PRESS_RELEASES_RSS","title":"Rate of growth increased","description":null,"expected_status":"NO_MATCH","expected_type":null},
+  {"case_id":"rbi_ambiguous","source_id":"RBI_OFFICIAL_PRESS_RELEASES_RSS","title":"Repo rate increased and repo rate cut","description":"Synthetic contradictory wording.","expected_status":"AMBIGUOUS","expected_type":null},
+  {"case_id":"sebi_interim","source_id":"SEBI_OFFICIAL_RSS","title":"Interim order in synthetic matter","description":null,"expected_status":"MATCHED","expected_type":"REGULATORY_ACTION"},
+  {"case_id":"sebi_final","source_id":"SEBI_OFFICIAL_RSS","title":"Final order regarding synthetic entity","description":null,"expected_status":"MATCHED","expected_type":"REGULATORY_ACTION"},
+  {"case_id":"sebi_adjudication","source_id":"SEBI_OFFICIAL_RSS","title":"Adjudication order issued","description":null,"expected_status":"MATCHED","expected_type":"REGULATORY_ACTION"},
+  {"case_id":"sebi_settlement","source_id":"SEBI_OFFICIAL_RSS","title":"Settlement order issued","description":null,"expected_status":"MATCHED","expected_type":"REGULATORY_ACTION"},
+  {"case_id":"sebi_no_match_consultation","source_id":"SEBI_OFFICIAL_RSS","title":"SEBI publishes consultation paper","description":null,"expected_status":"NO_MATCH","expected_type":null},
+  {"case_id":"sebi_false_order","source_id":"SEBI_OFFICIAL_RSS","title":"General order update","description":null,"expected_status":"NO_MATCH","expected_type":null},
+  {"case_id":"sebi_false_orderly","source_id":"SEBI_OFFICIAL_RSS","title":"Orderly market update","description":null,"expected_status":"NO_MATCH","expected_type":null},
+  {"case_id":"sebi_source_isolation","source_id":"SEBI_OFFICIAL_RSS","title":"Repo rate increased","description":null,"expected_status":"NO_MATCH","expected_type":null},
+  {"case_id":"rbi_source_isolation","source_id":"RBI_OFFICIAL_PRESS_RELEASES_RSS","title":"Final order regarding synthetic entity","description":null,"expected_status":"NO_MATCH","expected_type":null}
+]
