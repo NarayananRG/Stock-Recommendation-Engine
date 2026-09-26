@@ -29,6 +29,7 @@
 - Enforces evolution PIT using evidence retrieval times and the explicit evolution cutoff.
 - Recovers safely when EventStore V2 succeeds before evolution-store persistence and detects orphan Stage 6.2E V2 records.
 - Replays directives, evidence provenance, corroboration/conflict mapping, predecessor binding, and Event V2 deterministically.
+- Binds directive and evolution policy hashes exactly to the immutable EvolutionStore policy snapshot and verifies exact policy dependency ID/hash agreement.
 - Remains zero-network and `SHADOW_ONLY`.
 
 ## What Stage 6.2E does not do
@@ -43,12 +44,14 @@ The frozen Stage 6.2D regression continues to pass in its clean V1-only environm
 |---|---:|
 | Stage 6.1A / 6.1B / 6.1C | 152 / 68 / 86 PASS |
 | Stage 6.2A / 6.2B / 6.2C / 6.2D | 75 / 68 / 61 / 57 PASS |
-| Stage 6.2E acceptance/adversarial suite | 51 PASS / 0 FAIL |
+| Stage 6.2E acceptance/adversarial suite | 57 PASS / 0 FAIL |
 | Stage 6.0C validator | PASS / 10 schemas |
 | ADD_SUPPORT / OPEN_CONFLICT | PASS / PASS |
 | Same-source non-corroboration / independent-source corroboration | PASS / PASS |
 | V1 immutable / V2 append / predecessor chain | PASS / PASS / PASS |
 | Directive / materialization / evidence / policy binding | PASS |
+| Directive exact policy hash / evolution exact policy hash | PASS / PASS |
+| Record/dependency policy consistency / coordinated wrong-policy tamper detection | PASS / PASS |
 | PIT / cross-store recovery / orphan V2 detection | PASS / PASS / PASS |
 | Append-only protection / evolution replay / restart integrity | PASS / PASS / PASS |
 | Network / LLM / ML / trading authority | 0 / 0 / false / 0 |

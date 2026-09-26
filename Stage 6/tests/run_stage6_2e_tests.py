@@ -19,8 +19,8 @@ from stage6_ingestion.evidence_store import IngestionStore
 from stage6_materialization import MaterializationStore
 from stage6_evolution import (AUTHORITY,DIRECTIVE_SCHEMA_VERSION,EVOLUTION_SCHEMA_VERSION,EVOLVER_VERSION,
     POLICY_ID,POLICY_VERSION,EvolutionConflict,EvolutionIntegrityFailure,EvolutionStore,Stage6EvolutionError,
-    build_directive,directive_identity,load_policy,validate_directive,validate_policy)
-from stage6_evolution.evolution_mapper import build_event_v2,build_evolution_record
+    build_directive,directive_identity,load_policy,validate_directive,validate_evolution,validate_policy)
+from stage6_evolution.evolution_mapper import build_event_v2,build_evolution_record,evolution_identity
 
 RESULT_PATH=STAGE_ROOT/"results"/"stage6_2e_test_results.csv"
 BASELINE_2D_TAG="stage6-2d-candidate-event-materialization-baseline"; BASELINE_2D_COMMIT="117208546dd9b02c288ddd34d712761d73ea2b79"
@@ -158,8 +158,22 @@ def _():
 def _():
     with fresh_environment() as (*_,store,ctx,root):
         v1,mat,_=store._validate_v1_anchor(ctx["target_event_id"]); directive=build_directive(directive_type="ADD_SUPPORT",target_event_id=v1["event_id"],base_event=v1,materialization=mat,additional_evidence_ids=[ctx["same"]["evidence_id"]],conflict_evidence_ids=[],conflict_description=None,evolution_cutoff=LATER_CUTOFF,policy=POLICY,policy_hash=POLICY_HASH)
-        bad=deepcopy(directive); bad["base_event_version"]=2; expect(Stage6EvolutionError,lambda:validate_directive(bad,v1,mat),"ANCHOR_BINDING")
-        bad=deepcopy(directive); bad["base_event_hash"]="f"*64; expect(Stage6EvolutionError,lambda:validate_directive(bad,v1,mat),"ANCHOR_BINDING")
+        bad=deepcopy(directive); bad["base_event_version"]=2; expect(Stage6EvolutionError,lambda:validate_directive(bad,v1,mat,expected_policy_hash=POLICY_HASH),"ANCHOR_BINDING")
+        bad=deepcopy(directive); bad["base_event_hash"]="f"*64; expect(Stage6EvolutionError,lambda:validate_directive(bad,v1,mat,expected_policy_hash=POLICY_HASH),"ANCHOR_BINDING")
+
+@check("POLICY_BINDING","directive runtime rejects internally consistent wrong policy hash")
+def _():
+    with fresh_environment() as (*_,store,ctx,root):
+        v1,mat,_=store._validate_v1_anchor(ctx["target_event_id"]); directive=build_directive(directive_type="ADD_SUPPORT",target_event_id=v1["event_id"],base_event=v1,materialization=mat,additional_evidence_ids=[ctx["same"]["evidence_id"]],conflict_evidence_ids=[],conflict_description=None,evolution_cutoff=LATER_CUTOFF,policy=POLICY,policy_hash=POLICY_HASH)
+        bad=deepcopy(directive); bad["policy_hash"]="f"*64; bad["directive_id"]=directive_identity(bad); bad["record_hash"]=canonical_hash(without(bad,"record_hash"))
+        expect(Stage6EvolutionError,lambda:validate_directive(bad,v1,mat,expected_policy_hash=POLICY_HASH),"POLICY_HASH_MISMATCH")
+
+@check("POLICY_BINDING","evolution runtime rejects internally consistent wrong policy hash")
+def _():
+    with fresh_environment() as (*prefix,events,mat_store,store,ctx,root):
+        result=evolve(store,ctx); directive=result["directive"]; bad=deepcopy(result["evolution"]); v1=events.get_event(ctx["target_event_id"],1)
+        bad["policy_hash"]="f"*64; bad["evolution_id"]=evolution_identity(directive,v1,bad["policy_hash"]); bad["record_hash"]=canonical_hash(without(bad,"record_hash"))
+        expect(Stage6EvolutionError,lambda:validate_evolution(bad,directive,v1,ctx["materialization"],expected_policy_hash=POLICY_HASH),"POLICY_HASH_MISMATCH")
 
 @check("ADD_SUPPORT","V1 to V2 mapping exact")
 def _():
@@ -289,6 +303,51 @@ def _():
 @check("RESTART_INTEGRITY","policy tamper detected")
 def _():
     with fresh_environment() as (*_,store,ctx,root): evolve(store,ctx); store.connection.execute("DROP TRIGGER protect_evolution_policies_update"); store.connection.execute("UPDATE evolution_policies SET policy_hash=?",("f"*64,)); restore_trigger(store,"evolution_policies","UPDATE"); store.connection.commit(); expect(EvolutionIntegrityFailure,store.integrity_check,"POLICY_SNAPSHOT")
+@check("POLICY_BINDING","stored directive coordinated wrong-policy tamper detected")
+def _():
+    with fresh_environment() as (*_,store,ctx,root):
+        result=evolve(store,ctx); old=result["directive"]; bad=deepcopy(old); bad["policy_hash"]="f"*64; bad["directive_id"]=directive_identity(bad); bad["record_hash"]=canonical_hash(without(bad,"record_hash"))
+        store.connection.commit(); store.connection.execute("PRAGMA foreign_keys=OFF")
+        for table in ("evolution_directives","directive_dependencies","evolution_records","evolution_dependencies"): store.connection.execute(f"DROP TRIGGER protect_{table}_update")
+        store.connection.execute("UPDATE evolution_directives SET directive_id=?,record_hash=?,canonical_json=? WHERE directive_id=?",(bad["directive_id"],bad["record_hash"],canonical_json(bad),old["directive_id"]))
+        store.connection.execute("UPDATE directive_dependencies SET directive_id=? WHERE directive_id=?",(bad["directive_id"],old["directive_id"]))
+        store.connection.execute("UPDATE directive_dependencies SET dependency_record_hash=? WHERE directive_id=? AND dependency_record_type='EVOLUTION_POLICY'",(bad["policy_hash"],bad["directive_id"]))
+        store.connection.execute("UPDATE evolution_records SET directive_id=? WHERE directive_id=?",(bad["directive_id"],old["directive_id"]))
+        store.connection.execute("UPDATE evolution_dependencies SET dependency_record_id=?,dependency_record_hash=? WHERE dependency_record_type='EVOLUTION_DIRECTIVE' AND dependency_record_id=?",(bad["directive_id"],bad["record_hash"],old["directive_id"]))
+        for table in ("evolution_directives","directive_dependencies","evolution_records","evolution_dependencies"): restore_trigger(store,table,"UPDATE")
+        store.connection.commit(); store.connection.execute("PRAGMA foreign_keys=ON")
+        expect(EvolutionIntegrityFailure,store.integrity_check,"POLICY_HASH_MISMATCH")
+@check("POLICY_BINDING","stored evolution coordinated wrong-policy tamper detected")
+def _():
+    with fresh_environment() as (*prefix,events,mat_store,store,ctx,root):
+        result=evolve(store,ctx); old=result["evolution"]; directive=result["directive"]; v1=events.get_event(ctx["target_event_id"],1); bad=deepcopy(old)
+        bad["policy_hash"]="f"*64; bad["evolution_id"]=evolution_identity(directive,v1,bad["policy_hash"]); bad["record_hash"]=canonical_hash(without(bad,"record_hash"))
+        store.connection.commit(); store.connection.execute("PRAGMA foreign_keys=OFF")
+        for table in ("evolution_records","evolution_dependencies"): store.connection.execute(f"DROP TRIGGER protect_{table}_update")
+        store.connection.execute("UPDATE evolution_records SET evolution_id=?,record_hash=?,canonical_json=? WHERE evolution_id=?",(bad["evolution_id"],bad["record_hash"],canonical_json(bad),old["evolution_id"]))
+        store.connection.execute("UPDATE evolution_dependencies SET evolution_id=? WHERE evolution_id=?",(bad["evolution_id"],old["evolution_id"]))
+        store.connection.execute("UPDATE evolution_dependencies SET dependency_record_hash=? WHERE evolution_id=? AND dependency_record_type='EVOLUTION_POLICY'",(bad["policy_hash"],bad["evolution_id"]))
+        for table in ("evolution_records","evolution_dependencies"): restore_trigger(store,table,"UPDATE")
+        store.connection.commit(); store.connection.execute("PRAGMA foreign_keys=ON")
+        expect(EvolutionIntegrityFailure,store.integrity_check,"POLICY_HASH_MISMATCH")
+@check("POLICY_BINDING","correct policy record with wrong dependency hash rejected")
+def _():
+    for table in ("directive_dependencies","evolution_dependencies"):
+        with fresh_environment() as (*_,store,ctx,root):
+            evolve(store,ctx); store.connection.execute(f"DROP TRIGGER protect_{table}_update"); store.connection.execute(f"UPDATE {table} SET dependency_record_hash=? WHERE dependency_record_type='EVOLUTION_POLICY'",("f"*64,)); restore_trigger(store,table,"UPDATE"); store.connection.commit()
+            expect(EvolutionIntegrityFailure,store.integrity_check,"POLICY_DEPENDENCY_MISMATCH")
+@check("POLICY_BINDING","wrong policy record with correct dependency hash rejected")
+def _():
+    with fresh_environment() as (*prefix,events,mat_store,store,ctx,root):
+        result=evolve(store,ctx); old=result["evolution"]; directive=result["directive"]; v1=events.get_event(ctx["target_event_id"],1); bad=deepcopy(old)
+        bad["policy_hash"]="f"*64; bad["evolution_id"]=evolution_identity(directive,v1,bad["policy_hash"]); bad["record_hash"]=canonical_hash(without(bad,"record_hash"))
+        store.connection.commit(); store.connection.execute("PRAGMA foreign_keys=OFF")
+        for table in ("evolution_records","evolution_dependencies"): store.connection.execute(f"DROP TRIGGER protect_{table}_update")
+        store.connection.execute("UPDATE evolution_records SET evolution_id=?,record_hash=?,canonical_json=? WHERE evolution_id=?",(bad["evolution_id"],bad["record_hash"],canonical_json(bad),old["evolution_id"]))
+        store.connection.execute("UPDATE evolution_dependencies SET evolution_id=? WHERE evolution_id=?",(bad["evolution_id"],old["evolution_id"]))
+        for table in ("evolution_records","evolution_dependencies"): restore_trigger(store,table,"UPDATE")
+        store.connection.commit(); store.connection.execute("PRAGMA foreign_keys=ON")
+        expect(EvolutionIntegrityFailure,store.integrity_check,"POLICY_HASH_MISMATCH")
 @check("RESTART_INTEGRITY","directive hash and content tamper detected")
 def _():
     with fresh_environment() as (*_,store,ctx,root): evolve(store,ctx); store.connection.execute("DROP TRIGGER protect_evolution_directives_update"); store.connection.execute("UPDATE evolution_directives SET record_hash=?",("f"*64,)); restore_trigger(store,"evolution_directives","UPDATE"); store.connection.commit(); expect(EvolutionIntegrityFailure,store.integrity_check)

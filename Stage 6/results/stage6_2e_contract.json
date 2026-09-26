@@ -56,7 +56,7 @@
   "stage6_2b_regression": {"passed": 68, "failed": 0, "result": "PASS"},
   "stage6_2c_regression": {"passed": 61, "failed": 0, "result": "PASS"},
   "stage6_2d_regression": {"passed": 57, "failed": 0, "result": "PASS"},
-  "stage6_2e_tests": {"passed": 51, "failed": 0, "result": "PASS"},
+  "stage6_2e_tests": {"passed": 57, "failed": 0, "result": "PASS"},
   "stage6_0c_validator": {"result": "PASS", "schemas_parsed": 10},
   "full_restart_integrity": "PASS",
   "acceptance_gates": {
@@ -75,7 +75,11 @@
     "CROSS_STORE_RECOVERY": "PASS",
     "ORPHAN_V2_DETECTION": "PASS",
     "APPEND_ONLY_PROTECTION": "PASS",
-    "EVOLUTION_REPLAY": "PASS"
+    "EVOLUTION_REPLAY": "PASS",
+    "DIRECTIVE_EXACT_POLICY_HASH_BINDING": "PASS",
+    "EVOLUTION_EXACT_POLICY_HASH_BINDING": "PASS",
+    "RECORD_DEPENDENCY_POLICY_CONSISTENCY": "PASS",
+    "COORDINATED_WRONG_POLICY_HASH_TAMPER_DETECTED": "PASS"
   },
   "frozen_architecture_changed_files": 0,
   "frozen_stage6_1_changed_files": 0,

@@ -25,7 +25,8 @@ def _ids(value: object, field: str, *, minimum: int = 0) -> list[str]:
     return value
 
 
-def validate_directive(record: dict, base_event: dict, materialization: dict, *, verify_hash: bool = True) -> dict:
+def validate_directive(record: dict, base_event: dict, materialization: dict, *,
+                       expected_policy_hash: str, verify_hash: bool = True) -> dict:
     if not isinstance(record, dict) or set(record) != FIELDS:
         raise Stage6EvolutionError("DIRECTIVE_FIELDS_MISMATCH")
     if (record["schema_version"] != DIRECTIVE_SCHEMA_VERSION or record["policy_id"] != POLICY_ID
@@ -39,6 +40,10 @@ def validate_directive(record: dict, base_event: dict, materialization: dict, *,
     for field in ("record_hash", "base_event_hash", "target_materialization_hash", "policy_hash"):
         if not isinstance(record[field], str) or not HASH.fullmatch(record[field]):
             raise Stage6EvolutionError(f"DIRECTIVE_HASH_INVALID:{field}")
+    if not isinstance(expected_policy_hash, str) or not HASH.fullmatch(expected_policy_hash):
+        raise Stage6EvolutionError("DIRECTIVE_EXPECTED_POLICY_HASH_INVALID")
+    if record["policy_hash"] != expected_policy_hash:
+        raise Stage6EvolutionError("DIRECTIVE_POLICY_HASH_MISMATCH")
     additional = _ids(record["additional_evidence_ids"], "additional", minimum=1)
     conflicts = _ids(record["conflict_evidence_ids"], "conflict")
     existing = set(base_event["source_evidence_ids"])

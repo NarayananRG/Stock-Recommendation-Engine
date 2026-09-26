@@ -20,7 +20,8 @@ FIELDS = {"schema_version", "evolution_id", "record_hash", "directive_id", "dire
 
 
 def validate_evolution(record: dict, directive: dict, base_event: dict,
-                       materialization: dict, *, verify_hash: bool = True) -> dict:
+                       materialization: dict, *, expected_policy_hash: str,
+                       verify_hash: bool = True) -> dict:
     if not isinstance(record, dict) or set(record) != FIELDS:
         raise Stage6EvolutionError("EVOLUTION_FIELDS_MISMATCH")
     if (record["schema_version"] != EVOLUTION_SCHEMA_VERSION or record["policy_id"] != POLICY_ID
@@ -42,6 +43,12 @@ def validate_evolution(record: dict, directive: dict, base_event: dict,
                   "target_materialization_hash", "policy_hash"):
         if not isinstance(record[field], str) or not HASH.fullmatch(record[field]):
             raise Stage6EvolutionError(f"EVOLUTION_HASH_INVALID:{field}")
+    if not isinstance(expected_policy_hash, str) or not HASH.fullmatch(expected_policy_hash):
+        raise Stage6EvolutionError("EVOLUTION_EXPECTED_POLICY_HASH_INVALID")
+    if (record["policy_hash"] != expected_policy_hash
+            or directive["policy_hash"] != expected_policy_hash
+            or record["policy_hash"] != directive["policy_hash"]):
+        raise Stage6EvolutionError("EVOLUTION_POLICY_HASH_MISMATCH")
     if utc_timestamp(record["evolution_cutoff"], "evolution_cutoff") != record["evolution_cutoff"]:
         raise Stage6EvolutionError("EVOLUTION_CUTOFF_INVALID")
     expected = ("CANDIDATE", "CORROBORATED", "SINGLE_SOURCE_OFFICIAL", "SINGLE_SOURCE_INDEPENDENT")

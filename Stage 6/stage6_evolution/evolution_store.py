@@ -221,7 +221,7 @@ class EvolutionStore:
             base_event=v1,materialization=materialization,additional_evidence_ids=additional_evidence_ids,
             conflict_evidence_ids=conflict_evidence_ids or [],conflict_description=conflict_description,
             evolution_cutoff=evolution_cutoff,policy=self.policy,policy_hash=self.policy_hash)
-        validate_directive(directive,v1,materialization)
+        validate_directive(directive,v1,materialization,expected_policy_hash=self.policy_hash)
         added=self._evidence(directive["additional_evidence_ids"],directive["evolution_cutoff"])
         all_evidence=self._evidence(sorted({*v1["source_evidence_ids"],*directive["additional_evidence_ids"]}),directive["evolution_cutoff"])
         event_key=self._event_key(target_event_id); expected_v2=build_event_v2(event_key=event_key,base_event=v1,directive=directive,evidence=all_evidence)
@@ -246,7 +246,7 @@ class EvolutionStore:
             raise EvolutionIntegrityFailure("EVENTSTORE_V2_RESULT_MISMATCH")
         record=build_evolution_record(directive=directive,base_event=v1,result_event=expected_v2,
                                       materialization=materialization,policy_hash=self.policy_hash)
-        validate_evolution(record,directive,v1,materialization)
+        validate_evolution(record,directive,v1,materialization,expected_policy_hash=self.policy_hash)
         if existing_directive is not None:
             stored=self.connection.execute("SELECT canonical_json FROM evolution_records WHERE directive_id=?",(directive["directive_id"],)).fetchone()
             if stored is not None and json.loads(stored[0])==record:
@@ -275,6 +275,14 @@ class EvolutionStore:
         wanted={(kind,identity):record_hash for identity,record_hash,kind in expected}
         if actual!=wanted: raise EvolutionIntegrityFailure(label+"_DEPENDENCY_MISMATCH")
 
+    def _verify_policy_dependency(self, rows:list[sqlite3.Row], record:dict, label:str)->None:
+        policy_rows=[row for row in rows if row["dependency_record_type"]=="EVOLUTION_POLICY"]
+        if (len(policy_rows)!=1 or policy_rows[0]["dependency_record_id"]!=record["policy_id"]
+                or record["policy_id"]!=POLICY_ID
+                or policy_rows[0]["dependency_record_hash"]!=record["policy_hash"]
+                or record["policy_hash"]!=self.policy_hash):
+            raise EvolutionIntegrityFailure(label+"_POLICY_DEPENDENCY_MISMATCH")
+
     def integrity_check(self) -> dict:
         try:
             self._verify_metadata()
@@ -291,7 +299,7 @@ class EvolutionStore:
             for directive_id,row in directives.items():
                 directive=json.loads(row["canonical_json"]); v1,materialization,_candidate=self._validate_v1_anchor(directive["target_event_id"])
                 if row["canonical_json"]!=canonical_json(directive): raise EvolutionIntegrityFailure("DIRECTIVE_CANONICAL_JSON_MISMATCH")
-                validate_directive(directive,v1,materialization)
+                validate_directive(directive,v1,materialization,expected_policy_hash=self.policy_hash)
                 added=self._evidence(directive["additional_evidence_ids"],directive["evolution_cutoff"])
                 all_evidence=self._evidence(sorted({*v1["source_evidence_ids"],*directive["additional_evidence_ids"]}),directive["evolution_cutoff"])
                 expected_v2=build_event_v2(event_key=self._event_key(v1["event_id"]),base_event=v1,directive=directive,evidence=all_evidence)
@@ -299,13 +307,17 @@ class EvolutionStore:
                 if actual_v2!=expected_v2: raise EvolutionIntegrityFailure("EVOLUTION_EVENT_V2_REPLAY_MISMATCH")
                 record_row=records[directive_id]; record=json.loads(record_row["canonical_json"])
                 if record_row["canonical_json"]!=canonical_json(record): raise EvolutionIntegrityFailure("EVOLUTION_CANONICAL_JSON_MISMATCH")
-                validate_evolution(record,directive,v1,materialization)
+                validate_evolution(record,directive,v1,materialization,expected_policy_hash=self.policy_hash)
                 replay=build_evolution_record(directive=directive,base_event=v1,result_event=expected_v2,materialization=materialization,policy_hash=self.policy_hash)
                 if record!=replay: raise EvolutionIntegrityFailure("EVOLUTION_REPLAY_MISMATCH")
                 if (row["directive_type"],row["target_event_id"],row["base_event_hash"],row["target_materialization_id"],row["evolution_cutoff"],row["record_hash"])!=(directive["directive_type"],directive["target_event_id"],directive["base_event_hash"],directive["target_materialization_id"],directive["evolution_cutoff"],directive["record_hash"]): raise EvolutionIntegrityFailure("DIRECTIVE_TYPED_COLUMN_MISMATCH")
                 if (record_row["evolution_id"],record_row["target_event_id"],record_row["base_event_hash"],record_row["result_event_hash"],record_row["record_hash"])!=(record["evolution_id"],record["target_event_id"],record["base_event_hash"],record["result_event_hash"],record["record_hash"]): raise EvolutionIntegrityFailure("EVOLUTION_TYPED_COLUMN_MISMATCH")
-                self._verify_dependencies(list(self.connection.execute("SELECT * FROM directive_dependencies WHERE directive_id=?",(directive_id,))),self._directive_dependencies(directive,materialization,added),"DIRECTIVE")
-                self._verify_dependencies(list(self.connection.execute("SELECT * FROM evolution_dependencies WHERE evolution_id=?",(record["evolution_id"],))),self._evolution_dependencies(record,directive,materialization,added),"EVOLUTION")
+                directive_deps=list(self.connection.execute("SELECT * FROM directive_dependencies WHERE directive_id=?",(directive_id,)))
+                evolution_deps=list(self.connection.execute("SELECT * FROM evolution_dependencies WHERE evolution_id=?",(record["evolution_id"],)))
+                self._verify_policy_dependency(directive_deps,directive,"DIRECTIVE")
+                self._verify_policy_dependency(evolution_deps,record,"EVOLUTION")
+                self._verify_dependencies(directive_deps,self._directive_dependencies(directive,materialization,added),"DIRECTIVE")
+                self._verify_dependencies(evolution_deps,self._evolution_dependencies(record,directive,materialization,added),"EVOLUTION")
                 evolved_events.add(v1["event_id"])
             owned_v2=set()
             for series in self.event_store.connection.execute("SELECT event_id,event_key_json FROM event_series"):
