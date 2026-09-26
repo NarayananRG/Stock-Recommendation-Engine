@@ -1,0 +1,8 @@
+[
+  {"event_key":"fixture-rate-hike-001","event_type":"RATE_HIKE","direction":"NEGATIVE"},
+  {"event_key":"fixture-regulatory-action-001","event_type":"REGULATORY_ACTION","direction":"MIXED"},
+  {"event_key":"fixture-government-policy-001","event_type":"GOVERNMENT_POLICY","direction":"UNKNOWN"},
+  {"event_key":"fixture-merger-001","event_type":"MERGER","direction":"POSITIVE"},
+  {"event_key":"fixture-credit-downgrade-001","event_type":"CREDIT_DOWNGRADE","direction":"NEGATIVE"},
+  {"event_key":"fixture-other-001","event_type":"OTHER","direction":"UNKNOWN"}
+]
