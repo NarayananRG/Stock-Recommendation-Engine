@@ -1,0 +1,5 @@
+[
+  {"case_id":"same_source_support","directive_type":"ADD_SUPPORT","additional_source":"RBI_OFFICIAL_PRESS_RELEASES_RSS","expected_status":"CANDIDATE","expected_corroboration":"SINGLE_SOURCE_OFFICIAL"},
+  {"case_id":"independent_source_support","directive_type":"ADD_SUPPORT","additional_source":"SEBI_OFFICIAL_RSS","expected_status":"CANDIDATE","expected_corroboration":"CORROBORATED"},
+  {"case_id":"explicit_conflict","directive_type":"OPEN_CONFLICT","additional_source":"SEBI_OFFICIAL_RSS","expected_status":"CONFLICTED","expected_corroboration":"CONFLICTING_EVIDENCE"}
+]

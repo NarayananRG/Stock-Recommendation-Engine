@@ -1,0 +1,9 @@
+{
+  "schema_version": "STAGE6_2E_EVOLUTION_POLICY_V1",
+  "policy_id": "S6EVOPOL_STAGE6_2E_V1",
+  "policy_version": 1,
+  "evolver_version": "STAGE6_2E_EVENT_EVOLVER_V1",
+  "supported_directives": ["ADD_SUPPORT", "OPEN_CONFLICT"],
+  "trustworthy_authorities": ["AUTHORITATIVE_INDEPENDENT", "PRIMARY_OFFICIAL"],
+  "maximum_conflict_description_characters": 1000
+}
