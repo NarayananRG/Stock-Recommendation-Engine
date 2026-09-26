@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Synthetic Stage 6.2B Atom</title>
+  <updated>2026-09-25T05:00:00Z</updated>
+  <entry>
+    <title>Atom <em>nested</em> title</title>
+    <summary>Publisher summary text.</summary>
+    <id>atom-id-one</id>
+    <link rel="enclosure" href="https://invalid.example/never-fetch.zip" />
+    <link rel="alternate" href="https://invalid.example/atom-one" />
+    <published>2026-09-25T05:01:00+00:00</published>
+  </entry>
+  <entry>
+    <title>Atom content fallback</title>
+    <content>&lt;strong&gt;Escaped atom content stays inert.&lt;/strong&gt;</content>
+    <id>atom-id-one</id>
+    <updated>2026-09-25T10:32:00+05:30</updated>
+  </entry>
+  <entry>
+    <title>Atom missing stable ID</title>
+    <link href="not-a-network-request" />
+    <published>2026-09-25T05:03:00</published>
+  </entry>
+</feed>

@@ -1,0 +1,3 @@
+<?xml version="1.0"?>
+<!DOCTYPE rss [<!ENTITY unsafe SYSTEM "https://invalid.example/entity">]>
+<rss><channel><item><title>&unsafe;</title></item></channel></rss>

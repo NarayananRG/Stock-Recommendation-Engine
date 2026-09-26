@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Synthetic Stage 6.2B RSS</title>
+    <pubDate>Fri, 25 Sep 2026 10:00:00 +0530</pubDate>
+    <item>
+      <title>Repeated <b>synthetic</b> title</title>
+      <description>&lt;p&gt;Escaped HTML remains inert.&lt;/p&gt;</description>
+      <link>https://invalid.example/item-one</link>
+      <guid>duplicate-guid</guid>
+      <pubDate>Fri, 25 Sep 2026 10:01:00 +0530</pubDate>
+      <enclosure url="https://invalid.example/never-fetch.pdf" type="application/pdf" />
+    </item>
+    <item>
+      <title>Repeated synthetic title</title>
+      <link>not-a-fetchable-url</link>
+      <guid>duplicate-guid</guid>
+      <pubDate>Fri, 25 Sep 2026 04:32:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>Missing identifiers synthetic item</title>
+      <description>Timezone-less timestamp is not invented.</description>
+      <pubDate>2026-09-25 04:33:00</pubDate>
+    </item>
+    <item>
+      <description>Optional title, link, identifier and timestamp are absent.</description>
+    </item>
+  </channel>
+</rss>
