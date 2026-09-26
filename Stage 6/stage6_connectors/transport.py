@@ -1,4 +1,4 @@
-"""Small bounded HTTPS transport for the fixed SEBI RSS endpoint."""
+"""Small bounded HTTPS transport for explicitly approved RSS endpoints."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -8,12 +8,11 @@ import socket
 import ssl
 from typing import Callable
 
-from .policy import ALLOWED_REDIRECTS, SEBI_RSS_HOST, SEBI_RSS_PATH, SEBI_RSS_URL, validate_endpoint, validate_redirect
+from .policy import EndpointPolicy, SEBI_ENDPOINT, SEBI_RSS_URL, validate_endpoint, validate_redirect
 
 
 DEFAULT_MAX_BYTES = 2 * 1024 * 1024
 DEFAULT_TIMEOUT_SECONDS = 15.0
-USER_AGENT = "Stock-Recommendation-Engine-Stage6.1B/1.0 (+controlled-SEBI-RSS-research)"
 REDIRECT_STATUSES = {301, 302, 303, 307, 308}
 
 
@@ -31,6 +30,7 @@ class TransportResponse:
     retrieved_timestamp_utc: str
     final_url: str = SEBI_RSS_URL
     truncated: bool = False
+    redirects: tuple[dict[str, object], ...] = ()
 
 
 def utc_now() -> str:
@@ -40,27 +40,35 @@ def utc_now() -> str:
 class ControlledHttpsTransport:
     """One-purpose transport; callers cannot supply an endpoint."""
 
-    def __init__(self, *, timeout_seconds: float = DEFAULT_TIMEOUT_SECONDS,
-                 max_bytes: int = DEFAULT_MAX_BYTES, max_redirects: int = ALLOWED_REDIRECTS,
+    def __init__(self, *, endpoint: EndpointPolicy = SEBI_ENDPOINT,
+                 timeout_seconds: float = DEFAULT_TIMEOUT_SECONDS,
+                 max_bytes: int = DEFAULT_MAX_BYTES, max_redirects: int | None = None,
                  connection_factory: Callable[..., http.client.HTTPSConnection] = http.client.HTTPSConnection):
-        if timeout_seconds <= 0 or max_bytes <= 0 or max_redirects < 0:
+        validate_endpoint(endpoint.url, endpoint)
+        redirect_limit = endpoint.max_redirects if max_redirects is None else max_redirects
+        if timeout_seconds <= 0 or max_bytes <= 0 or redirect_limit < 0:
             raise ValueError("INVALID_TRANSPORT_LIMIT")
+        self.endpoint = endpoint
         self.timeout_seconds = timeout_seconds
         self.max_bytes = max_bytes
-        self.max_redirects = max_redirects
+        self.max_redirects = redirect_limit
         self.connection_factory = connection_factory
         self.request_count = 0
+        self.redirect_history: list[dict[str, object]] = []
+        self.final_url = endpoint.url
 
     def fetch(self) -> TransportResponse:
-        url = validate_endpoint(SEBI_RSS_URL)
+        self.redirect_history = []
+        self.final_url = self.endpoint.url
+        url = validate_endpoint(self.endpoint.url, self.endpoint)
         redirects = 0
         while True:
-            validate_endpoint(url)
-            connection = self.connection_factory(SEBI_RSS_HOST, 443, timeout=self.timeout_seconds)
+            validate_endpoint(url, self.endpoint)
+            connection = self.connection_factory(self.endpoint.host, 443, timeout=self.timeout_seconds)
             self.request_count += 1
             try:
-                connection.request("GET", SEBI_RSS_PATH, headers={
-                    "User-Agent": USER_AGENT,
+                connection.request("GET", self.endpoint.path, headers={
+                    "User-Agent": self.endpoint.user_agent,
                     "Accept": "application/rss+xml, application/xml, text/xml;q=0.9",
                     "Connection": "close",
                 })
@@ -70,9 +78,14 @@ class ControlledHttpsTransport:
                     if redirects >= self.max_redirects:
                         raise TransportFailure("REDIRECT_LIMIT_EXCEEDED")
                     try:
-                        url = validate_redirect(url, headers.get("location", ""))
+                        next_url = validate_redirect(url, headers.get("location", ""), self.endpoint)
                     except ValueError as exc:
                         raise TransportFailure(str(exc)) from exc
+                    self.redirect_history.append({
+                        "from_url": url, "status": response.status,
+                        "location": headers.get("location", ""), "to_url": next_url,
+                    })
+                    url = next_url
                     redirects += 1
                     continue
                 body = bytearray()
@@ -90,6 +103,7 @@ class ControlledHttpsTransport:
                         truncated = int(content_length) != len(body)
                     except ValueError:
                         truncated = True
+                self.final_url = url
                 return TransportResponse(
                     status=response.status,
                     headers=headers,
@@ -97,6 +111,7 @@ class ControlledHttpsTransport:
                     retrieved_timestamp_utc=utc_now(),
                     final_url=url,
                     truncated=truncated,
+                    redirects=tuple(self.redirect_history),
                 )
             except TransportFailure:
                 raise

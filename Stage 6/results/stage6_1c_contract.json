@@ -1,0 +1,128 @@
+{
+  "acceptance_gates": {
+    "FULL_STORE_RESTART_INTEGRITY": "PASS",
+    "HISTORICAL_V1_EVIDENCE_PRESERVED": "PASS",
+    "MULTISOURCE_IDENTITY_ISOLATION": "PASS",
+    "NETWORK_ALLOWLIST_FAIL_CLOSED": "PASS",
+    "RBI_ACQUISITION_UNDER_V1_FAIL_CLOSED": "PASS",
+    "RBI_ACQUISITION_UNDER_V2": "PASS",
+    "RBI_LIVE_SMOKE": "PASS",
+    "REGISTRY_V2_CHAIN_INTEGRITY": "PASS",
+    "SEBI_ACQUISITION_UNDER_V2": "PASS",
+    "SEBI_LIVE_REGRESSION": "PASS",
+    "SOURCE_APPROVAL_BEFORE_NETWORK": "PASS",
+    "STAGE6_1A_REGRESSION": "PASS",
+    "STAGE6_1B_REGRESSION": "PASS"
+  },
+  "allowed_network_endpoints": [
+    "https://www.sebi.gov.in/sebirss.xml",
+    "https://rbi.org.in/pressreleases_rss.xml"
+  ],
+  "architecture_baseline_commit": "d5bc19c7c2341f56bcaa8c890e0d95979dca878b",
+  "architecture_baseline_tag": "stage6-decision-intelligence-architecture-baseline-v2",
+  "architecture_validator": {
+    "result": "PASS",
+    "schemas_parsed": 10,
+    "stage": "6.0C"
+  },
+  "authority": "SHADOW_ONLY",
+  "baseline_stage6_1a_commit": "d5012decd2ff92ab088648b651d6285be17e8cc3",
+  "baseline_stage6_1a_tag": "stage6-1a-ingestion-foundation-baseline",
+  "baseline_stage6_1b_commit": "680f07926b51c6473f4069f93a3d1c679ca438cd",
+  "baseline_stage6_1b_tag": "stage6-1b-sebi-rss-ingestion-baseline",
+  "broker_execution": false,
+  "conditional_http_polling": "DEFERRED",
+  "entity_registry": {
+    "v1_snapshot_id": "S6ENTREG_757a611b3d0381b4b4087282",
+    "v2_snapshot_id": "S6ENTREG_2aed0e083e1186bcade4ede9",
+    "version": 2
+  },
+  "frozen_architecture_changed_files": 0,
+  "frozen_stage5d_changed_files": 0,
+  "full_store_integrity": "PASS",
+  "historical_v1_evidence_preserved": true,
+  "live_validation_total_network_requests": 3,
+  "ml_production_influence": false,
+  "production_control_commit": "74b2710f0e19bd403978da81e87f25a3059ace06",
+  "production_control_tag": "stage5d5-live-paper-runner-baseline",
+  "production_decision_influence": false,
+  "rbi_live_smoke": {
+    "acquisition_attempt_ids": [],
+    "entity_registry_snapshot_id": "S6ENTREG_2aed0e083e1186bcade4ede9",
+    "entity_registry_version": 2,
+    "evidence_id": "S6EV_25194dbd877a83a0adbaa981",
+    "final_url": "https://rbi.org.in/pressreleases_rss.xml",
+    "full_store_integrity": "PASS",
+    "hosts_contacted": [
+      "rbi.org.in"
+    ],
+    "network_requests": 1,
+    "raw_payload_hash": "0ccad2f0859e5481bf34499fdb14fe16c901f7bc73110dc78a0bb0fae269f8a0",
+    "redirects": [],
+    "requested_url": "https://rbi.org.in/pressreleases_rss.xml",
+    "result": "PASS",
+    "retrieval_status": "RETRIEVED",
+    "source_record_version": 1,
+    "source_registry_snapshot_id": "S6SRCREG_39b7deae3a0e811e7327af2c",
+    "source_registry_version": 2
+  },
+  "rbi_redirect_discovery": {
+    "content_type": "text/xml",
+    "location": null,
+    "network_requests": 1,
+    "result": "NO_REDIRECT",
+    "status_code": 200
+  },
+  "registry_v2_chain_integrity": "PASS",
+  "result": "PASS",
+  "runtime_artifacts_committed": 0,
+  "sebi_live_smoke": {
+    "entity_registry_snapshot_id": "S6ENTREG_757a611b3d0381b4b4087282",
+    "entity_registry_version": 1,
+    "evidence_id": "S6EV_68500dfb372b50b8279d4247",
+    "full_store_integrity": "PASS",
+    "hosts_contacted": [
+      "www.sebi.gov.in"
+    ],
+    "network_requests": 1,
+    "raw_payload_hash": "2120106ed900bca08637fb17223990cd97f0f128bba64cce99213bfaa539cb25",
+    "result": "PASS",
+    "retrieval_status": "RETRIEVED",
+    "source_registry_snapshot_id": "S6SRCREG_8f44a23927fe94bea455f7e3",
+    "source_registry_version": 1
+  },
+  "source_authorities": {
+    "RBI_OFFICIAL_PRESS_RELEASES_RSS": "PRIMARY_OFFICIAL",
+    "SEBI_OFFICIAL_RSS": "PRIMARY_OFFICIAL"
+  },
+  "source_registry": {
+    "v1_snapshot_id": "S6SRCREG_8f44a23927fe94bea455f7e3",
+    "v2_snapshot_id": "S6SRCREG_39b7deae3a0e811e7327af2c",
+    "version": 2
+  },
+  "sources": [
+    "SEBI_OFFICIAL_RSS",
+    "RBI_OFFICIAL_PRESS_RELEASES_RSS"
+  ],
+  "stage": "6.1C",
+  "stage6_1a_regression": {
+    "failed": 0,
+    "passed": 152,
+    "result": "PASS",
+    "total": 152
+  },
+  "stage6_1b_regression": {
+    "failed": 0,
+    "passed": 68,
+    "result": "PASS",
+    "total": 68
+  },
+  "stage6_1c_tests": {
+    "failed": 0,
+    "network_calls": 0,
+    "passed": 86,
+    "result": "PASS",
+    "total": 86
+  },
+  "trading_actions": false
+}

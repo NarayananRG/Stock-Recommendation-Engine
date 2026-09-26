@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>RBI Press Releases RSS Fixture</title>
+    <link>https://rbi.org.in/</link>
+    <description>Synthetic offline shape fixture; not copied RBI content.</description>
+    <pubDate>Sat, 26 Sep 2026 12:30:00 +0530</pubDate>
+    <item>
+      <title>Synthetic central-bank press release</title>
+      <link>https://rbi.org.in/synthetic-not-fetched</link>
+      <enclosure url="https://rbi.org.in/synthetic-not-fetched.pdf" type="application/pdf" />
+      <description>Connector tests must never fetch links or enclosures.</description>
+    </item>
+  </channel>
+</rss>
