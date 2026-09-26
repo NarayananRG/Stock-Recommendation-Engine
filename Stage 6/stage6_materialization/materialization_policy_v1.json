@@ -1,0 +1,24 @@
+{
+  "schema_version": "STAGE6_2D_MATERIALIZATION_POLICY_V1",
+  "policy_id": "S6MATPOL_STAGE6_2D_V1",
+  "policy_version": 1,
+  "materializer_version": "STAGE6_2D_EVENT_MATERIALIZER_V1",
+  "eligible_candidate_status": "MATCHED",
+  "event_defaults": {
+    "event_status": "CANDIDATE",
+    "direction": "UNKNOWN",
+    "severity": "UNKNOWN",
+    "materiality": "UNKNOWN",
+    "confidence": 0.0,
+    "entities": [],
+    "sectors": [],
+    "geographies": [],
+    "commodities": [],
+    "currencies": [],
+    "corroboration_status": "SINGLE_SOURCE_OFFICIAL",
+    "event_horizon": "UNKNOWN",
+    "transmission_channels": [],
+    "causality_assessment": "NO_SUPPORTED_CAUSE_FOUND",
+    "evidence_conflicts": []
+  }
+}

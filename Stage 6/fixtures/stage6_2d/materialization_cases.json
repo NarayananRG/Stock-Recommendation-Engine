@@ -1,0 +1,7 @@
+[
+  {"case_id":"matched_rate_hike","source_id":"RBI_OFFICIAL_PRESS_RELEASES_RSS","title":"Repo rate raised","expected_status":"MATCHED","expected_type":"RATE_HIKE"},
+  {"case_id":"matched_rate_cut","source_id":"RBI_OFFICIAL_PRESS_RELEASES_RSS","title":"Repo rate cut","expected_status":"MATCHED","expected_type":"RATE_CUT"},
+  {"case_id":"no_match","source_id":"RBI_OFFICIAL_PRESS_RELEASES_RSS","title":"Synthetic annual report released","expected_status":"NO_MATCH","expected_type":null},
+  {"case_id":"ambiguous","source_id":"RBI_OFFICIAL_PRESS_RELEASES_RSS","title":"Repo rate raised and repo rate cut","expected_status":"AMBIGUOUS","expected_type":null},
+  {"case_id":"matched_regulatory_action","source_id":"SEBI_OFFICIAL_RSS","title":"Final order regarding synthetic matter","expected_status":"MATCHED","expected_type":"REGULATORY_ACTION"}
+]
