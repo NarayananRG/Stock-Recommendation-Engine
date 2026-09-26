@@ -1,0 +1,12 @@
+{
+  "fixture_only": true,
+  "synthetic": true,
+  "cases": [
+    "single_source_correction",
+    "multi_source_correction",
+    "complete_single_source_retraction",
+    "complete_multi_source_retraction",
+    "conflict_resolved_by_correction",
+    "conflict_resolved_by_retraction"
+  ]
+}

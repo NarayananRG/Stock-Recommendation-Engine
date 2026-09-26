@@ -1,0 +1,9 @@
+{
+  "schema_version": "STAGE6_2F_LIFECYCLE_POLICY_V1",
+  "policy_id": "S6LIFEPOL_STAGE6_2F_V1",
+  "policy_version": 1,
+  "processor_version": "STAGE6_2F_EVENT_LIFECYCLE_V1",
+  "supported_directives": ["APPLY_CORRECTION", "RETRACT_EVENT", "RESOLVE_CONFLICT"],
+  "trustworthy_authorities": ["AUTHORITATIVE_INDEPENDENT", "PRIMARY_OFFICIAL"],
+  "authority": "SHADOW_ONLY"
+}
