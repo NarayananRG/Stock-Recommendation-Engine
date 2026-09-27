@@ -3,13 +3,15 @@ from pathlib import Path
 from stage6_ingestion.canonical import canonical_json
 from stage6_exposure_binding import BindingStore
 from .errors import *
-from .policy import AUTHORITY,POLICY_ID,PROCESSOR_VERSION,load_policy
+from .policy import AUTHORITY,EXPECTED_POLICY_HASH_V1,POLICY_ID,PROCESSOR_VERSION,load_policy
 from .transmission_builder import SCHEMA_VERSION,build_transmission
 from .transmission_validation import validate_transmission
 STORE_SCHEMA_VERSION="STAGE6_3C_TRANSMISSION_STORE_V1"
 class TransmissionStore:
  def __init__(self,database:Path,binding_store:BindingStore):
-  self.database=Path(database);self.binding_store=binding_store;self.policy,self.policy_json,self.policy_hash=load_policy();new=not self.database.exists();self.connection=sqlite3.connect(self.database);self.connection.row_factory=sqlite3.Row;self.connection.execute("PRAGMA foreign_keys=ON")
+  self.database=Path(database);self.binding_store=binding_store;self.policy,self.policy_json,self.policy_hash=load_policy()
+  if self.policy_hash!=EXPECTED_POLICY_HASH_V1:raise TransmissionIntegrityFailure("TRANSMISSION_EXPECTED_V1_POLICY_HASH_MISMATCH")
+  new=not self.database.exists();self.connection=sqlite3.connect(self.database);self.connection.row_factory=sqlite3.Row;self.connection.execute("PRAGMA foreign_keys=ON")
   if new:self._init()
   self._meta();self._policy()
  def __enter__(self):return self
@@ -25,7 +27,7 @@ class TransmissionStore:
   if r is None or tuple(r)!=(1,STORE_SCHEMA_VERSION,"d05495b250ff9abefd912b763780ec5f4f6003cb",SCHEMA_VERSION,PROCESSOR_VERSION,AUTHORITY):raise TransmissionIntegrityFailure("TRANSMISSION_METADATA_MISMATCH")
  def _policy(self):
   r=self.connection.execute("SELECT * FROM transmission_policies WHERE policy_id=?",(POLICY_ID,)).fetchone()
-  if r is None or (r["policy_hash"],r["canonical_json"])!=(self.policy_hash,self.policy_json):raise TransmissionIntegrityFailure("TRANSMISSION_POLICY_SNAPSHOT_MISMATCH")
+  if self.policy_hash!=EXPECTED_POLICY_HASH_V1 or r is None or (r["policy_hash"],r["canonical_json"])!=(EXPECTED_POLICY_HASH_V1,self.policy_json):raise TransmissionIntegrityFailure("TRANSMISSION_POLICY_SNAPSHOT_MISMATCH")
  def _binding(self,identity):
   r=self.binding_store.connection.execute("SELECT canonical_json FROM binding_records WHERE binding_id=?",(identity,)).fetchone()
   if r is None:raise Stage6TransmissionError("BINDING_NOT_FOUND")

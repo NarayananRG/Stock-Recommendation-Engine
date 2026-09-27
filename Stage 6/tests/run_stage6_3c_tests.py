@@ -25,10 +25,25 @@ def frozen_binding(store,event,exposure,channel="RATE",types=None):
 @test("BASELINE","frozen 6.3B exact ancestor")
 def _():ok(git("rev-parse",f"{BASE}^{{}}")==COMMIT);subprocess.check_call(["git","merge-base","--is-ancestor",COMMIT,"HEAD"],cwd=REPO)
 @test("POLICY","identity hash five rules and uniqueness")
-def _():p,j,h=load_policy();ok(validate_policy(p)==p and canonical_hash(p)==h and len(p["rules"])==5 and len({r["rule_id"] for r in p["rules"]})==5)
+def _():p,j,h=load_policy();ok(validate_policy(p)==p and canonical_hash(p)==h==EXPECTED_POLICY_HASH_V1 and p["rules"]==EXPECTED_RULES_V1 and len(p["rules"])==5 and len({r["rule_id"] for r in p["rules"]})==5)
 @test("POLICY","overlap and unsorted arrays rejected")
 def _():
  p,_,_=load_policy();q=deepcopy(p);q["rules"][1]["event_types"]=q["rules"][0]["event_types"];q["rules"][1]["binding_channel"]=q["rules"][0]["binding_channel"];err(Stage6TransmissionError,lambda:validate_policy(q));q=deepcopy(p);q["rules"][0]["event_types"].reverse();err(Stage6TransmissionError,lambda:validate_policy(q))
+@test("POLICY","structurally valid semantic drift is rejected for frozen V1")
+def _():
+ p,_,_=load_policy()
+ def rejected(change):
+  q=deepcopy(p);change(q);q["rules"].sort(key=lambda r:r["rule_id"]);err(Stage6TransmissionError,lambda:validate_policy(q))
+ def rate(q):return next(r for r in q["rules"] if r["rule_id"]=="S6TRANS_RATE_V1")
+ rejected(lambda q:q["rules"].append({"rule_id":"S6TRANS_REGULATORY_V1","event_types":["REGULATORY_ACTION"],"binding_channel":"SECTOR","allowed_exposure_types":["GOVERNMENT_SPENDING"],"dimension_match_mode":"NOT_EVALUATED"}))
+ rejected(lambda q:q["rules"].__setitem__(slice(None),[r for r in q["rules"] if r["rule_id"]!="S6TRANS_TRADE_V1"]))
+ rejected(lambda q:rate(q).__setitem__("event_types",["LIQUIDITY_EVENT","RATE_CUT"]))
+ rejected(lambda q:rate(q).__setitem__("event_types",["LIQUIDITY_EVENT","RATE_CUT","RATE_HIKE"]))
+ rejected(lambda q:rate(q).__setitem__("binding_channel","MACRO"))
+ rejected(lambda q:rate(q).__setitem__("allowed_exposure_types",["DEBT_SENSITIVITY","GOVERNMENT_SPENDING","INTEREST_RATE_SENSITIVITY"]))
+ rejected(lambda q:rate(q).__setitem__("allowed_exposure_types",["INTEREST_RATE_SENSITIVITY"]))
+ rejected(lambda q:rate(q).__setitem__("dimension_match_mode","NOT_EVALUATED"))
+ rejected(lambda q:rate(q).__setitem__("rule_id","S6TRANS_RATE_RENAMED_V1"))
 @test("TYPE_MATCH","RATE full partial no-match and unsupported")
 def _():
  with b.env() as (*_,store,event,exposure,root):

@@ -13,4 +13,6 @@ Policy hash: `b751cbe45a8a619a416a920cae30368c7b328481259928d828e7760b20635101`
 
 Safety statuses remain `NOT_EVALUATED` for semantic compatibility, directional effect, magnitude, and causal effect. Dimension status is `NOT_REQUIRED` only for RATE and `NOT_EVALUATED` for CURRENCY, COMMODITY, GEOGRAPHY, and TRADE.
 
-Validation: Stage 6.3C 12/12 PASS. Frozen Stage 6.1–6.3B regressions and Stage 6.0C were run unchanged and passed at their required counts. Frozen changed files: 0. Runtime artifacts: 0. Tags created: none.
+`S6TRANSPOL_STAGE6_3C_V1` is now independently bound in code to the exact approved five-rule semantic contract and exact canonical policy hash. Structurally valid additions, omissions, or semantic changes fail closed. Any future event/channel/exposure mapping requires a new policy version rather than mutation of V1.
+
+Validation: Stage 6.3C 13/13 PASS. Frozen Stage 6.1–6.3B regressions and Stage 6.0C were run unchanged and passed at their required counts. Frozen changed files: 0. Runtime artifacts: 0. Tags created: none.
