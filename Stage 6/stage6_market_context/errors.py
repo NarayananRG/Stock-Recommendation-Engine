@@ -1,0 +1,3 @@
+class Stage6MarketContextError(Exception):pass
+class MarketContextIntegrityFailure(Stage6MarketContextError):pass
+class MarketContextConflict(Stage6MarketContextError):pass

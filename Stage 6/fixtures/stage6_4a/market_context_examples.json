@@ -1,0 +1,1 @@
+{"fixture_only":true,"authority":"SHADOW_ONLY","examples":[{"ticker":"FIXOLD","exchange":"FIXTURE_EXCHANGE","as_of_timestamp":"2026-05-01T12:00:00Z","data_cutoff_timestamp":"2026-05-01T11:00:00Z","notes":"All numeric measurements are explicit caller-supplied fixture values; null remains null."}]}
