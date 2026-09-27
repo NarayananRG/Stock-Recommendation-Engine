@@ -1,0 +1,10 @@
+{
+  "schema_version": "STAGE6_3B_BINDING_POLICY_V1",
+  "policy_id": "S6EXPBINDPOL_STAGE6_3B_V1",
+  "policy_version": 1,
+  "processor_version": "STAGE6_3B_EVENT_EXPOSURE_BINDER_V1",
+  "authority": "SHADOW_ONLY",
+  "supported_event_statuses": ["CANDIDATE"],
+  "binding_basis": "EXPLICIT_ASSERTION_SELECTION",
+  "supported_binding_channels": ["COMMODITY", "COMPANY_EXPOSURE", "CURRENCY", "GEOGRAPHY", "MACRO", "RATE", "SECTOR"]
+}

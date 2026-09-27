@@ -1,0 +1,8 @@
+{
+  "fixture_only": true,
+  "synthetic": true,
+  "events": ["candidate_rate_event", "candidate_commodity_event", "candidate_currency_event", "candidate_geography_macro_event"],
+  "exposure_assertions": ["INTEREST_RATE_SENSITIVITY", "COMMODITY", "CURRENCY", "REVENUE_GEOGRAPHY", "GEOPOLITICAL"],
+  "exposure_versions": [1, 2],
+  "interpretation": "Testing mechanics only; no real company, investment claim, direction, magnitude, or recommendation."
+}
