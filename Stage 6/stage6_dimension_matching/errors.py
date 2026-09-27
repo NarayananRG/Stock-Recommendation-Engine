@@ -1,0 +1,3 @@
+class Stage6DimensionMatchingError(ValueError): pass
+class DimensionMatchingIntegrityFailure(Stage6DimensionMatchingError): pass
+class DimensionMatchingConflict(Stage6DimensionMatchingError): pass
