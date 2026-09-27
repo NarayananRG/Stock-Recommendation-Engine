@@ -1,0 +1,13 @@
+test_id,category,test_name,result,detail
+S6_3C_001,BASELINE,frozen 6.3B exact ancestor,PASS,
+S6_3C_002,POLICY,identity hash five rules and uniqueness,PASS,
+S6_3C_003,POLICY,overlap and unsorted arrays rejected,PASS,
+S6_3C_004,TYPE_MATCH,RATE full partial no-match and unsupported,PASS,
+S6_3C_005,RULE,currency commodity geography trade and debt rules,PASS,
+S6_3C_006,RULE,regulatory event deliberately unsupported,PASS,
+S6_3C_007,PARTITION,matched unmatched exact and paths equal matches,PASS,
+S6_3C_008,STORE,exact binding evaluation idempotency and integrity,PASS,
+S6_3C_009,APPEND_ONLY,all tables protected and trigger loss detected,PASS,
+S6_3C_010,TAMPER,record policy binding child and dependency tamper rejected,PASS,
+S6_3C_011,BOUNDARY,no inference direction magnitude AI trading or frozen changes,PASS,
+S6_3C_012,NETWORK_AI_TRADING,socket sentinel,PASS,
