@@ -1,0 +1,17 @@
+{
+  "fixture_only": true,
+  "investment_claims": false,
+  "authority": "SHADOW_ONLY",
+  "entities": ["CUR_USD", "CUR_EUR", "CUR_JPY", "CMD_CRUDE_OIL", "CMD_NATURAL_GAS"],
+  "examples": [
+    {"subject": "CUR_USD", "reference": "CUR_EUR", "metric": "RELATIVE_VALUE", "movement": "STRENGTHEN"},
+    {"subject": "CUR_USD", "reference": "CUR_EUR", "metric": "RELATIVE_VALUE", "movement": "WEAKEN"},
+    {"subject": "CUR_USD", "reference": "CUR_EUR", "metric": "RELATIVE_VALUE", "movement": "UNKNOWN"},
+    {"subject": "CUR_USD", "reference": "CUR_EUR", "metric": "RELATIVE_VALUE", "movement": "MIXED"},
+    {"subject": "CUR_USD", "reference": "CUR_JPY", "metric": "RELATIVE_VALUE", "movement": "WEAKEN"},
+    {"subject": "CMD_CRUDE_OIL", "reference": null, "metric": "PRICE", "movement": "INCREASE"},
+    {"subject": "CMD_CRUDE_OIL", "reference": null, "metric": "PRICE", "movement": "DECREASE"},
+    {"subject": "CMD_CRUDE_OIL", "reference": null, "metric": "PRICE", "movement": "MIXED"},
+    {"subject": "CMD_NATURAL_GAS", "reference": null, "metric": "PRICE", "movement": "INCREASE"}
+  ]
+}
