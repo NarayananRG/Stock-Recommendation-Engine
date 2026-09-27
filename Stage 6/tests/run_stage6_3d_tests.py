@@ -103,6 +103,12 @@ def _():
 @check("DEPENDENCY","exact complete upstream evidence registry and policy dependencies")
 def _():
  with env() as (*_,s,e,r,event,exposure,binding,t,root):x=s.qualify_transmission(transmission_id=t["transmission_id"],qualifier_inputs=[input_for(t,e)])["qualification"];types={z[0] for z in s.connection.execute("SELECT record_type FROM dimension_dependencies WHERE qualification_id=?",(x["qualification_id"],))};require(types=={"TRANSMISSION","EVENT_EXPOSURE_BINDING","STAGE6_EXPOSURE","ENTITY_REGISTRY_SNAPSHOT","DIMENSION_QUALIFICATION_POLICY","EVIDENCE"} and s.integrity_check()["result"]=="PASS")
+@check("RESTART","closed store reopens and passes full deterministic integrity replay")
+def _():
+ with env() as (ing,events,exposures,bindings,transmissions,s,e,r,event,exposure,binding,t,root):
+  s.qualify_transmission(transmission_id=t["transmission_id"],qualifier_inputs=[input_for(t,e)]);s.close();reopened=DimensionQualificationStore(root/"dimension.sqlite3",transmissions)
+  try:require(reopened.integrity_check()["result"]=="PASS")
+  finally:reopened.close()
 @check("APPEND_ONLY","all tables protected and trigger loss detected")
 def _():
  with env() as (*_,s,e,r,event,exposure,binding,t,root):

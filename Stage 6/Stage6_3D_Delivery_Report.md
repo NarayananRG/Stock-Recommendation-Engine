@@ -56,7 +56,7 @@ Both the exact rule list and canonical policy hash are independently enforced by
 | Stage 6.3A | 39/39 PASS |
 | Stage 6.3B | 28/28 PASS |
 | Stage 6.3C | 13/13 PASS |
-| Stage 6.3D | 23/23 PASS |
+| Stage 6.3D | 24/24 PASS |
 | Stage 6.0C architecture validator | PASS, 10 schemas parsed |
 
 The focused suite covers exact upstream binding, all five policy rules, policy drift and hash enforcement, currency/commodity/country qualification, RATE prohibition, wrong type, missing/future entities, assertion-evidence subset, evidence entity support, multiple dimensions, all qualification statuses, deterministic ordering, idempotency, distinct-record conflict, direct dependencies, append-only triggers, deterministic replay, store and upstream tamper detection, zero network, and authority boundaries.

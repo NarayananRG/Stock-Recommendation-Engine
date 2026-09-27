@@ -52,7 +52,7 @@
   "stage6_3a_regression": "39/39 PASS",
   "stage6_3b_regression": "28/28 PASS",
   "stage6_3c_regression": "13/13 PASS",
-  "stage6_3d_tests": "23/23 PASS",
+  "stage6_3d_tests": "24/24 PASS",
   "stage6_0c_validator": "PASS / 10 schemas",
   "acceptance_gates": {
     "exact_stage6_3c_transmission_binding": "PASS",
