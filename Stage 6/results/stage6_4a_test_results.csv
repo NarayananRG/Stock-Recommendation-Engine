@@ -1,6 +1,6 @@
 test_id,category,test_name,result,detail
-S6_4A_001,BASELINE,exact Stage 6.3I baseline,PASS,
-S6_4A_002,BASELINE,new branch exact baseline,PASS,
+S6_4A_001,BASELINE,Stage 6.4A exact Stage 6.3I parent baseline,PASS,
+S6_4A_002,BASELINE,current HEAD descends from exact Stage 6.4A baseline,PASS,
 S6_4A_003,CONTRACT,frozen market context contract unchanged,PASS,
 S6_4A_004,IDENTITY,schema exact,PASS,
 S6_4A_005,IDENTITY,store exact,PASS,

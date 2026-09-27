@@ -12,7 +12,7 @@ from stage6_ingestion.fixtures import build_fixture_registries
 from stage6_ingestion.errors import IntegrityFailure
 from stage6_market_context import *
 from stage6_market_context.market_context_builder import normalize_payload
-BASE="56c6922d4f4c0e58c90d1751973ae64868d8b98a";CONTRACT_BLOB="a141b221228718b8276b3d05b2f028d21adcfc3f";OUT=ROOT/"results"/"stage6_4a_test_results.csv";CASES=[]
+BASE="56c6922d4f4c0e58c90d1751973ae64868d8b98a";STAGE6_4A_COMMIT="8efd269970321638c6db5c14d8c745930f9c27b6";CONTRACT_BLOB="a141b221228718b8276b3d05b2f028d21adcfc3f";OUT=ROOT/"results"/"stage6_4a_test_results.csv";CASES=[]
 def case(category,name,fn):CASES.append((category,name,fn))
 def require(v,m="assertion failed"):
  if not v:raise AssertionError(m)
@@ -41,8 +41,8 @@ def env(*,failure=False,retrieved="2026-05-01T10:01:00Z"):
    ing.close()
 def make(store,regs,evidence,p=None,entity="S6FIX_COMPANY_001",exchange="FIXTURE_EXCHANGE"):return store.materialize(market_context=p or payload(evidence["evidence_id"]),company_entity_id=entity,entity_registry_snapshot_id=regs["entity_v1"]["registry_snapshot_id"],exchange=exchange)
 def norm(p):return normalize_payload(p,load_policy()[0])
-case("BASELINE","exact Stage 6.3I baseline",lambda:require(git("rev-parse","HEAD")==BASE))
-case("BASELINE","new branch exact baseline",lambda:require(git("branch","--show-current")=="stage6-historical-analogue" and git("merge-base","HEAD",BASE)==BASE))
+case("BASELINE","Stage 6.4A exact Stage 6.3I parent baseline",lambda:require(git("rev-parse",f"{STAGE6_4A_COMMIT}^")==BASE))
+case("BASELINE","current HEAD descends from exact Stage 6.4A baseline",lambda:require(git("branch","--show-current")=="stage6-historical-analogue" and git("merge-base","HEAD",STAGE6_4A_COMMIT)==STAGE6_4A_COMMIT))
 case("CONTRACT","frozen market context contract unchanged",lambda:require(git("hash-object","Stage 6/contracts/market_context.schema.json")==CONTRACT_BLOB))
 case("IDENTITY","schema exact",lambda:require(SCHEMA_VERSION=="STAGE6_MARKET_CONTEXT_V2"))
 case("IDENTITY","store exact",lambda:require(STORE_SCHEMA_VERSION=="STAGE6_4A_MARKET_CONTEXT_STORE_V1"))
