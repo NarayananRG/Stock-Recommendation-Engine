@@ -1,0 +1,3 @@
+class Stage6MovementPathEffectError(ValueError): pass
+class MovementPathEffectIntegrityFailure(Stage6MovementPathEffectError): pass
+class MovementPathEffectConflict(Stage6MovementPathEffectError): pass
