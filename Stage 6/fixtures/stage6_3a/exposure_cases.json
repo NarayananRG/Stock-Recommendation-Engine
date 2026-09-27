@@ -1,0 +1,24 @@
+{
+  "fixture_only": true,
+  "synthetic": true,
+  "company_examples": [
+    {"company_entity_id": "SYNTHETIC_COMPANY_A", "sector_entity_id": "SYNTHETIC_SECTOR", "subsector_entity_id": null},
+    {"company_entity_id": "SYNTHETIC_COMPANY_B", "sector_entity_id": "SYNTHETIC_SECTOR", "subsector_entity_id": "SYNTHETIC_SUBSECTOR"}
+  ],
+  "assertion_examples": [
+    {"exposure_type": "REVENUE_GEOGRAPHY", "value_type": "QUANTITATIVE", "value": 30.0, "unit": "PERCENT_REVENUE", "basis": "FY2025 synthetic consolidated revenue"},
+    {"exposure_type": "EXPORT_DEPENDENCY", "value_type": "QUANTITATIVE", "value": 0.25, "unit": "FRACTION_REVENUE", "basis": "FY2025 synthetic export revenue"},
+    {"exposure_type": "CURRENCY", "value_type": "QUANTITATIVE", "value": 1000000.0, "unit": "USD", "basis": "Synthetic USD receivables at FY2025 year-end"},
+    {"exposure_type": "INPUT_COST_SENSITIVITY", "value_type": "QUANTITATIVE", "value": 12.0, "unit": "PERCENT_COST", "basis": "FY2025 synthetic copper input cost"},
+    {"exposure_type": "GEOPOLITICAL", "value_type": "QUALITATIVE", "qualitative_value": "MEDIUM"}
+  ],
+  "relationship_examples": [
+    {"relationship_type": "PARENT", "related_entity_id": "SYNTHETIC_PARENT"},
+    {"relationship_type": "SUBSIDIARY", "related_entity_id": "SYNTHETIC_SUBSIDIARY"},
+    {"relationship_type": "GROUP_COMPANY", "related_entity_id": "SYNTHETIC_GROUP_COMPANY"}
+  ],
+  "version_examples": [
+    {"exposure_version": 1, "previous_version_hash": null},
+    {"exposure_version": 2, "previous_version_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}
+  ]
+}
