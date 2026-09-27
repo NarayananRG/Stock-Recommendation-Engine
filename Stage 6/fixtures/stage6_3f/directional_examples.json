@@ -1,0 +1,19 @@
+{
+  "fixture_only": true,
+  "investment_claims": false,
+  "authority": "SHADOW_ONLY",
+  "examples": [
+    {"event_type": "RATE_HIKE", "effect_direction": "ADVERSE"},
+    {"event_type": "RATE_HIKE", "effect_direction": "FAVORABLE"},
+    {"event_type": "RATE_CUT", "effect_direction": "FAVORABLE"},
+    {"event_type": "RATE_CUT", "effect_direction": "ADVERSE"},
+    {"event_type": "TARIFF_INCREASE", "effect_direction": "ADVERSE"},
+    {"event_type": "TARIFF_REDUCTION", "effect_direction": "FAVORABLE"},
+    {"event_type": "WAR_ESCALATION", "effect_direction": "ADVERSE"},
+    {"event_type": "WAR_ESCALATION", "effect_direction": "FAVORABLE"},
+    {"event_type": "WAR_DEESCALATION", "effect_direction": "FAVORABLE"},
+    {"event_type": "WAR_DEESCALATION", "effect_direction": "ADVERSE"},
+    {"event_type": "RATE_HIKE", "effect_direction": "UNKNOWN"},
+    {"event_type": "RATE_HIKE", "effect_direction": "MIXED"}
+  ]
+}

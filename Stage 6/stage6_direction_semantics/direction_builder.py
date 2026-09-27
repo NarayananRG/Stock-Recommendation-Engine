@@ -1,0 +1,24 @@
+from stage6_ingestion.canonical import canonical_hash,without
+SCHEMA_VERSION="STAGE6_ECONOMIC_PATH_DIRECTION_V1";DIRECTIONS={"FAVORABLE","ADVERSE","MIXED","UNKNOWN"}
+def direction_qualifier_id(match,event,item,policy_hash,processor):return "S6DIRQUAL_"+canonical_hash({"match_id":match["match_id"],"match_hash":match["record_hash"],"source_path_id":item["source_path_id"],"direction_rule_id":item["direction_rule_id"],"direction_rule_hash":item["direction_rule_hash"],"event_id":event["event_id"],"event_version":event["event_version"],"event_hash":event["record_hash"],"assertion_hash":item["assertion_hash"],"effect_direction":item["effect_direction"],"evidence_refs":item["evidence_refs"],"policy_hash":policy_hash,"processor_version":processor})[:24]
+def direction_record_id(match,items,policy_hash,processor):return "S6DIR_"+canonical_hash({"schema_version":SCHEMA_VERSION,"match_id":match["match_id"],"match_hash":match["record_hash"],"direction_qualifiers":items,"policy_id":"S6DIRPOL_STAGE6_3F_V1","policy_hash":policy_hash,"processor_version":processor})[:24]
+def eligibility(path,event_type,rules):
+ rule=rules.get(event_type)
+ if rule is None or path["source_rule_id"]!=rule["source_rule_id"]:return None
+ required=rule["dimension_requirement"]
+ if required=="NOT_REQUIRED" and path["dimension_match_status"]=="NOT_REQUIRED":return rule
+ if required=="EXACT_ENTITY_MATCH_REQUIRED" and path["dimension_match_status"]=="EXACT_ENTITY_MATCH":return rule
+ return None
+def build_direction_record(*,match,qualification,transmission,binding,event,exposure,qualifier_items,policy,policy_hash):
+ rules={x["event_type"]:x for x in policy["rules"]};items=sorted(qualifier_items,key=lambda x:x["source_path_id"]);items=[{"direction_qualifier_id":direction_qualifier_id(match,event,x,policy_hash,policy["processor_version"]),**x} for x in items];by_path={x["source_path_id"]:x for x in items};eligible=[];results=[]
+ for path in match["path_matches"]:
+  rule=eligibility(path,event["event_type"],rules)
+  if rule:eligible.append(path["source_path_id"]);qualifier=by_path.get(path["source_path_id"]);results.append({"source_path_id":path["source_path_id"],"eligibility_status":"ELIGIBLE","direction_rule_id":rule["rule_id"],"direction_rule_hash":canonical_hash(rule),"event_driver_change":rule["event_driver_change"],"effect_direction":qualifier["effect_direction"] if qualifier else None})
+  else:results.append({"source_path_id":path["source_path_id"],"eligibility_status":"NOT_ELIGIBLE","direction_rule_id":None,"direction_rule_hash":None,"event_driver_change":None,"effect_direction":None})
+ results.sort(key=lambda x:x["source_path_id"]);qualified=sorted(by_path);unqualified=sorted(set(eligible)-set(qualified))
+ status="NO_ELIGIBLE_PATHS" if not eligible else "UNQUALIFIED" if not qualified else "PARTIALLY_QUALIFIED" if unqualified else "ALL_ELIGIBLE_PATHS_QUALIFIED"
+ if status=="NO_ELIGIBLE_PATHS":summary="NOT_EVALUATED"
+ elif status!="ALL_ELIGIBLE_PATHS_QUALIFIED":summary="INDETERMINATE"
+ else:
+  effects={x["effect_direction"] for x in items};summary="INDETERMINATE" if "UNKNOWN" in effects else "FAVORABLE_ONLY" if effects=={"FAVORABLE"} else "ADVERSE_ONLY" if effects=={"ADVERSE"} else "MIXED_PATH_DIRECTIONS"
+ out={"schema_version":SCHEMA_VERSION,"direction_record_id":"","record_hash":"0"*64,"match_id":match["match_id"],"match_hash":match["record_hash"],"qualification_id":match["qualification_id"],"qualification_hash":match["qualification_hash"],"transmission_id":match["transmission_id"],"transmission_hash":match["transmission_hash"],"binding_id":match["binding_id"],"binding_hash":match["binding_hash"],"event_id":event["event_id"],"event_version":event["event_version"],"event_hash":event["record_hash"],"event_type":event["event_type"],"exposure_id":match["exposure_id"],"exposure_version":match["exposure_version"],"exposure_hash":match["exposure_hash"],"company_entity_id":match["company_entity_id"],"sector_entity_id":match["sector_entity_id"],"subsector_entity_id":match["subsector_entity_id"],"direction_cutoff_timestamp":match["match_cutoff_timestamp"],"directional_scope":"MATCHED_EXPOSURE_PATH_ONLY","direction_qualification_status":status,"qualified_path_ids":qualified,"unqualified_eligible_path_ids":unqualified,"direction_qualifiers":items,"path_direction_results":results,"matched_path_direction_summary":summary,"overall_company_effect_status":"NOT_EVALUATED","stock_direction_status":"NOT_EVALUATED","market_reaction_status":"NOT_EVALUATED","magnitude_status":"NOT_EVALUATED","expected_return_status":"NOT_EVALUATED","causal_effect_status":"NOT_EVALUATED","trade_role_semantics_status":"NOT_EVALUATED","policy_id":policy["policy_id"],"policy_hash":policy_hash,"processor_version":policy["processor_version"],"authority":policy["authority"]};out["direction_record_id"]=direction_record_id(match,items,policy_hash,policy["processor_version"]);out["record_hash"]=canonical_hash(without(out,"record_hash"));return out
