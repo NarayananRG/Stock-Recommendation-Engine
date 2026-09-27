@@ -40,6 +40,12 @@ The exact policy hash is `bd57553eaa0185612aeb73baf03b242b9a16db1c3b4a113fad70eb
 
 Both the exact rule list and canonical policy hash are independently enforced by code and by the store.
 
+## Dependency and control-record hardening
+
+Stage 6.3D direct dependencies now use exact Stage-qualified record-type identities: `STAGE6_3C_TRANSMISSION` and `STAGE6_3B_EVENT_EXPOSURE_BINDING`. The generic `TRANSMISSION` and `EVENT_EXPOSURE_BINDING` identities, as well as other syntactically valid but incorrect record types, fail deterministic integrity replay.
+
+The metadata table contains exactly one immutable Store V1 metadata row. Its `singleton` key is constrained to `1`, and store validation independently requires exactly one row with the expected values. The policy table likewise contains exactly one immutable `S6DIMPOL_STAGE6_3D_V1` snapshot with the frozen policy hash and canonical JSON. Extra metadata or policy rows fail closed.
+
 ## Verification
 
 | Suite | Result |
@@ -56,10 +62,10 @@ Both the exact rule list and canonical policy hash are independently enforced by
 | Stage 6.3A | 39/39 PASS |
 | Stage 6.3B | 28/28 PASS |
 | Stage 6.3C | 13/13 PASS |
-| Stage 6.3D | 24/24 PASS |
+| Stage 6.3D | 27/27 PASS |
 | Stage 6.0C architecture validator | PASS, 10 schemas parsed |
 
-The focused suite covers exact upstream binding, all five policy rules, policy drift and hash enforcement, currency/commodity/country qualification, RATE prohibition, wrong type, missing/future entities, assertion-evidence subset, evidence entity support, multiple dimensions, all qualification statuses, deterministic ordering, idempotency, distinct-record conflict, direct dependencies, append-only triggers, deterministic replay, store and upstream tamper detection, zero network, and authority boundaries.
+The focused suite covers exact upstream binding, all five policy rules, policy drift and hash enforcement, currency/commodity/country qualification, RATE prohibition, wrong type, missing/future entities, assertion-evidence subset, evidence entity support, multiple dimensions, all qualification statuses, deterministic ordering, idempotency, distinct-record conflict, exact Stage-qualified direct dependencies, rejection of generic dependency types, metadata and policy singleton enforcement, append-only triggers, deterministic replay, store and upstream tamper detection, zero network, and authority boundaries.
 
 ## Boundary audit
 

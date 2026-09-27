@@ -102,7 +102,17 @@ def _():
  with env() as (*_,s,e,r,event,exposure,binding,t,root):a=input_for(t,e);s.qualify_transmission(transmission_id=t["transmission_id"],qualifier_inputs=[a]);require(s.qualify_transmission(transmission_id=t["transmission_id"],qualifier_inputs=[a])["status"]=="IDEMPOTENT_SUCCESS");expect(DimensionConflict,lambda:s.qualify_transmission(transmission_id=t["transmission_id"],qualifier_inputs=[input_for(t,e,dimension_id="CUR_EUR")]))
 @check("DEPENDENCY","exact complete upstream evidence registry and policy dependencies")
 def _():
- with env() as (*_,s,e,r,event,exposure,binding,t,root):x=s.qualify_transmission(transmission_id=t["transmission_id"],qualifier_inputs=[input_for(t,e)])["qualification"];types={z[0] for z in s.connection.execute("SELECT record_type FROM dimension_dependencies WHERE qualification_id=?",(x["qualification_id"],))};require(types=={"TRANSMISSION","EVENT_EXPOSURE_BINDING","STAGE6_EXPOSURE","ENTITY_REGISTRY_SNAPSHOT","DIMENSION_QUALIFICATION_POLICY","EVIDENCE"} and s.integrity_check()["result"]=="PASS")
+ with env() as (*_,s,e,r,event,exposure,binding,t,root):x=s.qualify_transmission(transmission_id=t["transmission_id"],qualifier_inputs=[input_for(t,e)])["qualification"];types={z[0] for z in s.connection.execute("SELECT record_type FROM dimension_dependencies WHERE qualification_id=?",(x["qualification_id"],))};require(types=={"STAGE6_3C_TRANSMISSION","STAGE6_3B_EVENT_EXPOSURE_BINDING","STAGE6_EXPOSURE","ENTITY_REGISTRY_SNAPSHOT","DIMENSION_QUALIFICATION_POLICY","EVIDENCE"} and "TRANSMISSION" not in types and "EVENT_EXPOSURE_BINDING" not in types and s.integrity_check()["result"]=="PASS")
+@check("DEPENDENCY","generic and wrong syntactically valid dependency types fail integrity")
+def _():
+ for source,replacement in (("STAGE6_3C_TRANSMISSION","TRANSMISSION"),("STAGE6_3B_EVENT_EXPOSURE_BINDING","EVENT_EXPOSURE_BINDING"),("STAGE6_3C_TRANSMISSION","STAGE6_EVENT")):
+  with env() as (*_,s,e,r,event,exposure,binding,t,root):s.qualify_transmission(transmission_id=t["transmission_id"],qualifier_inputs=[input_for(t,e)]);s.connection.execute("DROP TRIGGER protect_dimension_dependencies_update");s.connection.execute("UPDATE dimension_dependencies SET record_type=? WHERE record_type=?",(replacement,source));s.connection.execute("CREATE TRIGGER protect_dimension_dependencies_update BEFORE UPDATE ON dimension_dependencies BEGIN SELECT RAISE(ABORT,'IMMUTABLE');END");s.connection.commit();expect(DimensionIntegrityFailure,s.integrity_check,"DEPENDENCY")
+@check("CARDINALITY","metadata singleton check rejects any extra metadata row")
+def _():
+ with env() as (*_,s,e,r,event,exposure,binding,t,root):expect(sqlite3.IntegrityError,lambda:s.connection.execute("INSERT INTO dimension_store_meta VALUES(2,?,?,?,?,?)",(STORE_SCHEMA_VERSION,COMMIT,SCHEMA_VERSION,PROCESSOR_VERSION,AUTHORITY)))
+@check("CARDINALITY","policy table singleton rejects an additional valid-looking row")
+def _():
+ with env() as (*_,s,e,r,event,exposure,binding,t,root):s.connection.execute("INSERT INTO dimension_policies VALUES(?,?,?)",("S6DIMPOL_FAKE_V2","f"*64,"{}"));s.connection.commit();expect(DimensionIntegrityFailure,s.integrity_check,"POLICY_SNAPSHOT")
 @check("RESTART","closed store reopens and passes full deterministic integrity replay")
 def _():
  with env() as (ing,events,exposures,bindings,transmissions,s,e,r,event,exposure,binding,t,root):
