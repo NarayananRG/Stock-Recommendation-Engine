@@ -1,0 +1,23 @@
+{
+  "policy_id": "S6PORTSRCPOL_STAGE6_5A_V1",
+  "processor_version": "STAGE6_5A_PORTFOLIO_SOURCE_FREEZER_V1",
+  "authority": "SHADOW_ONLY",
+  "development_baseline": "f150608994fbeea3b79d2a078642dee89e4f6a59",
+  "stage5d5_reference_commit": "74b2710f0e19bd403978da81e87f25a3059ace06",
+  "accepted_source_systems": ["FIXTURE", "STAGE5D5_PAPER_EXPORT"],
+  "accepted_currencies": ["INR", "USD"],
+  "fixture_only_tests": true,
+  "network_calls": 0,
+  "external_apis": 0,
+  "broker_apis": 0,
+  "market_data_calls": 0,
+  "llm": false,
+  "nlp": false,
+  "ml": false,
+  "ocr": false,
+  "embeddings": false,
+  "semantic_similarity": false,
+  "trading_authority": false,
+  "aggregate_calculations": false,
+  "portfolio_context_v2_materialization": false
+}

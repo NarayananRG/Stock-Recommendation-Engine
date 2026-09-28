@@ -1,0 +1,49 @@
+{
+  "inr": {
+    "source_system": "FIXTURE",
+    "source_stage5d5_commit": "74b2710f0e19bd403978da81e87f25a3059ace06",
+    "source_export_id": "S6FIX_PORTFOLIO_EXPORT_INR_001",
+    "source_export_hash": "1111111111111111111111111111111111111111111111111111111111111111",
+    "source_database_id": "S6FIX_LEDGER_INR_001",
+    "source_schema_version": "FIXTURE_PORTFOLIO_EXPORT_V1",
+    "as_of_timestamp": "2026-05-01T12:00:00Z",
+    "data_cutoff_timestamp": "2026-05-01T11:59:00Z",
+    "currency": "INR",
+    "capital_ceiling": {"value": 1000000.0, "currency": "INR"},
+    "open_positions": [{
+      "company_entity_id": "S6FIX_COMPANY_001",
+      "exchange": "FIXTURE_EXCHANGE",
+      "ticker": "FIXOLD",
+      "recommendation_id": "REC_FIX_001",
+      "thesis_id": null,
+      "transaction_fill_ids": ["FILL_FIX_002", "FILL_FIX_001"],
+      "quantity": 100,
+      "current_price": {"value": 125.5, "currency": "INR", "observed_at_utc": "2026-05-01T11:55:00Z"},
+      "average_cost_per_share": {"value": 110.0, "currency": "INR"},
+      "risk_at_stop": {"value": 750.0, "currency": "INR", "observed_at_utc": "2026-05-01T11:56:00Z", "method": "SOURCE_LEDGER_EXPLICIT"},
+      "sector_entity_id": "S6FIX_SECTOR_TECH",
+      "subsector_entity_id": null,
+      "source_position_snapshot_id": "POS_FIX_001",
+      "source_position_snapshot_hash": "2222222222222222222222222222222222222222222222222222222222222222",
+      "source_record_bindings": [
+        {"record_type": "TRANSACTION_FILL", "record_id": "FILL_FIX_002", "record_hash": "4444444444444444444444444444444444444444444444444444444444444444", "recorded_or_persisted_at_utc": "2026-04-30T10:01:00Z"},
+        {"record_type": "RECOMMENDATION", "record_id": "REC_FIX_001", "record_hash": "3333333333333333333333333333333333333333333333333333333333333333", "recorded_or_persisted_at_utc": "2026-04-29T10:00:00Z"},
+        {"record_type": "TRANSACTION_FILL", "record_id": "FILL_FIX_001", "record_hash": "5555555555555555555555555555555555555555555555555555555555555555", "recorded_or_persisted_at_utc": "2026-04-30T10:00:00Z"}
+      ]
+    }],
+    "pending_entries": [{
+      "company_entity_id": "S6FIX_COMPANY_001",
+      "exchange": "FIXTURE_EXCHANGE",
+      "ticker": "FIXOLD",
+      "recommendation_id": "REC_FIX_PENDING_001",
+      "thesis_id": null,
+      "committed_reserved_capital": {"value": 25000.0, "currency": "INR"},
+      "sector_entity_id": "S6FIX_SECTOR_TECH",
+      "subsector_entity_id": null,
+      "source_record_id": "REC_FIX_PENDING_001",
+      "source_record_hash": "6666666666666666666666666666666666666666666666666666666666666666",
+      "source_effective_or_recorded_timestamp": "2026-05-01T10:00:00Z",
+      "source_record_bindings": [{"record_type": "RECOMMENDATION", "record_id": "REC_FIX_PENDING_001", "record_hash": "6666666666666666666666666666666666666666666666666666666666666666", "recorded_or_persisted_at_utc": "2026-05-01T10:00:00Z"}]
+    }]
+  }
+}

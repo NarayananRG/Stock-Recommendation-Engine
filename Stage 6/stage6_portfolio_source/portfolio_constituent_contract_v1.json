@@ -1,0 +1,23 @@
+{
+  "contract_version": "STAGE6_PORTFOLIO_CONSTITUENT_CONTRACT_V1",
+  "purpose": "Freeze explicit portfolio constituents and paired provenance without portfolio arithmetic",
+  "open_position_required": [
+    "company_entity_id", "exchange", "ticker", "recommendation_id", "thesis_id",
+    "transaction_fill_ids", "quantity", "current_price", "average_cost_per_share",
+    "risk_at_stop", "sector_entity_id", "subsector_entity_id",
+    "source_position_snapshot_id", "source_position_snapshot_hash", "source_record_bindings"
+  ],
+  "pending_entry_required": [
+    "company_entity_id", "exchange", "ticker", "recommendation_id", "thesis_id",
+    "committed_reserved_capital", "source_record_id", "source_record_hash",
+    "source_effective_or_recorded_timestamp", "source_record_bindings"
+  ],
+  "binding_fields": ["record_type", "record_id", "record_hash", "recorded_or_persisted_at_utc"],
+  "canonical_open_position_order": ["company_entity_id", "ticker", "recommendation_id"],
+  "canonical_pending_entry_order": ["company_entity_id", "ticker", "recommendation_id"],
+  "quantity_type": "POSITIVE_INTEGER_WHOLE_SHARES",
+  "monetary_currency_rule": "EXACT_SNAPSHOT_CURRENCY_NO_CONVERSION",
+  "portfolio_arithmetic": "DEFERRED_TO_STAGE6_5B",
+  "correlation": "DEFERRED_TO_STAGE6_5C",
+  "portfolio_context_v2": "DEFERRED_TO_STAGE6_5D"
+}
