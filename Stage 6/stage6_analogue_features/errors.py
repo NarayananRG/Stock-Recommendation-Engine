@@ -1,0 +1,3 @@
+class Stage6AnalogueFeatureError(Exception):pass
+class AnalogueFeatureIntegrityFailure(Stage6AnalogueFeatureError):pass
+class AnalogueFeatureConflict(Stage6AnalogueFeatureError):pass

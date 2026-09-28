@@ -1,0 +1,1 @@
+{"fixture_only":true,"authority":"SHADOW_ONLY","examples":[{"source":"RATE_HIKE plus exact company effect plus exact market context","selection_fields":12,"company_effect_treatment":"AUDIT_ONLY","future_outcomes":"NOT_ATTACHED"}]}
