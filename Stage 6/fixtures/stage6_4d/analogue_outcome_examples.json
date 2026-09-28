@@ -1,0 +1,1 @@
+{"fixture_only":true,"authority":"SHADOW_ONLY","examples":[{"selection":"exact frozen Stage 6.4C record","outcome_unit":"PERCENT_RETURN","available":"explicit value, method, observation-through timestamp and Evidence V2 binding","not_matured":"null without evidence","missing":"null without imputation","future_outcomes":"cutoff-gated"}]}
