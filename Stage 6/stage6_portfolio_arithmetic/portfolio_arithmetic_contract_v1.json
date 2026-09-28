@@ -1,0 +1,23 @@
+{
+  "contract_version": "STAGE6_PORTFOLIO_ARITHMETIC_CONTRACT_V1",
+  "numeric_input_rule": "Decimal(str(value))",
+  "intermediate_arithmetic": "DECIMAL_PRECISION_50_NO_CURRENCY_QUANTIZATION",
+  "json_emission": "INTEGER_IF_INTEGRAL_OTHERWISE_FLOAT_FROM_DECIMAL_STRING_AT_FINAL_BOUNDARY",
+  "market_value_formula": "quantity * current_price",
+  "invested_capital_formula": "sum(open_position.market_value)",
+  "pending_committed_capital_formula": "sum(pending_entry.committed_reserved_capital)",
+  "committed_capital_formula": "invested_capital + pending_committed_capital",
+  "cash_formula": "max(0, capital_ceiling - invested_capital)",
+  "available_capital_formula": "max(0, capital_ceiling - committed_capital)",
+  "invested_capital_overage_formula": "max(0, invested_capital - capital_ceiling)",
+  "committed_capital_overage_formula": "max(0, committed_capital - capital_ceiling)",
+  "aggregate_risk_formula": "sum(open_position.risk_at_stop)",
+  "held_exposure_denominator": "INVESTED_CAPITAL",
+  "held_exposure_unit": "FRACTION_OF_INVESTED_CAPITAL",
+  "pending_exposure_in_held_exposure": false,
+  "subsector_unknown_bucket": false,
+  "fraction_conservation_tolerance": "1E-12",
+  "correlation": "DEFERRED_TO_STAGE6_5C",
+  "portfolio_context_v2": "DEFERRED_TO_STAGE6_5D",
+  "portfolio_constraints": "NOT_EVALUATED"
+}

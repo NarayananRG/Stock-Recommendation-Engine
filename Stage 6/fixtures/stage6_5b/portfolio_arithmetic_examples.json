@@ -1,0 +1,15 @@
+{
+  "base_inr_expected": {
+    "position_market_value": {"value": 12550, "unit": "INR"},
+    "invested_capital": {"value": 12550, "unit": "INR"},
+    "pending_committed_capital": {"value": 25000, "unit": "INR"},
+    "committed_capital": {"value": 37550, "unit": "INR"},
+    "cash": {"value": 987450, "unit": "INR"},
+    "available_capital": {"value": 962450, "unit": "INR"},
+    "invested_capital_overage": {"value": 0, "unit": "INR"},
+    "committed_capital_overage": {"value": 0, "unit": "INR"},
+    "aggregate_risk_at_stop": {"value": 750, "unit": "INR"},
+    "positions_without_subsector_count": 1,
+    "market_value_without_subsector": {"value": 12550, "unit": "INR"}
+  }
+}
