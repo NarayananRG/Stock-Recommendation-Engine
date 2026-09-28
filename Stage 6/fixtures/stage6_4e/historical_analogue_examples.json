@@ -1,0 +1,1 @@
+{"fixture_only":true,"authority":"SHADOW_ONLY","examples":[{"selection":"frozen Stage 6.4C","outcomes":"frozen Stage 6.4D","target_snapshot":"exact target Stage 6.4B only","aggregation":"UNWEIGHTED_AVAILABLE_ONLY","relative_return":"MEDIAN_PAIRED_RELATIVE_RETURN_V1","final_schema":"STAGE6_HISTORICAL_ANALOGUE_V2"}]}
