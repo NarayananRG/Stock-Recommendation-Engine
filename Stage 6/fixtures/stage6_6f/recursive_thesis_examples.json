@@ -1,0 +1,10 @@
+{
+  "fixture_version": "STAGE6_6F_FIXTURES_V1",
+  "development_baseline": "11f90c3263476f9b396b2beefebcd4f3ddb147b7",
+  "semantic_code_commit": "3b094f4167e78de7699742080e0a163e7550bc0e",
+  "cycles": [
+    {"name": "v2_to_v3", "source": "STAGE6_6E", "review_cutoff": "2026-09-29T13:00:00Z", "assessment": "SUPPORTIVE_MATERIAL", "result_version": 3},
+    {"name": "v3_to_v4", "source": "STAGE6_6F", "review_cutoff": "2026-09-29T14:00:00Z", "assessment": "ADVERSE_MATERIAL", "result_version": 4},
+    {"name": "v4_indeterminate", "source": "STAGE6_6F", "review_cutoff": "2026-09-29T15:00:00Z", "assessment": "INVALIDATION_NOT_EVALUATED", "result": "WITHHELD_INDETERMINATE"}
+  ]
+}

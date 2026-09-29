@@ -1,0 +1,22 @@
+{
+  "contract_version": "STAGE6_RECURSIVE_THESIS_REVIEW_CONTRACT_V1",
+  "review_schema": "STAGE6_RECURSIVE_THESIS_REVIEW_INPUT_V1",
+  "assessment_schema": "STAGE6_RECURSIVE_THESIS_REVIEW_ASSESSMENT_V1",
+  "wrapper_schema": "STAGE6_6F_RECURSIVE_TRADE_THESIS_VERSION_RECORD_V1",
+  "store_schema": "STAGE6_6F_RECURSIVE_THESIS_STORE_V1",
+  "processor_version": "STAGE6_6F_RECURSIVE_THESIS_REVIEW_ENGINE_V1",
+  "decision_semantics": "STAGE6_THESIS_MATERIAL_CHANGE_RULES_V1",
+  "semantic_code_commit": "3b094f4167e78de7699742080e0a163e7550bc0e",
+  "trade_thesis_schema": "STAGE6_TRADE_THESIS_V2",
+  "trade_thesis_schema_blob": "2cc390a2cb85d938062511408293adcaf84ea288",
+  "authority": "SHADOW_ONLY",
+  "version_direct_input_order": [
+    "STAGE6_TRADE_THESIS_V2",
+    "STAGE6_RECURSIVE_THESIS_REVIEW_INPUT_V1",
+    "STAGE6_RECURSIVE_THESIS_REVIEW_ASSESSMENT_V1"
+  ],
+  "recursive_version_minimum": 3,
+  "closed_status_permitted": false,
+  "dynamic_management": false,
+  "trading_authority": false
+}

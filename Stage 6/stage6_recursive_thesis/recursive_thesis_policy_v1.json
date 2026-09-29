@@ -1,0 +1,24 @@
+{
+  "policy_id": "S6THRECPOL_STAGE6_6F_V1",
+  "processor_version": "STAGE6_6F_RECURSIVE_THESIS_REVIEW_ENGINE_V1",
+  "development_baseline": "11f90c3263476f9b396b2beefebcd4f3ddb147b7",
+  "semantic_code_commit": "3b094f4167e78de7699742080e0a163e7550bc0e",
+  "decision_semantics": "STAGE6_THESIS_MATERIAL_CHANGE_RULES_V1",
+  "authority": "SHADOW_ONLY",
+  "current_source_types": ["STAGE6_6E", "STAGE6_6F"],
+  "automatic_current_selection": false,
+  "version_increment": 1,
+  "availability_states": ["AVAILABLE", "NOT_PROVIDED"],
+  "rule_order": [
+    "INVALIDATION_TRIGGERED",
+    "INVALIDATION_NOT_FULLY_EVALUATED",
+    "CHANGE_ASSERTION_INDETERMINATE",
+    "CONFLICTING_MATERIAL_CHANGE",
+    "ADVERSE_MATERIAL_CHANGE",
+    "SUPPORTIVE_MATERIAL_CHANGE",
+    "NO_MATERIAL_CHANGE"
+  ],
+  "dynamic_management": false,
+  "trading_authority": false,
+  "network_calls": 0
+}
