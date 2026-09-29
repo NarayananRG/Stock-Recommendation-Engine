@@ -1,0 +1,15 @@
+{
+  "contract_version": "STAGE6_MORNING_REVALIDATION_INPUT_CONTRACT_V1",
+  "snapshot_schema": "STAGE6_MORNING_REVALIDATION_INPUT_SNAPSHOT_V1",
+  "store_schema": "STAGE6_7A_MORNING_REVALIDATION_INPUT_STORE_V1",
+  "processor_version": "STAGE6_7A_MORNING_REVALIDATION_INPUT_FREEZER_V1",
+  "authority": "SHADOW_ONLY",
+  "portfolio_context_schema": "STAGE6_PORTFOLIO_CONTEXT_V2",
+  "portfolio_context_blob": "5900278a891dc70c63ce02f69002b5e9dec13799",
+  "trade_thesis_schema": "STAGE6_TRADE_THESIS_V2",
+  "trade_thesis_blob": "2cc390a2cb85d938062511408293adcaf84ea288",
+  "market_context_blob": "a141b221228718b8276b3d05b2f028d21adcfc3f",
+  "historical_analogue_blob": "85a2b0d00cacd6a3caea484e3ef3071eb16fe01d",
+  "entry_revalidation_status": "NOT_EVALUATED",
+  "entry_proposal_status": "NOT_MATERIALIZED"
+}

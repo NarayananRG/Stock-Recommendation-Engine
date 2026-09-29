@@ -1,0 +1,10 @@
+{
+  "fixture_version": "STAGE6_7A_FIXTURES_V1",
+  "development_baseline": "4232b1406bd6531925155132169db138c8784369",
+  "authority": "SHADOW_ONLY",
+  "examples": [
+    {"thesis_source": "STAGE6_6B", "inputs": "NO_OPTIONAL_INPUTS", "entry_revalidation_status": "NOT_EVALUATED"},
+    {"thesis_source": "STAGE6_6E", "inputs": "EVIDENCE_ONLY", "entry_revalidation_status": "NOT_EVALUATED"},
+    {"thesis_source": "STAGE6_6F", "inputs": "EXPLICIT_PIT_INPUTS", "entry_revalidation_status": "NOT_EVALUATED"}
+  ]
+}

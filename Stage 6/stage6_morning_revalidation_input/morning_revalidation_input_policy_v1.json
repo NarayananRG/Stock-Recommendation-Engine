@@ -1,0 +1,13 @@
+{
+  "policy_id": "S6MRINPOL_STAGE6_7A_V1",
+  "processor_version": "STAGE6_7A_MORNING_REVALIDATION_INPUT_FREEZER_V1",
+  "development_baseline": "4232b1406bd6531925155132169db138c8784369",
+  "authority": "SHADOW_ONLY",
+  "thesis_sources": ["STAGE6_6B", "STAGE6_6E", "STAGE6_6F"],
+  "availability_states": ["AVAILABLE", "NOT_PROVIDED"],
+  "automatic_candidate_selection": false,
+  "automatic_thesis_selection": false,
+  "entry_decision": false,
+  "network_calls": 0,
+  "trading_authority": false
+}

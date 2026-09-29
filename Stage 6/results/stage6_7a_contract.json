@@ -1,0 +1,10 @@
+{
+  "stage":"6.7A","result":"PASS","branch":"stage6-morning-revalidation","development_baseline":"4232b1406bd6531925155132169db138c8784369",
+  "schema":"STAGE6_MORNING_REVALIDATION_INPUT_SNAPSHOT_V1","store":"STAGE6_7A_MORNING_REVALIDATION_INPUT_STORE_V1","processor":"STAGE6_7A_MORNING_REVALIDATION_INPUT_FREEZER_V1",
+  "policy_id":"S6MRINPOL_STAGE6_7A_V1","policy_hash":"7f7fd729c0d57bcb909ea0c83b869e807d9db89a2bc52f5eb99d286d46e2bc20",
+  "contract":"STAGE6_MORNING_REVALIDATION_INPUT_CONTRACT_V1","contract_hash":"169a9cce2c33855c4866029c9b9ca889fb253a4b50ee7cd2eee03a110aa33f70",
+  "authority":"SHADOW_ONLY","candidate_selection":"EXACT_SINGLE_PENDING_ENTRY","thesis_sources":["STAGE6_6B","STAGE6_6E","STAGE6_6F"],"automatic_selection":false,
+  "session_timing_status":"CALLER_DECLARED_PRE_SESSION","entry_revalidation_status":"NOT_EVALUATED","entry_proposal_status":"NOT_MATERIALIZED",
+  "stage6_7a_tests":{"passed":305,"failed":0,"total":305},"prior_stage6_tests":{"passed":4315,"failed":0,"total":4315},"combined_stage6_tests":{"passed":4620,"failed":0,"total":4620},
+  "stage6_0c":{"result":"PASS","schemas":10},"frozen_changed_files":0,"stage5d_changed_files":0,"runtime_artifacts_committed":0,"network_calls":0,"external_api_calls":0,"ai_ml_nlp_ocr_embeddings":false,"trading_authority":false,"tags_created":0
+}
