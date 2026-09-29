@@ -1,0 +1,19 @@
+{
+  "fixture_version": "STAGE6_6C_FIXTURES_V1",
+  "review_request": {
+    "review_cutoff": "2026-09-29T12:00:00.000000Z",
+    "evidence_ids": ["S6EV_REVIEW_001"],
+    "company_effect_ids": ["S6COMEFF_REVIEW_001"],
+    "market_context_id": "S6MCTX_REVIEW_001",
+    "historical_analogue_id": "S6HAN_REVIEW_001",
+    "portfolio_context_id": "S6PORTCTX_REVIEW_001"
+  },
+  "empty_optional_expected": {
+    "new_evidence_status": "NOT_PROVIDED",
+    "company_effect_status": "NOT_PROVIDED",
+    "market_context_status": "NOT_PROVIDED",
+    "historical_analogue_status": "NOT_PROVIDED",
+    "portfolio_context_status": "NOT_PROVIDED",
+    "portfolio_subject_presence": "NOT_PROVIDED"
+  }
+}

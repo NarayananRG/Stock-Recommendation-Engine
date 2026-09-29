@@ -1,0 +1,15 @@
+{
+  "policy_id": "S6THREVINPOL_STAGE6_6C_V1",
+  "processor_version": "STAGE6_6C_THESIS_REVIEW_INPUT_FREEZER_V1",
+  "development_baseline": "eac8ae133acb712fbe2777ad025ed98b9d0c05f8",
+  "authority": "SHADOW_ONLY",
+  "availability_states": ["AVAILABLE", "NOT_PROVIDED"],
+  "company_effect_relevance": "CALLER_SELECTED_UNINTERPRETED",
+  "historical_analogue_relevance": "CALLER_SELECTED_UNINTERPRETED",
+  "supported_previous_thesis_version": 1,
+  "selection_mode": "EXPLICIT_CALLER_IDS_ONLY",
+  "network_calls": 0,
+  "external_apis": 0,
+  "ai": false,
+  "trading_authority": false
+}

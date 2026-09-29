@@ -1,0 +1,12 @@
+{
+  "contract_version": "STAGE6_THESIS_REVIEW_INPUT_CONTRACT_V1",
+  "schema_version": "STAGE6_THESIS_REVIEW_INPUT_SNAPSHOT_V1",
+  "store_schema_version": "STAGE6_6C_THESIS_REVIEW_INPUT_STORE_V1",
+  "identity_prefix": "S6THREVINPUT_",
+  "previous_thesis_schema": "STAGE6_TRADE_THESIS_V2",
+  "review_cutoff_rule": "STRICTLY_AFTER_PREVIOUS_DECISION_CUTOFF",
+  "input_selection": "EXPLICIT_CALLER_IDS_ONLY",
+  "material_change_status": "NOT_EVALUATED",
+  "next_thesis_version_status": "NOT_MATERIALIZED",
+  "authority": "SHADOW_ONLY"
+}
