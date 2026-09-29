@@ -1,0 +1,11 @@
+{
+  "projection_contract": {
+    "payload_schema": "STAGE6_PORTFOLIO_CONTEXT_V2",
+    "open_position_fields": ["average_cost", "current_price", "market_value", "quantity", "recommendation_id", "risk_at_stop", "sector_entity_id", "subsector_entity_id", "thesis_id", "ticker", "transaction_or_fill_ids"],
+    "pending_entry_fields": ["committed_capital", "recommendation_id", "thesis_id", "ticker"],
+    "exposure_unit": "FRACTION_OF_INVESTED_CAPITAL",
+    "exposure_denominator": "INVESTED_CAPITAL",
+    "correlation_projection": "EXACT_WRAPPER_CORRELATION_OBJECT",
+    "null_correlation_preserved": true
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "contract_version": "STAGE6_PORTFOLIO_CONTEXT_ASSEMBLY_CONTRACT_V1",
+  "payload_schema": "STAGE6_PORTFOLIO_CONTEXT_V2",
+  "portfolio_context_blob": "5900278a891dc70c63ce02f69002b5e9dec13799",
+  "source_stages": ["STAGE6_5B_PORTFOLIO_ARITHMETIC", "STAGE6_5C_PORTFOLIO_CORRELATION"],
+  "operation": "VALIDATE_AND_PROJECT_ONLY",
+  "preserve_upstream_order": true,
+  "preserve_null_correlations": true,
+  "recalculate_arithmetic": false,
+  "recalculate_correlation": false,
+  "interpret_correlation": false,
+  "evaluate_constraints": false,
+  "authority": "SHADOW_ONLY",
+  "trading_authority": false
+}

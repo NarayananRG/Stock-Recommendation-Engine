@@ -1,0 +1,15 @@
+{
+  "policy_id": "S6PORTCTXPOL_STAGE6_5D_V1",
+  "processor_version": "STAGE6_5D_PORTFOLIO_CONTEXT_ASSEMBLER_V1",
+  "authority": "SHADOW_ONLY",
+  "development_baseline": "a8f282e6b5c5ccccbdfb594a1744a504f14d91ad",
+  "payload_schema": "STAGE6_PORTFOLIO_CONTEXT_V2",
+  "arithmetic_schema": "STAGE6_PORTFOLIO_ARITHMETIC_V1",
+  "arithmetic_policy_hash": "dd2dcdcd7cbf00182d9ab62f0eca942fae8246ec570a2004388aa9dd3bdb5d19",
+  "arithmetic_contract_hash": "72642f1d50d6d1c78e2c15c23f81cefd88a62bf942d5f7d01bfd113665b7da80",
+  "correlation_schema": "STAGE6_PORTFOLIO_CORRELATION_CONTEXT_V1",
+  "correlation_policy_hash": "b03dd26fdf5d8171dd42bb628f80609a833c9c2bce7c0808ca9ea8e0c87321c0",
+  "correlation_contract_hash": "9e852563a63c8e8ce1f21ebd542a2355b5330b8e0aa2d7b940d350fa399c234e",
+  "assembly_only": true,
+  "trading_authority": false
+}
