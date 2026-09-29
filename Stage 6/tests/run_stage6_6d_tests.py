@@ -73,7 +73,7 @@ for b in ("evidence_binding","effect_binding","market_binding","analogue_binding
 case("SUPPORT","altered hash",lambda:expect(ThesisReviewAssessmentIntegrityFailure,lambda:validate_structured(CTX["thesis"],CTX["snapshot"],invalidations(),[assertion("NON_MATERIAL",supports=[CTX["evidence_binding"]|{"record_hash":"0"*64}])])))
 case("SUPPORT","unknown id",lambda:expect(ThesisReviewAssessmentIntegrityFailure,lambda:validate_structured(CTX["thesis"],CTX["snapshot"],invalidations(),[assertion("NON_MATERIAL",supports=[CTX["evidence_binding"]|{"record_id":"OTHER"}])])))
 case("SUPPORT","thesis prohibited",lambda:expect(ThesisReviewAssessmentIntegrityFailure,lambda:validate_structured(CTX["thesis"],CTX["snapshot"],invalidations(),[assertion("NON_MATERIAL",supports=[CTX["snapshot"]["previous_thesis_binding"]])])))
-for value in CHANGE_ASSESSMENTS:case("ASSERTION",value,lambda value=value:require(validate_structured(CTX["thesis"],CTX["snapshot"],invalidations(),[assertion(value)])))
+for value in sorted(CHANGE_ASSESSMENTS):case("ASSERTION",value,lambda value=value:require(validate_structured(CTX["thesis"],CTX["snapshot"],invalidations(),[assertion(value)])))
 case("ASSERTION","unknown",lambda:expect(ThesisReviewAssessmentIntegrityFailure,lambda:validate_structured(CTX["thesis"],CTX["snapshot"],invalidations(),[assertion("OTHER")])))
 case("ASSERTION","support required",lambda:expect(ThesisReviewAssessmentIntegrityFailure,lambda:validate_structured(CTX["thesis"],CTX["snapshot"],invalidations(),[assertion("NON_MATERIAL",supports=[])])))
 case("ASSERTION","reason enum",lambda:expect(ThesisReviewAssessmentIntegrityFailure,lambda:validate_structured(CTX["thesis"],CTX["snapshot"],invalidations(),[assertion("NON_MATERIAL","OTHER")])))
@@ -122,7 +122,7 @@ case("STORE","idempotent",lambda:require(CTX["store"].assess(**request())["statu
 case("STORE","logical conflict",lambda:expect(ThesisReviewAssessmentConflict,lambda:CTX["store"].assess(**request(assertions=[assertion("SUPPORTIVE_MATERIAL")]))))
 case("STORE","two bindings",lambda:require(CTX["store"].connection.execute("SELECT count(*) FROM thesis_review_assessment_bindings").fetchone()[0]==2))
 case("STORE","four dependencies",lambda:require(CTX["store"].connection.execute("SELECT count(*) FROM thesis_review_assessment_dependencies").fetchone()[0]==4))
-for forbidden in ALLOWED_SUPPORT:case("DEPENDENCY","no transitive "+forbidden,lambda forbidden=forbidden:require(CTX["store"].connection.execute("SELECT count(*) FROM thesis_review_assessment_dependencies WHERE record_type=?",(forbidden,)).fetchone()[0]==0))
+for forbidden in sorted(ALLOWED_SUPPORT):case("DEPENDENCY","no transitive "+forbidden,lambda forbidden=forbidden:require(CTX["store"].connection.execute("SELECT count(*) FROM thesis_review_assessment_dependencies WHERE record_type=?",(forbidden,)).fetchone()[0]==0))
 for t in TABLES:
  case("APPEND_ONLY",t+" update",lambda t=t:expect(sqlite3.DatabaseError,lambda:CTX["store"].connection.execute(f"UPDATE {t} SET rowid=rowid")))
  case("APPEND_ONLY",t+" delete",lambda t=t:expect(sqlite3.DatabaseError,lambda:CTX["store"].connection.execute(f"DELETE FROM {t}")))
