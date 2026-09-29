@@ -1,0 +1,13 @@
+{
+  "policy_id": "S6THMATPOL_STAGE6_6B_V1",
+  "processor_version": "STAGE6_6B_INITIAL_THESIS_MATERIALIZER_V1",
+  "development_baseline": "1672ab7ed7322b8dc4406ab5ea556325977bc8cd",
+  "thesis_engine_version": "STAGE6_INITIAL_THESIS_SEMANTICS_V1",
+  "authority": "SHADOW_ONLY",
+  "accepted_seed_schema": "STAGE6_INITIAL_THESIS_SEED_V1",
+  "initial_thesis_status": "THESIS_UNCHANGED",
+  "network_calls": 0,
+  "external_apis": 0,
+  "ai": false,
+  "trading_authority": false
+}

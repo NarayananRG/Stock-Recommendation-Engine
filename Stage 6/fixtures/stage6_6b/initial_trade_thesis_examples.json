@@ -1,0 +1,15 @@
+{
+  "fixture_version": "STAGE6_6B_FIXTURES_V1",
+  "seed_source_fixture": "../stage6_6a/initial_thesis_seed_examples.json#examples/0",
+  "expected": {
+    "schema_version": "STAGE6_TRADE_THESIS_V2",
+    "thesis_engine_version": "STAGE6_INITIAL_THESIS_SEMANTICS_V1",
+    "code_commit": "1672ab7ed7322b8dc4406ab5ea556325977bc8cd",
+    "version": 1,
+    "thesis_status": "THESIS_UNCHANGED",
+    "authority_mode": "SHADOW_ONLY",
+    "input_record_count": 1,
+    "change_history_count": 1,
+    "previous_version_hash": null
+  }
+}
