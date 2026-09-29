@@ -1,0 +1,36 @@
+{
+  "two_company_daily": {
+    "source_system": "FIXTURE",
+    "source_export_id": "S6FIX_RETURNS_001",
+    "source_export_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "source_schema_version": "FIXTURE_PIT_RETURNS_V1",
+    "source_dataset_id": "S6FIX_RETURN_DATASET_001",
+    "as_of_timestamp": "2026-05-01T11:58:00Z",
+    "data_cutoff_timestamp": "2026-05-01T11:58:00Z",
+    "return_frequency": "DAILY",
+    "return_unit": "PERCENT_RETURN",
+    "lookback_window": {"value": 30, "unit": "TRADING_SESSIONS"},
+    "window_start_timestamp": "2026-04-01T00:00:00Z",
+    "minimum_observations": 3,
+    "series": [
+      {
+        "company_entity_id": "S6FIX_COMPANY_001",
+        "status": "AVAILABLE",
+        "observations": [
+          {"period_end_utc": "2026-04-28T00:00:00Z", "return_value": 1, "return_unit": "PERCENT_RETURN", "source_record_id": "RET_A_1", "source_record_hash": "1111111111111111111111111111111111111111111111111111111111111111", "source_recorded_at_utc": "2026-04-28T01:00:00Z"},
+          {"period_end_utc": "2026-04-29T00:00:00Z", "return_value": 2, "return_unit": "PERCENT_RETURN", "source_record_id": "RET_A_2", "source_record_hash": "2222222222222222222222222222222222222222222222222222222222222222", "source_recorded_at_utc": "2026-04-29T01:00:00Z"},
+          {"period_end_utc": "2026-04-30T00:00:00Z", "return_value": 3, "return_unit": "PERCENT_RETURN", "source_record_id": "RET_A_3", "source_record_hash": "3333333333333333333333333333333333333333333333333333333333333333", "source_recorded_at_utc": "2026-04-30T01:00:00Z"}
+        ]
+      },
+      {
+        "company_entity_id": "S6FIX_COMPANY_002",
+        "status": "AVAILABLE",
+        "observations": [
+          {"period_end_utc": "2026-04-28T00:00:00Z", "return_value": 2, "return_unit": "PERCENT_RETURN", "source_record_id": "RET_B_1", "source_record_hash": "4444444444444444444444444444444444444444444444444444444444444444", "source_recorded_at_utc": "2026-04-28T01:00:00Z"},
+          {"period_end_utc": "2026-04-29T00:00:00Z", "return_value": 4, "return_unit": "PERCENT_RETURN", "source_record_id": "RET_B_2", "source_record_hash": "5555555555555555555555555555555555555555555555555555555555555555", "source_recorded_at_utc": "2026-04-29T01:00:00Z"},
+          {"period_end_utc": "2026-04-30T00:00:00Z", "return_value": 6, "return_unit": "PERCENT_RETURN", "source_record_id": "RET_B_3", "source_record_hash": "6666666666666666666666666666666666666666666666666666666666666666", "source_recorded_at_utc": "2026-04-30T01:00:00Z"}
+        ]
+      }
+    ]
+  }
+}

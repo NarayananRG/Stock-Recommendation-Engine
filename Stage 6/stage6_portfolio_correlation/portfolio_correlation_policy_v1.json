@@ -1,0 +1,18 @@
+{
+  "policy_id": "S6PORTCORRPOL_STAGE6_5C_V1",
+  "processor_version": "STAGE6_5C_PORTFOLIO_CORRELATION_CALCULATOR_V1",
+  "authority": "SHADOW_ONLY",
+  "development_baseline": "31527d4c6f61e467306c62607d5d3ab4dd98a9d5",
+  "source_schema_version": "STAGE6_PORTFOLIO_ARITHMETIC_V1",
+  "source_processor_version": "STAGE6_5B_PORTFOLIO_ARITHMETIC_AGGREGATOR_V1",
+  "source_policy_id": "S6PORTARITHPOL_STAGE6_5B_V1",
+  "source_policy_hash": "dd2dcdcd7cbf00182d9ab62f0eca942fae8246ec570a2004388aa9dd3bdb5d19",
+  "source_arithmetic_contract_version": "STAGE6_PORTFOLIO_ARITHMETIC_CONTRACT_V1",
+  "source_arithmetic_contract_hash": "72642f1d50d6d1c78e2c15c23f81cefd88a62bf942d5f7d01bfd113665b7da80",
+  "member_identity": "company_entity_id",
+  "pair_semantics": "UNIQUE_UNORDERED_HELD_COMPANY_PAIRS",
+  "alignment": "PAIRWISE_COMPLETE_EXACT_TIMESTAMP",
+  "pending_entries_included": false,
+  "interpretation": false,
+  "trading_authority": false
+}

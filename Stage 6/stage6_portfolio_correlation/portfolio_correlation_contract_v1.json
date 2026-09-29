@@ -1,0 +1,20 @@
+{
+  "contract_version": "STAGE6_PORTFOLIO_CORRELATION_CONTRACT_V1",
+  "method": "PEARSON_PAIRWISE_COMPLETE_V1",
+  "alignment": "PAIRWISE_COMPLETE_EXACT_TIMESTAMP",
+  "decimal_precision": 50,
+  "boundary_tolerance": "1E-24",
+  "return_frequencies": ["DAILY", "MONTHLY", "WEEKLY"],
+  "return_units": ["DECIMAL_RETURN", "PERCENT_RETURN"],
+  "lookback_units": ["DAYS", "TRADING_SESSIONS"],
+  "series_statuses": ["AVAILABLE", "MISSING"],
+  "pair_statuses": ["AVAILABLE", "INSUFFICIENT_OBSERVATIONS", "MISSING_SERIES", "ZERO_VARIANCE"],
+  "minimum_observations_floor": 2,
+  "null_when_insufficient": true,
+  "null_when_zero_variance": true,
+  "no_imputation": true,
+  "no_resampling": true,
+  "signed_correlation": true,
+  "authority": "SHADOW_ONLY",
+  "trading_authority": false
+}
