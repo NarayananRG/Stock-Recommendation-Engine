@@ -1,0 +1,27 @@
+{
+  "contract_version": "STAGE6_TRADE_THESIS_VERSION_MATERIALIZATION_CONTRACT_V1",
+  "wrapper_schema_version": "STAGE6_6E_TRADE_THESIS_VERSION_RECORD_V1",
+  "payload_schema_version": "STAGE6_TRADE_THESIS_V2",
+  "store_schema_version": "STAGE6_6E_TRADE_THESIS_VERSION_STORE_V1",
+  "processor_version": "STAGE6_6E_TRADE_THESIS_VERSION_MATERIALIZER_V1",
+  "thesis_engine_version": "STAGE6_THESIS_MATERIAL_CHANGE_RULES_V1",
+  "runtime_semantic_commit": "3b094f4167e78de7699742080e0a163e7550bc0e",
+  "authority": "SHADOW_ONLY",
+  "input_order": [
+    "STAGE6_TRADE_THESIS_V2",
+    "STAGE6_THESIS_REVIEW_INPUT_SNAPSHOT_V1",
+    "STAGE6_THESIS_REVIEW_ASSESSMENT_V1"
+  ],
+  "direct_dependency_order": [
+    "STAGE6_TRADE_THESIS_V2",
+    "STAGE6_THESIS_REVIEW_INPUT_SNAPSHOT_V1",
+    "STAGE6_THESIS_REVIEW_ASSESSMENT_V1",
+    "STAGE6_6E_POLICY",
+    "STAGE6_6E_MATERIALIZATION_CONTRACT"
+  ],
+  "previous_version": 1,
+  "materialized_version": 2,
+  "closed_status_permitted": false,
+  "dynamic_management": false,
+  "trading_authority": false
+}

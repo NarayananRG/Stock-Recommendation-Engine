@@ -1,0 +1,13 @@
+{
+  "fixture_version": "STAGE6_6E_FIXTURES_V1",
+  "development_baseline": "16346dee8270135a7f43f1140f920531d33f6cbd",
+  "runtime_semantic_commit": "3b094f4167e78de7699742080e0a163e7550bc0e",
+  "review_cutoff": "2026-09-29T12:00:00Z",
+  "cases": [
+    {"name": "strengthened", "assessment": "SUPPORTIVE_MATERIAL", "expected_status": "THESIS_STRENGTHENED", "expected_change_type": "THESIS_STRENGTHENED_REVIEW"},
+    {"name": "unchanged", "assessment": "NON_MATERIAL", "expected_status": "THESIS_UNCHANGED", "expected_change_type": "THESIS_REVIEWED_UNCHANGED"},
+    {"name": "weakened", "assessment": "ADVERSE_MATERIAL", "expected_status": "THESIS_WEAKENED", "expected_change_type": "THESIS_WEAKENED_REVIEW"},
+    {"name": "invalidated", "assessment": "INVALIDATION_TRIGGERED", "expected_status": "THESIS_INVALIDATED", "expected_change_type": "THESIS_INVALIDATED_REVIEW"},
+    {"name": "indeterminate", "assessment": "INVALIDATION_NOT_EVALUATED", "expected_result": "WITHHELD_INDETERMINATE"}
+  ]
+}

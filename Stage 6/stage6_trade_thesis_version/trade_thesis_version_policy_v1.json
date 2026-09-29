@@ -1,0 +1,22 @@
+{
+  "policy_id": "S6THVERPOL_STAGE6_6E_V1",
+  "processor_version": "STAGE6_6E_TRADE_THESIS_VERSION_MATERIALIZER_V1",
+  "development_baseline": "16346dee8270135a7f43f1140f920531d33f6cbd",
+  "runtime_semantic_commit": "3b094f4167e78de7699742080e0a163e7550bc0e",
+  "thesis_engine_version": "STAGE6_THESIS_MATERIAL_CHANGE_RULES_V1",
+  "authority": "SHADOW_ONLY",
+  "eligible_review_outcome": "DETERMINATE",
+  "eligible_next_version_status": "READY_FOR_MATERIALIZATION",
+  "eligible_target_statuses": [
+    "THESIS_INVALIDATED",
+    "THESIS_STRENGTHENED",
+    "THESIS_UNCHANGED",
+    "THESIS_WEAKENED"
+  ],
+  "indeterminate_result": "WITHHELD_INDETERMINATE",
+  "version_transition": [1, 2],
+  "stable_thesis_identity": true,
+  "stop_target_changes": false,
+  "trading_authority": false,
+  "network_calls": 0
+}
