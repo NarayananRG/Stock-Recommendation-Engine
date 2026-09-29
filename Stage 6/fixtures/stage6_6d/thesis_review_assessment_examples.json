@@ -1,0 +1,12 @@
+{
+  "fixture_version": "STAGE6_6D_FIXTURES_V1",
+  "examples": [
+    {"name": "strengthened", "assertions": ["SUPPORTIVE_MATERIAL"], "expected": "THESIS_STRENGTHENED"},
+    {"name": "weakened", "assertions": ["ADVERSE_MATERIAL"], "expected": "THESIS_WEAKENED"},
+    {"name": "invalidated", "triggered_condition": 0, "expected": "THESIS_INVALIDATED"},
+    {"name": "unchanged", "assertions": ["NON_MATERIAL"], "expected": "THESIS_UNCHANGED"},
+    {"name": "indeterminate_invalidation", "unevaluated_condition": 0, "expected": null},
+    {"name": "indeterminate_assertion", "assertions": ["INDETERMINATE"], "expected": null},
+    {"name": "conflicting_material", "assertions": ["SUPPORTIVE_MATERIAL", "ADVERSE_MATERIAL"], "expected": null}
+  ]
+}

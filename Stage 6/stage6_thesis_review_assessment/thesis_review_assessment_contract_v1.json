@@ -1,0 +1,12 @@
+{
+  "contract_version": "STAGE6_THESIS_REVIEW_ASSESSMENT_CONTRACT_V1",
+  "schema_version": "STAGE6_THESIS_REVIEW_ASSESSMENT_V1",
+  "store_schema_version": "STAGE6_6D_THESIS_REVIEW_ASSESSMENT_STORE_V1",
+  "decision_semantics_version": "STAGE6_THESIS_MATERIAL_CHANGE_RULES_V1",
+  "identity_prefix": "S6THREVASS_",
+  "assertion_identity_prefix": "S6THASSERT_",
+  "supported_previous_version": 1,
+  "next_version_materialization": "DEFERRED_TO_STAGE6_6E",
+  "direct_dependencies": ["STAGE6_TRADE_THESIS_V2", "STAGE6_THESIS_REVIEW_INPUT_SNAPSHOT_V1", "STAGE6_6D_POLICY", "STAGE6_6D_ASSESSMENT_CONTRACT"],
+  "authority": "SHADOW_ONLY"
+}

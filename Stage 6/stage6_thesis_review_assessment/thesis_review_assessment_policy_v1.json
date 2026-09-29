@@ -1,0 +1,16 @@
+{
+  "policy_id": "S6THREVASSPOL_STAGE6_6D_V1",
+  "processor_version": "STAGE6_6D_THESIS_REVIEW_ASSESSOR_V1",
+  "development_baseline": "ce37a7422a2e4723cf2dea515046ed447946a5eb",
+  "decision_semantics_version": "STAGE6_THESIS_MATERIAL_CHANGE_RULES_V1",
+  "authority": "SHADOW_ONLY",
+  "condition_indexing": "ZERO_BASED",
+  "invalidation_statuses": ["TRIGGERED", "NOT_TRIGGERED", "NOT_EVALUATED"],
+  "change_assessments": ["SUPPORTIVE_MATERIAL", "ADVERSE_MATERIAL", "NON_MATERIAL", "INDETERMINATE"],
+  "reason_codes": ["NEW_EVIDENCE", "COMPANY_EFFECT", "MARKET_CONTEXT", "HISTORICAL_ANALOGUE", "PORTFOLIO_CONTEXT", "INVALIDATION_CONDITION", "MULTI_SOURCE_REVIEW"],
+  "rule_order": ["INVALIDATION_TRIGGERED", "INVALIDATION_NOT_FULLY_EVALUATED", "CHANGE_ASSERTION_INDETERMINATE", "CONFLICTING_MATERIAL_CHANGE", "ADVERSE_MATERIAL_CHANGE", "SUPPORTIVE_MATERIAL_CHANGE", "NO_MATERIAL_CHANGE"],
+  "network_calls": 0,
+  "external_apis": 0,
+  "ai": false,
+  "trading_authority": false
+}
