@@ -1,0 +1,14 @@
+{
+  "policy_id": "S6MGMTPOPPOL_STAGE6_6G_V1",
+  "processor_version": "STAGE6_6G_DYNAMIC_MANAGEMENT_PROPOSER_V1",
+  "development_baseline": "db01e70880b9744f7383dcc1a8afabbf10fe70cd",
+  "authority": "SHADOW_ONLY",
+  "source_types": ["STAGE6_6E", "STAGE6_6F"],
+  "proposal_modes": ["NO_CHANGE", "STOP_CHANGE", "TARGET_CHANGE", "STOP_AND_TARGET_CHANGE"],
+  "reason_codes": ["NO_CHANGE_REVIEW", "THESIS_STATUS_REVIEW", "RISK_CONTROL_REVIEW", "MARKET_CONTEXT_REVIEW", "PORTFOLIO_CONTEXT_REVIEW", "MULTI_SOURCE_MANAGEMENT_REVIEW"],
+  "automatic_current_selection": false,
+  "automatic_proposal_generation": false,
+  "proposal_only": true,
+  "trading_authority": false,
+  "network_calls": 0
+}

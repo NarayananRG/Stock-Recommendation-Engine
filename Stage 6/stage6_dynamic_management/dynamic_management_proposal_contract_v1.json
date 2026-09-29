@@ -1,0 +1,15 @@
+{
+  "contract_version": "STAGE6_DYNAMIC_MANAGEMENT_PROPOSAL_CONTRACT_V1",
+  "proposal_schema": "STAGE6_DYNAMIC_MANAGEMENT_PROPOSAL_V1",
+  "store_schema": "STAGE6_6G_DYNAMIC_MANAGEMENT_STORE_V1",
+  "processor_version": "STAGE6_6G_DYNAMIC_MANAGEMENT_PROPOSER_V1",
+  "authority": "SHADOW_ONLY",
+  "trade_thesis_schema": "STAGE6_TRADE_THESIS_V2",
+  "trade_thesis_schema_blob": "2cc390a2cb85d938062511408293adcaf84ea288",
+  "proposal_status": "SHADOW_PROPOSAL_ONLY",
+  "source_types": ["STAGE6_6E", "STAGE6_6F"],
+  "direct_dependency_count": 5,
+  "mutates_trade_thesis": false,
+  "mutates_stage5d": false,
+  "executes_trades": false
+}

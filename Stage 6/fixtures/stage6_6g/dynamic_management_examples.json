@@ -1,0 +1,11 @@
+{
+  "fixture_version": "STAGE6_6G_FIXTURES_V1",
+  "development_baseline": "db01e70880b9744f7383dcc1a8afabbf10fe70cd",
+  "authority": "SHADOW_ONLY",
+  "examples": [
+    {"source": "STAGE6_6E", "mode": "NO_CHANGE", "expected": "SHADOW_PROPOSAL_ONLY"},
+    {"source": "STAGE6_6E", "mode": "STOP_CHANGE", "expected": "SHADOW_PROPOSAL_ONLY"},
+    {"source": "STAGE6_6F", "mode": "TARGET_CHANGE", "expected": "SHADOW_PROPOSAL_ONLY"},
+    {"source": "STAGE6_6F", "mode": "STOP_AND_TARGET_CHANGE", "expected": "SHADOW_PROPOSAL_ONLY"}
+  ]
+}
