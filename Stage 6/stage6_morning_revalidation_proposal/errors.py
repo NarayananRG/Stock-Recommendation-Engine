@@ -1,0 +1,3 @@
+class Stage6MorningProposalError(ValueError): pass
+class MorningProposalConflict(Stage6MorningProposalError): pass
+class MorningProposalIntegrityFailure(Stage6MorningProposalError): pass

@@ -1,0 +1,17 @@
+{
+  "fixture_version": "STAGE6_7B_FIXTURES_V1",
+  "development_baseline": "66c6b7bdbc2fb3dd993e6a2900215a74d5f3c415",
+  "authority": "SHADOW_ONLY",
+  "examples": [
+    {"name": "V1_ZERO_ASSERTIONS", "thesis_version": 1, "decision": "ENTRY_VALID", "reason": "NO_MATERIAL_ENTRY_BLOCKER"},
+    {"name": "V2_SUPPORTIVE", "thesis_version": 2, "decision": "ENTRY_VALID", "reason": "SUPPORTIVE_REVALIDATION"},
+    {"name": "V3_ADVERSE", "thesis_version": 3, "decision": "WAIT", "reason": "ADVERSE_MATERIAL_CHANGE"},
+    {"name": "CURRENT_INVALIDATED", "decision": "CANCEL_ENTRY", "reason": "CURRENT_THESIS_INVALIDATED"},
+    {"name": "TRIGGERED_INVALIDATION", "decision": "CANCEL_ENTRY", "reason": "INVALIDATION_TRIGGERED"},
+    {"name": "INCOMPLETE_INVALIDATION", "decision": "WAIT", "reason": "INVALIDATION_NOT_FULLY_EVALUATED"},
+    {"name": "MISSING_MARKET", "decision": "WAIT", "reason": "MARKET_CONTEXT_NOT_PROVIDED"},
+    {"name": "INDETERMINATE_ASSERTION", "decision": "WAIT", "reason": "CHANGE_ASSERTION_INDETERMINATE"},
+    {"name": "CONFLICTING_ASSERTIONS", "decision": "WAIT", "reason": "CONFLICTING_MATERIAL_CHANGE"},
+    {"name": "NON_MATERIAL", "decision": "ENTRY_VALID", "reason": "NO_MATERIAL_ENTRY_BLOCKER"}
+  ]
+}

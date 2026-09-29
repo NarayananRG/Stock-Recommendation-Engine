@@ -1,0 +1,14 @@
+{
+  "contract_version": "STAGE6_MORNING_REVALIDATION_PROPOSAL_CONTRACT_V1",
+  "proposal_schema": "STAGE6_MORNING_REVALIDATION_PROPOSAL_V1",
+  "store_schema": "STAGE6_7B_MORNING_REVALIDATION_PROPOSAL_STORE_V1",
+  "processor_version": "STAGE6_7B_MORNING_REVALIDATION_PROPOSER_V1",
+  "decision_engine_version": "STAGE6_MORNING_REVALIDATION_RULES_V1",
+  "decision_code_manifest_version": "STAGE6_7B_DECISION_CODE_MANIFEST_V1",
+  "input_schema": "STAGE6_MORNING_REVALIDATION_INPUT_SNAPSHOT_V1",
+  "decision_scope": "NEW_ENTRY",
+  "authority": "SHADOW_ONLY",
+  "direct_dependency_count": 6,
+  "confidence_field": false,
+  "generic_shadow_decision": false
+}

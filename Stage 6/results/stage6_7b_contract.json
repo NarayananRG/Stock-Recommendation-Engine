@@ -1,0 +1,23 @@
+{
+  "stage": "6.7B",
+  "result": "PASS",
+  "schema": "STAGE6_MORNING_REVALIDATION_PROPOSAL_V1",
+  "store": "STAGE6_7B_MORNING_REVALIDATION_PROPOSAL_STORE_V1",
+  "processor": "STAGE6_7B_MORNING_REVALIDATION_PROPOSER_V1",
+  "policy": "S6MRPROPPOL_STAGE6_7B_V1",
+  "policy_hash": "998a527039f4c203ad4dfe1a628eea32c66a3e6082e3e10e206c5da10de5000d",
+  "contract": "STAGE6_MORNING_REVALIDATION_PROPOSAL_CONTRACT_V1",
+  "contract_hash": "5cd2a04126e39e72afb177e46478539ef2892601010335e1f0588c34c8a59140",
+  "decision_engine": "STAGE6_MORNING_REVALIDATION_RULES_V1",
+  "code_manifest": "STAGE6_7B_DECISION_CODE_MANIFEST_V1",
+  "decision_code_hash": "ecb321e2c2a351a7b201178da31f8b5fb1f68c55964c9410d4edb06cfdc3e277",
+  "authority": "SHADOW_ONLY",
+  "tests_passed": 353,
+  "tests_failed": 0,
+  "combined_stage6_tests": 4973,
+  "stage6_7_status": "COMPLETE_SHADOW_ONLY",
+  "next_stage": "STAGE6_8_PROSPECTIVE_SHADOW_VALIDATION",
+  "trading_authority": false,
+  "network_calls": 0,
+  "external_api_calls": 0
+}

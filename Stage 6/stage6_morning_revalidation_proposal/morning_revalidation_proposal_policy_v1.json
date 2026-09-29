@@ -1,0 +1,11 @@
+{
+  "policy_id": "S6MRPROPPOL_STAGE6_7B_V1",
+  "processor_version": "STAGE6_7B_MORNING_REVALIDATION_PROPOSER_V1",
+  "decision_engine_version": "STAGE6_MORNING_REVALIDATION_RULES_V1",
+  "development_baseline": "66c6b7bdbc2fb3dd993e6a2900215a74d5f3c415",
+  "authority": "SHADOW_ONLY",
+  "proposal_decisions": ["ENTRY_VALID", "WAIT", "CANCEL_ENTRY"],
+  "invalidation_statuses": ["TRIGGERED", "NOT_TRIGGERED", "NOT_EVALUATED"],
+  "assertion_assessments": ["SUPPORTIVE_MATERIAL", "ADVERSE_MATERIAL", "NON_MATERIAL", "INDETERMINATE"],
+  "assertion_reason_codes": ["NEW_EVIDENCE", "COMPANY_EFFECT", "MARKET_CONTEXT", "HISTORICAL_ANALOGUE", "THESIS_STATE", "MULTI_SOURCE_REVALIDATION"]
+}
