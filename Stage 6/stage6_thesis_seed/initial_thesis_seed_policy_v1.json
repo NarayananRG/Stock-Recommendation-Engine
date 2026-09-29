@@ -1,0 +1,15 @@
+{
+  "policy_id": "S6THSEEDPOL_STAGE6_6A_V1",
+  "processor_version": "STAGE6_6A_INITIAL_THESIS_SEED_FREEZER_V1",
+  "development_baseline": "8696e7aa4e179cbe4f4fd2413d79643299260f97",
+  "authority": "SHADOW_ONLY",
+  "accepted_source_systems": ["FIXTURE", "STAGE5D5_THESIS_SEED_EXPORT"],
+  "stage5d5_commit": "74b2710f0e19bd403978da81e87f25a3059ace06",
+  "fill_order": ["fill_date", "transaction_id"],
+  "decimal_precision": 50,
+  "initial_thesis_status": "THESIS_UNCHANGED",
+  "network_calls": 0,
+  "external_apis": 0,
+  "ai": false,
+  "trading_authority": false
+}

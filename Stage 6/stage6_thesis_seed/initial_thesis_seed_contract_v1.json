@@ -1,0 +1,18 @@
+{
+  "contract_version": "STAGE6_INITIAL_THESIS_SEED_CONTRACT_V1",
+  "schema_version": "STAGE6_INITIAL_THESIS_SEED_V1",
+  "semantic_projection_version": "STAGE6_INITIAL_THESIS_SEMANTICS_V1",
+  "store_schema_version": "STAGE6_6A_INITIAL_THESIS_SEED_STORE_V1",
+  "identity_prefix": "S6THSEED_",
+  "record_hash_excludes": ["record_hash"],
+  "seed_id_excludes": ["seed_record_id", "record_hash"],
+  "aggregate_fill": {
+    "zero_fills": null,
+    "quantity": "SUM_QUANTITY",
+    "price": "VWAP_DECIMAL_PRECISION_50",
+    "fees": false,
+    "slippage": false
+  },
+  "final_trade_thesis_v2": "NOT_MATERIALIZED",
+  "authority": "SHADOW_ONLY"
+}
