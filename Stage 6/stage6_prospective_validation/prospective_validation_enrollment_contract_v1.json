@@ -7,6 +7,13 @@
   "processor_version": "STAGE6_8A_PROSPECTIVE_VALIDATION_ENROLLER_V1",
   "control_schema": "STAGE5D5_SCHEMA_V1",
   "shadow_schema": "STAGE6_MORNING_REVALIDATION_PROPOSAL_V1",
+  "control_origin_session_binding": "REQUIRED",
+  "target_control_session_binding": "REQUIRED",
+  "target_session_calendar_proof": "REQUIRED",
+  "control_only_direct_dependency_count": 6,
+  "paired_direct_dependency_count": 7,
+  "shadow_submission_capture": "SEPARATE_PRE_SESSION_APPEND_ONLY_STEP",
+  "prospective_shadow_submission_deadline": "BEFORE_09_15_IST_ON_TARGET_SESSION",
   "outcome_status": "NOT_ATTACHED",
   "authority": "SHADOW_ONLY",
   "trading_authority": false

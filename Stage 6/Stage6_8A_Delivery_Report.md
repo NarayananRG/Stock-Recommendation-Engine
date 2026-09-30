@@ -11,16 +11,16 @@ No real activation or prospective runtime database was created during implementa
 - Branch: `stage6-prospective-shadow-validation`
 - Exact baseline: `241256fa5e27838b40367dce24ae39fba88d3cee`
 - Protocol: `STAGE6_PROSPECTIVE_VALIDATION_PROTOCOL_V1`
-- Protocol hash: `6f769ef1799bbac7084f4a60f9ff879db9c223f1420d1f905c6f899862b8084f`
+- Protocol hash: `6232ae23df487f2b6fe7b84df971cbee902f3cad91b2da6f66e7d5ca2c8022be`
 - Activation schema: `STAGE6_PROSPECTIVE_ACTIVATION_V1`
 - Session schema: `STAGE6_PROSPECTIVE_SESSION_ENROLLMENT_V1`
 - Case schema: `STAGE6_PROSPECTIVE_CASE_ENROLLMENT_V1`
 - Store: `STAGE6_8A_PROSPECTIVE_VALIDATION_STORE_V1`
 - Processor: `STAGE6_8A_PROSPECTIVE_VALIDATION_ENROLLER_V1`
 - Policy: `S6PROSVALPOL_STAGE6_8A_V1`
-- Policy hash: `74a7655d8ffb34483b8b66197a2d46a66cbe35022a32b0de72fca9a05d743a40`
+- Policy hash: `d684bb4358dbe5a89f466f6eacaa0a4f759e3477b3002bf0f2e95ef102387f5d`
 - Contract: `STAGE6_PROSPECTIVE_VALIDATION_ENROLLMENT_CONTRACT_V1`
-- Contract hash: `106c4001a98acc6eb036791342c48af0c568e655fe99d8fdddf3185e73adf644`
+- Contract hash: `af73aab6e67bef22111d62ed563695ea6fc8d5f0a0234f3de41d1fd773c7fb05`
 - Authority: `SHADOW_ONLY`; trading authority: `false`
 
 ## Frozen controls and protocol
@@ -44,6 +44,16 @@ The real CLI creates exactly one content-addressed runtime activation only after
 
 Activation is deliberately pending independent audit and manual execution. Re-running activation cannot overwrite or regenerate the activation record.
 
+## Independent Audit Corrections
+
+1. The prior same-allocation assumption was removed. A recommendation now resolves exactly one Stage 5D.5 origin run by its allocation-run ID, and that run must have its own already enrolled prospective session.
+2. Origin and target sessions are distinct bindings. The origin session must equal the recommendation decision date; the target ordinary session must be strictly later than both decision and signal dates. The corrected fixture proves a `2026-10-05` recommendation and `ALLOC2` origin can be revalidated on `2026-10-06` under target `ALLOC3`.
+3. Shadow proposals are admitted through a separate append-only submission step before target-session enrollment. The internally generated timestamp must be strictly before `09:15:00 Asia/Kolkata`; exactly 09:15 or later fails closed.
+4. The PENDING_ENTRY event must be recorded strictly before the same 09:15 cutoff, after recommendation persistence, and before any paired shadow submission.
+5. Target dates are verified offline against the frozen NSE Capital Market ordinary-session artifact whose payload hash is `c93f0340ca55ace9650b4c68e85836d01303f35f8abd7dc22cad5ef34800a656`.
+6. Weekends and official closed dates are rejected. Special sessions return `UNSUPPORTED_FOR_STAGE6_8_V1`; their trading times are never guessed.
+7. The corrected D→D+1 fixture and its different origin/target allocations pass, while missing or ambiguous origin runs, late submissions, late pending events, future proposal cutoffs, holidays, weekends, special sessions, unsupported years, and calendar tampering fail closed.
+
 ## Read-only control and enrollment results
 
 - Stage 5D control database: SQLite URI `mode=ro`, `PRAGMA query_only=ON`
@@ -62,16 +72,16 @@ No economic winner, P&L, fill, cancellation, quantity, stop, target, or promotio
 
 ## Verification and boundaries
 
-- Stage 6.8A: 342/342 PASS with byte-stable evidence
+- Stage 6.8A: 373/373 PASS with byte-stable evidence
 - Prior Stage 6: 4,973/4,973 PASS
-- Combined Stage 6: 5,315/5,315 PASS
+- Combined Stage 6: 5,346/5,346 PASS
 - Stage 6.0C: PASS / 10 schemas
 - Existing/frozen changed files: 0
 - Stage 5D changes: 0
 - Runtime activation/database/WAL/SHM/log artifacts committed: 0
 - Network/API/broker/market/news downloads: 0
 - LLM/NLP/ML/OCR/embeddings/semantic similarity: none
-- Files added: 19; existing files modified/deleted: 0
+- Correction files changed: 14 Stage 6.8A files; existing frozen files modified/deleted: 0
 - Tags created: 0
 
 Stage 6.8B, outcome attachment, comparison summaries, Stage 6.9 promotion analysis, and every production action remain deferred.

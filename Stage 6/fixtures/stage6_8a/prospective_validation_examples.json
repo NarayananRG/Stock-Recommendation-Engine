@@ -4,10 +4,12 @@
   "examples": [
     {"name": "ZERO_CASE_SESSION", "candidate_count": 0, "recommendation_count": 0, "counts_toward_window": true},
     {"name": "CONTROL_ONLY", "case_state": "CONTROL_ONLY_PENDING_SHADOW", "outcome_status": "NOT_ATTACHED"},
-    {"name": "PAIRED", "case_state": "PAIRED_SHADOW_AVAILABLE", "outcome_status": "NOT_ATTACHED"},
+    {"name": "PAIRED", "case_state": "PAIRED_SHADOW_AVAILABLE", "outcome_status": "NOT_ATTACHED", "origin_session_date": "2026-10-05", "origin_allocation_run_id": "ALLOC2", "target_session_date": "2026-10-06", "target_allocation_run_id": "ALLOC3", "shadow_submitted_at_utc": "2026-10-06T03:30:00Z", "submission_deadline": "BEFORE_09_15_IST_ON_TARGET_SESSION"},
     {"name": "MISSING_LATER", "future_state": "SHADOW_OUTPUT_MISSING", "excluded": false},
     {"name": "SAME_ACTIVATION_DATE", "eligible": false},
     {"name": "PRE_ACTIVATION", "eligible": false},
-    {"name": "OUT_OF_ORDER", "accepted": false}
+    {"name": "OUT_OF_ORDER", "accepted": false},
+    {"name": "NSE_HOLIDAY_TARGET", "target_session_date": "2026-10-02", "accepted": false},
+    {"name": "SPECIAL_SESSION", "target_session_date": "2026-11-08", "accepted": false, "reason": "UNSUPPORTED_FOR_STAGE6_8_V1"}
   ]
 }

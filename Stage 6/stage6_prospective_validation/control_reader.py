@@ -61,6 +61,12 @@ class Stage5DControlReader:
   row=self.connection.execute("SELECT * FROM stage5d5_live_runs WHERE run_id=?",(run_id,)).fetchone()
   if row is None:raise Stage6ProspectiveError("CONTROL_RUN_NOT_FOUND")
   self.verify_integrity();return dict(row)
+ def get_origin_run(self,allocation_run_id):
+  if not isinstance(allocation_run_id,str) or not allocation_run_id:raise Stage6ProspectiveError("CONTROL_ORIGIN_ALLOCATION_REQUIRED")
+  rows=self.connection.execute("SELECT * FROM stage5d5_live_runs WHERE allocation_run_id=? ORDER BY market_session_date",(allocation_run_id,)).fetchall()
+  if len(rows)==0:raise Stage6ProspectiveError("CONTROL_ORIGIN_RUN_MISSING")
+  if len(rows)>1:raise Stage6ProspectiveError("CONTROL_ORIGIN_RUN_AMBIGUOUS")
+  self.verify_integrity();return dict(rows[0])
  def eligible_runs(self,activation_date_ist,activated_at_utc):
   start=parse_utc(activated_at_utc);return [dict(x) for x in self.connection.execute("SELECT * FROM stage5d5_live_runs ORDER BY market_session_date") if x["market_session_date"]>activation_date_ist and parse_utc(x["run_started_utc"])>start and parse_utc(x["run_completed_utc"])>=parse_utc(x["run_started_utc"])]
  def get_recommendation(self,recommendation_id):

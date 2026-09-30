@@ -5,6 +5,10 @@
   "branch": "stage6-prospective-shadow-validation",
   "stage5d_control_tag": "stage5d5-live-paper-runner-baseline",
   "stage5d_control_commit": "74b2710f0e19bd403978da81e87f25a3059ace06",
+  "ordinary_session_calendar": "Stage 5D/live_paper/data/nse_equity_calendar_2026.json",
+  "ordinary_session_calendar_hash": "c93f0340ca55ace9650b4c68e85836d01303f35f8abd7dc22cad5ef34800a656",
+  "submission_deadline_ist": "09:15:00",
+  "submission_deadline_comparison": "STRICTLY_BEFORE",
   "authority": "SHADOW_ONLY",
   "network_calls": 0,
   "external_api_calls": 0

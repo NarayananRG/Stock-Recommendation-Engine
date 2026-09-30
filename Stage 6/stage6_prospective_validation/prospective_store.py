@@ -7,7 +7,7 @@ from .stage6_shadow_reader import Stage6ShadowReader
 from .errors import ProspectiveConflict,ProspectiveIntegrityFailure,Stage6ProspectiveError
 from .policy import *
 from .enrollment_builder import build_session,build_submission,build_case,now_utc
-from .enrollment_validation import validate_run_eligibility,validate_session,validate_control_case,validate_pairing,validate_case
+from .enrollment_validation import validate_run_eligibility,validate_session,validate_control_case,validate_pairing,validate_bound_submission,validate_case
 
 TABLES=("prospective_store_meta","prospective_protocols","prospective_policies","prospective_contracts","prospective_activations","prospective_sessions","prospective_control_recommendations","prospective_pending_events","prospective_shadow_submissions","prospective_cases","prospective_case_dependencies","prospective_audits")
 class ProspectiveValidationStore:
@@ -61,34 +61,58 @@ CREATE TABLE prospective_audits(record_type TEXT NOT NULL,record_id TEXT NOT NUL
    audit={"record_type":SESSION_SCHEMA,"record_id":record["enrollment_id"],"prospective_eligibility":"PASS","outcome_status":"NOT_ATTACHED","authority":AUTHORITY}
    with self.connection:self.connection.execute("INSERT INTO prospective_sessions VALUES(?,?,?,?,?,?)",(record["enrollment_id"],run_id,run["market_session_date"],ordinal,record["record_hash"],canonical_json(record)));self.connection.execute("INSERT INTO prospective_audits VALUES(?,?,?)",(SESSION_SCHEMA,record["enrollment_id"],canonical_json(audit)))
    return {"status":"CREATED","session":record}
- def enroll_case(self,*,control_database,session_enrollment_id,recommendation_id,shadow_database=None,shadow_runtime_root=None,proposal_id=None):
+ def _session_for_run(self,run_id):
+  row=self.connection.execute("SELECT canonical_json FROM prospective_sessions WHERE run_id=?",(run_id,)).fetchone()
+  if row is None:raise Stage6ProspectiveError("CONTROL_ORIGIN_SESSION_NOT_ENROLLED")
+  return json.loads(row[0])
+ def submit_shadow_proposal(self,*,control_database,shadow_database,shadow_runtime_root,proposal_id,recommendation_id):
+  self._singletons()
+  with Stage6ShadowReader(shadow_database,shadow_runtime_root,self.activation) as shadow:proposal=shadow.get_proposal(proposal_id)
+  if proposal["recommendation_id"]!=recommendation_id:raise Stage6ProspectiveError("SHADOW_CONTROL_PAIRING_MISMATCH")
+  existing=self.connection.execute("SELECT canonical_json FROM prospective_shadow_submissions WHERE proposal_id=?",(proposal_id,)).fetchone()
+  if existing:
+   submission=json.loads(existing[0])
+   if submission["recommendation_id"]!=recommendation_id or submission["target_session_date"]!=proposal["target_session_date"] or submission["proposal_binding"]["record_hash"]!=proposal["record_hash"]:raise ProspectiveConflict("PROSPECTIVE_SHADOW_SUBMISSION_CONFLICT")
+   return {"status":"IDEMPOTENT_SUCCESS","shadow_submission":submission}
+  with Stage5DControlReader(control_database) as control:
+   recommendation=control.get_recommendation(recommendation_id);pending=control.get_pending_event(recommendation_id);origin_run=control.get_origin_run(recommendation["allocation_run_id"]);origin_session=self._session_for_run(origin_run["run_id"])
+   target={"market_session_date":proposal["target_session_date"]};validate_control_case(self.activation,origin_run,origin_session,target,recommendation,pending)
+  submitted=now_utc();validate_pairing(self.activation,target,recommendation,pending,proposal,submitted);submission=build_submission(self.activation,proposal,submitted)
+  with self.connection:self.connection.execute("INSERT INTO prospective_shadow_submissions VALUES(?,?,?,?)",(submission["submission_id"],proposal_id,submission["record_hash"],canonical_json(submission)))
+  return {"status":"CREATED","shadow_submission":submission}
+ def enroll_case(self,*,control_database,session_enrollment_id,recommendation_id,shadow_submission_id=None,shadow_database=None,shadow_runtime_root=None,proposal_id=None):
   self._singletons();old=self.connection.execute("SELECT canonical_json FROM prospective_cases WHERE recommendation_id=?",(recommendation_id,)).fetchone()
   if old:
-   record=json.loads(old[0]);supplied=all(x is not None for x in (shadow_database,shadow_runtime_root,proposal_id))
-   if any(x is not None for x in (shadow_database,shadow_runtime_root,proposal_id)) and not supplied:raise ProspectiveConflict("PROSPECTIVE_CASE_CONFLICT")
+   record=json.loads(old[0]);legacy=all(x is not None for x in (shadow_database,shadow_runtime_root,proposal_id));supplied=shadow_submission_id is not None or legacy
+   if any(x is not None for x in (shadow_database,shadow_runtime_root,proposal_id)) and not legacy:raise ProspectiveConflict("PROSPECTIVE_CASE_CONFLICT")
    existing=record["shadow_submission_binding"] is not None
    if record["control_session_binding"]["record_id"]!=session_enrollment_id or existing!=supplied:raise ProspectiveConflict("PROSPECTIVE_CASE_CONFLICT")
    if supplied:
     sr=self.connection.execute("SELECT canonical_json FROM prospective_shadow_submissions WHERE submission_id=?",(record["shadow_submission_binding"]["record_id"],)).fetchone();submission=json.loads(sr[0]) if sr else None
-    if submission is None or submission["proposal_binding"]["record_id"]!=proposal_id:raise ProspectiveConflict("PROSPECTIVE_CASE_CONFLICT")
+    expected_id=shadow_submission_id if shadow_submission_id is not None else record["shadow_submission_binding"]["record_id"]
+    if submission is None or submission["submission_id"]!=expected_id or (proposal_id is not None and submission["proposal_binding"]["record_id"]!=proposal_id):raise ProspectiveConflict("PROSPECTIVE_CASE_CONFLICT")
    return {"status":"IDEMPOTENT_SUCCESS","case":record}
   srow=self.connection.execute("SELECT canonical_json FROM prospective_sessions WHERE enrollment_id=?",(session_enrollment_id,)).fetchone()
   if srow is None:raise Stage6ProspectiveError("PROSPECTIVE_SESSION_REQUIRED")
   session=json.loads(srow[0])
   with Stage5DControlReader(control_database) as control:
    if control.database_id()!=session["control_database_id"]:raise Stage6ProspectiveError("CONTROL_DATABASE_MISMATCH")
-   recommendation=control.get_recommendation(recommendation_id);pending=control.get_pending_event(recommendation_id);validate_control_case(self.activation,session,recommendation,pending)
-  supplied=[shadow_database is not None,shadow_runtime_root is not None,proposal_id is not None]
-  if any(supplied) and not all(supplied):raise Stage6ProspectiveError("COMPLETE_SHADOW_SUBMISSION_REQUIRED")
+   recommendation=control.get_recommendation(recommendation_id);pending=control.get_pending_event(recommendation_id);origin_run=control.get_origin_run(recommendation["allocation_run_id"]);origin_session=self._session_for_run(origin_run["run_id"]);calendar_proof=validate_control_case(self.activation,origin_run,origin_session,session,recommendation,pending)
+  legacy=[shadow_database is not None,shadow_runtime_root is not None,proposal_id is not None]
+  if any(legacy) and not all(legacy):raise Stage6ProspectiveError("COMPLETE_SHADOW_SUBMISSION_REQUIRED")
+  if shadow_submission_id is not None and any(legacy):raise Stage6ProspectiveError("AMBIGUOUS_SHADOW_SUBMISSION")
   submission=None
-  if all(supplied):
-   with Stage6ShadowReader(shadow_database,shadow_runtime_root,self.activation) as shadow:proposal=shadow.get_proposal(proposal_id)
-   submitted=now_utc();validate_pairing(self.activation,session,recommendation,proposal,submitted);submission=build_submission(self.activation,proposal,submitted)
-  record=build_case(self.activation,self.protocol_hash,session,recommendation,pending,submission);validate_case(record,self.activation,self.protocol_hash,session,recommendation,pending,submission)
+  if all(legacy):
+   submission=self.submit_shadow_proposal(control_database=control_database,shadow_database=shadow_database,shadow_runtime_root=shadow_runtime_root,proposal_id=proposal_id,recommendation_id=recommendation_id)["shadow_submission"]
+  elif shadow_submission_id is not None:
+   row=self.connection.execute("SELECT canonical_json FROM prospective_shadow_submissions WHERE submission_id=?",(shadow_submission_id,)).fetchone()
+   if row is None:raise Stage6ProspectiveError("PROSPECTIVE_SHADOW_SUBMISSION_REQUIRED")
+   submission=json.loads(row[0])
+  if submission is not None:validate_bound_submission(self.activation,session,recommendation,pending,submission)
+  record=build_case(self.activation,self.protocol_hash,origin_session,session,recommendation,pending,calendar_proof,submission);validate_case(record,self.activation,self.protocol_hash,origin_session,session,recommendation,pending,calendar_proof,submission)
   audit={"record_type":CASE_SCHEMA,"record_id":record["case_id"],"case_state":record["case_state"],"outcome_status":"NOT_ATTACHED","authority":AUTHORITY}
   with self.connection:
    self.connection.execute("INSERT INTO prospective_control_recommendations VALUES(?,?,?,?)",(recommendation_id,recommendation["payload_sha256"],recommendation["canonical_payload_json"],canonical_json(recommendation)));self.connection.execute("INSERT INTO prospective_pending_events VALUES(?,?,?,?,?)",(pending["event_id"],recommendation_id,pending["payload_sha256"],pending["payload_json"],canonical_json(pending)))
-   if submission:self.connection.execute("INSERT INTO prospective_shadow_submissions VALUES(?,?,?,?)",(submission["submission_id"],proposal_id,submission["record_hash"],canonical_json(submission)))
    self.connection.execute("INSERT INTO prospective_cases VALUES(?,?,?,?,?,?)",(record["case_id"],recommendation_id,session_enrollment_id,record["case_state"],record["record_hash"],canonical_json(record)));self.connection.executemany("INSERT INTO prospective_case_dependencies VALUES(?,?,?,?,?)",[(record["case_id"],i,x["record_type"],x["record_id"],x["record_hash"]) for i,x in enumerate(record["direct_dependencies"])]);self.connection.execute("INSERT INTO prospective_audits VALUES(?,?,?)",(CASE_SCHEMA,record["case_id"],canonical_json(audit)))
   return {"status":"CREATED","case":record,"shadow_submission":submission}
  def integrity_check(self):
@@ -103,14 +127,14 @@ CREATE TABLE prospective_audits(record_type TEXT NOT NULL,record_id TEXT NOT NUL
    if (row["enrollment_id"],row["run_id"],row["market_session_date"],row["session_ordinal"],row["record_hash"])!=(record["enrollment_id"],record["stage5d5_run_id"],record["market_session_date"],record["session_ordinal_since_activation"],record["record_hash"]) or record["record_hash"]!=canonical_hash(without(record,"record_hash")) or row["session_ordinal"]!=(previous or 0)+1:raise ProspectiveIntegrityFailure("PROSPECTIVE_SESSION_INVALID")
    previous=row["session_ordinal"]
   for row in self.connection.execute("SELECT * FROM prospective_cases"):
-   record=json.loads(row["canonical_json"]);s=json.loads(self.connection.execute("SELECT canonical_json FROM prospective_sessions WHERE enrollment_id=?",(row["enrollment_id"],)).fetchone()[0]);recrow=self.connection.execute("SELECT canonical_row_json FROM prospective_control_recommendations WHERE recommendation_id=?",(row["recommendation_id"],)).fetchone();evrow=self.connection.execute("SELECT canonical_row_json FROM prospective_pending_events WHERE recommendation_id=?",(row["recommendation_id"],)).fetchone()
-   if recrow is None or evrow is None:raise ProspectiveIntegrityFailure("PROSPECTIVE_CONTROL_COPY_MISSING")
-   rec=json.loads(recrow[0]);event=json.loads(evrow[0]);sub=None
+   record=json.loads(row["canonical_json"]);s=json.loads(self.connection.execute("SELECT canonical_json FROM prospective_sessions WHERE enrollment_id=?",(row["enrollment_id"],)).fetchone()[0]);origin_row=self.connection.execute("SELECT canonical_json FROM prospective_sessions WHERE enrollment_id=?",(record["control_origin_session_binding"]["record_id"],)).fetchone();recrow=self.connection.execute("SELECT canonical_row_json FROM prospective_control_recommendations WHERE recommendation_id=?",(row["recommendation_id"],)).fetchone();evrow=self.connection.execute("SELECT canonical_row_json FROM prospective_pending_events WHERE recommendation_id=?",(row["recommendation_id"],)).fetchone()
+   if origin_row is None or recrow is None or evrow is None:raise ProspectiveIntegrityFailure("PROSPECTIVE_CONTROL_COPY_MISSING")
+   origin=json.loads(origin_row[0]);rec=json.loads(recrow[0]);event=json.loads(evrow[0]);sub=None
    if record["shadow_submission_binding"] is not None:
     sr=self.connection.execute("SELECT canonical_json FROM prospective_shadow_submissions WHERE submission_id=?",(record["shadow_submission_binding"]["record_id"],)).fetchone()
     if sr is None:raise ProspectiveIntegrityFailure("PROSPECTIVE_SUBMISSION_MISSING")
     sub=json.loads(sr[0])
-   validate_case(record,self.activation,self.protocol_hash,s,rec,event,sub);deps=[tuple(x) for x in self.connection.execute("SELECT record_type,record_id,record_hash FROM prospective_case_dependencies WHERE case_id=? ORDER BY dependency_ordinal",(record["case_id"],))]
+   validate_case(record,self.activation,self.protocol_hash,origin,s,rec,event,record["target_session_calendar_proof"],sub);deps=[tuple(x) for x in self.connection.execute("SELECT record_type,record_id,record_hash FROM prospective_case_dependencies WHERE case_id=? ORDER BY dependency_ordinal",(record["case_id"],))]
    if deps!=[(x["record_type"],x["record_id"],x["record_hash"]) for x in record["direct_dependencies"]] or row["state"]!=record["case_state"] or row["record_hash"]!=record["record_hash"]:raise ProspectiveIntegrityFailure("PROSPECTIVE_CASE_CHILD_INVALID")
   for row in self.connection.execute("SELECT * FROM prospective_control_recommendations"):
    value=json.loads(row["canonical_row_json"])
