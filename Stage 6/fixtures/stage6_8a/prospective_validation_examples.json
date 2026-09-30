@@ -1,0 +1,13 @@
+{
+  "fixture_version": "STAGE6_8A_FIXTURES_V1",
+  "fixture_only": true,
+  "examples": [
+    {"name": "ZERO_CASE_SESSION", "candidate_count": 0, "recommendation_count": 0, "counts_toward_window": true},
+    {"name": "CONTROL_ONLY", "case_state": "CONTROL_ONLY_PENDING_SHADOW", "outcome_status": "NOT_ATTACHED"},
+    {"name": "PAIRED", "case_state": "PAIRED_SHADOW_AVAILABLE", "outcome_status": "NOT_ATTACHED"},
+    {"name": "MISSING_LATER", "future_state": "SHADOW_OUTPUT_MISSING", "excluded": false},
+    {"name": "SAME_ACTIVATION_DATE", "eligible": false},
+    {"name": "PRE_ACTIVATION", "eligible": false},
+    {"name": "OUT_OF_ORDER", "accepted": false}
+  ]
+}

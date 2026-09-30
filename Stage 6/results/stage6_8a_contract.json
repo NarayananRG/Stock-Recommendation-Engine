@@ -1,0 +1,20 @@
+{
+  "stage": "6.8A",
+  "implementation_status": "PASS",
+  "prospective_activation_status": "READY_FOR_MANUAL_ACTIVATION",
+  "protocol": "STAGE6_PROSPECTIVE_VALIDATION_PROTOCOL_V1",
+  "protocol_hash": "6f769ef1799bbac7084f4a60f9ff879db9c223f1420d1f905c6f899862b8084f",
+  "policy": "S6PROSVALPOL_STAGE6_8A_V1",
+  "policy_hash": "74a7655d8ffb34483b8b66197a2d46a66cbe35022a32b0de72fca9a05d743a40",
+  "contract": "STAGE6_PROSPECTIVE_VALIDATION_ENROLLMENT_CONTRACT_V1",
+  "contract_hash": "106c4001a98acc6eb036791342c48af0c568e655fe99d8fdddf3185e73adf644",
+  "authority": "SHADOW_ONLY",
+  "outcome_status": "NOT_ATTACHED",
+  "real_activation_created": false,
+  "tests_passed": 342,
+  "tests_failed": 0,
+  "prior_stage6_tests": 4973,
+  "combined_stage6_tests": 5315,
+  "minimum_completed_control_sessions": 20,
+  "performance_based_early_stopping": "PROHIBITED"
+}

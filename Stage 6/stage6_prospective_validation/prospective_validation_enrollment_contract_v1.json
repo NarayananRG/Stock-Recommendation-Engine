@@ -1,0 +1,13 @@
+{
+  "contract_version": "STAGE6_PROSPECTIVE_VALIDATION_ENROLLMENT_CONTRACT_V1",
+  "activation_schema": "STAGE6_PROSPECTIVE_ACTIVATION_V1",
+  "session_schema": "STAGE6_PROSPECTIVE_SESSION_ENROLLMENT_V1",
+  "case_schema": "STAGE6_PROSPECTIVE_CASE_ENROLLMENT_V1",
+  "store_schema": "STAGE6_8A_PROSPECTIVE_VALIDATION_STORE_V1",
+  "processor_version": "STAGE6_8A_PROSPECTIVE_VALIDATION_ENROLLER_V1",
+  "control_schema": "STAGE5D5_SCHEMA_V1",
+  "shadow_schema": "STAGE6_MORNING_REVALIDATION_PROPOSAL_V1",
+  "outcome_status": "NOT_ATTACHED",
+  "authority": "SHADOW_ONLY",
+  "trading_authority": false
+}

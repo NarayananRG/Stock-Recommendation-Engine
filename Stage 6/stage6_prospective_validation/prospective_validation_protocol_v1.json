@@ -1,0 +1,16 @@
+{
+  "protocol_id": "STAGE6_PROSPECTIVE_VALIDATION_PROTOCOL_V1",
+  "component_under_test": "MORNING_REVALIDATION_V1",
+  "minimum_completed_control_sessions": 20,
+  "minimum_window_is_promotion_threshold": false,
+  "performance_based_early_stopping": "PROHIBITED",
+  "zero_candidate_sessions_count": true,
+  "zero_recommendation_sessions_count": true,
+  "pre_activation_enrollment": "PROHIBITED",
+  "activation_date_enrollment": "PROHIBITED",
+  "missing_shadow_output": "PRESERVE_AS_VALIDATION_EVIDENCE",
+  "case_states": ["CONTROL_ONLY_PENDING_SHADOW", "PAIRED_SHADOW_AVAILABLE", "SHADOW_OUTPUT_MISSING", "INELIGIBLE_PRE_ACTIVATION", "INVALID_CONTROL_EVIDENCE", "INVALID_SHADOW_EVIDENCE"],
+  "initial_outcome_status": "NOT_ATTACHED",
+  "authority": "SHADOW_ONLY",
+  "promotion": "NOT_AUTHORIZED"
+}

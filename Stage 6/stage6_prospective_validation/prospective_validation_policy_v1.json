@@ -1,0 +1,11 @@
+{
+  "policy_id": "S6PROSVALPOL_STAGE6_8A_V1",
+  "processor_version": "STAGE6_8A_PROSPECTIVE_VALIDATION_ENROLLER_V1",
+  "development_baseline": "241256fa5e27838b40367dce24ae39fba88d3cee",
+  "branch": "stage6-prospective-shadow-validation",
+  "stage5d_control_tag": "stage5d5-live-paper-runner-baseline",
+  "stage5d_control_commit": "74b2710f0e19bd403978da81e87f25a3059ace06",
+  "authority": "SHADOW_ONLY",
+  "network_calls": 0,
+  "external_api_calls": 0
+}
