@@ -42,7 +42,7 @@ def _parser():
     status.add_argument("--activation-record", required=True);status.add_argument("--prospective-db");status.add_argument("--control-db")
     attest = commands.add_parser("attest-sources");attest.add_argument("--activation-record", required=True)
     capture = commands.add_parser("capture-primary-evidence")
-    capture.add_argument("--activation-record", required=True);capture.add_argument("--runtime-root", required=True);capture.add_argument("--live", action="store_true")
+    capture.add_argument("--activation-record", required=True);capture.add_argument("--runtime-root", required=True);capture.add_argument("--target-session-date", required=True);capture.add_argument("--live", action="store_true")
     enroll = commands.add_parser("enroll-control")
     enroll.add_argument("--activation-record", required=True);enroll.add_argument("--prospective-db", required=True);enroll.add_argument("--control-db", required=True);enroll.add_argument("--run-id", required=True)
     ready = commands.add_parser("pre-session-check")
@@ -58,7 +58,7 @@ def main(argv=None):
         elif args.command == "attest-sources":
             result = attest_sources(args.activation_record)
         elif args.command == "capture-primary-evidence":
-            result = capture_primary_evidence(activation_record=args.activation_record, runtime_root=args.runtime_root, live=args.live)
+            result = capture_primary_evidence(activation_record=args.activation_record, runtime_root=args.runtime_root, target_session_date=args.target_session_date, live=args.live)
         elif args.command == "enroll-control":
             result = enroll_control(activation_record=args.activation_record, prospective_database=args.prospective_db, control_database=args.control_db, run_id=args.run_id)
         else:

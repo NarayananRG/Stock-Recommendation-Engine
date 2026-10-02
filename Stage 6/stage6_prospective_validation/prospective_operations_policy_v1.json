@@ -2,7 +2,7 @@
   "policy_id": "S6PROSOPSPOL_STAGE6_8B_V1",
   "daily_operator": "STAGE6_8B_DAILY_OPERATOR_V1",
   "source_coverage": "STAGE6_8B_SOURCE_COVERAGE_V1",
-  "primary_evidence_capture": "STAGE6_8B_PRIMARY_EVIDENCE_CAPTURE_V1",
+  "primary_evidence_capture": "STAGE6_8B_PRIMARY_EVIDENCE_CAPTURE_V2",
   "pre_session_readiness": "STAGE6_8B_PRE_SESSION_READINESS_V1",
   "baseline": "95696d7e616a798d87c81936125bacdb9f441f2e",
   "operational_primary_sources": ["RBI_OFFICIAL_PRESS_RELEASES_RSS", "SEBI_OFFICIAL_RSS"],
@@ -10,6 +10,11 @@
   "yfinance_stage6_evidence_status": "NOT_APPROVED_NOT_REGISTERED",
   "normal_command_network_calls": 0,
   "live_capture_max_intended_sources": 2,
+  "capture_target_binding": "EXACT_ORDINARY_NSE_SESSION",
+  "capture_window": "SAME_TARGET_SESSION_IST_BEFORE_09_15",
+  "usable_retrieval_statuses": ["PARTIAL", "RETRIEVED"],
+  "unusable_retrieval_statuses": ["ACCESS_DENIED", "FAILED", "NOT_FOUND", "QUARANTINED"],
+  "capture_summary_store": "STAGE6_8B_CAPTURE_SUMMARY_STORE_V2",
   "authority": "SHADOW_ONLY",
   "trading_authority": false
 }
