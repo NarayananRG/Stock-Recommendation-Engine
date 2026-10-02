@@ -1,0 +1,17 @@
+{
+  "fixture_version": "STAGE6_8B_OPERATIONS_FIXTURES_V1",
+  "fixture_only": true,
+  "activation_date_ist": "2026-09-30",
+  "origin_session_date": "2026-10-01",
+  "target_session_date": "2026-10-05",
+  "operational_primary_sources": ["RBI_OFFICIAL_PRESS_RELEASES_RSS", "SEBI_OFFICIAL_RSS"],
+  "source_scenarios": [
+    {"name": "BOTH_RETRIEVED", "expected": "AVAILABLE"},
+    {"name": "ONE_RETRIEVED_ONE_FAILED", "expected": "PARTIAL"},
+    {"name": "BOTH_FAILED", "expected": "FAILED"},
+    {"name": "NOT_RUN", "expected": "NOT_CAPTURED"}
+  ],
+  "expected_authority": "SHADOW_ONLY",
+  "trading_authority": false,
+  "outcome_scoring": "DEFERRED"
+}

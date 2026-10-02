@@ -1,0 +1,17 @@
+{
+  "contract_version": "STAGE6_8B_PROSPECTIVE_OPERATIONS_CONTRACT_V1",
+  "daily_operator": "STAGE6_8B_DAILY_OPERATOR_V1",
+  "source_coverage_schema": "STAGE6_8B_SOURCE_COVERAGE_V1",
+  "capture_summary_schema": "STAGE6_8B_PRIMARY_EVIDENCE_CAPTURE_V1",
+  "pre_session_readiness_schema": "STAGE6_8B_PRE_SESSION_READINESS_V1",
+  "activation_schema": "STAGE6_PROSPECTIVE_ACTIVATION_V1",
+  "source_registry_version": 2,
+  "entity_registry_version": 2,
+  "approved_endpoint_count": 2,
+  "live_flag_required": true,
+  "outcome_scoring": "DEFERRED",
+  "stage5d_mutation": "PROHIBITED",
+  "proposal_generation": "PROHIBITED",
+  "authority": "SHADOW_ONLY",
+  "trading_authority": false
+}
