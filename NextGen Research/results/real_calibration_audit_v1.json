@@ -1,0 +1,907 @@
+{
+  "active_prospective_authority": "NONE",
+  "active_recommendation_influence": "NONE",
+  "active_source_registry_authority": "NONE",
+  "authority": "RESEARCH_ONLY",
+  "evaluations": [
+    {
+      "active_prospective_authority": "NONE",
+      "active_recommendation_influence": "NONE",
+      "active_source_registry_authority": "NONE",
+      "authority": "RESEARCH_ONLY",
+      "calibration_status": "INSUFFICIENT_EVIDENCE",
+      "dataset_hash": "c79d599e2c506ffce7ed1f84fb0088217632bc1a28148e0d463753199729879e",
+      "dataset_id": "STAGE4A_OOS_2026_IMMUTABLE",
+      "evaluation_cutoff": "2026-08-28",
+      "identity_binding": {
+        "dataset_hash": "c79d599e2c506ffce7ed1f84fb0088217632bc1a28148e0d463753199729879e",
+        "dataset_id": "STAGE4A_OOS_2026_IMMUTABLE",
+        "evaluation_period": "2026-01-01..2026-08-28",
+        "feature_set_hash": "62c26716ced06ea266e50ac79e404a2377015361b5ecd4f6228da77a8f6491b9",
+        "model_bundle_hash": "4631eb8a1d0b34212252df3b1aae180f64ec98ba5e7955a84729df0a471c62da",
+        "model_name": "PRIMARY_ONLY_T1_LOGIT_FULL",
+        "sample_count": 13,
+        "serialized_model_sha256": "ae57b7d2ff86c209ff9b3559ecb6456578520100a6b4f84f0db5ad27df88aa29",
+        "target": "T1_BEFORE_STOP_63"
+      },
+      "model_hash": "ae57b7d2ff86c209ff9b3559ecb6456578520100a6b4f84f0db5ad27df88aa29",
+      "model_id": "PRIMARY_ONLY_T1_LOGIT_FULL",
+      "model_promotion_authority": "NONE",
+      "policy_hash": "a9476d8bb7cda390c4e8e497814064506a40d0df4690373b2669a398bee7060c",
+      "policy_id": "REAL_STAGE4_CALIBRATION_AUDIT_POLICY_V1",
+      "record_hash": "41e41d96a505abeb8b8463795ee06b40e3c18d1bf92ee4cf0c80dddc584e5f60",
+      "record_id": "CALIBRATION_EVALUATION_V1_41e41d96a505abeb8b846379",
+      "sample_count": 13,
+      "schema": "CALIBRATION_EVALUATION_V1",
+      "status": "INSUFFICIENT_SAMPLE_FOR_CALIBRATION",
+      "target": "T1_BEFORE_STOP_63",
+      "terminology_classification": "UNCALIBRATED_MODEL_SCORE",
+      "trading_authority": false
+    },
+    {
+      "active_prospective_authority": "NONE",
+      "active_recommendation_influence": "NONE",
+      "active_source_registry_authority": "NONE",
+      "authority": "RESEARCH_ONLY",
+      "calibration_status": "INSUFFICIENT_EVIDENCE",
+      "dataset_hash": "c79d599e2c506ffce7ed1f84fb0088217632bc1a28148e0d463753199729879e",
+      "dataset_id": "STAGE4A_OOS_2026_IMMUTABLE",
+      "evaluation_cutoff": "2026-08-28",
+      "identity_binding": {
+        "dataset_hash": "c79d599e2c506ffce7ed1f84fb0088217632bc1a28148e0d463753199729879e",
+        "dataset_id": "STAGE4A_OOS_2026_IMMUTABLE",
+        "evaluation_period": "2026-01-01..2026-08-28",
+        "feature_set_hash": "a7712564c2b308c570374a1b1634f59971b9823a87a276fed8f995e1321bd490",
+        "model_bundle_hash": "4631eb8a1d0b34212252df3b1aae180f64ec98ba5e7955a84729df0a471c62da",
+        "model_name": "PRIMARY_ONLY_T1_LOGIT_RAW",
+        "sample_count": 13,
+        "serialized_model_sha256": "511a9d3444ff21881610fb54cb614cb59e7b94e455bba1adc8f3ab76f8484bd2",
+        "target": "T1_BEFORE_STOP_63"
+      },
+      "model_hash": "511a9d3444ff21881610fb54cb614cb59e7b94e455bba1adc8f3ab76f8484bd2",
+      "model_id": "PRIMARY_ONLY_T1_LOGIT_RAW",
+      "model_promotion_authority": "NONE",
+      "policy_hash": "a9476d8bb7cda390c4e8e497814064506a40d0df4690373b2669a398bee7060c",
+      "policy_id": "REAL_STAGE4_CALIBRATION_AUDIT_POLICY_V1",
+      "record_hash": "07f1e81561a10a23c207839467e057c18ca5843c0b600695114448a0b210e372",
+      "record_id": "CALIBRATION_EVALUATION_V1_07f1e81561a10a23c2078394",
+      "sample_count": 13,
+      "schema": "CALIBRATION_EVALUATION_V1",
+      "status": "INSUFFICIENT_SAMPLE_FOR_CALIBRATION",
+      "target": "T1_BEFORE_STOP_63",
+      "terminology_classification": "UNCALIBRATED_MODEL_SCORE",
+      "trading_authority": false
+    },
+    {
+      "active_prospective_authority": "NONE",
+      "active_recommendation_influence": "NONE",
+      "active_source_registry_authority": "NONE",
+      "authority": "RESEARCH_ONLY",
+      "baseline_brier_score": 0.1645095245507118,
+      "brier_score": 0.15672774178818202,
+      "brier_skill_score": 0.04730293144899922,
+      "calibration_intercept": 0.27957951537652337,
+      "calibration_slope": 0.7376509279778959,
+      "calibration_status": "UNCALIBRATED_MODEL_SCORE",
+      "dataset_hash": "c79d599e2c506ffce7ed1f84fb0088217632bc1a28148e0d463753199729879e",
+      "dataset_id": "STAGE4A_OOS_2026_IMMUTABLE",
+      "evaluation_cutoff": "2026-08-28",
+      "identity_binding": {
+        "dataset_hash": "c79d599e2c506ffce7ed1f84fb0088217632bc1a28148e0d463753199729879e",
+        "dataset_id": "STAGE4A_OOS_2026_IMMUTABLE",
+        "evaluation_period": "2026-01-01..2026-08-28",
+        "feature_set_hash": "62c26716ced06ea266e50ac79e404a2377015361b5ecd4f6228da77a8f6491b9",
+        "model_bundle_hash": "4631eb8a1d0b34212252df3b1aae180f64ec98ba5e7955a84729df0a471c62da",
+        "model_name": "TRANSFER_ENTRY_LOGIT_FULL",
+        "sample_count": 289,
+        "serialized_model_sha256": "32eb8db84c8a6430c1b7bbc742d5256babeb68375b05533c55c2c75f58c626e7",
+        "target": "ENTRY_FILLED"
+      },
+      "model_hash": "32eb8db84c8a6430c1b7bbc742d5256babeb68375b05533c55c2c75f58c626e7",
+      "model_id": "TRANSFER_ENTRY_LOGIT_FULL",
+      "model_promotion_authority": "NONE",
+      "negative_count": 60,
+      "policy_hash": "a9476d8bb7cda390c4e8e497814064506a40d0df4690373b2669a398bee7060c",
+      "policy_id": "REAL_STAGE4_CALIBRATION_AUDIT_POLICY_V1",
+      "positive_count": 229,
+      "record_hash": "5bf70d716b8c9b00c20523d1fd4f81642094d9166d3d5b518866331416bba680",
+      "record_id": "CALIBRATION_EVALUATION_V1_5bf70d716b8c9b00c20523d1",
+      "regime_analysis": {
+        "BEAR": {
+          "brier": 0.1461573909771396,
+          "count": 63,
+          "status": "SUFFICIENT"
+        },
+        "BULL": {
+          "brier": 0.2542740428032732,
+          "count": 27,
+          "status": "SUFFICIENT"
+        },
+        "NEUTRAL": {
+          "brier": 0.13532948881837822,
+          "count": 142,
+          "status": "SUFFICIENT"
+        },
+        "STRONG BEAR": {
+          "brier": 0.1957186523055035,
+          "count": 25,
+          "status": "SUFFICIENT"
+        },
+        "STRONG BULL": {
+          "brier": 0.15972652717778563,
+          "count": 32,
+          "status": "SUFFICIENT"
+        }
+      },
+      "reliability_buckets": [
+        {
+          "bucket": 0,
+          "count": 2,
+          "observed_rate": 0.0,
+          "predicted_mean": 0.07136431004999999
+        },
+        {
+          "bucket": 1,
+          "count": 1,
+          "observed_rate": 1.0,
+          "predicted_mean": 0.178115292923
+        },
+        {
+          "bucket": 2,
+          "count": 13,
+          "observed_rate": 0.5384615384615384,
+          "predicted_mean": 0.2689357854956923
+        },
+        {
+          "bucket": 3,
+          "count": 18,
+          "observed_rate": 0.6111111111111112,
+          "predicted_mean": 0.3570478063578333
+        },
+        {
+          "bucket": 4,
+          "count": 12,
+          "observed_rate": 0.4166666666666667,
+          "predicted_mean": 0.44964653556708334
+        },
+        {
+          "bucket": 5,
+          "count": 27,
+          "observed_rate": 0.6296296296296297,
+          "predicted_mean": 0.5495753801031481
+        },
+        {
+          "bucket": 6,
+          "count": 38,
+          "observed_rate": 0.7368421052631579,
+          "predicted_mean": 0.64731024117
+        },
+        {
+          "bucket": 7,
+          "count": 76,
+          "observed_rate": 0.868421052631579,
+          "predicted_mean": 0.7528508509788947
+        },
+        {
+          "bucket": 8,
+          "count": 76,
+          "observed_rate": 0.9342105263157895,
+          "predicted_mean": 0.8522112605047762
+        },
+        {
+          "bucket": 9,
+          "count": 26,
+          "observed_rate": 0.8846153846153846,
+          "predicted_mean": 0.9172855691876923
+        }
+      ],
+      "sample_count": 289,
+      "schema": "CALIBRATION_EVALUATION_V1",
+      "score_semantics": "UNCALIBRATED_MODEL_SCORE",
+      "status": "EVALUATED_NOT_OPERATIONAL",
+      "target": "ENTRY_FILLED",
+      "temporal_analysis": {
+        "2026-01": {
+          "brier": 0.1412578494548233,
+          "count": 64,
+          "status": "SUFFICIENT"
+        },
+        "2026-02": {
+          "brier": 0.25345772739478384,
+          "count": 66,
+          "status": "SUFFICIENT"
+        },
+        "2026-03": {
+          "brier": 0.10738903212850391,
+          "count": 22,
+          "status": "SUFFICIENT"
+        },
+        "2026-04": {
+          "count": 13,
+          "status": "INSUFFICIENT_SAMPLE"
+        },
+        "2026-05": {
+          "count": 18,
+          "status": "INSUFFICIENT_SAMPLE"
+        },
+        "2026-06": {
+          "brier": 0.10504175826374054,
+          "count": 26,
+          "status": "SUFFICIENT"
+        },
+        "2026-07": {
+          "brier": 0.14287005428163485,
+          "count": 32,
+          "status": "SUFFICIENT"
+        },
+        "2026-08": {
+          "brier": 0.121806023678679,
+          "count": 48,
+          "status": "SUFFICIENT"
+        }
+      },
+      "terminology_classification": "UNCALIBRATED_MODEL_SCORE",
+      "trading_authority": false
+    },
+    {
+      "active_prospective_authority": "NONE",
+      "active_recommendation_influence": "NONE",
+      "active_source_registry_authority": "NONE",
+      "authority": "RESEARCH_ONLY",
+      "baseline_brier_score": 0.24964207450693934,
+      "brier_score": 0.22812911240150585,
+      "brier_skill_score": 0.08617522566227309,
+      "calibration_intercept": 0.02979873751260803,
+      "calibration_slope": 0.9308979829631556,
+      "calibration_status": "UNCALIBRATED_MODEL_SCORE",
+      "dataset_hash": "c79d599e2c506ffce7ed1f84fb0088217632bc1a28148e0d463753199729879e",
+      "dataset_id": "STAGE4A_OOS_2026_IMMUTABLE",
+      "evaluation_cutoff": "2026-08-28",
+      "identity_binding": {
+        "dataset_hash": "c79d599e2c506ffce7ed1f84fb0088217632bc1a28148e0d463753199729879e",
+        "dataset_id": "STAGE4A_OOS_2026_IMMUTABLE",
+        "evaluation_period": "2026-01-01..2026-08-28",
+        "feature_set_hash": "62c26716ced06ea266e50ac79e404a2377015361b5ecd4f6228da77a8f6491b9",
+        "model_bundle_hash": "4631eb8a1d0b34212252df3b1aae180f64ec98ba5e7955a84729df0a471c62da",
+        "model_name": "TRANSFER_T1_LOGIT_FULL",
+        "sample_count": 185,
+        "serialized_model_sha256": "941efb064043e4e86405a0fb4154df8a8653a8dfbc2e54ad3f1a9942bb355bc0",
+        "target": "T1_BEFORE_STOP_63"
+      },
+      "model_hash": "941efb064043e4e86405a0fb4154df8a8653a8dfbc2e54ad3f1a9942bb355bc0",
+      "model_id": "TRANSFER_T1_LOGIT_FULL",
+      "model_promotion_authority": "NONE",
+      "negative_count": 89,
+      "policy_hash": "a9476d8bb7cda390c4e8e497814064506a40d0df4690373b2669a398bee7060c",
+      "policy_id": "REAL_STAGE4_CALIBRATION_AUDIT_POLICY_V1",
+      "positive_count": 96,
+      "record_hash": "15783b3d06b83a092454532b087d657a248129ad6980e2de91990014a4f6ab10",
+      "record_id": "CALIBRATION_EVALUATION_V1_15783b3d06b83a092454532b",
+      "regime_analysis": {
+        "BEAR": {
+          "brier": 0.16416012493646334,
+          "count": 41,
+          "status": "SUFFICIENT"
+        },
+        "BULL": {
+          "count": 13,
+          "status": "INSUFFICIENT_SAMPLE"
+        },
+        "NEUTRAL": {
+          "brier": 0.2146253988256308,
+          "count": 89,
+          "status": "SUFFICIENT"
+        },
+        "STRONG BEAR": {
+          "count": 14,
+          "status": "INSUFFICIENT_SAMPLE"
+        },
+        "STRONG BULL": {
+          "brier": 0.2985372508189799,
+          "count": 28,
+          "status": "SUFFICIENT"
+        }
+      },
+      "reliability_buckets": [
+        {
+          "bucket": 1,
+          "count": 4,
+          "observed_rate": 0.25,
+          "predicted_mean": 0.159067223203
+        },
+        {
+          "bucket": 2,
+          "count": 11,
+          "observed_rate": 0.18181818181818182,
+          "predicted_mean": 0.2517468818319091
+        },
+        {
+          "bucket": 3,
+          "count": 20,
+          "observed_rate": 0.4,
+          "predicted_mean": 0.354780608667
+        },
+        {
+          "bucket": 4,
+          "count": 47,
+          "observed_rate": 0.3404255319148936,
+          "predicted_mean": 0.46422221641648936
+        },
+        {
+          "bucket": 5,
+          "count": 48,
+          "observed_rate": 0.625,
+          "predicted_mean": 0.53711057104175
+        },
+        {
+          "bucket": 6,
+          "count": 33,
+          "observed_rate": 0.696969696969697,
+          "predicted_mean": 0.6417033996649697
+        },
+        {
+          "bucket": 7,
+          "count": 8,
+          "observed_rate": 0.625,
+          "predicted_mean": 0.744939001110125
+        },
+        {
+          "bucket": 8,
+          "count": 11,
+          "observed_rate": 0.9090909090909091,
+          "predicted_mean": 0.8321552783001818
+        },
+        {
+          "bucket": 9,
+          "count": 3,
+          "observed_rate": 0.3333333333333333,
+          "predicted_mean": 0.9379873984466668
+        }
+      ],
+      "sample_count": 185,
+      "schema": "CALIBRATION_EVALUATION_V1",
+      "score_semantics": "UNCALIBRATED_MODEL_SCORE",
+      "status": "EVALUATED_NOT_OPERATIONAL",
+      "target": "T1_BEFORE_STOP_63",
+      "temporal_analysis": {
+        "2026-01": {
+          "brier": 0.22576822003136682,
+          "count": 54,
+          "status": "SUFFICIENT"
+        },
+        "2026-02": {
+          "brier": 0.26144599493037346,
+          "count": 40,
+          "status": "SUFFICIENT"
+        },
+        "2026-03": {
+          "brier": 0.11612464157039556,
+          "count": 21,
+          "status": "SUFFICIENT"
+        },
+        "2026-04": {
+          "count": 10,
+          "status": "INSUFFICIENT_SAMPLE"
+        },
+        "2026-05": {
+          "count": 15,
+          "status": "INSUFFICIENT_SAMPLE"
+        },
+        "2026-06": {
+          "brier": 0.29526512831505625,
+          "count": 20,
+          "status": "SUFFICIENT"
+        },
+        "2026-07": {
+          "count": 14,
+          "status": "INSUFFICIENT_SAMPLE"
+        },
+        "2026-08": {
+          "count": 11,
+          "status": "INSUFFICIENT_SAMPLE"
+        }
+      },
+      "terminology_classification": "UNCALIBRATED_MODEL_SCORE",
+      "trading_authority": false
+    },
+    {
+      "active_prospective_authority": "NONE",
+      "active_recommendation_influence": "NONE",
+      "active_source_registry_authority": "NONE",
+      "authority": "RESEARCH_ONLY",
+      "baseline_brier_score": 0.1645095245507118,
+      "brier_score": 0.15570724298372457,
+      "brier_skill_score": 0.05350621242768128,
+      "calibration_intercept": 0.27570111221862414,
+      "calibration_slope": 0.7404109166475324,
+      "calibration_status": "UNCALIBRATED_MODEL_SCORE",
+      "dataset_hash": "c79d599e2c506ffce7ed1f84fb0088217632bc1a28148e0d463753199729879e",
+      "dataset_id": "STAGE4A_OOS_2026_IMMUTABLE",
+      "evaluation_cutoff": "2026-08-28",
+      "identity_binding": {
+        "dataset_hash": "c79d599e2c506ffce7ed1f84fb0088217632bc1a28148e0d463753199729879e",
+        "dataset_id": "STAGE4A_OOS_2026_IMMUTABLE",
+        "evaluation_period": "2026-01-01..2026-08-28",
+        "feature_set_hash": "a7712564c2b308c570374a1b1634f59971b9823a87a276fed8f995e1321bd490",
+        "model_bundle_hash": "4631eb8a1d0b34212252df3b1aae180f64ec98ba5e7955a84729df0a471c62da",
+        "model_name": "TRANSFER_ENTRY_LOGIT_RAW",
+        "sample_count": 289,
+        "serialized_model_sha256": "a041607e6d76b35eab7d7eadbbda62be655b0aae2b9d7c0e5da3d577aab275ef",
+        "target": "ENTRY_FILLED"
+      },
+      "model_hash": "a041607e6d76b35eab7d7eadbbda62be655b0aae2b9d7c0e5da3d577aab275ef",
+      "model_id": "TRANSFER_ENTRY_LOGIT_RAW",
+      "model_promotion_authority": "NONE",
+      "negative_count": 60,
+      "policy_hash": "a9476d8bb7cda390c4e8e497814064506a40d0df4690373b2669a398bee7060c",
+      "policy_id": "REAL_STAGE4_CALIBRATION_AUDIT_POLICY_V1",
+      "positive_count": 229,
+      "record_hash": "2d7ee990ddb5f8ba542e17b815aad64f596ff792eacd2e6d44038dcefe0d54d7",
+      "record_id": "CALIBRATION_EVALUATION_V1_2d7ee990ddb5f8ba542e17b8",
+      "regime_analysis": {
+        "BEAR": {
+          "brier": 0.1476566781673541,
+          "count": 63,
+          "status": "SUFFICIENT"
+        },
+        "BULL": {
+          "brier": 0.25290728318638134,
+          "count": 27,
+          "status": "SUFFICIENT"
+        },
+        "NEUTRAL": {
+          "brier": 0.1348085897158438,
+          "count": 142,
+          "status": "SUFFICIENT"
+        },
+        "STRONG BEAR": {
+          "brier": 0.18292936828568696,
+          "count": 25,
+          "status": "SUFFICIENT"
+        },
+        "STRONG BULL": {
+          "brier": 0.16101474702902496,
+          "count": 32,
+          "status": "SUFFICIENT"
+        }
+      },
+      "reliability_buckets": [
+        {
+          "bucket": 0,
+          "count": 1,
+          "observed_rate": 0.0,
+          "predicted_mean": 0.0461869937737
+        },
+        {
+          "bucket": 1,
+          "count": 4,
+          "observed_rate": 0.75,
+          "predicted_mean": 0.1749295048275
+        },
+        {
+          "bucket": 2,
+          "count": 6,
+          "observed_rate": 0.6666666666666666,
+          "predicted_mean": 0.264521763104
+        },
+        {
+          "bucket": 3,
+          "count": 21,
+          "observed_rate": 0.5238095238095238,
+          "predicted_mean": 0.33808184596119045
+        },
+        {
+          "bucket": 4,
+          "count": 17,
+          "observed_rate": 0.47058823529411764,
+          "predicted_mean": 0.4523806493574706
+        },
+        {
+          "bucket": 5,
+          "count": 21,
+          "observed_rate": 0.5714285714285714,
+          "predicted_mean": 0.5464019490777619
+        },
+        {
+          "bucket": 6,
+          "count": 42,
+          "observed_rate": 0.7619047619047619,
+          "predicted_mean": 0.6463006051100476
+        },
+        {
+          "bucket": 7,
+          "count": 68,
+          "observed_rate": 0.8529411764705882,
+          "predicted_mean": 0.7546801298311177
+        },
+        {
+          "bucket": 8,
+          "count": 87,
+          "observed_rate": 0.9310344827586207,
+          "predicted_mean": 0.854128783329931
+        },
+        {
+          "bucket": 9,
+          "count": 22,
+          "observed_rate": 0.9090909090909091,
+          "predicted_mean": 0.9229665760244546
+        }
+      ],
+      "sample_count": 289,
+      "schema": "CALIBRATION_EVALUATION_V1",
+      "score_semantics": "UNCALIBRATED_MODEL_SCORE",
+      "status": "EVALUATED_NOT_OPERATIONAL",
+      "target": "ENTRY_FILLED",
+      "temporal_analysis": {
+        "2026-01": {
+          "brier": 0.14156332036933664,
+          "count": 64,
+          "status": "SUFFICIENT"
+        },
+        "2026-02": {
+          "brier": 0.2527285735059609,
+          "count": 66,
+          "status": "SUFFICIENT"
+        },
+        "2026-03": {
+          "brier": 0.10499232652366806,
+          "count": 22,
+          "status": "SUFFICIENT"
+        },
+        "2026-04": {
+          "count": 13,
+          "status": "INSUFFICIENT_SAMPLE"
+        },
+        "2026-05": {
+          "count": 18,
+          "status": "INSUFFICIENT_SAMPLE"
+        },
+        "2026-06": {
+          "brier": 0.09432183602444687,
+          "count": 26,
+          "status": "SUFFICIENT"
+        },
+        "2026-07": {
+          "brier": 0.14024522028973477,
+          "count": 32,
+          "status": "SUFFICIENT"
+        },
+        "2026-08": {
+          "brier": 0.12031488575118192,
+          "count": 48,
+          "status": "SUFFICIENT"
+        }
+      },
+      "terminology_classification": "UNCALIBRATED_MODEL_SCORE",
+      "trading_authority": false
+    },
+    {
+      "active_prospective_authority": "NONE",
+      "active_recommendation_influence": "NONE",
+      "active_source_registry_authority": "NONE",
+      "authority": "RESEARCH_ONLY",
+      "baseline_brier_score": 0.24964207450693934,
+      "brier_score": 0.22261756611790004,
+      "brier_skill_score": 0.10825301961784528,
+      "calibration_intercept": -0.011075835392008404,
+      "calibration_slope": 1.0196237413741156,
+      "calibration_status": "UNCALIBRATED_MODEL_SCORE",
+      "dataset_hash": "c79d599e2c506ffce7ed1f84fb0088217632bc1a28148e0d463753199729879e",
+      "dataset_id": "STAGE4A_OOS_2026_IMMUTABLE",
+      "evaluation_cutoff": "2026-08-28",
+      "identity_binding": {
+        "dataset_hash": "c79d599e2c506ffce7ed1f84fb0088217632bc1a28148e0d463753199729879e",
+        "dataset_id": "STAGE4A_OOS_2026_IMMUTABLE",
+        "evaluation_period": "2026-01-01..2026-08-28",
+        "feature_set_hash": "a7712564c2b308c570374a1b1634f59971b9823a87a276fed8f995e1321bd490",
+        "model_bundle_hash": "4631eb8a1d0b34212252df3b1aae180f64ec98ba5e7955a84729df0a471c62da",
+        "model_name": "TRANSFER_T1_LOGIT_RAW",
+        "sample_count": 185,
+        "serialized_model_sha256": "f5ea7ce10b7879ad789979675fc21101dfc94f243e8e97c2233c5131e6088fc7",
+        "target": "T1_BEFORE_STOP_63"
+      },
+      "model_hash": "f5ea7ce10b7879ad789979675fc21101dfc94f243e8e97c2233c5131e6088fc7",
+      "model_id": "TRANSFER_T1_LOGIT_RAW",
+      "model_promotion_authority": "NONE",
+      "negative_count": 89,
+      "policy_hash": "a9476d8bb7cda390c4e8e497814064506a40d0df4690373b2669a398bee7060c",
+      "policy_id": "REAL_STAGE4_CALIBRATION_AUDIT_POLICY_V1",
+      "positive_count": 96,
+      "record_hash": "36a1dd3b7a9edebdd0e218f0412d8e7e1cb51b8102d5162dedec408f3bcf6b9d",
+      "record_id": "CALIBRATION_EVALUATION_V1_36a1dd3b7a9edebdd0e218f0",
+      "regime_analysis": {
+        "BEAR": {
+          "brier": 0.16579105350793075,
+          "count": 41,
+          "status": "SUFFICIENT"
+        },
+        "BULL": {
+          "count": 13,
+          "status": "INSUFFICIENT_SAMPLE"
+        },
+        "NEUTRAL": {
+          "brier": 0.2059029849137273,
+          "count": 89,
+          "status": "SUFFICIENT"
+        },
+        "STRONG BEAR": {
+          "count": 14,
+          "status": "INSUFFICIENT_SAMPLE"
+        },
+        "STRONG BULL": {
+          "brier": 0.2919646853429279,
+          "count": 28,
+          "status": "SUFFICIENT"
+        }
+      },
+      "reliability_buckets": [
+        {
+          "bucket": 1,
+          "count": 4,
+          "observed_rate": 0.5,
+          "predicted_mean": 0.16702876171225
+        },
+        {
+          "bucket": 2,
+          "count": 10,
+          "observed_rate": 0.1,
+          "predicted_mean": 0.2526202026734
+        },
+        {
+          "bucket": 3,
+          "count": 26,
+          "observed_rate": 0.38461538461538464,
+          "predicted_mean": 0.3516868546175769
+        },
+        {
+          "bucket": 4,
+          "count": 50,
+          "observed_rate": 0.32,
+          "predicted_mean": 0.46152607487276
+        },
+        {
+          "bucket": 5,
+          "count": 39,
+          "observed_rate": 0.6666666666666666,
+          "predicted_mean": 0.5368010114247436
+        },
+        {
+          "bucket": 6,
+          "count": 34,
+          "observed_rate": 0.7352941176470589,
+          "predicted_mean": 0.6427933654497353
+        },
+        {
+          "bucket": 7,
+          "count": 7,
+          "observed_rate": 0.5714285714285714,
+          "predicted_mean": 0.7399115607931429
+        },
+        {
+          "bucket": 8,
+          "count": 12,
+          "observed_rate": 0.9166666666666666,
+          "predicted_mean": 0.8327003913745834
+        },
+        {
+          "bucket": 9,
+          "count": 3,
+          "observed_rate": 0.3333333333333333,
+          "predicted_mean": 0.9284977837056667
+        }
+      ],
+      "sample_count": 185,
+      "schema": "CALIBRATION_EVALUATION_V1",
+      "score_semantics": "UNCALIBRATED_MODEL_SCORE",
+      "status": "EVALUATED_NOT_OPERATIONAL",
+      "target": "T1_BEFORE_STOP_63",
+      "temporal_analysis": {
+        "2026-01": {
+          "brier": 0.21891669672088312,
+          "count": 54,
+          "status": "SUFFICIENT"
+        },
+        "2026-02": {
+          "brier": 0.25188665149551326,
+          "count": 40,
+          "status": "SUFFICIENT"
+        },
+        "2026-03": {
+          "brier": 0.11636184072269354,
+          "count": 21,
+          "status": "SUFFICIENT"
+        },
+        "2026-04": {
+          "count": 10,
+          "status": "INSUFFICIENT_SAMPLE"
+        },
+        "2026-05": {
+          "count": 15,
+          "status": "INSUFFICIENT_SAMPLE"
+        },
+        "2026-06": {
+          "brier": 0.3059203343890954,
+          "count": 20,
+          "status": "SUFFICIENT"
+        },
+        "2026-07": {
+          "count": 14,
+          "status": "INSUFFICIENT_SAMPLE"
+        },
+        "2026-08": {
+          "count": 11,
+          "status": "INSUFFICIENT_SAMPLE"
+        }
+      },
+      "terminology_classification": "UNCALIBRATED_MODEL_SCORE",
+      "trading_authority": false
+    },
+    {
+      "active_prospective_authority": "NONE",
+      "active_recommendation_influence": "NONE",
+      "active_source_registry_authority": "NONE",
+      "authority": "RESEARCH_ONLY",
+      "baseline_brier_score": 0.1645095245507118,
+      "brier_score": 0.14294039528513036,
+      "brier_skill_score": 0.1311117354723892,
+      "calibration_intercept": -0.031467083832050546,
+      "calibration_slope": 1.105919607438158,
+      "calibration_status": "UNCALIBRATED_MODEL_SCORE",
+      "dataset_hash": "c79d599e2c506ffce7ed1f84fb0088217632bc1a28148e0d463753199729879e",
+      "dataset_id": "STAGE4A_OOS_2026_IMMUTABLE",
+      "evaluation_cutoff": "2026-08-28",
+      "identity_binding": {
+        "dataset_hash": "c79d599e2c506ffce7ed1f84fb0088217632bc1a28148e0d463753199729879e",
+        "dataset_id": "STAGE4A_OOS_2026_IMMUTABLE",
+        "evaluation_period": "2026-01-01..2026-08-28",
+        "feature_set_hash": "62c26716ced06ea266e50ac79e404a2377015361b5ecd4f6228da77a8f6491b9",
+        "model_bundle_hash": "4631eb8a1d0b34212252df3b1aae180f64ec98ba5e7955a84729df0a471c62da",
+        "model_name": "TRANSFER_ENTRY_RF_FULL",
+        "sample_count": 289,
+        "serialized_model_sha256": "8d9f9f09f8afc1d0f97b7304bfe8b5f64824f5588d4b225009ba790aad8a0f0b",
+        "target": "ENTRY_FILLED"
+      },
+      "model_hash": "8d9f9f09f8afc1d0f97b7304bfe8b5f64824f5588d4b225009ba790aad8a0f0b",
+      "model_id": "TRANSFER_ENTRY_RF_FULL",
+      "model_promotion_authority": "NONE",
+      "negative_count": 60,
+      "policy_hash": "a9476d8bb7cda390c4e8e497814064506a40d0df4690373b2669a398bee7060c",
+      "policy_id": "REAL_STAGE4_CALIBRATION_AUDIT_POLICY_V1",
+      "positive_count": 229,
+      "record_hash": "38b30cc2ec77037dc5489fe5a4c01bed249977cc94cd5e195e19a5051e81c112",
+      "record_id": "CALIBRATION_EVALUATION_V1_38b30cc2ec77037dc5489fe5",
+      "regime_analysis": {
+        "BEAR": {
+          "brier": 0.13386045346522768,
+          "count": 63,
+          "status": "SUFFICIENT"
+        },
+        "BULL": {
+          "brier": 0.25924427485939744,
+          "count": 27,
+          "status": "SUFFICIENT"
+        },
+        "NEUTRAL": {
+          "brier": 0.13059217466301426,
+          "count": 142,
+          "status": "SUFFICIENT"
+        },
+        "STRONG BEAR": {
+          "brier": 0.15413418114981667,
+          "count": 25,
+          "status": "SUFFICIENT"
+        },
+        "STRONG BULL": {
+          "brier": 0.10873521615612994,
+          "count": 32,
+          "status": "SUFFICIENT"
+        }
+      },
+      "reliability_buckets": [
+        {
+          "bucket": 2,
+          "count": 1,
+          "observed_rate": 0.0,
+          "predicted_mean": 0.294998046311
+        },
+        {
+          "bucket": 3,
+          "count": 1,
+          "observed_rate": 0.0,
+          "predicted_mean": 0.393229535968
+        },
+        {
+          "bucket": 4,
+          "count": 23,
+          "observed_rate": 0.5652173913043478,
+          "predicted_mean": 0.4733179595506087
+        },
+        {
+          "bucket": 5,
+          "count": 38,
+          "observed_rate": 0.5789473684210527,
+          "predicted_mean": 0.5517726851044736
+        },
+        {
+          "bucket": 6,
+          "count": 25,
+          "observed_rate": 0.64,
+          "predicted_mean": 0.6472560697402401
+        },
+        {
+          "bucket": 7,
+          "count": 58,
+          "observed_rate": 0.8103448275862069,
+          "predicted_mean": 0.7616133233071379
+        },
+        {
+          "bucket": 8,
+          "count": 137,
+          "observed_rate": 0.9124087591240876,
+          "predicted_mean": 0.8536889629495109
+        },
+        {
+          "bucket": 9,
+          "count": 6,
+          "observed_rate": 1.0,
+          "predicted_mean": 0.9063727811878334
+        }
+      ],
+      "sample_count": 289,
+      "schema": "CALIBRATION_EVALUATION_V1",
+      "score_semantics": "UNCALIBRATED_MODEL_SCORE",
+      "status": "EVALUATED_NOT_OPERATIONAL",
+      "target": "ENTRY_FILLED",
+      "temporal_analysis": {
+        "2026-01": {
+          "brier": 0.1228818446321373,
+          "count": 64,
+          "status": "SUFFICIENT"
+        },
+        "2026-02": {
+          "brier": 0.23122460226976924,
+          "count": 66,
+          "status": "SUFFICIENT"
+        },
+        "2026-03": {
+          "brier": 0.08746400338756607,
+          "count": 22,
+          "status": "SUFFICIENT"
+        },
+        "2026-04": {
+          "count": 13,
+          "status": "INSUFFICIENT_SAMPLE"
+        },
+        "2026-05": {
+          "count": 18,
+          "status": "INSUFFICIENT_SAMPLE"
+        },
+        "2026-06": {
+          "brier": 0.10956922745181165,
+          "count": 26,
+          "status": "SUFFICIENT"
+        },
+        "2026-07": {
+          "brier": 0.139218478953721,
+          "count": 32,
+          "status": "SUFFICIENT"
+        },
+        "2026-08": {
+          "brier": 0.11129614048141805,
+          "count": 48,
+          "status": "SUFFICIENT"
+        }
+      },
+      "terminology_classification": "UNCALIBRATED_MODEL_SCORE",
+      "trading_authority": false
+    }
+  ],
+  "legacy_artifacts_mutated": false,
+  "model_bundle_hash": "4631eb8a1d0b34212252df3b1aae180f64ec98ba5e7955a84729df0a471c62da",
+  "model_promotion_authority": "NONE",
+  "record_hash": "e83c661b3281a0b90fcbb31cf1dc47f448ab9d4d3415f9127f7c533738da0afe",
+  "record_id": "REAL_CALIBRATION_AUDIT_V1_e83c661b3281a0b90fcbb31c",
+  "retraining_performed": false,
+  "schema": "REAL_CALIBRATION_AUDIT_V1",
+  "trading_authority": false
+}

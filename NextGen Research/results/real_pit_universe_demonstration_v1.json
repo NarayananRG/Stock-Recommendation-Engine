@@ -1,0 +1,58 @@
+{
+  "active_prospective_authority": "NONE",
+  "active_recommendation_influence": "NONE",
+  "active_source_registry_authority": "NONE",
+  "architecture_status": "ARCHITECTURE_IMPLEMENTED",
+  "as_of_date": "2026-10-03",
+  "authority": "RESEARCH_ONLY",
+  "data_status": "REAL_VERIFIED_CURRENT_SNAPSHOT_PARTIAL_HISTORY",
+  "dataset_hash": "63adfa453aae6aba957e1c9b47c2426b828a94d9efdffb356734cdcf01a9842b",
+  "dataset_id": "NSE_CURRENT_SECURITY_MASTER_REAL_DEMONSTRATION_20261003",
+  "demonstration_scope": "FIVE_RECORD_SANITIZED_REAL_STRUCTURE_SUBSET",
+  "excluded_count": 0,
+  "full_archive_record_count": 2593,
+  "full_archive_sha256": "95f0d731f5858f71e876c45377dcefa79bc7a8db1e8161d0c92320252af4aa8f",
+  "historical_index_membership": "DATA_GAP",
+  "historical_sector_membership": "UNKNOWN",
+  "included_securities": [
+    {
+      "entity_id": "ISIN:INE144J01027",
+      "exchange": "NSE",
+      "security_id": "NSE:INE144J01027",
+      "ticker": "20MICRONS"
+    },
+    {
+      "entity_id": "ISIN:INE253B01015",
+      "exchange": "NSE",
+      "security_id": "NSE:INE253B01015",
+      "ticker": "21STCENMGM"
+    },
+    {
+      "entity_id": "ISIN:INE466L01038",
+      "exchange": "NSE",
+      "security_id": "NSE:INE466L01038",
+      "ticker": "360ONE"
+    },
+    {
+      "entity_id": "ISIN:INE748C01038",
+      "exchange": "NSE",
+      "security_id": "NSE:INE748C01038",
+      "ticker": "3IINFOLTD"
+    },
+    {
+      "entity_id": "ISIN:INE994E01018",
+      "exchange": "NSE",
+      "security_id": "NSE:INE994E01018",
+      "ticker": "3BBLACKBIO"
+    }
+  ],
+  "model_promotion_authority": "NONE",
+  "policy_hash": "3de6c40e498533c46171353dab7a2276f53c7c0119d91432eb12818fc72f7f39",
+  "policy_id": "CURRENT_NSE_LISTED_SECURITIES_RESEARCH_V1",
+  "record_hash": "eb2a4c43abcaaec3c264cb2aff1bd2f477d63c646a22e58c665d3878f29a0854",
+  "record_id": "PIT_UNIVERSE_SNAPSHOT_V1_eb2a4c43abcaaec3c264cb2a",
+  "schema": "PIT_UNIVERSE_SNAPSHOT_V1",
+  "survivorship_bias_fully_solved": false,
+  "trading_authority": false,
+  "unknown_count": 0
+}

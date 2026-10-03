@@ -1,0 +1,48 @@
+{
+  "active_prospective_authority": "NONE",
+  "active_recommendation_influence": "NONE",
+  "active_source_registry_authority": "NONE",
+  "authority": "RESEARCH_ONLY",
+  "fields": [
+    {
+      "classification": "UNCALIBRATED_MODEL_SCORE",
+      "compatibility_label": "model_score",
+      "field": "Predicted Probability"
+    },
+    {
+      "classification": "UNCALIBRATED_MODEL_SCORE",
+      "compatibility_label": "model_score",
+      "field": "P Fill"
+    },
+    {
+      "classification": "UNCALIBRATED_MODEL_SCORE",
+      "compatibility_label": "model_score",
+      "field": "P T1 Conditional"
+    },
+    {
+      "classification": "UNCALIBRATED_MODEL_SCORE",
+      "compatibility_label": "model_score",
+      "field": "P T2 Conditional"
+    },
+    {
+      "classification": "RULE_SCORE",
+      "compatibility_label": "signal_score",
+      "field": "Actionability Score"
+    },
+    {
+      "classification": "RULE_SCORE",
+      "compatibility_label": "signal_score",
+      "field": "Technical Score"
+    }
+  ],
+  "legacy_artifacts_mutated": false,
+  "model_promotion_authority": "NONE",
+  "record_hash": "48b6cfbbaaf13d442d72b00ea0ab54d9d6e4c9099e1d4a4c44433da434c667c7",
+  "record_id": "MODEL_OUTPUT_TERMINOLOGY_AUDIT_V1_48b6cfbbaaf13d442d72b00e",
+  "schema": "MODEL_OUTPUT_TERMINOLOGY_AUDIT_V1",
+  "source_artifacts": [
+    "Stage 4A/results/stage4a_oos_predictions.csv.gz",
+    "Stage 4A/results/stage4a_joint_oos_predictions.csv.gz"
+  ],
+  "trading_authority": false
+}

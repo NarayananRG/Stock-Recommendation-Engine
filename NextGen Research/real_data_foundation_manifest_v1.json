@@ -1,0 +1,30 @@
+{
+  "active_lane_changed_files": 0,
+  "active_prospective_authority": "NONE",
+  "active_recommendation_influence": "NONE",
+  "active_source_registry_authority": "NONE",
+  "authority": "RESEARCH_ONLY",
+  "authority_scope": "RESEARCH_ONLY",
+  "component_file_sha256": {
+    "calibration_audit": "606d1e884475868f7d57bce11611606a92689d7acd7bac292997949b09256f84",
+    "cost_schedule": "b23bc51da54fa1e97ead6deb14debf604d2e4f2cee44ea3c5f92b599f8230fde",
+    "coverage_report": "9111991a9483cc908e1f52bf8e15bafd024d1b6fb6f08173901ea516c9773349",
+    "drift_policy": "72a73ebc24f8c6e8d43be9204c0f5071b0c6650e25247c58f302ffa29459efde",
+    "pit_demonstration": "abe13115bf9888a3ac905bb78a3d37632d2f545029ce5973a1dffc4d7c758c65",
+    "source_archive_manifest": "954b744f38f8cbb80be6c078751bc95e5d267efcf5a7f624877f9fb1ace794f6",
+    "terminology_audit": "dfe0d2532a71d39d4892832ca606ef76137781377d1bf415fe6dab9f0385b7b7",
+    "verified_source_registry": "24954f80f71dfc4aeba5661e17c624efeb880762d0ad1ce39ba7786ddd088948"
+  },
+  "fixture_only_tests": true,
+  "live_connectors": 0,
+  "ml_authority": "NONE",
+  "model_promotion_authority": "NONE",
+  "network_calls_in_tests": 0,
+  "parent_foundation_commit": "c6e03f9e1ee3cab6600e441ebc7390819716fdb2",
+  "parent_manifest_hash": "78cf0de0a208e142bdc0f79e990c12fe992a18cc1fd439c7464e4112a04166a3",
+  "promotion_authority": "NONE",
+  "record_hash": "060666117ecb2c3fc65dbd8b17a454534810900d71820b9e0cd04149ec65ff6b",
+  "record_id": "NEXTGEN_REAL_DATA_FOUNDATION_MANIFEST_V1_060666117ecb2c3fc65dbd8b",
+  "schema": "NEXTGEN_REAL_DATA_FOUNDATION_MANIFEST_V1",
+  "trading_authority": false
+}

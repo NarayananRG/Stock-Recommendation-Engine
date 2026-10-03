@@ -1,0 +1,10 @@
+{
+  "manifest_id": "NEXTGEN_REAL_SOURCE_ARCHIVE_MANIFEST_V1",
+  "authority_scope": "RESEARCH_ONLY",
+  "raw_data_committed": false,
+  "retrieved_at": "2026-10-03T00:00:00Z",
+  "archives": [
+    {"archive_id":"NSE_EQUITY_SECURITY_MASTER_20261003","publisher":"National Stock Exchange of India","source_url":"https://nsearchives.nseindia.com/content/equities/EQUITY_L.csv","sha256":"95f0d731f5858f71e876c45377dcefa79bc7a8db1e8161d0c92320252af4aa8f","content_length":183140,"record_count":2593,"date_semantics":"current listed securities observed on retrieval date","local_storage_policy":"GITIGNORED_RAW_ARCHIVE"},
+    {"archive_id":"NSE_DELISTED_COMPANIES_20260910","publisher":"National Stock Exchange of India","source_url":"https://nsearchives.nseindia.com/web/mediaattachment/2026-09/Copy_of_List_of_delisted_Companies_20260612152719_9_20260901172525_1_20260910122051.xlsx","sha256":"fcc27d5850f381fa0193003ddbd4d2f7724c770e9082d7fbbad6b97dd87f1664","content_length":61796,"record_count":457,"earliest_effective_date":"2002-04-15","latest_effective_date":"2026-09-02","publication_date":"2026-09-10","local_storage_policy":"GITIGNORED_RAW_ARCHIVE"}
+  ]
+}
