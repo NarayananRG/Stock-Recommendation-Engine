@@ -1,0 +1,11 @@
+{
+  "active_source_set_change": "PROHIBITED",
+  "authority": "SHADOW_ONLY",
+  "checkpoint_types": ["D+5", "D+20", "D+60", "FINAL_EXIT"],
+  "historical_backfill_as_prospective": "PROHIBITED",
+  "model_promotion": "PROHIBITED",
+  "model_retraining": "PROHIBITED",
+  "policy_id": "S6PROSOBSPOL_STAGE6_8C_V1",
+  "recommendation_influence": "NONE",
+  "trading_authority": false
+}

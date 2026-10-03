@@ -1,0 +1,40 @@
+{
+  "active_source_set": [
+    "RBI_OFFICIAL_PRESS_RELEASES_RSS",
+    "SEBI_OFFICIAL_RSS"
+  ],
+  "authority": "SHADOW_ONLY",
+  "checkpoint_types": [
+    "D+5",
+    "D+20",
+    "D+60",
+    "FINAL_EXIT"
+  ],
+  "contract_hash": "be5df00c70299966f40163e8b850a6939ed04f82cd0625f703d6d5bcc702ff4d",
+  "contract_version": "STAGE6_8C_PROSPECTIVE_OBSERVATION_CONTRACT_V1",
+  "entity_registry_v2_hash": "23438181ad6b3cea20c1bc2f4b3cd4236f5f3a1d5bbfcbb5c8cf0b3d0a2a258f",
+  "envelope_schema": "STAGE6_8C_RECOMMENDATION_AUDIT_ENVELOPE_V1",
+  "fixture_only_tests": true,
+  "frozen_stage4a3_changed_files": 0,
+  "frozen_stage5d_changed_files": 0,
+  "historical_backfill": "PROHIBITED",
+  "measurement_method": "STAGE6_8C_COMMON_CLOSE_DECIMAL_V1",
+  "model_bundle_hash": "4631eb8a1d0b34212252df3b1aae180f64ec98ba5e7955a84729df0a471c62da",
+  "model_retraining": "PROHIBITED",
+  "network_calls": 0,
+  "policy_hash": "55c7e9378e97848b72fb2a6fc737cc81925883215f7feffcee02c7d7815a51ba",
+  "policy_id": "S6PROSOBSPOL_STAGE6_8C_V1",
+  "recommendation_influence": "NONE",
+  "result": "PASS",
+  "source_package_hash": "cc1b7bfc85c77e40f029a5ccff670e531445e5051932dab7e7e8abd2116bdc2f",
+  "source_registry_v2_hash": "7d91f4c72365757b6cdfaef0c4027c46bfbdb11c3541c229e828f9ee28d58e90",
+  "stage": "6.8C",
+  "stage5d5_control_commit": "74b2710f0e19bd403978da81e87f25a3059ace06",
+  "stage6_0c_validator": "PASS / 10 schemas",
+  "stage6_8a_regression": "373/373 PASS",
+  "stage6_8b_regression": "392/392 PASS",
+  "stage6_8c_tests": "91/91 PASS",
+  "stage6_full_tests": "5829/5829 PASS",
+  "store_schema": "STAGE6_8C_PROSPECTIVE_OBSERVATION_STORE_V1",
+  "trading_authority": false
+}

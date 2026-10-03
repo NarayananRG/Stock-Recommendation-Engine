@@ -1,0 +1,17 @@
+{
+  "authority": "SHADOW_ONLY",
+  "benchmark_anchor": "COMMON_OBSERVED_COMPLETED_SESSION_CLOSE",
+  "checkpoint_schema": "STAGE6_8C_BENCHMARK_CHECKPOINT_V1",
+  "checkpoint_types": ["D+5", "D+20", "D+60", "FINAL_EXIT"],
+  "cohort_schema": "STAGE6_8C_COHORT_FINGERPRINT_V1",
+  "contract_version": "STAGE6_8C_PROSPECTIVE_OBSERVATION_CONTRACT_V1",
+  "envelope_schema": "STAGE6_8C_RECOMMENDATION_AUDIT_ENVELOPE_V1",
+  "final_exit_source": "NON_VOIDED_STAGE5D_TRANSACTION_LIFECYCLE_ONLY",
+  "market_data_classification": "OUTCOME_MEASUREMENT_ONLY_NOT_STAGE6_EVENT_EVIDENCE",
+  "measurement_numeric_policy": "CANONICAL_DECIMAL_STRING",
+  "point_in_time_rule": "ONLY_OBSERVATIONS_RECORDED_NOT_AFTER_EXACT_CHECKPOINT_CUTOFF",
+  "recommendation_influence": "NONE",
+  "sector_unavailable_status": "UNAVAILABLE_NO_VERIFIED_SECTOR_BENCHMARK",
+  "store_schema": "STAGE6_8C_PROSPECTIVE_OBSERVATION_STORE_V1",
+  "trading_authority": false
+}
