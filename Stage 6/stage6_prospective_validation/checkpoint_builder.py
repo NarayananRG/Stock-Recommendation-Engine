@@ -5,7 +5,7 @@ import json
 from datetime import date, datetime
 from decimal import Decimal, InvalidOperation, localcontext
 
-from stage6_ingestion.canonical import canonical_hash, without
+from stage6_ingestion.canonical import canonical_hash, canonical_json, without
 from .control_reader import parse_utc, payload_sha256
 from .errors import ProspectiveIntegrityFailure, Stage6ProspectiveError
 from .observation_config import AUTHORITY, CHECKPOINT_SCHEMA, CHECKPOINT_TYPES, MEASUREMENT_VERSION
@@ -16,7 +16,10 @@ SECTOR_UNAVAILABLE = "UNAVAILABLE_NO_VERIFIED_SECTOR_BENCHMARK"
 ORDINALS = {"D+5": 5, "D+20": 20, "D+60": 60}
 
 
-def determine_due_checkpoints(*, decision_date, completed_session_dates, existing_checkpoint_types=(), final_exit_completed=False):
+def determine_due_checkpoints(*, decision_date, completed_session_dates, existing_checkpoint_types=(), final_exit_completed=False,
+                              test_only_adapter=False):
+    if not test_only_adapter:
+        raise Stage6ProspectiveError("CALLER_SUPPLIED_SESSION_DATES_PROHIBITED")
     try:
         anchor = date.fromisoformat(decision_date).isoformat()
     except Exception as exc:
@@ -62,9 +65,13 @@ def _return(end, start):
 def _validate_manifest(manifest):
     if manifest.get("classification") != MARKET_CLASSIFICATION:
         raise ProspectiveIntegrityFailure("MARKET_DATA_CLASSIFICATION_INVALID")
-    expected = canonical_hash(without(manifest, "manifest_hash"))
-    if manifest.get("manifest_hash") != expected or not manifest.get("manifest_id"):
-        raise ProspectiveIntegrityFailure("MARKET_DATA_MANIFEST_INVALID")
+    if manifest.get("provenance_verification") == "PASS":
+        if not isinstance(manifest.get("manifest_hash"), str) or len(manifest["manifest_hash"]) != 64 or not manifest.get("manifest_id"):
+            raise ProspectiveIntegrityFailure("MARKET_DATA_MANIFEST_INVALID")
+    else:
+        expected = canonical_hash(without(manifest, "manifest_hash"))
+        if manifest.get("manifest_hash") != expected or not manifest.get("manifest_id"):
+            raise ProspectiveIntegrityFailure("MARKET_DATA_MANIFEST_INVALID")
     rows = manifest.get("observations")
     if not isinstance(rows, list) or not rows:
         raise Stage6ProspectiveError("MARKET_OBSERVATIONS_REQUIRED")
@@ -108,17 +115,35 @@ def derive_final_exit(control_reader, recommendation_id, checkpoint_cutoff_utc):
     voided = set()
     for row in control_reader.connection.execute("SELECT * FROM transaction_voids"):
         payload = json.loads(row["canonical_payload_json"])
-        if payload_sha256(row["canonical_payload_json"]) != row["payload_sha256"] or payload.get("transaction_id") != row["transaction_id"]:
+        if (canonical_hash(payload) != payload_sha256(row["canonical_payload_json"])
+                or payload_sha256(row["canonical_payload_json"]) != row["payload_sha256"]
+                or payload.get("transaction_id") != row["transaction_id"]
+                or payload.get("reason") != row["reason"]):
             raise ProspectiveIntegrityFailure("TRANSACTION_VOID_HASH_INVALID")
-        voided.add(row["transaction_id"])
+        if parse_utc(row["voided_at_utc"]) <= cutoff:
+            voided.add(row["transaction_id"])
     rows = control_reader.connection.execute("SELECT * FROM user_transactions WHERE recommendation_id=? ORDER BY trade_date,transaction_sequence", (recommendation_id,)).fetchall()
     active = []
     for row in rows:
+        payload = json.loads(row["canonical_payload_json"])
+        if canonical_json(payload) != row["canonical_payload_json"] or payload_sha256(row["canonical_payload_json"]) != row["payload_sha256"]:
+            raise ProspectiveIntegrityFailure("TRANSACTION_HASH_INVALID")
+        typed = {
+            "ticker": row["ticker"], "trade_date": row["trade_date"], "side": row["side"],
+            "quantity": row["quantity"], "price_inr": row["price_inr"], "fees_inr": row["fees_inr"],
+            "recommendation_id": row["recommendation_id"], "signal_id": row["signal_id"],
+            "external_reference": row["external_reference"], "notes": row["notes"],
+        }
+        if any(str(payload.get(key)) != str(value) for key, value in typed.items()):
+            raise ProspectiveIntegrityFailure("TRANSACTION_TYPED_BINDING_INVALID")
+        try:
+            trade_day = date.fromisoformat(row["trade_date"])
+        except Exception as exc:
+            raise ProspectiveIntegrityFailure("TRANSACTION_TRADE_DATE_INVALID") from exc
         if row["transaction_id"] in voided or parse_utc(row["recorded_at_utc"]) > cutoff:
             continue
-        payload = json.loads(row["canonical_payload_json"])
-        if payload_sha256(row["canonical_payload_json"]) != row["payload_sha256"]:
-            raise ProspectiveIntegrityFailure("TRANSACTION_HASH_INVALID")
+        if trade_day > cutoff.date():
+            raise Stage6ProspectiveError("FUTURE_TRANSACTION_TRADE_DATE")
         active.append((row, payload))
     if not active or not any(row["side"] == "BUY" for row, _ in active):
         raise Stage6ProspectiveError("FINAL_EXIT_REQUIRES_FILLED_POSITION")
@@ -131,11 +156,19 @@ def derive_final_exit(control_reader, recommendation_id, checkpoint_cutoff_utc):
 
 
 def build_checkpoint(*, envelope, checkpoint_type, checkpoint_cutoff_utc, market_data_manifest,
-                     thesis_records=(), final_exit=None):
+                     thesis_records=(), final_exit=None, test_only_adapter=False,
+                     thesis_records_verified=False):
     validate_envelope(envelope)
     if checkpoint_type not in CHECKPOINT_TYPES:
         raise Stage6ProspectiveError("CHECKPOINT_TYPE_INVALID")
     cutoff = parse_utc(checkpoint_cutoff_utc)
+    if not test_only_adapter:
+        if market_data_manifest.get("provenance_verification") != "PASS":
+            raise Stage6ProspectiveError("VERIFIED_MARKET_ARCHIVE_REQUIRED")
+        if market_data_manifest.get("ticker") != envelope["ticker"] or market_data_manifest.get("benchmark_ticker") != "^NSEI":
+            raise ProspectiveIntegrityFailure("MARKET_ARCHIVE_SUBJECT_MISMATCH")
+    if thesis_records and not (test_only_adapter or thesis_records_verified):
+        raise Stage6ProspectiveError("CALLER_SUPPLIED_THESIS_RECORDS_PROHIBITED")
     rows = _validate_manifest(market_data_manifest)
     if any(parse_utc(row["observed_at_utc"]) > cutoff for row in rows):
         raise Stage6ProspectiveError("FUTURE_MARKET_DATA_CROSSES_CHECKPOINT_CUTOFF")
@@ -163,8 +196,12 @@ def build_checkpoint(*, envelope, checkpoint_type, checkpoint_cutoff_utc, market
     target = target_rows[0]
     if any(row["session_date"] > target_date for row in rows):
         raise Stage6ProspectiveError("FUTURE_MARKET_DATA_CROSSES_CHECKPOINT_CUTOFF")
-    if cutoff.date().isoformat() != target_date:
+    if cutoff.date().isoformat() < target_date:
         raise Stage6ProspectiveError("CHECKPOINT_CUTOFF_SESSION_MISMATCH")
+    completed_boundary = market_data_manifest.get("completed_session_boundary_utc")
+    if not test_only_adapter:
+        if market_data_manifest.get("target_session_date") != target_date or completed_boundary is None or cutoff < parse_utc(completed_boundary):
+            raise Stage6ProspectiveError("CHECKPOINT_BEFORE_COMPLETED_SESSION_BOUNDARY")
     window = [row for row in rows if anchor_date <= row["session_date"] <= target_date]
     for row in window:
         for key in ("stock_close", "stock_high", "stock_low"):
@@ -178,8 +215,11 @@ def build_checkpoint(*, envelope, checkpoint_type, checkpoint_cutoff_utc, market
     nifty_anchor = _decimal(anchor["nifty_close"], "ANCHOR_NIFTY_PRICE")
     nifty_end = _decimal(target["nifty_close"], "CHECKPOINT_NIFTY_PRICE")
     stock_return = _return(stock_end, stock_anchor); nifty_return = _return(nifty_end, nifty_anchor)
-    highs = [_decimal(row["stock_high"], "STOCK_HIGH") for row in window]
-    lows = [_decimal(row["stock_low"], "STOCK_LOW") for row in window]
+    forward_window = [row for row in window if row["session_date"] > anchor_date]
+    if not forward_window:
+        raise Stage6ProspectiveError("FORWARD_EXCURSION_WINDOW_REQUIRED")
+    highs = [_decimal(row["stock_high"], "STOCK_HIGH") for row in forward_window]
+    lows = [_decimal(row["stock_low"], "STOCK_LOW") for row in forward_window]
     closes = [_decimal(row["stock_close"], "STOCK_CLOSE") for row in window]
     mfe = max(_return(value, stock_anchor) for value in highs)
     mae = min(_return(value, stock_anchor) for value in lows)
@@ -218,6 +258,8 @@ def build_checkpoint(*, envelope, checkpoint_type, checkpoint_cutoff_utc, market
         "current_thesis_state": current_thesis, "original_thesis_validity_state": original_validity,
         "thesis_review_bindings": thesis_bindings, **lifecycle,
         "market_data_manifest_binding": {"record_type": "STAGE6_8C_MARKET_DATA_MANIFEST", "record_id": market_data_manifest["manifest_id"], "record_hash": market_data_manifest["manifest_hash"]},
+        "market_data_provider": market_data_manifest.get("provider_identifier"),
+        "market_data_logical_hash": market_data_manifest.get("market_data_logical_hash"),
         "market_data_classification": MARKET_CLASSIFICATION, "measurement_method_version": MEASUREMENT_VERSION,
         "point_in_time_verification_status": "PASS", "authority": AUTHORITY, "recommendation_influence": "NONE",
         "trading_authority": False, "record_hash": "",

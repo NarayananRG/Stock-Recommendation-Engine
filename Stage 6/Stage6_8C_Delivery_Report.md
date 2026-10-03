@@ -10,11 +10,11 @@ The deterministic cohort fingerprint binds the verified activation record, Stage
 
 ## Recommendation audit envelope
 
-One deterministic envelope is permitted per legitimately enrolled prospective recommendation. Stage 5D and the active prospective store are opened read-only/query-only. The envelope binds the immutable recommendation and allocation hashes, portfolio/profile/capital context, Stage 4A.3 snapshot/candidate/feature/model/market-data lineage, and only Stage 6 context that existed no later than recommendation persistence. Missing context is explicit. A recursive safety validator rejects future/outcome leakage.
+One deterministic envelope is permitted per recommendation whose exact Stage 5D origin run is an enrolled post-activation prospective session. A later prospective case is not required. Stage 5D and the active prospective store are opened read-only/query-only. The envelope binds the immutable recommendation and allocation hashes, portfolio/profile/capital context, independently resolved Stage 4A.3 snapshot/candidate/feature/model/market-data lineage, and only verified Stage 6 context that existed no later than recommendation persistence. Missing context is explicit. A recursive safety validator rejects future/outcome leakage.
 
 ## Benchmark checkpoints
 
-The only checkpoint types are D+5, D+20, D+60 and FINAL_EXIT. D+N is the Nth supplied completed market session strictly after the recommendation decision session. The pure calculator uses a common observed stock/NIFTY close interval, canonical Decimal strings, exact point-in-time cutoffs, NIFTY-required comparison, explicit sector unavailability, MFE, MAE and completed-close maximum drawdown. Thesis records are selected only as of the checkpoint cutoff. FINAL_EXIT requires a completed, non-voided Stage 5D transaction lifecycle.
+The only checkpoint types are D+5, D+20, D+60 and FINAL_EXIT. Production D+N scheduling uses the verified Stage 6.8A enrolled control-session chain strictly after the origin session. The calculator uses a verified immutable market archive, a common stock/NIFTY close interval, canonical Decimal strings, exact point-in-time cutoffs, NIFTY-required comparison, explicit sector unavailability, forward-only D+1 onward MFE/MAE and completed-close maximum drawdown seeded by the decision close. Capture is blocked before 15:45 Asia/Kolkata. Thesis records are accepted only through verified read-only Stage 6 bindings as of cutoff. FINAL_EXIT applies transaction and void evidence point-in-time as of the checkpoint cutoff.
 
 Market observations are classified as `OUTCOME_MEASUREMENT_ONLY_NOT_STAGE6_EVENT_EVIDENCE`. They have no recommendation, ranking, sizing, morning-revalidation, event-corroboration, execution or trading authority.
 
@@ -24,12 +24,24 @@ The isolated `STAGE6_8C_PROSPECTIVE_OBSERVATION_STORE_V1` SQLite store contains 
 
 The separate observation operator supports cohort verification, envelope creation, checkpoint persistence and integrity/status reporting. It does not activate the protocol, download market/news data, create orders, change positions or mutate Stage 5D.
 
+## Independent Audit Corrections
+
+1. Real Stage 4A.3 snapshot resolution now verifies the seven immutable files, frozen snapshot content/hash chain, exact candidate and feature rows, candidate-input and market-data lineage, model bundle, feature identities and protocol identity. Caller-generated descriptors are production-prohibited.
+2. Envelope eligibility now binds the enrolled origin prospective session. A later prospective case is explicitly optional and is never retroactively attached.
+3. Production D+N scheduling now resolves only from the verified read-only Stage 6.8A session chain, with pinned NSE ordinary-session validation and explicit `NOT_DUE` behavior.
+4. Checkpoints now require a file-hashed immutable market archive with provider, ticker, `^NSEI`, session, logical-hash and cutoff provenance. Arbitrary price JSON is production-prohibited.
+5. Target-session capture is blocked before 15:45 Asia/Kolkata, including target market observations recorded before the completed-session boundary.
+6. MFE and MAE now begin strictly after D0; D0 high/low cannot affect forward excursion. Drawdown remains seeded by the D0 close.
+7. Creation and thesis context now require exact query-only Stage 6 store bindings or remain explicitly unavailable. Caller assertions are production-prohibited.
+8. FINAL_EXIT now verifies canonical and typed transaction/void rows, trade/effective chronology, and applies voids only when known by the checkpoint cutoff.
+9. Observation-store integrity now independently revalidates checkpoint-to-envelope and envelope-to-cohort relationships.
+
 ## Validation
 
-- Stage 6.8C: 91/91 PASS.
+- Stage 6.8C: 139/139 PASS.
 - Stage 6.8A: 373/373 PASS.
 - Stage 6.8B: 392/392 PASS.
-- Full Stage 6 regression chain: 5,829/5,829 PASS.
+- Full Stage 6 regression chain: 5,877/5,877 PASS.
 - Stage 5D: 80/80, 129/129, 130/130, 107/107 and 160/160 PASS.
 - Stage 6.0C architecture validator: PASS / 10 schemas.
 - Frozen Stage 4A.3 model/source components: verified byte-for-byte by the cohort guard. Existing recorded suites remain 118/118, 26/26, 20/20 and 24/24 PASS.
@@ -38,7 +50,7 @@ The separate observation operator supports cohort verification, envelope creatio
 
 All prior identities remain unchanged. The Stage 4A.3 bundle remains `4631eb8a1d0b34212252df3b1aae180f64ec98ba5e7955a84729df0a471c62da`; source package remains `cc1b7bfc85c77e40f029a5ccff670e531445e5051932dab7e7e8abd2116bdc2f`; Stage 6.8A protocol/policy/enrollment hashes remain `6232ae23df487f2b6fe7b84df971cbee902f3cad91b2da6f66e7d5ca2c8022be`, `d684bb4358dbe5a89f466f6eacaa0a4f759e3477b3002bf0f2e95ef102387f5d`, and `af73aab6e67bef22111d62ed563695ea6fc8d5f0a0234f3de41d1fd773c7fb05`; Stage 6.8B policy/contract hashes remain `582825a16b9ae40821dacb89c7e5711fd16998153557f2fc6315ca75e5088ec9` and `97f9eb9e551d9104291a21f7c9f935390fbd1359a6d472581ff6ce6a612eb9a4`.
 
-The new Stage 6.8C policy hash is `55c7e9378e97848b72fb2a6fc737cc81925883215f7feffcee02c7d7815a51ba`; the new contract hash is `be5df00c70299966f40163e8b850a6939ed04f82cd0625f703d6d5bcc702ff4d`.
+The corrected Stage 6.8C policy hash is `47277fdf3a56b3d8de09010c94426e59b3701556f086194bc6cc35d6a6664ed0`; the corrected contract hash is `5e6870495807a03ca48c47a9bac7f66613dbe691116e24bdd44939fc576e6aa0`.
 
 ## Safety boundary
 

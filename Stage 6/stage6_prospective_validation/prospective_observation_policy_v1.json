@@ -5,6 +5,10 @@
   "historical_backfill_as_prospective": "PROHIBITED",
   "model_promotion": "PROHIBITED",
   "model_retraining": "PROHIBITED",
+  "production_creation_context": "VERIFIED_READ_ONLY_STAGE6_BINDING_OR_EXPLICIT_UNAVAILABLE",
+  "production_market_input": "VERIFIED_IMMUTABLE_MARKET_ARCHIVE_ONLY",
+  "production_session_sequence": "VERIFIED_STAGE6_8A_ENROLLED_CONTROL_SESSION_CHAIN_ONLY",
+  "production_snapshot_input": "RESOLVED_REAL_IMMUTABLE_STAGE4A3_SNAPSHOT_ONLY",
   "policy_id": "S6PROSOBSPOL_STAGE6_8C_V1",
   "recommendation_influence": "NONE",
   "trading_authority": false

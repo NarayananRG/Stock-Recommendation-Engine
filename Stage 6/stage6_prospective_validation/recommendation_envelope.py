@@ -2,14 +2,13 @@
 from __future__ import annotations
 
 import json
-import sqlite3
-from pathlib import Path
-
 from stage6_ingestion.canonical import canonical_hash, canonical_json, without
 from .cohort_guard import FEATURE_HASHES, MODEL_BUNDLE_HASH, SOURCE_PACKAGE_HASH
 from .control_reader import Stage5DControlReader, parse_utc, payload_sha256
 from .errors import ProspectiveIntegrityFailure, Stage6ProspectiveError
 from .observation_config import AUTHORITY, ENVELOPE_SCHEMA
+from .activation import verify_activation_record
+from .verified_inputs import ProspectiveStoreReader, Stage4A3SnapshotResolver, Stage6ContextReader
 
 PROHIBITED_OUTCOME_KEYS = {
     "future_return", "realized_pnl", "realized_p&l", "exit_price", "exit_reason",
@@ -31,29 +30,6 @@ def _validate_no_outcomes(value, path="envelope"):
             _validate_no_outcomes(child, f"{path}[{index}]")
 
 
-def _prospective_case(database, recommendation_id):
-    path = Path(database).resolve()
-    if not path.is_file():
-        raise Stage6ProspectiveError("PROSPECTIVE_STORE_REQUIRED")
-    connection = sqlite3.connect(f"file:{path.as_posix()}?mode=ro", uri=True)
-    connection.row_factory = sqlite3.Row
-    try:
-        connection.execute("PRAGMA query_only=ON")
-        if connection.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
-            raise ProspectiveIntegrityFailure("PROSPECTIVE_STORE_INVALID")
-        row = connection.execute("SELECT canonical_json FROM prospective_cases WHERE recommendation_id=?", (recommendation_id,)).fetchone()
-        copied = connection.execute("SELECT payload_sha256,canonical_payload_json FROM prospective_control_recommendations WHERE recommendation_id=?", (recommendation_id,)).fetchone()
-        if row is None or copied is None:
-            raise Stage6ProspectiveError("RECOMMENDATION_NOT_IN_ACTIVE_PROSPECTIVE_COHORT")
-        case = json.loads(row[0])
-        if (canonical_json(case) != row[0] or case.get("recommendation_id") != recommendation_id
-                or case.get("record_hash") != canonical_hash(without(case, "record_hash"))):
-            raise ProspectiveIntegrityFailure("PROSPECTIVE_CASE_COPY_INVALID")
-        return case, dict(copied), connection.execute("PRAGMA query_only").fetchone()[0] == 1
-    finally:
-        connection.close()
-
-
 def _allocation(reader: Stage5DControlReader, allocation_run_id: str):
     row = reader.connection.execute("SELECT * FROM allocation_runs WHERE allocation_run_id=?", (allocation_run_id,)).fetchone()
     if row is None:
@@ -67,7 +43,7 @@ def _allocation(reader: Stage5DControlReader, allocation_run_id: str):
     return dict(row), value, snapshot
 
 
-def _verify_snapshot(snapshot: dict, origin_run: dict, recommendation: dict):
+def _verify_test_snapshot(snapshot: dict, origin_run: dict, recommendation: dict):
     required = ("snapshot_id", "snapshot_content_hash", "model_bundle_hash", "source_package_hash",
                 "feature_set", "feature_hash", "feature_row", "feature_row_hash", "candidate_input_hash",
                 "market_data_manifest_id", "market_data_manifest_hash", "signal_id", "ticker", "candidate_row",
@@ -89,22 +65,50 @@ def _verify_snapshot(snapshot: dict, origin_run: dict, recommendation: dict):
 
 
 def build_recommendation_envelope(*, control_database, prospective_database, recommendation_id,
-                                  cohort_fingerprint, stage4a3_snapshot, creation_context=None):
-    case, copied, prospective_query_only = _prospective_case(prospective_database, recommendation_id)
-    if (case.get("activation_binding", {}).get("record_id"), case.get("activation_binding", {}).get("record_hash")) != (cohort_fingerprint["activation_id"], cohort_fingerprint["activation_record_hash"]):
-        raise ProspectiveIntegrityFailure("PROSPECTIVE_CASE_ACTIVATION_MISMATCH")
+                                  cohort_fingerprint, activation_record=None,
+                                  stage4a3_root=None, stage4a3_prospective_root=None,
+                                  stage4a3_snapshot=None, creation_context=None,
+                                  stage6_context_database=None, stage6_context_binding=None,
+                                  test_only_adapter=False):
+    if activation_record is None:
+        if not test_only_adapter:
+            raise Stage6ProspectiveError("VERIFIED_ACTIVATION_RECORD_REQUIRED")
+        activation = {"activation_id": cohort_fingerprint["activation_id"], "record_hash": cohort_fingerprint["activation_record_hash"], "activation_date_ist": "1900-01-01", "activated_at_utc": "1900-01-01T00:00:00Z"}
+    else:
+        activation = verify_activation_record(activation_record)
+    if (activation["activation_id"], activation["record_hash"]) != (cohort_fingerprint["activation_id"], cohort_fingerprint["activation_record_hash"]):
+        raise ProspectiveIntegrityFailure("PROSPECTIVE_ACTIVATION_MISMATCH")
     with Stage5DControlReader(control_database) as reader:
         recommendation = reader.get_recommendation(recommendation_id)
-        if copied["payload_sha256"] != recommendation["payload_sha256"] or copied["canonical_payload_json"] != recommendation["canonical_payload_json"]:
-            raise ProspectiveIntegrityFailure("PROSPECTIVE_RECOMMENDATION_BINDING_INVALID")
         allocation_row, allocation, portfolio_snapshot = _allocation(reader, recommendation["allocation_run_id"])
         origin_run = reader.get_origin_run(recommendation["allocation_run_id"])
-        _verify_snapshot(stage4a3_snapshot, origin_run, recommendation)
+        control_database_id = reader.database_id()
+        if test_only_adapter:
+            if stage4a3_snapshot is None:
+                raise Stage6ProspectiveError("TEST_SNAPSHOT_DESCRIPTOR_REQUIRED")
+            _verify_test_snapshot(stage4a3_snapshot, origin_run, recommendation)
+            snapshot = stage4a3_snapshot
+        else:
+            if stage4a3_snapshot is not None:
+                raise Stage6ProspectiveError("CALLER_SUPPLIED_STAGE4A3_SNAPSHOT_PROHIBITED")
+            snapshot = Stage4A3SnapshotResolver(stage4a3_root, stage4a3_prospective_root).resolve(origin_run, recommendation)
         if reader.connection.execute("PRAGMA query_only").fetchone()[0] != 1:
             raise ProspectiveIntegrityFailure("CONTROL_NOT_QUERY_ONLY")
+    with ProspectiveStoreReader(prospective_database, activation) as prospective:
+        origin_session = prospective.origin_session(origin_run, control_database_id)
+        case_status, case_binding = prospective.case_at_creation(recommendation_id, recommendation["persisted_at_utc"])
+        prospective_query_only = prospective.connection.execute("PRAGMA query_only").fetchone()[0] == 1
     creation_time = recommendation["persisted_at_utc"]
     parse_utc(creation_time)
+    if creation_context is not None and not test_only_adapter:
+        raise Stage6ProspectiveError("CALLER_SUPPLIED_STAGE6_CONTEXT_PROHIBITED")
     context = creation_context or {}
+    if stage6_context_database is not None or stage6_context_binding is not None:
+        if not stage6_context_database or not stage6_context_binding:
+            raise Stage6ProspectiveError("VERIFIED_STAGE6_CONTEXT_BINDING_REQUIRED")
+        with Stage6ContextReader(stage6_context_database) as context_reader:
+            resolved, binding = context_reader.resolve(stage6_context_binding, cutoff_utc=creation_time, recommendation_id=recommendation_id, signal_id=recommendation["signal_id"], ticker=recommendation["ticker"])
+        context = {"availability": "AVAILABLE_VERIFIED_AT_RECOMMENDATION_CREATION", "record_binding": binding, "record": resolved}
     context_recorded = context.get("recorded_at_utc")
     if context_recorded is not None and parse_utc(context_recorded) > parse_utc(creation_time):
         raise Stage6ProspectiveError("CREATION_CONTEXT_AFTER_RECOMMENDATION")
@@ -116,10 +120,12 @@ def build_recommendation_envelope(*, control_database, prospective_database, rec
     record = {
         "schema_version": ENVELOPE_SCHEMA, "envelope_id": "",
         "cohort_fingerprint_binding": {"record_type": cohort_fingerprint["schema_version"], "record_id": cohort_fingerprint["cohort_fingerprint_id"], "record_hash": cohort_fingerprint["record_hash"]},
-        "prospective_case_binding": {"record_type": case["schema_version"], "record_id": case["case_id"], "record_hash": case["record_hash"]},
+        "prospective_origin_session_binding": {"record_type": origin_session["schema_version"], "record_id": origin_session["enrollment_id"], "record_hash": origin_session["record_hash"]},
+        "prospective_case_status": case_status,
+        "prospective_case_binding": case_binding,
         "recommendation_binding": {"record_type": "STAGE5D_RECOMMENDATION", "record_id": recommendation_id, "record_hash": recommendation["payload_sha256"]},
         "allocation_run_binding": {"record_type": "STAGE5D_ALLOCATION_RUN", "record_id": recommendation["allocation_run_id"], "record_hash": allocation_row["payload_sha256"]},
-        "stage4a3_snapshot_binding": {"record_type": "STAGE4A3_SNAPSHOT", "record_id": stage4a3_snapshot["snapshot_id"], "record_hash": stage4a3_snapshot["snapshot_content_hash"]},
+        "stage4a3_snapshot_binding": {"record_type": "STAGE4A3_SNAPSHOT", "record_id": snapshot["snapshot_id"], "record_hash": snapshot["snapshot_content_hash"]},
         "recommendation_id": recommendation_id, "signal_id": recommendation["signal_id"], "ticker": recommendation["ticker"],
         "signal_date": recommendation["signal_date"], "decision_date": recommendation["decision_date"],
         "recommendation_persisted_at_utc": creation_time,
@@ -127,13 +133,15 @@ def build_recommendation_envelope(*, control_database, prospective_database, rec
         "portfolio_snapshot": portfolio_snapshot,
         "profile_capital_context": {"profile_version": allocation_row["profile_version"], "capital_ceiling_inr": allocation_row["capital_ceiling_inr"], "selected_horizon": allocation_row["selected_horizon"]},
         "stage4a3": {
-            "snapshot_id": stage4a3_snapshot["snapshot_id"], "snapshot_content_hash": stage4a3_snapshot["snapshot_content_hash"],
-            "candidate_row": stage4a3_snapshot["candidate_row"], "feature_row_hash": stage4a3_snapshot["feature_row_hash"],
-            "feature_set": stage4a3_snapshot["feature_set"], "feature_hash": stage4a3_snapshot["feature_hash"],
-            "model_bundle_hash": stage4a3_snapshot["model_bundle_hash"], "source_package_hash": stage4a3_snapshot["source_package_hash"],
-            "protocol_version": stage4a3_snapshot["protocol_version"], "protocol_tag": stage4a3_snapshot["protocol_tag"],
-            "market_data_manifest_binding": {"record_type": "STAGE4A3_MARKET_DATA_MANIFEST", "record_id": stage4a3_snapshot["market_data_manifest_id"], "record_hash": stage4a3_snapshot["market_data_manifest_hash"]},
-            "candidate_input_hash": stage4a3_snapshot["candidate_input_hash"],
+            "snapshot_id": snapshot["snapshot_id"], "snapshot_content_hash": snapshot["snapshot_content_hash"],
+            "candidate_row": snapshot["candidate_row"], "feature_row_hash": snapshot["feature_row_hash"],
+            "feature_row_content_hash": snapshot.get("feature_row_content_hash", snapshot["feature_row_hash"]),
+            "feature_set": snapshot["feature_set"], "feature_hash": snapshot["feature_hash"],
+            "model_bundle_hash": snapshot["model_bundle_hash"], "source_package_hash": snapshot.get("source_package_hash", SOURCE_PACKAGE_HASH),
+            "protocol_version": snapshot["protocol_version"], "protocol_tag": snapshot["protocol_tag"],
+            "market_data_manifest_binding": {"record_type": "STAGE4A3_MARKET_DATA_MANIFEST", "record_id": snapshot["market_data_manifest_id"], "record_hash": snapshot["market_data_manifest_hash"]},
+            "candidate_input_hash": snapshot["candidate_input_hash"],
+            "snapshot_directory_verification": snapshot.get("snapshot_directory_verification", "TEST_ONLY_ADAPTER"),
         },
         "stage6_creation_context": stage6_context,
         "source_read_modes": {"stage5d": "READ_ONLY_QUERY_ONLY", "prospective_store": "READ_ONLY_QUERY_ONLY"},

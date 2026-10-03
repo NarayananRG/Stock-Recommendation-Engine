@@ -48,7 +48,11 @@ class ProspectiveObservationStore:
         self.connection.execute("PRAGMA foreign_keys=ON")
         if new:
             self._initialize()
-        self.integrity_check()
+        try:
+            self.integrity_check()
+        except Exception:
+            self.connection.close()
+            raise
 
     def __enter__(self): return self
     def __exit__(self, *_): self.close()
@@ -113,8 +117,18 @@ CREATE TABLE benchmark_checkpoints(checkpoint_id TEXT PRIMARY KEY,envelope_id TE
             value = json.loads(row["canonical_json"]); validate_envelope(value)
             if canonical_json(value) != row["canonical_json"] or (value["envelope_id"], value["recommendation_id"], value["record_hash"]) != (row["envelope_id"], row["recommendation_id"], row["record_hash"]):
                 raise ProspectiveIntegrityFailure("STORED_ENVELOPE_INVALID")
+            expected_cohort = {"record_type": self.cohort["schema_version"], "record_id": self.cohort["cohort_fingerprint_id"], "record_hash": self.cohort["record_hash"]}
+            if value.get("cohort_fingerprint_binding") != expected_cohort:
+                raise ProspectiveIntegrityFailure("STORED_ENVELOPE_COHORT_BINDING_INVALID")
         for row in self.connection.execute("SELECT * FROM benchmark_checkpoints"):
             value = json.loads(row["canonical_json"]); validate_checkpoint(value)
             if canonical_json(value) != row["canonical_json"] or (value["checkpoint_id"], value["recommendation_id"], value["checkpoint_type"], value["record_hash"]) != (row["checkpoint_id"], row["recommendation_id"], row["checkpoint_type"], row["record_hash"]):
                 raise ProspectiveIntegrityFailure("STORED_CHECKPOINT_INVALID")
+            envelope = self.connection.execute("SELECT recommendation_id,record_hash,canonical_json FROM recommendation_audit_envelopes WHERE envelope_id=?", (row["envelope_id"],)).fetchone()
+            binding = value.get("recommendation_audit_envelope_binding", {})
+            if (envelope is None or binding.get("record_id") != row["envelope_id"]
+                    or binding.get("record_hash") != envelope["record_hash"]
+                    or value.get("recommendation_id") != envelope["recommendation_id"]
+                    or row["recommendation_id"] != envelope["recommendation_id"]):
+                raise ProspectiveIntegrityFailure("STORED_CHECKPOINT_ENVELOPE_RELATIONSHIP_INVALID")
         return {"result": "PASS", "envelopes": self.connection.execute("SELECT count(*) FROM recommendation_audit_envelopes").fetchone()[0], "checkpoints": self.connection.execute("SELECT count(*) FROM benchmark_checkpoints").fetchone()[0], "authority": AUTHORITY, "trading_authority": False}
