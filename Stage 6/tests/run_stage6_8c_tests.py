@@ -3,6 +3,7 @@ from __future__ import annotations
 import csv
 import gzip
 import hashlib
+import inspect
 import json
 import shutil
 import sqlite3
@@ -24,6 +25,10 @@ from stage6_prospective_validation.activation import verify_activation_record
 from stage6_prospective_validation.checkpoint_builder import (
     MARKET_CLASSIFICATION, SECTOR_UNAVAILABLE, build_checkpoint, derive_final_exit, determine_due_checkpoints,
 )
+from stage6_prospective_validation.checkpoint_market_archive import (
+    ARCHIVE_SCHEMA, CREATOR_ID, FROZEN_ADAPTER_ID, FROZEN_PROVIDER, RUNTIME_RELATIVE,
+    capture_checkpoint_market_archive, validate_checkpoint_market_archive_root,
+)
 from stage6_prospective_validation.cohort_guard import (
     FEATURE_HASHES, MODEL_BUNDLE_HASH, SOURCE_PACKAGE_HASH, _validate_facts, verify_active_cohort,
 )
@@ -39,7 +44,7 @@ from stage6_prospective_validation import observation_config as oc
 from stage6_prospective_validation import operations_config as ops
 from stage6_prospective_validation import cohort_guard as cg
 from stage6_prospective_validation.verified_inputs import (
-    MARKET_ARCHIVE_SCHEMA, MarketArchiveResolver, ProspectiveStoreReader,
+    CHECKPOINT_MARKET_ARCHIVE_SCHEMA, MARKET_ARCHIVE_SCHEMA, MarketArchiveResolver, ProspectiveStoreReader,
     Stage4A3SnapshotResolver, Stage6ContextReader,
 )
 from stage6_prospective_validation.session_calendar import verify_ordinary_session
@@ -179,6 +184,30 @@ def make_market_archive(root, observations, *, ticker="AAA.NS", benchmark="^NSEI
     value={"archive_schema":MARKET_ARCHIVE_SCHEMA,"archive_id":"S6MD_"+logical[:24],"classification":MARKET_CLASSIFICATION,"provider_identifier":provider,"ticker":ticker,"benchmark_ticker":benchmark,"target_session_date":target_date,"captured_at_utc":captured_at,"market_data_logical_hash":logical,"files":[{"file":p.name,"sha256":_file_sha(p),"bytes":p.stat().st_size} for p in (stock_path,nifty_path)],"manifest_hash":""}
     value["manifest_hash"]=canonical_hash(without(value,"manifest_hash")); (directory/"market_archive_manifest.json").write_text(json.dumps(value,sort_keys=True,indent=2)+"\n",encoding="utf-8")
     return directory
+
+
+def frozen_fixture_acquire(repo, stage4a3_root, as_of_date, archive_parent, downloaded_utc):
+    """Injected test transport that exercises the frozen archive writer without network."""
+    import pandas as pd
+    sys.path.insert(0, str(stage4a3_root))
+    try:
+        from stage4a3.final_market_data import archive_market_frames, verify_and_load_archive
+        dates = CTX.get("adapter_dates_override") or CTX["verified_dates"]
+        stock = pd.DataFrame({"Open":[100+i for i in range(len(dates))],
+                              "High":[102+i for i in range(len(dates))],
+                              "Low":[98+i for i in range(len(dates))],
+                              "Close":[100+i for i in range(len(dates))]}, index=pd.to_datetime(dates))
+        nifty = pd.DataFrame({"Open":[20000+10*i for i in range(len(dates))],
+                              "High":[20005+10*i for i in range(len(dates))],
+                              "Low":[19995+10*i for i in range(len(dates))],
+                              "Close":[20000+10*i for i in range(len(dates))]}, index=pd.to_datetime(dates))
+        frames={"AAA.NS":stock,"^NSEI":nifty}; CTX["acquisition_calls"].append((as_of_date,downloaded_utc))
+        manifest=archive_market_frames(frames,Path(archive_parent)/"final_market_data",as_of_date,
+                                       "TEST_ONLY_FROZEN_STAGE4A3_ADAPTER",downloaded_utc)
+        loaded=verify_and_load_archive(Path(archive_parent)/"final_market_data",Path(archive_parent)/"stage4a3_final_market_data_manifest.json")
+        return loaded,manifest
+    finally:
+        sys.path.remove(str(stage4a3_root))
 
 
 def add_control_sessions(control, prospective, activation_path, count=40):
@@ -340,6 +369,39 @@ case("AUDIT_EXIT","incomplete position rejected",lambda:expect(Stage6Prospective
 case("AUDIT_STORE","checkpoint relational binding tamper fails",lambda:expect(ProspectiveIntegrityFailure,CTX["checkpoint_relationship_tamper"]))
 case("AUDIT_STORE","envelope cohort binding tamper fails",lambda:expect(ProspectiveIntegrityFailure,CTX["envelope_cohort_tamper"]))
 
+# Final operational market-archive correction
+case("ARCHIVE_CAPTURE","ticker derived from envelope",lambda:require(CTX["capture_manifest"]["ticker"]==CTX["env"]["ticker"]=="AAA.NS"))
+case("ARCHIVE_CAPTURE","target date derived from D+N chain",lambda:require(CTX["capture_manifest"]["target_session_date"]==CTX["target_date"]))
+case("ARCHIVE_CAPTURE","caller target date is not an input",lambda:require("target_date" not in inspect.signature(capture_checkpoint_market_archive).parameters))
+case("ARCHIVE_CAPTURE","caller ticker is not an input",lambda:require("ticker" not in inspect.signature(capture_checkpoint_market_archive).parameters))
+case("ARCHIVE_GATE","not due checkpoint uses zero acquisition calls",lambda:require(expect(Stage6ProspectiveError,CTX["capture_not_due"]) and len(CTX["acquisition_calls"])==2))
+case("ARCHIVE_GATE","before close uses zero acquisition calls",lambda:require(expect(Stage6ProspectiveError,CTX["capture_before_close"]) and len(CTX["acquisition_calls"])==2))
+case("ARCHIVE_GATE","due completed checkpoint invokes adapter",lambda:require(CTX["capture_result"]["status"]=="CREATED" and len(CTX["acquisition_calls"])==2))
+case("ARCHIVE_SOURCE","frozen Stage4A3 adapter identity",lambda:require(CTX["capture_manifest"]["frozen_adapter_id"]==FROZEN_ADAPTER_ID))
+case("ARCHIVE_SOURCE","production provider path fixed",lambda:require(FROZEN_PROVIDER=="YFINANCE_REFRESH_VIA_FROZEN_STAGE2_2_1" and "provider" not in inspect.signature(capture_checkpoint_market_archive).parameters))
+case("ARCHIVE_BOUNDARY","archive only below approved runtime root",lambda:require(RUNTIME_RELATIVE.as_posix()=="Stage 6/runtime/prospective_validation/checkpoint_market_data" and CTX["capture_dir"].is_relative_to(CTX["capture_runtime"].resolve())))
+case("ARCHIVE_BOUNDARY","research results path rejected",lambda:expect(Stage6ProspectiveError,lambda:validate_checkpoint_market_archive_root(REPO/"Stage 6/results/checkpoint_market_data",REPO)))
+case("ARCHIVE_BOUNDARY","fixture path rejected",lambda:expect(Stage6ProspectiveError,lambda:validate_checkpoint_market_archive_root(REPO/"Stage 6/tests/fixtures/checkpoint_market_data",REPO)))
+case("ARCHIVE_HASH","stock file hash verified",lambda:require(next(x for x in CTX["capture_manifest"]["files"] if x["file"]=="stock_ohlc.csv.gz")["sha256"]==_file_sha(CTX["capture_dir"]/"stock_ohlc.csv.gz")))
+case("ARCHIVE_HASH","NIFTY file hash verified",lambda:require(next(x for x in CTX["capture_manifest"]["files"] if x["file"]=="nifty_close.csv.gz")["sha256"]==_file_sha(CTX["capture_dir"]/"nifty_close.csv.gz")))
+case("ARCHIVE_HASH","manifest hash verified",lambda:require(CTX["capture_manifest"]["manifest_hash"]==canonical_hash(without(CTX["capture_manifest"],"manifest_hash"))))
+case("ARCHIVE_HASH","logical market hash verified",lambda:require(CTX["capture_manifest"]["market_data_logical_hash"]==CTX["captured_market"]["market_data_logical_hash"]))
+case("ARCHIVE_SESSION","exact verified session sequence preserved",lambda:require(CTX["capture_manifest"]["verified_session_dates"]==CTX["verified_dates"]))
+case("ARCHIVE_SESSION","target session preserved",lambda:require(CTX["captured_market"]["target_session_date"]==CTX["target_date"]))
+case("ARCHIVE_IDEMPOTENCY","exact replay idempotent",lambda:require(CTX["capture_replay"]()["status"]=="IDEMPOTENT_SUCCESS" and len(CTX["acquisition_calls"])==2))
+case("ARCHIVE_IDEMPOTENCY","conflicting archive rejected",lambda:expect(ProspectiveConflict,CTX["capture_conflict"]))
+case("ARCHIVE_RESOLVER","creator archive consumed by resolver",lambda:require(CTX["captured_market"]["archive_schema"]==CHECKPOINT_MARKET_ARCHIVE_SCHEMA and CTX["captured_market"]["provenance_verification"]=="PASS"))
+case("ARCHIVE_RESOLVER","resolved archive builds checkpoint",lambda:require(CTX["captured_checkpoint"]["checkpoint_date"]==CTX["target_date"]))
+case("ARCHIVE_READ_ONLY","Stage5D unchanged",lambda:require(CTX["capture_control_before"]==CTX["capture_control_after"]))
+case("ARCHIVE_READ_ONLY","prospective store unchanged",lambda:require(CTX["capture_prospective_before"]==CTX["capture_prospective_after"]))
+case("ARCHIVE_READ_ONLY","recommendation envelope unchanged",lambda:require(CTX["capture_envelope_before"]==CTX["capture_envelope_after"]))
+case("ARCHIVE_AUTHORITY","classification remains outcome measurement only",lambda:require(CTX["capture_manifest"]["classification"]==MARKET_CLASSIFICATION))
+case("ARCHIVE_AUTHORITY","active RBI SEBI source set unchanged",lambda:require(tuple(OPERATIONAL_SOURCES)==("RBI_OFFICIAL_PRESS_RELEASES_RSS","SEBI_OFFICIAL_RSS")))
+case("ARCHIVE_AUTHORITY","no broker or trading authority",lambda:require(CTX["capture_manifest"]["trading_authority"] is False))
+case("ARCHIVE_AUTHORITY","no model or recommendation influence",lambda:require(CTX["capture_manifest"]["recommendation_influence"]=="NONE"))
+case("ARCHIVE_FINAL_EXIT","target date derived from verified transaction lifecycle",lambda:require(CTX["final_capture_manifest"]["target_session_date"]==CTX["final_exit"]["final_exit_date"]))
+case("ARCHIVE_NETWORK","zero real network and operator action exposed",lambda:require(len(CTX["acquisition_calls"])==2 and "capture-checkpoint-market-data" in (ROOT/"stage6_prospective_validation/observation_operator.py").read_text()))
+
 
 def enrich():
     # aliases avoid the intentionally overlapping 6.8A/6.8B imported names
@@ -385,6 +447,25 @@ def enrich():
     CTX["archive_dir"]=make_market_archive(CTX["root"]/"market_archive",verified_rows,target_date=CTX["target_date"],captured_at=CTX["checkpoint_cutoff"])
     CTX["verified_market"]=MarketArchiveResolver(CTX["archive_dir"]).resolve(ticker="AAA.NS",anchor_date="2026-10-05",target_date=CTX["target_date"],checkpoint_cutoff_utc=CTX["checkpoint_cutoff"],verified_session_dates=CTX["verified_dates"])
     CTX["verified_checkpoint"]=build_checkpoint(envelope=CTX["real_env"],checkpoint_type="D+5",checkpoint_cutoff_utc=CTX["checkpoint_cutoff"],market_data_manifest=CTX["verified_market"])
+    CTX["acquisition_calls"]=[]; CTX["capture_runtime"]=CTX["root"]/"capture_runtime"
+    CTX["capture_control_before"]=Path(CTX["control"]).read_bytes(); CTX["capture_prospective_before"]=Path(CTX["prospective"]).read_bytes()
+    CTX["capture_envelope_before"]=CTX["store"].connection.execute("SELECT canonical_json FROM recommendation_audit_envelopes WHERE recommendation_id='REC1'").fetchone()[0]
+    CTX["capture_result"]=capture_checkpoint_market_archive(repo_root=REPO,activation_record=CTX["activation_path"],prospective_database=CTX["prospective"],control_database=CTX["control"],observation_database=CTX["store"].database,recommendation_id="REC1",checkpoint_type="D+5",current_time_utc=CTX["checkpoint_cutoff"],acquisition_adapter=frozen_fixture_acquire,runtime_root=CTX["capture_runtime"],test_only_adapter=True)
+    CTX["capture_dir"]=Path(CTX["capture_result"]["archive_directory"]); CTX["capture_manifest"]=json.loads((CTX["capture_dir"]/"market_archive_manifest.json").read_text())
+    CTX["captured_market"]=CTX["capture_result"]["market_manifest"]
+    CTX["captured_checkpoint"]=build_checkpoint(envelope=CTX["env"],checkpoint_type="D+5",checkpoint_cutoff_utc=CTX["capture_manifest"]["captured_at_utc"],market_data_manifest=CTX["captured_market"])
+    CTX["capture_control_after"]=Path(CTX["control"]).read_bytes(); CTX["capture_prospective_after"]=Path(CTX["prospective"]).read_bytes()
+    CTX["capture_envelope_after"]=CTX["store"].connection.execute("SELECT canonical_json FROM recommendation_audit_envelopes WHERE recommendation_id='REC1'").fetchone()[0]
+    def replay_capture(runtime=None, checkpoint="D+5", current=None):
+        return capture_checkpoint_market_archive(repo_root=REPO,activation_record=CTX["activation_path"],prospective_database=CTX["prospective"],control_database=CTX["control"],observation_database=CTX["store"].database,recommendation_id="REC1",checkpoint_type=checkpoint,current_time_utc=current or CTX["checkpoint_cutoff"],acquisition_adapter=frozen_fixture_acquire,runtime_root=runtime or CTX["capture_runtime"],test_only_adapter=True)
+    CTX["capture_replay"]=replay_capture
+    CTX["capture_not_due"]=lambda:replay_capture(CTX["root"]/"not_due_runtime","D+60")
+    CTX["capture_before_close"]=lambda:replay_capture(CTX["root"]/"before_close_runtime","D+5",CTX["target_date"]+"T09:00:00Z")
+    def capture_conflict():
+        target=CTX["root"]/"conflict_runtime"; shutil.copytree(CTX["capture_runtime"],target)
+        archive=Path(next((target/"REC1").iterdir())); path=archive/"stock_ohlc.csv.gz"; path.write_bytes(path.read_bytes()+b"tamper")
+        return replay_capture(target)
+    CTX["capture_conflict"]=capture_conflict
     def snapshot_variant(name, **kwargs):
         root=CTX["root"]/("s4_"+name); prospective=make_real_snapshot(root,**kwargs)
         return Stage4A3SnapshotResolver(REPO/"Stage 4A.3",prospective).resolve(CTX["origin_run"],CTX["recommendation_row"])
@@ -440,6 +521,10 @@ def enrich():
     c.commit(); c.close()
     CTX["control_hash_before"]=Path(CTX["control"]).read_bytes(); CTX["control_hash_after"]=lambda:Path(CTX["control"]).read_bytes()
     with Stage5DControlReader(CTX["control"]) as reader: CTX["final_exit"]=derive_final_exit(reader,"REC1",CTX["m5"]["observations"][-1]["session_date"]+"T11:00:00Z")
+    with ProspectiveStoreReader(CTX["prospective"],CTX["activation"]) as reader: CTX["adapter_dates_override"]=reader.session_dates_through(CTX["origin_session"],CTX["final_exit"]["final_exit_date"])
+    CTX["final_capture"]=capture_checkpoint_market_archive(repo_root=REPO,activation_record=CTX["activation_path"],prospective_database=CTX["prospective"],control_database=CTX["control"],observation_database=CTX["store"].database,recommendation_id="REC1",checkpoint_type="FINAL_EXIT",current_time_utc=CTX["final_exit"]["final_exit_date"]+"T11:00:00Z",acquisition_adapter=frozen_fixture_acquire,runtime_root=CTX["root"]/"final_capture_runtime",test_only_adapter=True)
+    CTX.pop("adapter_dates_override")
+    CTX["final_capture_manifest"]=json.loads((Path(CTX["final_capture"]["archive_directory"])/"market_archive_manifest.json").read_text())
     CTX["cp_exit"]=build_checkpoint(envelope=CTX["env"],checkpoint_type="FINAL_EXIT",checkpoint_cutoff_utc=CTX["m5"]["observations"][-1]["session_date"]+"T11:00:00Z",market_data_manifest=CTX["m5"],final_exit=CTX["final_exit"],test_only_adapter=True)
     def voided_exit():
         clone=CTX["root"] / "voided.sqlite3"; clone.write_bytes(Path(CTX["control"]).read_bytes()); c=sqlite3.connect(clone); p={"transaction_id":"SELL1","reason":"fixture"}; text=canonical_json(p); c.execute("INSERT INTO transaction_voids(void_id,transaction_id,idempotency_key,reason,voided_at_utc,canonical_payload_json,payload_sha256) VALUES('V1','SELL1','VK','fixture','2026-10-13T10:00:00Z',?,?)",(text,payload_sha256(text))); c.commit(); c.close();

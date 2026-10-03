@@ -9,6 +9,7 @@ import sqlite3
 import sys
 from contextlib import contextmanager
 from datetime import date, datetime, time, timezone
+from decimal import Decimal
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -30,6 +31,9 @@ PROTOCOL_COMMIT = "3ff3c0283174589d43883ce75b1dfd87a33613ce"
 PREDICTION_SEMANTICS = "SHADOW_ONLY_NO_TRADING_EFFECT"
 MARKET_CLASSIFICATION = "OUTCOME_MEASUREMENT_ONLY_NOT_STAGE6_EVENT_EVIDENCE"
 MARKET_ARCHIVE_SCHEMA = "STAGE6_8C_VERIFIED_MARKET_ARCHIVE_V1"
+CHECKPOINT_MARKET_ARCHIVE_SCHEMA = "STAGE6_8C_CHECKPOINT_MARKET_ARCHIVE_V1"
+CHECKPOINT_MARKET_ARCHIVE_CREATOR = "STAGE6_8C_CHECKPOINT_MARKET_ARCHIVE_CREATOR_V1"
+FROZEN_MARKET_ADAPTER = "STAGE4A3_FINAL_MARKET_DATA_ACQUIRE_AND_ARCHIVE_V1"
 IST = ZoneInfo("Asia/Kolkata")
 COMPLETED_SESSION_TIME = time(15, 45)
 SNAPSHOT_FILES = {
@@ -321,11 +325,72 @@ class MarketArchiveResolver:
         with gzip.open(path, "rt", encoding="utf-8", newline="") as handle:
             return list(csv.DictReader(handle))
 
-    def resolve(self, *, ticker, anchor_date, target_date, checkpoint_cutoff_utc, verified_session_dates):
+    def _verified_source(self, manifest, stock, nifty):
+        source = manifest.get("source_archive")
+        if not isinstance(source, dict) or source.get("schema") != "STAGE4A3_FINAL_MARKET_DATA_V1":
+            raise ProspectiveIntegrityFailure("MARKET_ARCHIVE_SOURCE_PROVENANCE_INVALID")
+        manifest_path = (self.directory / str(source.get("manifest_file", ""))).resolve()
+        try:
+            manifest_path.relative_to(self.directory)
+        except ValueError as exc:
+            raise ProspectiveIntegrityFailure("MARKET_ARCHIVE_SOURCE_PATH_INVALID") from exc
+        if not manifest_path.is_file() or source.get("manifest_sha256") != _sha256(manifest_path):
+            raise ProspectiveIntegrityFailure("MARKET_ARCHIVE_SOURCE_MANIFEST_HASH_INVALID")
+        source_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        if canonical_hash(source_manifest) != source.get("manifest_hash") or source_manifest.get("schema") != source.get("schema"):
+            raise ProspectiveIntegrityFailure("MARKET_ARCHIVE_SOURCE_MANIFEST_INVALID")
+        if (source_manifest.get("overall_logical_hash") != source.get("overall_logical_hash")
+                or source_manifest.get("provider") != manifest.get("provider_identifier")
+                or source_manifest.get("as_of_date") != manifest.get("target_session_date")
+                or source_manifest.get("immutable") is not True):
+            raise ProspectiveIntegrityFailure("MARKET_ARCHIVE_SOURCE_IDENTITY_INVALID")
+        required = source.get("required_files")
+        if not isinstance(required, list) or {item.get("ticker") for item in required} != {manifest["ticker"], "^NSEI"}:
+            raise ProspectiveIntegrityFailure("MARKET_ARCHIVE_SOURCE_FILES_INVALID")
+        source_rows = {}
+        for item in required:
+            path = (self.directory / str(item.get("file", ""))).resolve()
+            try:
+                path.relative_to(self.directory)
+            except ValueError as exc:
+                raise ProspectiveIntegrityFailure("MARKET_ARCHIVE_SOURCE_PATH_INVALID") from exc
+            if not path.is_file() or _sha256(path) != item.get("sha256"):
+                raise ProspectiveIntegrityFailure("MARKET_ARCHIVE_SOURCE_FILE_HASH_INVALID")
+            rows = self._rows(path)
+            source_rows[item["ticker"]] = {str(row.get("Date"))[:10]: row for row in rows}
+        def same(left, right):
+            try: return Decimal(str(left)) == Decimal(str(right))
+            except Exception: return False
+        for row in stock:
+            source_row = source_rows[manifest["ticker"]].get(row["session_date"])
+            if source_row is None or any(not same(row[name], source_row[name.title()]) for name in ("open", "high", "low", "close")):
+                raise ProspectiveIntegrityFailure("MARKET_ARCHIVE_SOURCE_STOCK_MISMATCH")
+        for row in nifty:
+            source_row = source_rows["^NSEI"].get(row["session_date"])
+            if source_row is None or not same(row["close"], source_row["Close"]):
+                raise ProspectiveIntegrityFailure("MARKET_ARCHIVE_SOURCE_NIFTY_MISMATCH")
+
+    def resolve(self, *, ticker, anchor_date, target_date, checkpoint_cutoff_utc, verified_session_dates,
+                require_creator_archive=False, recommendation_id=None, checkpoint_type=None,
+                envelope_binding=None):
         manifest = json.loads(self.manifest_path.read_text(encoding="utf-8"))
         stored_hash = manifest.get("manifest_hash")
-        if manifest.get("archive_schema") != MARKET_ARCHIVE_SCHEMA or stored_hash != canonical_hash(without(manifest, "manifest_hash")):
+        schema = manifest.get("archive_schema")
+        if schema not in {MARKET_ARCHIVE_SCHEMA, CHECKPOINT_MARKET_ARCHIVE_SCHEMA} or stored_hash != canonical_hash(without(manifest, "manifest_hash")):
             raise ProspectiveIntegrityFailure("MARKET_ARCHIVE_MANIFEST_INVALID")
+        if require_creator_archive and schema != CHECKPOINT_MARKET_ARCHIVE_SCHEMA:
+            raise ProspectiveIntegrityFailure("PRODUCTION_CHECKPOINT_MARKET_ARCHIVE_REQUIRED")
+        if schema == CHECKPOINT_MARKET_ARCHIVE_SCHEMA:
+            if (manifest.get("creator_id") != CHECKPOINT_MARKET_ARCHIVE_CREATOR
+                    or manifest.get("frozen_adapter_id") != FROZEN_MARKET_ADAPTER
+                    or manifest.get("record_hash") != canonical_hash(without(manifest, "record_hash", "manifest_hash"))):
+                raise ProspectiveIntegrityFailure("MARKET_ARCHIVE_CREATOR_IDENTITY_INVALID")
+            if recommendation_id is not None and manifest.get("recommendation_id") != recommendation_id:
+                raise ProspectiveIntegrityFailure("MARKET_ARCHIVE_RECOMMENDATION_MISMATCH")
+            if checkpoint_type is not None and manifest.get("checkpoint_type") != checkpoint_type:
+                raise ProspectiveIntegrityFailure("MARKET_ARCHIVE_CHECKPOINT_TYPE_MISMATCH")
+            if envelope_binding is not None and manifest.get("envelope_binding") != envelope_binding:
+                raise ProspectiveIntegrityFailure("MARKET_ARCHIVE_ENVELOPE_BINDING_MISMATCH")
         if manifest.get("classification") != MARKET_CLASSIFICATION or manifest.get("ticker") != ticker or manifest.get("benchmark_ticker") != "^NSEI":
             raise ProspectiveIntegrityFailure("MARKET_ARCHIVE_IDENTITY_INVALID")
         if manifest.get("target_session_date") != target_date or not manifest.get("provider_identifier"):
@@ -346,6 +411,8 @@ class MarketArchiveResolver:
             raise ProspectiveIntegrityFailure("MARKET_ARCHIVE_TICKER_MISMATCH")
         stock_by = {r["session_date"]: r for r in stock}; nifty_by = {r["session_date"]: r for r in nifty}
         wanted = [d for d in verified_session_dates if anchor_date <= d <= target_date]
+        if schema == CHECKPOINT_MARKET_ARCHIVE_SCHEMA and manifest.get("verified_session_dates") != wanted:
+            raise ProspectiveIntegrityFailure("MARKET_ARCHIVE_VERIFIED_SESSION_SEQUENCE_INVALID")
         if not wanted or wanted[0] != anchor_date or wanted[-1] != target_date or set(stock_by) != set(wanted) or set(nifty_by) != set(wanted):
             raise ProspectiveIntegrityFailure("MARKET_ARCHIVE_SESSION_ALIGNMENT_INVALID")
         observations = []
@@ -359,7 +426,15 @@ class MarketArchiveResolver:
         logical = canonical_hash({"provider_identifier": manifest["provider_identifier"], "ticker": ticker, "benchmark_ticker": "^NSEI", "observations": observations})
         if manifest.get("market_data_logical_hash") != logical:
             raise ProspectiveIntegrityFailure("MARKET_ARCHIVE_LOGICAL_HASH_INVALID")
-        return {"manifest_id": manifest["archive_id"], "manifest_hash": stored_hash, "classification": MARKET_CLASSIFICATION, "provider_identifier": manifest["provider_identifier"], "ticker": ticker, "benchmark_ticker": "^NSEI", "target_session_date": target_date, "completed_session_boundary_utc": boundary.isoformat().replace("+00:00", "Z"), "market_data_logical_hash": logical, "provenance_verification": "PASS", "observations": observations}
+        if schema == CHECKPOINT_MARKET_ARCHIVE_SCHEMA:
+            self._verified_source(manifest, stock, nifty)
+        return {"manifest_id": manifest["archive_id"], "manifest_hash": stored_hash, "archive_schema": schema,
+                "classification": MARKET_CLASSIFICATION, "provider_identifier": manifest["provider_identifier"],
+                "ticker": ticker, "benchmark_ticker": "^NSEI", "target_session_date": target_date,
+                "checkpoint_type": manifest.get("checkpoint_type"), "recommendation_id": manifest.get("recommendation_id"),
+                "completed_session_boundary_utc": boundary.isoformat().replace("+00:00", "Z"),
+                "captured_at_utc": manifest["captured_at_utc"], "market_data_logical_hash": logical,
+                "provenance_verification": "PASS", "observations": observations}
 
 
 class Stage6ContextReader:

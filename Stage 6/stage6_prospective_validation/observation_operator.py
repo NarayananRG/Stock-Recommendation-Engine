@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 
 from .activation import verify_activation_record
+from .checkpoint_market_archive import capture_checkpoint_market_archive
 from .checkpoint_builder import build_checkpoint, derive_final_exit
 from .control_reader import Stage5DControlReader
 from .cohort_guard import verify_active_cohort
@@ -26,6 +27,12 @@ def run(args):
     cohort = verify_active_cohort(args.repo_root, args.activation_record)
     if args.action == "verify-cohort":
         return {"status": "PASS", "cohort_fingerprint": cohort}
+    if args.action == "capture-checkpoint-market-data":
+        return capture_checkpoint_market_archive(
+            repo_root=args.repo_root, activation_record=args.activation_record,
+            prospective_database=args.prospective_database, control_database=args.control_database,
+            observation_database=args.observation_database, recommendation_id=args.recommendation_id,
+            checkpoint_type=args.checkpoint_type)
     with _store(args, cohort) as store:
         if args.action == "status":
             return store.integrity_check()
@@ -55,9 +62,17 @@ def run(args):
                 if args.action == "due-checkpoints":
                     return {"status": "PASS", "due_checkpoints": due}
             final_exit = None
+            checkpoint_cutoff = args.checkpoint_cutoff_utc
+            if args.action == "build-checkpoint" and checkpoint_cutoff is None:
+                if args.market_archive_directory is None:
+                    raise ValueError("CHECKPOINT_MARKET_ARCHIVE_REQUIRED")
+                document = _json(Path(args.market_archive_directory) / "market_archive_manifest.json")
+                checkpoint_cutoff = document.get("captured_at_utc")
+                if not checkpoint_cutoff:
+                    raise ValueError("CHECKPOINT_MARKET_ARCHIVE_CUTOFF_MISSING")
             if args.checkpoint_type == "FINAL_EXIT":
                 with Stage5DControlReader(args.control_database) as reader:
-                    final_exit = derive_final_exit(reader, args.recommendation_id, args.checkpoint_cutoff_utc)
+                    final_exit = derive_final_exit(reader, args.recommendation_id, checkpoint_cutoff)
                 target_date = final_exit["final_exit_date"]
             else:
                 matches = [item for item in due if item["checkpoint_type"] == args.checkpoint_type]
@@ -68,20 +83,23 @@ def run(args):
                 verified_dates = prospective.session_dates_through(origin_session, target_date)
             market_manifest = MarketArchiveResolver(args.market_archive_directory).resolve(
                 ticker=envelope["ticker"], anchor_date=envelope["decision_date"], target_date=target_date,
-                checkpoint_cutoff_utc=args.checkpoint_cutoff_utc, verified_session_dates=verified_dates)
+                checkpoint_cutoff_utc=checkpoint_cutoff, verified_session_dates=verified_dates,
+                require_creator_archive=True, recommendation_id=args.recommendation_id,
+                checkpoint_type=args.checkpoint_type,
+                envelope_binding={"record_type": envelope["schema_version"], "record_id": envelope["envelope_id"], "record_hash": envelope["record_hash"]})
             thesis_records = []
             if args.thesis_binding is not None:
                 if args.stage6_thesis_database is None:
                     raise ValueError("STAGE6_THESIS_DATABASE_REQUIRED")
                 with Stage6ContextReader(args.stage6_thesis_database) as context_reader:
-                    value, binding = context_reader.resolve(_json(args.thesis_binding), cutoff_utc=args.checkpoint_cutoff_utc,
+                    value, binding = context_reader.resolve(_json(args.thesis_binding), cutoff_utc=checkpoint_cutoff,
                         recommendation_id=envelope["recommendation_id"], signal_id=envelope["signal_id"], ticker=envelope["ticker"])
                 thesis_records = [{"recorded_at_utc": value.get("recorded_at_utc") or value.get("decision_cutoff") or value.get("review_cutoff"),
                     "current_thesis_state": value.get("current_thesis_state", value.get("thesis_status", "INDETERMINATE")),
                     "original_thesis_validity_state": value.get("original_thesis_validity_state", "INDETERMINATE"), "binding": binding}]
             checkpoint = build_checkpoint(
                 envelope=envelope, checkpoint_type=args.checkpoint_type,
-                checkpoint_cutoff_utc=args.checkpoint_cutoff_utc,
+                checkpoint_cutoff_utc=checkpoint_cutoff,
                 market_data_manifest=market_manifest,
                 thesis_records=thesis_records, thesis_records_verified=True, final_exit=final_exit)
             return store.persist_checkpoint(checkpoint)
@@ -90,7 +108,7 @@ def run(args):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description="Stage 6.8C shadow-only prospective observation operator")
-    parser.add_argument("action", choices=("verify-cohort", "create-envelope", "due-checkpoints", "build-checkpoint", "status"))
+    parser.add_argument("action", choices=("verify-cohort", "create-envelope", "due-checkpoints", "capture-checkpoint-market-data", "build-checkpoint", "status"))
     parser.add_argument("--repo-root", required=True); parser.add_argument("--activation-record", required=True)
     parser.add_argument("--observation-database"); parser.add_argument("--control-database"); parser.add_argument("--prospective-database")
     parser.add_argument("--recommendation-id"); parser.add_argument("--stage4a3-root"); parser.add_argument("--stage4a3-prospective-root")
