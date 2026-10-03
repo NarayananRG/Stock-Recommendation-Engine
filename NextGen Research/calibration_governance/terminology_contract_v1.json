@@ -1,0 +1,1 @@
+{"contract_id":"SCORE_TERMINOLOGY_CONTRACT_V1","authority":"RESEARCH_ONLY","classifications":["CALIBRATED_PROBABILITY","UNCALIBRATED_MODEL_SCORE","RANKING_SCORE","RULE_SCORE","LEGACY_IMMUTABLE_FIELD","UNKNOWN_SEMANTICS"],"predict_proba_is_calibration_evidence":false,"future_uncalibrated_label":"model_score","legacy_fields_mutated":false}

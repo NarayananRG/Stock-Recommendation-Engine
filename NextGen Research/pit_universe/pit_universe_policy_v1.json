@@ -1,0 +1,1 @@
+{"policy_id":"PIT_UNIVERSE_POLICY_V1","authority":"RESEARCH_ONLY","eligible_exchanges":["NSE","BSE"],"unknown_eligibility":"EXCLUDE_AND_REPORT_UNKNOWN","archival_late_observation":"ALLOW_ONLY_VERIFIED_HISTORICAL_EFFECTIVE_FACT","real_data_status":"DATA_INCOMPLETE","operationally_activated":false}

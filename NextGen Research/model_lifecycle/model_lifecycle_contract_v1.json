@@ -1,0 +1,1 @@
+{"contract_id":"NEXTGEN_MODEL_LIFECYCLE_CONTRACT_V1","authority":"RESEARCH_ONLY","states":["INCUMBENT","CHALLENGER","APPROVED","REJECTED","RETIRED","ROLLED_BACK"],"default_promotion":"NO_PROMOTION","active_system_apply_status":"NOT_EXECUTED","active_model_control":false,"trading_authority":false,"real_challenger_trained":false,"promotion_executed":false,"rollback_executed":false}
