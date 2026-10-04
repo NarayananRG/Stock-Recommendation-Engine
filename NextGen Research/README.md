@@ -19,3 +19,9 @@ python "NextGen Research/tests/run_nextgen_priority4_8_tests.py"
 ```
 
 The runner performs zero network calls and writes only the committed results CSV.
+
+## Authoritative historical data acquisition
+
+The `authoritative_data` package provides deterministic, fail-closed offline imports for official historical security masters, broad-index constituent snapshots, bounded membership periods, corporate actions, and security identity periods. It does not train models and has no active recommendation, trading, broker, or promotion authority.
+
+Current decision: `ADVANCED_RESEARCH_READINESS_V3 = NOT_READY — OFFICIAL_DATA_ACQUISITION_REQUIRED`. Public official current-master, delisting, and index-change evidence does not prove a continuous historical PIT universe. See `data/external_authoritative/DATA_DROP_README.md` for the licensed/manual data-drop workflow and `results/nextgen_data_acquisition_decision_v1.json` for the minimum acquisition decision.

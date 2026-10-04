@@ -1,0 +1,24 @@
+{
+  "active_prospective_authority": "NONE",
+  "active_recommendation_influence": "NONE",
+  "active_source_registry_authority": "NONE",
+  "allowed_states": [
+    "RAW_UNADJUSTED",
+    "SPLIT_ADJUSTED",
+    "DIVIDEND_ADJUSTED",
+    "TOTAL_RETURN_ADJUSTED"
+  ],
+  "authority": "RESEARCH_ONLY",
+  "corporate_action_provenance_required": true,
+  "current_state": "NOT_VERIFIED",
+  "dividend_treatment_must_be_explicit": true,
+  "mixing_states_permitted": false,
+  "model_promotion_authority": "NONE",
+  "model_training_permitted": false,
+  "raw_price_retention_required": true,
+  "record_hash": "5a55d2563575ad1e047c85da2710b51e92913a4e56b95d35e9ebfe2679ec625f",
+  "record_id": "NEXTGEN_PRICE_ADJUSTMENT_POLICY_V1_5a55d2563575ad1e047c85da",
+  "schema": "NEXTGEN_PRICE_ADJUSTMENT_POLICY_V1",
+  "trading_authority": false,
+  "unknown_state_action": "REJECT_FOR_RETURN_FEATURES"
+}

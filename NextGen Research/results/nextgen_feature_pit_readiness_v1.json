@@ -1,0 +1,64 @@
+{
+  "active_prospective_authority": "NONE",
+  "active_recommendation_influence": "NONE",
+  "active_source_registry_authority": "NONE",
+  "authority": "RESEARCH_ONLY",
+  "blocking_required_feature_families": [
+    "technical",
+    "momentum",
+    "volatility",
+    "liquidity",
+    "market_index"
+  ],
+  "features": [
+    {
+      "family": "technical",
+      "reason": "Official bounded price history not yet ingested",
+      "required_for_minimal_profile": true,
+      "status": "REQUIRES_NEW_SOURCE"
+    },
+    {
+      "family": "momentum",
+      "reason": "Official bounded adjusted/raw semantics absent",
+      "required_for_minimal_profile": true,
+      "status": "REQUIRES_NEW_SOURCE"
+    },
+    {
+      "family": "volatility",
+      "reason": "Official bounded OHLC history absent",
+      "required_for_minimal_profile": true,
+      "status": "REQUIRES_NEW_SOURCE"
+    },
+    {
+      "family": "liquidity",
+      "reason": "Turnover and untraded-session completeness absent",
+      "required_for_minimal_profile": true,
+      "status": "REQUIRES_NEW_SOURCE"
+    },
+    {
+      "family": "market_index",
+      "reason": "Benchmark series must be bound to session dates",
+      "required_for_minimal_profile": true,
+      "status": "REQUIRES_EFFECTIVE_DATE_LOGIC"
+    },
+    {
+      "family": "fundamentals",
+      "reason": "Not required for first technical/liquidity challenger",
+      "required_for_minimal_profile": false,
+      "status": "OPTIONAL_FUTURE_FEATURE_FAMILY"
+    },
+    {
+      "family": "stage6_events",
+      "reason": "Use only immutable observed-at evidence from frozen Stage 6 contracts",
+      "required_for_minimal_profile": false,
+      "status": "PIT_SAFE_NOW"
+    }
+  ],
+  "fundamentals_policy": "OPTIONAL_FUTURE_FEATURE_FAMILY",
+  "minimal_profile_pit_safe": false,
+  "model_promotion_authority": "NONE",
+  "record_hash": "9788d8774c3abac821d3a7aeba07e0350c84ecdbde5b125a88981252731041e3",
+  "record_id": "NEXTGEN_FEATURE_PIT_READINESS_V1_9788d8774c3abac821d3a7ae",
+  "schema": "NEXTGEN_FEATURE_PIT_READINESS_V1",
+  "trading_authority": false
+}

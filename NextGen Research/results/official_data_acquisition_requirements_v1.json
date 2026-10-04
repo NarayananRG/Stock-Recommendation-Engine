@@ -1,0 +1,103 @@
+{
+  "active_prospective_authority": "NONE",
+  "active_recommendation_influence": "NONE",
+  "active_source_registry_authority": "NONE",
+  "authority": "RESEARCH_ONLY",
+  "model_promotion_authority": "NONE",
+  "record_hash": "c88106a814d2c8c47c9f4ee9406f9715ff25ef6edba94cd5f52e96a151487e50",
+  "record_id": "OFFICIAL_DATA_ACQUISITION_REQUIREMENTS_V1_c88106a814d2c8c47c9f4ee9",
+  "requirements": [
+    {
+      "exact_dataset": "Historical constituent data for NIFTY 500 (preferred) or NIFTY 200",
+      "expected_local_destination": "data/external_authoritative/nifty_constituents/",
+      "ingestion_adapter_status": "IMPLEMENTED_OFFLINE",
+      "minimum_acceptable_date_coverage": "Any continuous verified multi-year period ending no later than 2026-10-03",
+      "one_time_historical_purchase_may_suffice": true,
+      "ongoing_subscription_required": false,
+      "preferred_date_coverage": "2016-01-01..2026-10-03",
+      "preferred_file_format": "CSV",
+      "provider": "NSE Indices Limited",
+      "readiness_gate": "index_membership_and_universe",
+      "required_fields": [
+        "index ID",
+        "effective/snapshot date",
+        "ISIN",
+        "symbol",
+        "company"
+      ],
+      "requirement_id": "REQ_NIFTY_BROAD_CONSTITUENTS",
+      "research_purpose": "Bounded broad cross-sectional PIT universe",
+      "target_research_profile": "INDEX_CONSTITUENT_PIT",
+      "validation_steps": [
+        "hash raw bytes",
+        "validate exact schema",
+        "build bounded periods",
+        "measure gaps",
+        "run V3"
+      ]
+    },
+    {
+      "exact_dataset": "NSE Capital Market EOD/Historical security, bhavcopy and trade-detail data",
+      "expected_local_destination": "data/external_authoritative/nse_historical_eod/",
+      "ingestion_adapter_status": "SECURITY_MASTER_IMPLEMENTED_EOD_PRICE_LAYOUT_REQUIRES_DELIVERY_SPEC",
+      "minimum_acceptable_date_coverage": "Same continuous period as selected universe",
+      "one_time_historical_purchase_may_suffice": true,
+      "ongoing_subscription_required": false,
+      "preferred_date_coverage": "2016-01-01..2026-10-03",
+      "preferred_file_format": "CSV or documented fixed format",
+      "provider": "National Stock Exchange of India",
+      "readiness_gate": "market_data_identity_liquidity",
+      "required_fields": [
+        "date",
+        "ISIN/security ID",
+        "symbol",
+        "series",
+        "OHLC",
+        "volume",
+        "turnover",
+        "trading status"
+      ],
+      "requirement_id": "REQ_NSE_CM_EOD",
+      "research_purpose": "Official prices, liquidity, trading status and security reference",
+      "target_research_profile": "BOTH",
+      "validation_steps": [
+        "hash raw bytes",
+        "bind delivery specification",
+        "validate adjustment semantics",
+        "audit sessions",
+        "run V3"
+      ]
+    },
+    {
+      "exact_dataset": "Official effective-dated corporate actions for selected period",
+      "expected_local_destination": "data/external_authoritative/nse_corporate_actions/",
+      "ingestion_adapter_status": "IMPLEMENTED_OFFLINE",
+      "minimum_acceptable_date_coverage": "Same continuous period as selected universe",
+      "one_time_historical_purchase_may_suffice": true,
+      "ongoing_subscription_required": false,
+      "preferred_date_coverage": "2016-01-01..2026-10-03",
+      "preferred_file_format": "CSV",
+      "provider": "National Stock Exchange of India",
+      "readiness_gate": "corporate_action_adjustment",
+      "required_fields": [
+        "ISIN",
+        "symbol",
+        "action type",
+        "record date",
+        "ex/effective date",
+        "terms"
+      ],
+      "requirement_id": "REQ_NSE_CORPORATE_ACTIONS",
+      "research_purpose": "Price adjustment and identity/event correctness",
+      "target_research_profile": "BOTH",
+      "validation_steps": [
+        "hash raw bytes",
+        "validate effective dates",
+        "reject unknown action schema",
+        "audit adjustment policy"
+      ]
+    }
+  ],
+  "schema": "OFFICIAL_DATA_ACQUISITION_REQUIREMENTS_V1",
+  "trading_authority": false
+}

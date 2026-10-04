@@ -1,0 +1,15 @@
+{
+  "canonical_hash": "7a235c7d537ef50ac4833c5181e47bdaeed99a4f97a717e29c4120d6b6076809",
+  "change_control": "Version and reapprove; never mutate silently.",
+  "classification": "RESEARCH_GOVERNANCE_THRESHOLD",
+  "policy_id": "SURVIVORSHIP_COVERAGE_POLICY_V1",
+  "scientific_truth_claimed": false,
+  "thresholds": {
+    "delisting_coverage_required": true,
+    "maximum_unknown_universe_share": 0.02,
+    "minimum_continuous_years": 3,
+    "minimum_evidence_source_count": 2,
+    "minimum_known_non_survivors": 1,
+    "minimum_security_identity_coverage": 0.99
+  }
+}

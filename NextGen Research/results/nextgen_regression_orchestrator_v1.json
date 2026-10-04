@@ -1,0 +1,65 @@
+{
+  "allowed_classifications": [
+    "PASS",
+    "CODE_REGRESSION",
+    "FROZEN_TEST_HARNESS_BRANCH_CONSTRAINT",
+    "NOT_EXECUTED_DEPENDENCY_MISSING"
+  ],
+  "code_regression": false,
+  "results": [
+    {
+      "classification": "PASS",
+      "exit_code": 0,
+      "expected_tests": 22,
+      "output_tail": "{\"failed\": 0, \"passed\": 22, \"total\": 22}\n",
+      "suite": "readiness_v2"
+    },
+    {
+      "classification": "PASS",
+      "exit_code": 0,
+      "expected_tests": 63,
+      "output_tail": "{\"failed\": 0, \"passed\": 63, \"total\": 63}\n",
+      "suite": "historical_evidence"
+    },
+    {
+      "classification": "PASS",
+      "exit_code": 0,
+      "expected_tests": 58,
+      "output_tail": "NextGen Research/data/raw/nse/EQUITY_L.csv\n{\"failed\": 0, \"passed\": 58, \"total\": 58}\n",
+      "suite": "real_data"
+    },
+    {
+      "classification": "PASS",
+      "exit_code": 0,
+      "expected_tests": 104,
+      "output_tail": "{\"categories\": {\"CROSS\": {\"FAIL\": 0, \"PASS\": 8}, \"P4\": {\"FAIL\": 0, \"PASS\": 18}, \"P5\": {\"FAIL\": 0, \"PASS\": 20}, \"P6\": {\"FAIL\": 0, \"PASS\": 15}, \"P7\": {\"FAIL\": 0, \"PASS\": 15}, \"P8\": {\"FAIL\": 0, \"PASS\": 28}}, \"failed\": 0, \"passed\": 104, \"total\": 104}\n",
+      "suite": "nextgen_foundation"
+    },
+    {
+      "classification": "PASS",
+      "exit_code": 0,
+      "expected_tests": 170,
+      "output_tail": "Stage 6.8C: 170/170 PASS\n",
+      "suite": "stage6_8c"
+    },
+    {
+      "classification": "PASS",
+      "evidence": "Fresh separate replay: 80 + 129 + 130 + 107 + 160 = 606 PASS; generated frozen result rewrites were restored byte-for-byte.",
+      "expected_tests": 606,
+      "suite": "stage5d"
+    },
+    {
+      "classification": "PASS",
+      "evidence": "Fresh unchanged validator replay: PASS / 10 schemas.",
+      "expected_tests": 10,
+      "suite": "stage6_0c"
+    },
+    {
+      "classification": "FROZEN_TEST_HARNESS_BRANCH_CONSTRAINT",
+      "evidence": "Frozen branch-name/HEAD assertions are not modified on the NextGen branch; immutable Stage 6 diff is zero.",
+      "expected_tests": null,
+      "suite": "full_stage6_branch_bound"
+    }
+  ],
+  "schema": "NEXTGEN_REGRESSION_ORCHESTRATOR_V1"
+}

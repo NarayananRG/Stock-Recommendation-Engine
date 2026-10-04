@@ -1,0 +1,29 @@
+{
+  "active_prospective_authority": "NONE",
+  "active_recommendation_influence": "NONE",
+  "active_source_registry_authority": "NONE",
+  "authority": "RESEARCH_ONLY",
+  "current_assessment": "Existing frozen Stage 4 data is not replaced; NextGen official turnover, adjustment and complete provenance remain unverified.",
+  "frozen_stage4_data_replaced": false,
+  "gates": {
+    "adjustment_semantics_explicit": false,
+    "official_provenance": false,
+    "ohlc": true,
+    "trading_day_availability": true,
+    "turnover": false,
+    "volume": true
+  },
+  "model_promotion_authority": "NONE",
+  "official_nse_eod_would_materially_improve": [
+    "price provenance",
+    "liquidity modeling",
+    "corporate-action correctness",
+    "suspended/untraded detection"
+  ],
+  "price_adjustment_state": "UNKNOWN",
+  "record_hash": "e5fa970d10386f9168f38a66bdd62b04a67e743d53e0ab2f29515efe371b3d18",
+  "record_id": "MARKET_DATA_SOURCE_READINESS_V1_e5fa970d10386f9168f38a66",
+  "schema": "MARKET_DATA_SOURCE_READINESS_V1",
+  "status": "INSUFFICIENT",
+  "trading_authority": false
+}

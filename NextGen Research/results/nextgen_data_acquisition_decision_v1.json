@@ -1,0 +1,24 @@
+{
+  "active_prospective_authority": "NONE",
+  "active_recommendation_influence": "NONE",
+  "active_source_registry_authority": "NONE",
+  "authority": "RESEARCH_ONLY",
+  "exchange_wide_public_official_sufficient": "PARTIAL",
+  "index_constituent_public_official_sufficient": "PARTIAL",
+  "minimum_acquisition": "ONE_TIME_HISTORICAL_CONSTITUENT_DATA_REQUIRED",
+  "missing_official_products": [
+    "NSE Indices historical broad-index constituent data",
+    "NSE Capital Market historical EOD/security data if public archive cannot cover chosen period",
+    "matching official corporate actions"
+  ],
+  "model_promotion_authority": "NONE",
+  "period_unlocked": "Exact period depends on delivered licensed coverage; preferred 2016-01-01..2026-10-03, minimum continuous multi-year period",
+  "public_data_limit": "Current master, delistings and change notices are valuable evidence but do not establish a complete continuous PIT universe.",
+  "purchase_or_contact_performed": false,
+  "record_hash": "13f055f3c98b9cc2a55c23ebbcd12477f6d611d7e6f95f35217e1dbdd99e2889",
+  "record_id": "NEXTGEN_DATA_ACQUISITION_DECISION_V1_13f055f3c98b9cc2a55c23eb",
+  "schema": "NEXTGEN_DATA_ACQUISITION_DECISION_V1",
+  "simple_challenger_sufficient_after_all_gates": true,
+  "stockmixer_cross_stock_note": "Still requires a broader, sufficiently large, continuously verified cross-section and is explicitly out of scope until simple baselines justify it.",
+  "trading_authority": false
+}
