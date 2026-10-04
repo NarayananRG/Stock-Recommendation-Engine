@@ -1,0 +1,9 @@
+{
+  "artifact_type": "FREE_OFFICIAL_MARKET_DATA_COVERAGE_POLICY_V1",
+  "authority": "SHADOW_ONLY",
+  "criterion_classification": "RESEARCH_GOVERNANCE_THRESHOLD",
+  "material_gaps_fail_readiness": true,
+  "maximum_duplicate_rows": 0,
+  "minimum_constituent_session_coverage": 0.98,
+  "minimum_session_coverage": 0.99
+}

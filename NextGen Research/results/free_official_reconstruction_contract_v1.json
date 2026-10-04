@@ -1,0 +1,30 @@
+{
+  "artifact_type": "FREE_OFFICIAL_RECONSTRUCTION_CONTRACT_V1",
+  "authority": "SHADOW_ONLY",
+  "broker_authority": false,
+  "fixture_only": false,
+  "focused_tests": "131/131 PASS",
+  "ml_authority": "NONE",
+  "official_public_only": true,
+  "paid_data_used": false,
+  "raw_bulk_files_committed": false,
+  "regressions": {
+    "authoritative_data": "83/83 PASS",
+    "full_stage6": "FROZEN_TEST_HARNESS_BRANCH_CONSTRAINT",
+    "historical_evidence": "63/63 PASS",
+    "nextgen_foundation": "104/104 PASS",
+    "readiness_v2": "22/22 PASS",
+    "real_data": "58/58 PASS",
+    "stage5d": "606/606 PASS",
+    "stage6_0c": "PASS / 10 schemas",
+    "stage6_8c": "170/170 PASS"
+  },
+  "secondary_gate_opening": false,
+  "status": "PASS_FREE_OFFICIAL_ROUTE_EXHAUSTED_FAIL_CLOSED",
+  "target_window": {
+    "end": "2026-10-01",
+    "start": "2021-10-01"
+  },
+  "trading_authority": false,
+  "training_started": false
+}

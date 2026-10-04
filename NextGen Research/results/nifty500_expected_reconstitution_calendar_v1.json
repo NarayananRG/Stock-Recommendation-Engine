@@ -1,0 +1,130 @@
+{
+  "artifact_type": "NIFTY500_EXPECTED_RECONSTITUTION_CALENDAR_V1",
+  "authority": "SHADOW_ONLY",
+  "cycles": [
+    {
+      "additions": 32,
+      "announcement_located": true,
+      "cycle": "MARCH",
+      "cycle_id": "2022-MARCH",
+      "deletions": 32,
+      "effective_date": "2022-03-31",
+      "expected": true,
+      "governance_basis": "OFFICIAL_SEMIANNUAL_REVIEW_SCHEDULE",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs24022022_1.pdf",
+      "year": 2022
+    },
+    {
+      "additions": 18,
+      "announcement_located": true,
+      "cycle": "SEPTEMBER",
+      "cycle_id": "2022-SEPTEMBER",
+      "deletions": 18,
+      "effective_date": "2022-09-30",
+      "expected": true,
+      "governance_basis": "OFFICIAL_SEMIANNUAL_REVIEW_SCHEDULE",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs01092022.pdf",
+      "year": 2022
+    },
+    {
+      "additions": 20,
+      "announcement_located": true,
+      "cycle": "MARCH",
+      "cycle_id": "2023-MARCH",
+      "deletions": 20,
+      "effective_date": "2023-03-31",
+      "expected": true,
+      "governance_basis": "OFFICIAL_SEMIANNUAL_REVIEW_SCHEDULE",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs17022023_1.pdf",
+      "year": 2023
+    },
+    {
+      "additions": 18,
+      "announcement_located": true,
+      "cycle": "SEPTEMBER",
+      "cycle_id": "2023-SEPTEMBER",
+      "deletions": 18,
+      "effective_date": "2023-09-29",
+      "expected": true,
+      "governance_basis": "OFFICIAL_SEMIANNUAL_REVIEW_SCHEDULE",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs17082023.pdf",
+      "year": 2023
+    },
+    {
+      "additions": 34,
+      "announcement_located": true,
+      "cycle": "MARCH",
+      "cycle_id": "2024-MARCH",
+      "deletions": 34,
+      "effective_date": "2024-03-28",
+      "expected": true,
+      "governance_basis": "OFFICIAL_SEMIANNUAL_REVIEW_SCHEDULE",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs28022024.pdf",
+      "year": 2024
+    },
+    {
+      "additions": 27,
+      "announcement_located": true,
+      "cycle": "SEPTEMBER",
+      "cycle_id": "2024-SEPTEMBER",
+      "deletions": 27,
+      "effective_date": "2024-09-30",
+      "expected": true,
+      "governance_basis": "OFFICIAL_SEMIANNUAL_REVIEW_SCHEDULE",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs23082024.pdf",
+      "year": 2024
+    },
+    {
+      "additions": 30,
+      "announcement_located": true,
+      "cycle": "MARCH",
+      "cycle_id": "2025-MARCH",
+      "deletions": 30,
+      "effective_date": "2025-03-28",
+      "expected": true,
+      "governance_basis": "OFFICIAL_SEMIANNUAL_REVIEW_SCHEDULE",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs21022025.pdf",
+      "year": 2025
+    },
+    {
+      "additions": 18,
+      "announcement_located": true,
+      "cycle": "SEPTEMBER",
+      "cycle_id": "2025-SEPTEMBER",
+      "deletions": 18,
+      "effective_date": "2025-09-30",
+      "expected": true,
+      "governance_basis": "OFFICIAL_SEMIANNUAL_REVIEW_SCHEDULE",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs22082025.pdf",
+      "year": 2025
+    },
+    {
+      "additions": 31,
+      "announcement_located": true,
+      "cycle": "MARCH",
+      "cycle_id": "2026-MARCH",
+      "deletions": 31,
+      "effective_date": "2026-03-30",
+      "expected": true,
+      "governance_basis": "OFFICIAL_SEMIANNUAL_REVIEW_SCHEDULE",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs23022026.pdf",
+      "year": 2026
+    },
+    {
+      "additions": 27,
+      "announcement_located": true,
+      "cycle": "SEPTEMBER",
+      "cycle_id": "2026-SEPTEMBER",
+      "deletions": 27,
+      "effective_date": "2026-09-30",
+      "expected": true,
+      "governance_basis": "OFFICIAL_SEMIANNUAL_REVIEW_SCHEDULE",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs10082026.pdf",
+      "year": 2026
+    }
+  ],
+  "schedule_source_sha256": "25a9b7fa45a5dee098968b8d690f9dae24564863e65fedd5db940427cd66ce0a",
+  "schedule_source_url": "https://www.niftyindices.com/resources/index-rebalancing-schedule",
+  "target_end": "2026-10-01",
+  "target_start": "2021-10-01"
+}

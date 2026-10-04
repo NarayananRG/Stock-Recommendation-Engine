@@ -1,0 +1,38 @@
+{
+  "artifact_type": "FREE_OFFICIAL_SOURCE_MANIFEST_V1",
+  "authority": "SHADOW_ONLY",
+  "paid_data_used": false,
+  "press_pdfs_acquired": 129,
+  "raw_files_committed": false,
+  "retrieved_at": "2026-10-04T00:00:00+05:30",
+  "secondary_data_used_to_open_gates": false,
+  "sources": [
+    {
+      "bytes": 32785,
+      "id": "NIFTY500_CURRENT",
+      "sha256": "2959bf206239284e145f7aecc65095b18d11556d2642323a70f2d26efe0f5cb3",
+      "url": "https://www.niftyindices.com/IndexConstituent/ind_nifty500list.csv"
+    },
+    {
+      "bytes": 660167,
+      "id": "NIFTY_PRESS_ARCHIVE",
+      "sha256": "af83f4711c543e1a881e210ed14af7cd9aee730c6ac82c827bf457b0bb169396",
+      "url": "https://www.niftyindices.com/press-release"
+    },
+    {
+      "id": "NIFTY_REBALANCING_SCHEDULE",
+      "sha256": "25a9b7fa45a5dee098968b8d690f9dae24564863e65fedd5db940427cd66ce0a",
+      "url": "https://www.niftyindices.com/resources/index-rebalancing-schedule"
+    },
+    {
+      "id": "NSE_MCP_DOCUMENTATION",
+      "sha256": "c23ae59a903088c73780ee520b16b55f64597942cfdb49c04160492a95be9696",
+      "url": "https://www.nseindia.com/nse-mcp"
+    },
+    {
+      "id": "NSE_ALL_REPORTS",
+      "sha256": "2977b2aab234122240784a54460a44646d33cfc568eb71b23f664367572ed485",
+      "url": "https://www.nseindia.com/all-reports"
+    }
+  ]
+}

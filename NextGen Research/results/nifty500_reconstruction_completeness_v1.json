@@ -1,0 +1,358 @@
+{
+  "artifact_type": "NIFTY500_RECONSTRUCTION_COMPLETENESS_V1",
+  "authority": "SHADOW_ONLY",
+  "cycles": [
+    {
+      "additions_removals_balanced": true,
+      "announcement_located": true,
+      "cycle": "MARCH",
+      "cycle_id": "2022-MARCH",
+      "effective_date_known": true,
+      "expected": true,
+      "governance_basis": "OFFICIAL_SEMIANNUAL_REVIEW_SCHEDULE",
+      "identity_complete": true,
+      "parsed": true,
+      "transition_applied": true,
+      "year": 2022
+    },
+    {
+      "additions_removals_balanced": true,
+      "announcement_located": true,
+      "cycle": "SEPTEMBER",
+      "cycle_id": "2022-SEPTEMBER",
+      "effective_date_known": true,
+      "expected": true,
+      "governance_basis": "OFFICIAL_SEMIANNUAL_REVIEW_SCHEDULE",
+      "identity_complete": true,
+      "parsed": true,
+      "transition_applied": true,
+      "year": 2022
+    },
+    {
+      "additions_removals_balanced": true,
+      "announcement_located": true,
+      "cycle": "MARCH",
+      "cycle_id": "2023-MARCH",
+      "effective_date_known": true,
+      "expected": true,
+      "governance_basis": "OFFICIAL_SEMIANNUAL_REVIEW_SCHEDULE",
+      "identity_complete": true,
+      "parsed": true,
+      "transition_applied": true,
+      "year": 2023
+    },
+    {
+      "additions_removals_balanced": true,
+      "announcement_located": true,
+      "cycle": "SEPTEMBER",
+      "cycle_id": "2023-SEPTEMBER",
+      "effective_date_known": true,
+      "expected": true,
+      "governance_basis": "OFFICIAL_SEMIANNUAL_REVIEW_SCHEDULE",
+      "identity_complete": true,
+      "parsed": true,
+      "transition_applied": true,
+      "year": 2023
+    },
+    {
+      "additions_removals_balanced": true,
+      "announcement_located": true,
+      "cycle": "MARCH",
+      "cycle_id": "2024-MARCH",
+      "effective_date_known": true,
+      "expected": true,
+      "governance_basis": "OFFICIAL_SEMIANNUAL_REVIEW_SCHEDULE",
+      "identity_complete": true,
+      "parsed": true,
+      "transition_applied": true,
+      "year": 2024
+    },
+    {
+      "additions_removals_balanced": true,
+      "announcement_located": true,
+      "cycle": "SEPTEMBER",
+      "cycle_id": "2024-SEPTEMBER",
+      "effective_date_known": true,
+      "expected": true,
+      "governance_basis": "OFFICIAL_SEMIANNUAL_REVIEW_SCHEDULE",
+      "identity_complete": true,
+      "parsed": true,
+      "transition_applied": true,
+      "year": 2024
+    },
+    {
+      "additions_removals_balanced": true,
+      "announcement_located": true,
+      "cycle": "MARCH",
+      "cycle_id": "2025-MARCH",
+      "effective_date_known": true,
+      "expected": true,
+      "governance_basis": "OFFICIAL_SEMIANNUAL_REVIEW_SCHEDULE",
+      "identity_complete": true,
+      "parsed": true,
+      "transition_applied": true,
+      "year": 2025
+    },
+    {
+      "additions_removals_balanced": true,
+      "announcement_located": true,
+      "cycle": "SEPTEMBER",
+      "cycle_id": "2025-SEPTEMBER",
+      "effective_date_known": true,
+      "expected": true,
+      "governance_basis": "OFFICIAL_SEMIANNUAL_REVIEW_SCHEDULE",
+      "identity_complete": true,
+      "parsed": true,
+      "transition_applied": true,
+      "year": 2025
+    },
+    {
+      "additions_removals_balanced": true,
+      "announcement_located": true,
+      "cycle": "MARCH",
+      "cycle_id": "2026-MARCH",
+      "effective_date_known": true,
+      "expected": true,
+      "governance_basis": "OFFICIAL_SEMIANNUAL_REVIEW_SCHEDULE",
+      "identity_complete": true,
+      "parsed": true,
+      "transition_applied": true,
+      "year": 2026
+    },
+    {
+      "additions_removals_balanced": true,
+      "announcement_located": true,
+      "cycle": "SEPTEMBER",
+      "cycle_id": "2026-SEPTEMBER",
+      "effective_date_known": true,
+      "expected": true,
+      "governance_basis": "OFFICIAL_SEMIANNUAL_REVIEW_SCHEDULE",
+      "identity_complete": true,
+      "parsed": true,
+      "transition_applied": true,
+      "year": 2026
+    }
+  ],
+  "expected_cycle_count": 10,
+  "inspected_equity_maintenance_releases": 129,
+  "located_cycle_count": 10,
+  "relevant_nifty500_releases": 94,
+  "status": "PARTIAL_WITH_GAPS",
+  "unresolved_events": [
+    {
+      "announcement_date": "2026-09-03",
+      "event_id": "N500-IND_PRS03092026",
+      "reason": "CORPORATE_ACTION_OR_STANDALONE_EXCLUSION_REQUIRES_EXPLICIT_LIFECYCLE_PAIRING",
+      "source_sha256": "5086c32763739c50f450a6bbbf0c7fa648ea8ac918b4bb3748e96471c77a211a",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs03092026.pdf",
+      "status": "IDENTITY_RESOLUTION_REQUIRED",
+      "title": "Corporate action adjustment for HEG Ltd. in Nifty Indices w.e.f. September 07, 2026"
+    },
+    {
+      "announcement_date": "2024-07-05",
+      "event_id": "N500-IND_PRS05072024",
+      "reason": "CORPORATE_ACTION_OR_STANDALONE_EXCLUSION_REQUIRES_EXPLICIT_LIFECYCLE_PAIRING",
+      "source_sha256": "73f07c0625bcf1137303ed537dc702c364bbb53d19f9e980bb1b63ed08d51d12",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs05072024.pdf",
+      "status": "IDENTITY_RESOLUTION_REQUIRED",
+      "title": "Corporate Adjustment for Raymond Ltd. in Nifty indices"
+    },
+    {
+      "announcement_date": "2023-09-05",
+      "event_id": "N500-IND_PRS05092023",
+      "reason": "CORPORATE_ACTION_OR_STANDALONE_EXCLUSION_REQUIRES_EXPLICIT_LIFECYCLE_PAIRING",
+      "source_sha256": "b8b7f5638efcc5e40c7dd04856b5aac5ec82fa8f43c7a6f285f6f3bd2aeae3f4",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs05092023.pdf",
+      "status": "IDENTITY_RESOLUTION_REQUIRED",
+      "title": "Exclusion of Jio Financial Services Limited from Nifty indices w.e.f. September 7, 2023"
+    },
+    {
+      "announcement_date": "2025-02-06",
+      "event_id": "N500-IND_PRS06022025_1",
+      "reason": "CORPORATE_ACTION_OR_STANDALONE_EXCLUSION_REQUIRES_EXPLICIT_LIFECYCLE_PAIRING",
+      "source_sha256": "60f61a6f41b2aa2f9f769d8fc42c4c090f03ae84b44af62827ea46ccd4d88878",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs06022025_1.pdf",
+      "status": "IDENTITY_RESOLUTION_REQUIRED",
+      "title": "Exclusion of ITC Hotels Ltd. from Nifty indices w.e.f. February 10, 2025"
+    },
+    {
+      "announcement_date": "2025-06-06",
+      "event_id": "N500-IND_PRS06062025",
+      "reason": "CORPORATE_ACTION_OR_STANDALONE_EXCLUSION_REQUIRES_EXPLICIT_LIFECYCLE_PAIRING",
+      "source_sha256": "ae01550c3c9e01356411204f3ba4609d91e849715c77103bb31aea91c04e5a25",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs06062025.pdf",
+      "status": "IDENTITY_RESOLUTION_REQUIRED",
+      "title": "Replacements in indices w.e.f. June 30, 2025"
+    },
+    {
+      "announcement_date": "2022-12-06",
+      "event_id": "N500-IND_PRS06122022",
+      "reason": "EFFECTIVE_DATE_NOT_PARSED",
+      "source_sha256": "93db2a1964717cb8ed1446778c69944826983679586ec84b55594668ee796097",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs06122022.pdf",
+      "status": "UNPARSED_OFFICIAL_EVENT",
+      "title": "Replacements in indices w.e.f. December 30, 2022"
+    },
+    {
+      "announcement_date": "2024-06-07",
+      "event_id": "N500-IND_PRS07062024_2",
+      "reason": "CORPORATE_ACTION_OR_STANDALONE_EXCLUSION_REQUIRES_EXPLICIT_LIFECYCLE_PAIRING",
+      "source_sha256": "bbc87e574cda5d9b6d528acc9fd17e3705cca9922cf328f7f066304aa108eb2b",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs07062024_2.pdf",
+      "status": "IDENTITY_RESOLUTION_REQUIRED",
+      "title": "Corporate Adjustment for Sanofi India Ltd. in Nifty indices"
+    },
+    {
+      "announcement_date": "2025-10-07",
+      "event_id": "N500-IND_PRS07102025",
+      "reason": "CORPORATE_ACTION_OR_STANDALONE_EXCLUSION_REQUIRES_EXPLICIT_LIFECYCLE_PAIRING",
+      "source_sha256": "58bafe38fcb153c8ee2794589497b452484b53f3a8c77247d7434368967b2459",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs07102025.pdf",
+      "status": "IDENTITY_RESOLUTION_REQUIRED",
+      "title": "Corporate Adjustment for Tata Motors Ltd. in Nifty Indices"
+    },
+    {
+      "announcement_date": "2025-07-08",
+      "event_id": "N500-IND_PRS08072025",
+      "reason": "CORPORATE_ACTION_OR_STANDALONE_EXCLUSION_REQUIRES_EXPLICIT_LIFECYCLE_PAIRING",
+      "source_sha256": "80eff6b898c415f692ab1312727bab04a952f825cd017c10544830f6f2b9fe52",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs08072025.pdf",
+      "status": "IDENTITY_RESOLUTION_REQUIRED",
+      "title": "Exclusion of Raymond Realty Ltd. from Nifty indices w.e.f. July 10, 2025"
+    },
+    {
+      "announcement_date": "2026-06-10",
+      "event_id": "N500-IND_PRS10062026",
+      "reason": "CORPORATE_ACTION_OR_STANDALONE_EXCLUSION_REQUIRES_EXPLICIT_LIFECYCLE_PAIRING",
+      "source_sha256": "480955597f73a77e88de07a944ecb0443b7c3e3902731cc0f490e8196db43cd6",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs10062026.pdf",
+      "status": "IDENTITY_RESOLUTION_REQUIRED",
+      "title": "Revision in criteria and replacements in indices"
+    },
+    {
+      "announcement_date": "2025-12-11",
+      "event_id": "N500-IND_PRS11122025_1",
+      "reason": "CORPORATE_ACTION_OR_STANDALONE_EXCLUSION_REQUIRES_EXPLICIT_LIFECYCLE_PAIRING",
+      "source_sha256": "e506d84fd34deba08a4610bbf1d4c01fb49201f1ec81d4475fbd8d4d68e2e568",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs11122025_1.pdf",
+      "status": "IDENTITY_RESOLUTION_REQUIRED",
+      "title": "Exclusion of SKF India (Industrial) Ltd. from Nifty Indices w.e.f. December 15, 2025"
+    },
+    {
+      "announcement_date": "2024-09-13",
+      "event_id": "N500-IND_PRS13092024",
+      "reason": "CORPORATE_ACTION_OR_STANDALONE_EXCLUSION_REQUIRES_EXPLICIT_LIFECYCLE_PAIRING",
+      "source_sha256": "6a557dcc285cc719343d2d92977e2cb180bb52fba91946a6c748cb7891ebd76e",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs13092024.pdf",
+      "status": "IDENTITY_RESOLUTION_REQUIRED",
+      "title": "Exclusion of Raymond Lifestyle Ltd. from Nifty indices w.e.f. September 17, 2024"
+    },
+    {
+      "announcement_date": "2022-09-16",
+      "event_id": "N500-IND_PRS16092022",
+      "reason": "EFFECTIVE_DATE_NOT_PARSED",
+      "source_sha256": "4c456435c1a862fa74ae71cd7a7af676b5ed173dd9e3805f56b133d361904166",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs16092022.pdf",
+      "status": "UNPARSED_OFFICIAL_EVENT",
+      "title": "Replacements in indices w.e.f. September 30, 2022"
+    },
+    {
+      "announcement_date": "2023-10-17",
+      "event_id": "N500-IND_PRS17102023",
+      "reason": "EFFECTIVE_DATE_NOT_PARSED",
+      "source_sha256": "58470e6a201cae915aaba853082bde8f4927dd15a2107d996a2a9bc475e4ad50",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs17102023.pdf",
+      "status": "UNPARSED_OFFICIAL_EVENT",
+      "title": "Replacements in indices w.e.f. October 26, 2023"
+    },
+    {
+      "announcement_date": "2023-04-19",
+      "event_id": "N500-IND_PRS19042023_1",
+      "reason": "EFFECTIVE_DATE_NOT_PARSED",
+      "source_sha256": "ff5b22792ef622e99a1b19d364ec1e04c7f6351a188c49cb820dd268c8fd9957",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs19042023_1.pdf",
+      "status": "UNPARSED_OFFICIAL_EVENT",
+      "title": "Replacements in indices w.e.f. April 28, 2023"
+    },
+    {
+      "announcement_date": "2025-05-19",
+      "event_id": "N500-IND_PRS19052025",
+      "reason": "CORPORATE_ACTION_OR_STANDALONE_EXCLUSION_REQUIRES_EXPLICIT_LIFECYCLE_PAIRING",
+      "source_sha256": "801f434cfb152028915b491124d60308e6533a9c7f3862f7009d88b5d36dc61a",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs19052025.pdf",
+      "status": "IDENTITY_RESOLUTION_REQUIRED",
+      "title": "Corporate Action Adjustment for Aditya Birla Fashion and Retail Ltd. in Nifty indices"
+    },
+    {
+      "announcement_date": "2026-06-19",
+      "event_id": "N500-IND_PRS19062026",
+      "reason": "CORPORATE_ACTION_OR_STANDALONE_EXCLUSION_REQUIRES_EXPLICIT_LIFECYCLE_PAIRING",
+      "source_sha256": "e27f1d4502fc367c78a113cf55224742e767327e6d7c2f8c90d899213dd7a874",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs19062026.pdf",
+      "status": "IDENTITY_RESOLUTION_REQUIRED",
+      "title": "Exclusion of Vedanta Aluminium Metal Ltd. from Nifty indices w.e.f. June 23, 2026"
+    },
+    {
+      "announcement_date": "2024-09-19",
+      "event_id": "N500-IND_PRS19092024",
+      "reason": "CORPORATE_ACTION_OR_STANDALONE_EXCLUSION_REQUIRES_EXPLICIT_LIFECYCLE_PAIRING",
+      "source_sha256": "8ca59713efb61899069ca316e175da1688735e873d1b6e7ddcbe6057c5e34337",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs19092024.pdf",
+      "status": "IDENTITY_RESOLUTION_REQUIRED",
+      "title": "Exclusion of Sanofi Consumer Healthcare India Ltd. from Nifty indices w.e.f. September 23, 2024"
+    },
+    {
+      "announcement_date": "2026-02-20",
+      "event_id": "N500-IND_PRS20022026_1",
+      "reason": "CORPORATE_ACTION_OR_STANDALONE_EXCLUSION_REQUIRES_EXPLICIT_LIFECYCLE_PAIRING",
+      "source_sha256": "5782871a33c28f33ee64e6ce056d3ee863bc7805b38e42b8c262d92336abf46e",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs20022026_1.pdf",
+      "status": "IDENTITY_RESOLUTION_REQUIRED",
+      "title": "Exclusion of Kwality Wall's (India) Ltd. from Nifty Indices"
+    },
+    {
+      "announcement_date": "2022-12-22",
+      "event_id": "N500-IND_PRS22122022",
+      "reason": "EFFECTIVE_DATE_NOT_PARSED",
+      "source_sha256": "d9c590cb31309bfe323e851594fe76f9f632cd05a835c85bfe97196d89e043be",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs22122022.pdf",
+      "status": "UNPARSED_OFFICIAL_EVENT",
+      "title": "Replacements in indices w.e.f December 30, 2022"
+    },
+    {
+      "announcement_date": "2026-04-23",
+      "event_id": "N500-IND_PRS23042026",
+      "reason": "CORPORATE_ACTION_OR_STANDALONE_EXCLUSION_REQUIRES_EXPLICIT_LIFECYCLE_PAIRING",
+      "source_sha256": "434aa85ef5ed3ff3f59826e2ed029de39f298173a1cdaa737b4989491d045c03",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs23042026.pdf",
+      "status": "IDENTITY_RESOLUTION_REQUIRED",
+      "title": "Corporate Adjustment for Vedanta Ltd. and Replacement in Nifty Indices w.e.f. April 30, 2026"
+    },
+    {
+      "announcement_date": "2025-11-26",
+      "event_id": "N500-IND_PRS26112025",
+      "reason": "CORPORATE_ACTION_OR_STANDALONE_EXCLUSION_REQUIRES_EXPLICIT_LIFECYCLE_PAIRING",
+      "source_sha256": "5f4c8441de12e13eb12a28d27cc6dd59da59b827b73486f00b3112d489fa3634",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs26112025.pdf",
+      "status": "IDENTITY_RESOLUTION_REQUIRED",
+      "title": "Exclusion of Advent Hotels International Ltd. from Nifty indices w.e.f. November 28, 2025"
+    },
+    {
+      "announcement_date": "2024-12-30",
+      "event_id": "N500-IND_PRS30122024",
+      "reason": "CORPORATE_ACTION_OR_STANDALONE_EXCLUSION_REQUIRES_EXPLICIT_LIFECYCLE_PAIRING",
+      "source_sha256": "ed408284ea6d56b1e21bf1c0a20166b56546440587670b21f56cf57439322229",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs30122024.pdf",
+      "status": "IDENTITY_RESOLUTION_REQUIRED",
+      "title": "Corporate Adjustment for ITC Ltd. in Nifty Indices"
+    },
+    {
+      "conflicting_restore": [],
+      "event_id": "N500-2025-SEPTEMBER",
+      "missing_current_inclusion": [
+        "AKZOINDIA"
+      ],
+      "status": "IDENTITY_RESOLUTION_REQUIRED"
+    }
+  ]
+}

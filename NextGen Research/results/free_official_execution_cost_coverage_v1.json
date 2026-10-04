@@ -1,0 +1,11 @@
+{
+  "artifact_type": "FREE_OFFICIAL_EXECUTION_COST_COVERAGE_V1",
+  "authority": "SHADOW_ONLY",
+  "blocker": "TIERED_HISTORICAL_NSE_CHARGES_REQUIRE_UNKNOWN_MEMBER_CONTEXT",
+  "brokerage": "EXTERNALLY_CONFIGURABLE",
+  "complete_verified_end": "2026-10-01",
+  "complete_verified_start": "2024-10-01",
+  "status": "PARTIAL_VERIFIED",
+  "target_end": "2026-10-01",
+  "target_start": "2021-10-01"
+}

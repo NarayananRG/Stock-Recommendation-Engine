@@ -1,0 +1,35 @@
+{
+  "artifact_type": "FREE_VS_PAID_DATA_DECISION_V1",
+  "authority": "SHADOW_ONLY",
+  "decision": "LICENSED_DATA_REQUIRED_FOR_RESEARCH_READINESS",
+  "minimum_missing_product": "NSE Indices Historical Index Constituent Data - NIFTY 500",
+  "purchase_performed": false,
+  "remaining_blockers": [
+    {
+      "class": "FREE_SOURCE_INCOMPLETE",
+      "detail": "corporate-action and standalone-exclusion lifecycle events are not fully paired to stable historical identities",
+      "gate": "constituent_reconstruction",
+      "minimum_product": "NSE Indices Historical Index Constituent Data - NIFTY 500"
+    },
+    {
+      "class": "FREE_SOURCE_AUTOMATION_RESTRICTED",
+      "detail": "official MCP is usable but only exposes bounded per-symbol chunks; full constituent panel not acquired",
+      "gate": "market_data"
+    },
+    {
+      "class": "CORPORATE_ACTION_HISTORY_INCOMPLETE",
+      "detail": "complete security-level official action ledger not acquired",
+      "gate": "price_adjustment"
+    },
+    {
+      "class": "COST_HISTORY_INCOMPLETE",
+      "detail": "pre-2024-10 tiered exchange charge context remains unknown",
+      "gate": "execution_costs"
+    },
+    {
+      "class": "FREE_SOURCE_NOT_FOUND",
+      "detail": "bulk official benchmark history for the joint window was not acquired",
+      "gate": "benchmark"
+    }
+  ]
+}

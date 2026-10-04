@@ -1,0 +1,17 @@
+{
+  "acquired_sessions": 64,
+  "artifact_type": "FREE_MARKET_DATA_COVERAGE_V1",
+  "authority": "SHADOW_ONLY",
+  "constituent_security_coverage": "1_SAMPLE_SECURITY_ONLY",
+  "duplicate_rows": 0,
+  "expected_sessions": null,
+  "missing_sessions": null,
+  "ohlc_coverage": "SAMPLE_COMPLETE",
+  "reason": "FULL_PANEL_AND_OFFICIAL_COMPLETE_TRADING_CALENDAR_NOT_ACQUIRED",
+  "status": "INSUFFICIENT",
+  "target_end": "2026-10-01",
+  "target_start": "2021-10-01",
+  "turnover_coverage": "SAMPLE_COMPLETE",
+  "volume_coverage": "SAMPLE_COMPLETE",
+  "zero_volume_sessions": 0
+}

@@ -1,0 +1,14 @@
+{
+  "artifact_type": "FREE_OFFICIAL_FEATURE_PIT_READINESS_V1",
+  "authority": "SHADOW_ONLY",
+  "families": {
+    "fundamentals": "OPTIONAL_NOT_ACQUIRED",
+    "liquidity": "NOT_READY",
+    "market_index": "NOT_READY",
+    "momentum": "NOT_READY",
+    "stage6_events": "OPTIONAL_NOT_ACQUIRED",
+    "technical": "NOT_READY",
+    "volatility": "NOT_READY"
+  },
+  "minimal_required_profile_pit_safe": false
+}

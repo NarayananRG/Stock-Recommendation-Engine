@@ -1,0 +1,12 @@
+{
+  "artifact_type": "NIFTY500_RECONSTRUCTION_CROSSCHECK_V1",
+  "authority": "SHADOW_ONLY",
+  "expected_constituents": null,
+  "intersection": null,
+  "match_percentage": null,
+  "missing": [],
+  "reason": "NO_FREE_OFFICIAL_DATED_HISTORICAL_NIFTY500_SNAPSHOT_LOCATED",
+  "reconstructed_constituents": null,
+  "status": "NOT_PERFORMED",
+  "unexpected": []
+}

@@ -1,0 +1,24 @@
+{
+  "approximately_five_years_available": false,
+  "artifact_type": "FREE_OFFICIAL_RESEARCH_WINDOW_V1",
+  "authority": "SHADOW_ONLY",
+  "constituent_observations": 0,
+  "duration_months": 0,
+  "end_date": null,
+  "exceeds_24_month_governance_threshold": false,
+  "exceeds_36_month_preference": false,
+  "failed_gates": [
+    "constituent_reconstruction",
+    "identity",
+    "market_data",
+    "corporate_actions",
+    "execution_costs",
+    "benchmark",
+    "features"
+  ],
+  "start_date": null,
+  "status": "NO_JOINTLY_VALID_WINDOW",
+  "threshold_classification": "RESEARCH_GOVERNANCE_THRESHOLD",
+  "trading_sessions": 0,
+  "unique_securities": 0
+}
