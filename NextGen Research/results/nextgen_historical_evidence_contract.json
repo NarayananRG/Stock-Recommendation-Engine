@@ -1,0 +1,71 @@
+{
+  "contract_id": "NEXTGEN_HISTORICAL_EVIDENCE_COMPLETION_CONTRACT_V1",
+  "result": "PARTIAL_WITH_EXPLICIT_DATA_GAPS",
+  "branch": "nextgen-research-historical-evidence",
+  "parent_commit": "354eb36e3383e5de303b1189e01313c7336657f0",
+  "research_period": "2016-01-01..2026-10-03",
+  "authority": "RESEARCH_ONLY",
+  "dated_security_master": {
+    "status": "DATED_SECURITY_MASTER_DATA_GAP",
+    "current_snapshot_records": 2593,
+    "current_snapshot_date": "2026-10-03",
+    "current_snapshot_backfilled": false,
+    "official_delisting_records": 457
+  },
+  "index_membership": {
+    "nifty_50_verified_change_events": 6,
+    "continuous_membership": "DATA_GAP",
+    "event_effective_dates": ["2020-03-27", "2020-09-25"]
+  },
+  "sector_history": "UNKNOWN_NO_EFFECTIVE_DATED_SERIES_INGESTED",
+  "corporate_actions": "OFFICIAL_FILE_STRUCTURE_VERIFIED_NO_COMPLETE_ARCHIVE_INGESTED",
+  "identity_history": "PARTIAL_EVENT_EVIDENCE_ONLY",
+  "historical_costs": {
+    "artifact_id": "INDIA_EQUITY_COST_SCHEDULE_HISTORY_V2",
+    "canonical_hash": "ff1f3183a7ec894d4fc30bf0874d5273ad9d2a01635b33dad01cce8dbc770c90",
+    "complete_combined_coverage_from": "2024-10-01",
+    "verified_partial_coverage_from": "2019-04-01",
+    "pre_2019_04_01": "UNVERIFIED",
+    "uncovered_period_action": "COST_SCHEDULE_NOT_VERIFIED_FOR_DATE"
+  },
+  "pit_audit": {
+    "artifact_id": "PIT_UNIVERSE_COVERAGE_AUDIT_V1",
+    "sufficient_years": [],
+    "partial_years": [2026],
+    "insufficient_years": [2016,2017,2018,2019,2020,2021,2022,2023,2024,2025]
+  },
+  "advanced_research_readiness": {
+    "status": "NOT_READY",
+    "recommended_safe_research_period": null,
+    "advanced_model_training_started": false
+  },
+  "tests": {
+    "historical_evidence_focused": "63/63 PASS",
+    "real_data_regression": "58/58 PASS",
+    "nextgen_foundation_regression": "104/104 PASS",
+    "stage6_8c": "170/170 PASS",
+    "stage5d": "606/606 PASS",
+    "stage6_0c": "PASS / 10 schemas",
+    "full_stage6": "FAIL / FROZEN_STAGE6_4A_BRANCH_NAME_GUARD_ON_REQUIRED_NEXTGEN_BRANCH",
+    "full_stage6_detail": "Stage 6.1A through 6.3I passed; Stage 6.4A ancestry is correct but test also requires branch stage6-historical-analogue. Downstream evidence-dependent suites cascade. No frozen file was changed."
+  },
+  "active_identities": {
+    "stage4a3_model_bundle_before_after": "4631eb8a1d0b34212252df3b1aae180f64ec98ba5e7955a84729df0a471c62da",
+    "stage6_v1_source_registry_before_after": "7d91f4c72365757b6cdfaef0c4027c46bfbdb11c3541c229e828f9ee28d58e90",
+    "prospective_activation_id_before_after": "S6PROSACT_7a2195d6a80d73508727c088",
+    "prospective_activation_hash_before_after": "0f3e6f69de267a85d6fd9f1937bc71f926a01fdfad162d18b5c2401275e64336"
+  },
+  "boundaries": {
+    "active_lane_changed_files": 0,
+    "raw_files_committed": 0,
+    "runtime_artifacts_committed": 0,
+    "network_calls_in_tests": 0,
+    "live_connectors": 0,
+    "active_model_retrained": false,
+    "challenger_trained": false,
+    "recommendation_logic_changed": false,
+    "trading_authority": false,
+    "ml_authority": "NONE",
+    "tags_created": 0
+  }
+}

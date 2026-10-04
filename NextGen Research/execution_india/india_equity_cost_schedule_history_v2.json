@@ -1,0 +1,93 @@
+{
+  "artifact_id": "INDIA_EQUITY_COST_SCHEDULE_HISTORY_V2",
+  "research_period": "2016-01-01..2026-10-03",
+  "market": "NSE_CASH_EQUITY_DELIVERY_RESEARCH",
+  "brokerage": "EXTERNALLY_CONFIGURABLE",
+  "uncovered_period_action": "COST_SCHEDULE_NOT_VERIFIED_FOR_DATE",
+  "periods": [
+    {
+      "period_id": "SEBI_ONLY_20190401_20201231",
+      "effective_from": "2019-04-01",
+      "effective_to": "2020-12-31",
+      "coverage_status": "PARTIAL_VERIFIED",
+      "components": [
+        {"component":"SEBI_TURNOVER_FEE","status":"VERIFIED","rate_bps":"0.01","sides":["BUY","SELL"],"calculation_base":"GROSS_TRADED_VALUE","source_id":"SEBI_2019_FEE_AMENDMENT"},
+        {"component":"NSE_EXCHANGE_TRANSACTION_CHARGE","status":"UNVERIFIED","sides":["BUY","SELL"]},
+        {"component":"STT_DELIVERY","status":"UNVERIFIED","sides":["BUY","SELL"]},
+        {"component":"STAMP_DUTY_DELIVERY","status":"UNVERIFIED","sides":["BUY"]},
+        {"component":"GST_TREATMENT","status":"UNVERIFIED","sides":["BUY","SELL"]}
+      ]
+    },
+    {
+      "period_id": "NSE_TIERED_20210101_20230331",
+      "effective_from": "2021-01-01",
+      "effective_to": "2023-03-31",
+      "coverage_status": "PARTIAL_VERIFIED",
+      "components": [
+        {"component":"NSE_EXCHANGE_TRANSACTION_CHARGE","status":"VERIFIED","rate_type":"MONTHLY_MEMBER_TURNOVER_TIER_PER_LAKH_EACH_SIDE","tiers":["3.45","3.40","3.35","3.30","3.25","3.20"],"sides":["BUY","SELL"],"calculation_base":"GROSS_TRADED_VALUE","source_id":"NSE_FA46730","context_required":["MEMBER_MONTHLY_TRADED_VALUE","SECURITY_CONCESSION_CLASS"]},
+        {"component":"SEBI_TURNOVER_FEE","status":"VERIFIED","rate_bps":"0.01","sides":["BUY","SELL"],"calculation_base":"GROSS_TRADED_VALUE","source_id":"SEBI_2019_FEE_AMENDMENT"},
+        {"component":"STT_DELIVERY","status":"UNVERIFIED","sides":["BUY","SELL"]},
+        {"component":"STAMP_DUTY_DELIVERY","status":"UNVERIFIED","sides":["BUY"]},
+        {"component":"GST_TREATMENT","status":"UNVERIFIED","sides":["BUY","SELL"]}
+      ]
+    },
+    {
+      "period_id": "NSE_TIERED_20230401_20240331",
+      "effective_from": "2023-04-01",
+      "effective_to": "2024-03-31",
+      "coverage_status": "PARTIAL_VERIFIED",
+      "components": [
+        {"component":"NSE_EXCHANGE_TRANSACTION_CHARGE","status":"VERIFIED","rate_type":"MONTHLY_MEMBER_TURNOVER_TIER_PER_LAKH_EACH_SIDE","tiers":["3.25","3.20","3.15","3.10","3.05","3.00"],"sides":["BUY","SELL"],"calculation_base":"GROSS_TRADED_VALUE","source_id":"NSE_FA56129","context_required":["MEMBER_MONTHLY_TRADED_VALUE","SECURITY_CONCESSION_CLASS"]},
+        {"component":"SEBI_TURNOVER_FEE","status":"VERIFIED","rate_bps":"0.01","sides":["BUY","SELL"],"calculation_base":"GROSS_TRADED_VALUE","source_id":"SEBI_2019_FEE_AMENDMENT"},
+        {"component":"STT_DELIVERY","status":"UNVERIFIED","sides":["BUY","SELL"]},
+        {"component":"STAMP_DUTY_DELIVERY","status":"UNVERIFIED","sides":["BUY"]},
+        {"component":"GST_TREATMENT","status":"UNVERIFIED","sides":["BUY","SELL"]}
+      ]
+    },
+    {
+      "period_id": "NSE_TIERED_20240401_20240930",
+      "effective_from": "2024-04-01",
+      "effective_to": "2024-09-30",
+      "coverage_status": "PARTIAL_VERIFIED",
+      "components": [
+        {"component":"NSE_EXCHANGE_TRANSACTION_CHARGE","status":"VERIFIED","rate_type":"MONTHLY_MEMBER_TURNOVER_TIER_PER_LAKH_EACH_SIDE","tiers":["3.22","3.17","3.12","3.07","3.02","2.97"],"sides":["BUY","SELL"],"calculation_base":"GROSS_TRADED_VALUE","source_id":"NSE_FA61137","context_required":["MEMBER_MONTHLY_TRADED_VALUE","SECURITY_CONCESSION_CLASS"]},
+        {"component":"SEBI_TURNOVER_FEE","status":"VERIFIED","rate_bps":"0.01","sides":["BUY","SELL"],"calculation_base":"GROSS_TRADED_VALUE","source_id":"SEBI_2019_FEE_AMENDMENT"},
+        {"component":"STT_DELIVERY","status":"UNVERIFIED","sides":["BUY","SELL"]},
+        {"component":"STAMP_DUTY_DELIVERY","status":"UNVERIFIED","sides":["BUY"]},
+        {"component":"GST_TREATMENT","status":"UNVERIFIED","sides":["BUY","SELL"]}
+      ]
+    },
+    {
+      "period_id": "UNIFORM_20241001_20260228",
+      "effective_from": "2024-10-01",
+      "effective_to": "2026-02-28",
+      "coverage_status": "COMPLETE_VERIFIED",
+      "components": [
+        {"component":"NSE_EXCHANGE_TRANSACTION_CHARGE","status":"VERIFIED","rate_bps":"0.297","sides":["BUY","SELL"],"calculation_base":"GROSS_TRADED_VALUE","source_id":"NSE_FA64232"},
+        {"component":"SEBI_TURNOVER_FEE","status":"VERIFIED","rate_bps":"0.01","sides":["BUY","SELL"],"calculation_base":"GROSS_TRADED_VALUE","source_id":"SEBI_2019_FEE_AMENDMENT"},
+        {"component":"STT_DELIVERY","status":"VERIFIED","rate_bps":"10","sides":["BUY","SELL"],"calculation_base":"GROSS_TRADED_VALUE","source_id":"EXISTING_VERIFIED_V1"},
+        {"component":"STAMP_DUTY_DELIVERY","status":"VERIFIED","rate_bps":"1.5","sides":["BUY"],"calculation_base":"GROSS_TRADED_VALUE","source_id":"EXISTING_VERIFIED_V1"},
+        {"component":"GST_TREATMENT","status":"VERIFIED","rate_percent":"18","sides":["BUY","SELL"],"calculation_base":"BROKERAGE_PLUS_EXCHANGE_PLUS_SEBI","source_id":"EXISTING_VERIFIED_V1"}
+      ]
+    },
+    {
+      "period_id": "UNIFORM_20260301_20261003",
+      "effective_from": "2026-03-01",
+      "effective_to": "2026-10-03",
+      "coverage_status": "COMPLETE_VERIFIED",
+      "components": [
+        {"component":"NSE_EXCHANGE_TRANSACTION_CHARGE","status":"VERIFIED","rate_bps":"0.30699","sides":["BUY","SELL"],"calculation_base":"GROSS_TRADED_VALUE","source_id":"NSE_FA73061"},
+        {"component":"SEBI_TURNOVER_FEE","status":"VERIFIED","rate_bps":"0.01","sides":["BUY","SELL"],"calculation_base":"GROSS_TRADED_VALUE","source_id":"SEBI_2019_FEE_AMENDMENT"},
+        {"component":"STT_DELIVERY","status":"VERIFIED","rate_bps":"10","sides":["BUY","SELL"],"calculation_base":"GROSS_TRADED_VALUE","source_id":"EXISTING_VERIFIED_V1"},
+        {"component":"STAMP_DUTY_DELIVERY","status":"VERIFIED","rate_bps":"1.5","sides":["BUY"],"calculation_base":"GROSS_TRADED_VALUE","source_id":"EXISTING_VERIFIED_V1"},
+        {"component":"GST_TREATMENT","status":"VERIFIED","rate_percent":"18","sides":["BUY","SELL"],"calculation_base":"BROKERAGE_PLUS_EXCHANGE_PLUS_SEBI","source_id":"EXISTING_VERIFIED_V1"}
+      ]
+    }
+  ],
+  "explicit_gaps": [
+    "2016-01-01..2019-03-31 has no verified combined schedule",
+    "2019-04-01..2024-09-30 is partial and cannot support complete net-return evaluation",
+    "tiered transaction charges require member-turnover and security-concession context"
+  ],
+  "canonical_hash": "ff1f3183a7ec894d4fc30bf0874d5273ad9d2a01635b33dad01cce8dbc770c90"
+}

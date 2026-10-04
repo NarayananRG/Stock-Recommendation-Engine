@@ -1,0 +1,31 @@
+{
+  "active_prospective_authority": "NONE",
+  "active_recommendation_influence": "NONE",
+  "active_source_registry_authority": "NONE",
+  "authority": "RESEARCH_ONLY",
+  "authority_scope": "RESEARCH_ONLY",
+  "challenger_trained": false,
+  "gates": {
+    "benchmark_prices_available": true,
+    "calibration_and_challenger_governance_ready": true,
+    "execution_cost_coverage_sufficient": true,
+    "features_pit_safe": false,
+    "identity_history_sufficient": false,
+    "index_membership_available_when_required": false,
+    "pit_universe_coverage_sufficient": true,
+    "survivorship_distortion_materially_reduced": false
+  },
+  "ml_authority": "NONE",
+  "model_promotion_authority": "NONE",
+  "reason": "No year has comprehensive dated investable-universe evidence; advanced cross-sectional research remains blocked.",
+  "recommended_safe_research_period": null,
+  "record_hash": "23b85bd772d339788af02d0ca6883279c9e1e7bb08dc2d5e6eac1a7440c9a3f2",
+  "record_id": "ADVANCED_RESEARCH_READINESS_V1_23b85bd772d339788af02d0c",
+  "safe_years": [
+    2026
+  ],
+  "schema": "ADVANCED_RESEARCH_READINESS_V1",
+  "status": "NOT_READY",
+  "trading_authority": false,
+  "training_started": false
+}

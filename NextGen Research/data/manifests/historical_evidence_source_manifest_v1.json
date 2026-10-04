@@ -1,0 +1,27 @@
+{
+  "manifest_id": "HISTORICAL_EVIDENCE_SOURCE_MANIFEST_V1",
+  "research_period": "2016-01-01..2026-10-03",
+  "retrieved_at": "2026-10-04T00:00:00Z",
+  "authority_scope": "RESEARCH_ONLY",
+  "raw_data_committed": false,
+  "dated_security_master_status": "DATED_SECURITY_MASTER_DATA_GAP",
+  "sources": [
+    {"source_id":"NIFTY_50_CHANGE_20200218","publisher":"NSE Indices Limited","url":"https://www.niftyindices.com/Press_Release/ind_prs18022020.pdf","sha256":"1943215214a0b967333ae4ec9c6aeaec9c5012fb03558c769ad895b7d1081f9e","evidence_scope":"NIFTY_50_CHANGE_EVENT","coverage":"CHANGE_EVENT_ONLY"},
+    {"source_id":"NIFTY_50_CHANGE_20200820","publisher":"NSE Indices Limited","url":"https://www.niftyindices.com/Press_Release/ind_prs20082020.pdf","sha256":"46c98f2c6cc53f925bed74bface526afc752a39706828836be23ab38d1fa898c","evidence_scope":"NIFTY_50_CHANGE_EVENT","coverage":"CHANGE_EVENT_ONLY"},
+    {"source_id":"NSE_CORPORATE_ACTION_FILE_STRUCTURE","publisher":"National Stock Exchange of India","url":"https://nsearchives.nseindia.com/content/circulars/cmpt13060.htm","sha256":"62dd1c82bb1582dbd268aecc8a312a1829f6aa5bf5848ee1a35e1c30d75404f4","evidence_scope":"FILE_STRUCTURE_ONLY","coverage":"NO_HISTORICAL_ACTION_ARCHIVE_INGESTED"},
+    {"source_id":"NSE_FA46730","publisher":"National Stock Exchange of India","url":"https://nsearchives.nseindia.com/content/circulars/FA46730.pdf","sha256":"a9ff85ab4deec82e02bb1e3fc213a2bbc02a72e9edb7b36cdf1568aeb792febf","published":"2020-12-18","effective_from":"2021-01-01","evidence_scope":"TIERED_CASH_TRANSACTION_CHARGES"},
+    {"source_id":"NSE_FA56129","publisher":"National Stock Exchange of India","url":"https://nsearchives.nseindia.com/content/circulars/FA56129.pdf","sha256":"ec260386adbcf3a0c3326d7d8b3b45b15ba693c55081fdc78fb05b83a5ee93e0","published":"2023-03-24","effective_from":"2023-04-01","evidence_scope":"TIERED_CASH_TRANSACTION_CHARGES"},
+    {"source_id":"NSE_FA61137","publisher":"National Stock Exchange of India","url":"https://nsearchives.nseindia.com/content/circulars/FA61137.pdf","sha256":"e01c5b6c76d29d559bc7f559758c99cb289ec44a88e3f89d5e46b8c2c360e0ac","published":"2024-03-14","effective_from":"2024-04-01","evidence_scope":"TIERED_CASH_TRANSACTION_CHARGES"},
+    {"source_id":"NSE_FA64232","publisher":"National Stock Exchange of India","url":"https://nsearchives.nseindia.com/content/circulars/FA64232.pdf","sha256":"85b816208f33bdd1c6c0d827b1ba996aba1fe08fe883a6d31c6a2c0ad55304a4","published":"2024-09-27","effective_from":"2024-10-01","evidence_scope":"UNIFORM_CASH_TRANSACTION_CHARGE"},
+    {"source_id":"NSE_FA73061","publisher":"National Stock Exchange of India","url":"https://nsearchives.nseindia.com/content/circulars/FA73061.pdf","sha256":"6085601a26177ed61e37e5347960b936d71464ab625d6a0d9fe72b2ec838ac09","published":"2026-02-27","effective_from":"2026-03-01","evidence_scope":"UNIFORM_CASH_TRANSACTION_CHARGE"},
+    {"source_id":"SEBI_2019_FEE_AMENDMENT","publisher":"Securities and Exchange Board of India","url":"https://www.sebi.gov.in/sebi_data/attachdocs/may-2019/1558953962673.pdf","sha256":"1a6848e6a96e6e98ee6c9c9fd9791c0bb1b25cfdb8b8355794546ff08daa1194","published":"2019-03-22","effective_from":"2019-04-01","evidence_scope":"SEBI_TURNOVER_FEE"}
+  ],
+  "explicit_gaps": [
+    "NO_REPRODUCIBLE_DATED_SECURITY_MASTER_SERIES_FOUND",
+    "NO_COMPLETE_HISTORICAL_INDEX_CONSTITUENT_SERIES_INGESTED",
+    "NO_EFFECTIVE_DATED_SECTOR_SERIES_INGESTED",
+    "NO_COMPLETE_CORPORATE_ACTION_ARCHIVE_INGESTED",
+    "PRE_2021_NSE_TRANSACTION_CHARGES_UNVERIFIED",
+    "PRE_2020_NATIONAL_STAMP_DUTY_NOT_UNIFORMLY_VERIFIED"
+  ]
+}

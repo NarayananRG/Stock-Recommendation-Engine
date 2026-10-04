@@ -1,0 +1,147 @@
+{
+  "active_prospective_authority": "NONE",
+  "active_recommendation_influence": "NONE",
+  "active_source_registry_authority": "NONE",
+  "authority": "RESEARCH_ONLY",
+  "authority_scope": "RESEARCH_ONLY",
+  "model_promotion_authority": "NONE",
+  "record_hash": "cd47fe7cb3d079cb52e0df8ca377c3f61dbddcbcca254d52463f6a1770a710a6",
+  "record_id": "EXECUTION_COST_COVERAGE_MATRIX_V1_cd47fe7cb3d079cb52e0df8c",
+  "research_period": "2016-01-01..2026-10-03",
+  "schema": "EXECUTION_COST_COVERAGE_MATRIX_V1",
+  "trading_authority": false,
+  "years": [
+    {
+      "brokerage": "EXTERNALLY_CONFIGURABLE",
+      "components": {
+        "GST_TREATMENT": "UNVERIFIED",
+        "NSE_EXCHANGE_TRANSACTION_CHARGE": "UNVERIFIED",
+        "SEBI_TURNOVER_FEE": "UNVERIFIED",
+        "STAMP_DUTY_DELIVERY": "UNVERIFIED",
+        "STT_DELIVERY": "UNVERIFIED"
+      },
+      "status": "UNVERIFIED",
+      "year": 2016
+    },
+    {
+      "brokerage": "EXTERNALLY_CONFIGURABLE",
+      "components": {
+        "GST_TREATMENT": "UNVERIFIED",
+        "NSE_EXCHANGE_TRANSACTION_CHARGE": "UNVERIFIED",
+        "SEBI_TURNOVER_FEE": "UNVERIFIED",
+        "STAMP_DUTY_DELIVERY": "UNVERIFIED",
+        "STT_DELIVERY": "UNVERIFIED"
+      },
+      "status": "UNVERIFIED",
+      "year": 2017
+    },
+    {
+      "brokerage": "EXTERNALLY_CONFIGURABLE",
+      "components": {
+        "GST_TREATMENT": "UNVERIFIED",
+        "NSE_EXCHANGE_TRANSACTION_CHARGE": "UNVERIFIED",
+        "SEBI_TURNOVER_FEE": "UNVERIFIED",
+        "STAMP_DUTY_DELIVERY": "UNVERIFIED",
+        "STT_DELIVERY": "UNVERIFIED"
+      },
+      "status": "UNVERIFIED",
+      "year": 2018
+    },
+    {
+      "brokerage": "EXTERNALLY_CONFIGURABLE",
+      "components": {
+        "GST_TREATMENT": "UNVERIFIED",
+        "NSE_EXCHANGE_TRANSACTION_CHARGE": "UNVERIFIED",
+        "SEBI_TURNOVER_FEE": "VERIFIED",
+        "STAMP_DUTY_DELIVERY": "UNVERIFIED",
+        "STT_DELIVERY": "UNVERIFIED"
+      },
+      "status": "PARTIAL_VERIFIED",
+      "year": 2019
+    },
+    {
+      "brokerage": "EXTERNALLY_CONFIGURABLE",
+      "components": {
+        "GST_TREATMENT": "UNVERIFIED",
+        "NSE_EXCHANGE_TRANSACTION_CHARGE": "UNVERIFIED",
+        "SEBI_TURNOVER_FEE": "VERIFIED",
+        "STAMP_DUTY_DELIVERY": "UNVERIFIED",
+        "STT_DELIVERY": "UNVERIFIED"
+      },
+      "status": "PARTIAL_VERIFIED",
+      "year": 2020
+    },
+    {
+      "brokerage": "EXTERNALLY_CONFIGURABLE",
+      "components": {
+        "GST_TREATMENT": "UNVERIFIED",
+        "NSE_EXCHANGE_TRANSACTION_CHARGE": "VERIFIED",
+        "SEBI_TURNOVER_FEE": "VERIFIED",
+        "STAMP_DUTY_DELIVERY": "UNVERIFIED",
+        "STT_DELIVERY": "UNVERIFIED"
+      },
+      "status": "PARTIAL_VERIFIED",
+      "year": 2021
+    },
+    {
+      "brokerage": "EXTERNALLY_CONFIGURABLE",
+      "components": {
+        "GST_TREATMENT": "UNVERIFIED",
+        "NSE_EXCHANGE_TRANSACTION_CHARGE": "VERIFIED",
+        "SEBI_TURNOVER_FEE": "VERIFIED",
+        "STAMP_DUTY_DELIVERY": "UNVERIFIED",
+        "STT_DELIVERY": "UNVERIFIED"
+      },
+      "status": "PARTIAL_VERIFIED",
+      "year": 2022
+    },
+    {
+      "brokerage": "EXTERNALLY_CONFIGURABLE",
+      "components": {
+        "GST_TREATMENT": "UNVERIFIED",
+        "NSE_EXCHANGE_TRANSACTION_CHARGE": "VERIFIED",
+        "SEBI_TURNOVER_FEE": "VERIFIED",
+        "STAMP_DUTY_DELIVERY": "UNVERIFIED",
+        "STT_DELIVERY": "UNVERIFIED"
+      },
+      "status": "PARTIAL_VERIFIED",
+      "year": 2023
+    },
+    {
+      "brokerage": "EXTERNALLY_CONFIGURABLE",
+      "components": {
+        "GST_TREATMENT": "PARTIAL_VERIFIED",
+        "NSE_EXCHANGE_TRANSACTION_CHARGE": "VERIFIED",
+        "SEBI_TURNOVER_FEE": "VERIFIED",
+        "STAMP_DUTY_DELIVERY": "PARTIAL_VERIFIED",
+        "STT_DELIVERY": "PARTIAL_VERIFIED"
+      },
+      "status": "PARTIAL_VERIFIED",
+      "year": 2024
+    },
+    {
+      "brokerage": "EXTERNALLY_CONFIGURABLE",
+      "components": {
+        "GST_TREATMENT": "VERIFIED",
+        "NSE_EXCHANGE_TRANSACTION_CHARGE": "VERIFIED",
+        "SEBI_TURNOVER_FEE": "VERIFIED",
+        "STAMP_DUTY_DELIVERY": "VERIFIED",
+        "STT_DELIVERY": "VERIFIED"
+      },
+      "status": "COMPLETE_VERIFIED",
+      "year": 2025
+    },
+    {
+      "brokerage": "EXTERNALLY_CONFIGURABLE",
+      "components": {
+        "GST_TREATMENT": "VERIFIED",
+        "NSE_EXCHANGE_TRANSACTION_CHARGE": "VERIFIED",
+        "SEBI_TURNOVER_FEE": "VERIFIED",
+        "STAMP_DUTY_DELIVERY": "VERIFIED",
+        "STT_DELIVERY": "VERIFIED"
+      },
+      "status": "COMPLETE_VERIFIED",
+      "year": 2026
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "active_lane_changed_files": 0,
+  "active_prospective_authority": "NONE",
+  "active_recommendation_influence": "NONE",
+  "active_source_registry_authority": "NONE",
+  "authority": "RESEARCH_ONLY",
+  "authority_scope": "RESEARCH_ONLY",
+  "branch": "nextgen-research-historical-evidence",
+  "component_file_sha256": {
+    "execution_coverage": "9b5513819555a2dfe88fe1849a42659dac40b29097b05da9fa9783dfc332212a",
+    "historical_cost_book": "5418699fc01f902a22fc82d87b37af1209a8903ec2a3cf50f0a4d7ecb407c805",
+    "pit_coverage": "f63d788fd49accf17c6f933341d09006a7e056231533eb3c1bbb7b9e4ca9c856",
+    "readiness": "70b603aecd427e9947d4fbf4a68b9eb6f32ff2c1151a930049300d343c5ba6b4",
+    "source_manifest": "87a01a43e2a0e76e7a860483e562e87d72115f8ae3aa30cc7a0a7292f9b714e5"
+  },
+  "dated_security_master_status": "DATED_SECURITY_MASTER_DATA_GAP",
+  "delisting_records": 457,
+  "fixture_only_tests": true,
+  "index_change_events": 6,
+  "live_connectors": 0,
+  "ml_authority": "NONE",
+  "model_promotion_authority": "NONE",
+  "model_training": false,
+  "network_calls_in_tests": 0,
+  "parent_commit": "354eb36e3383e5de303b1189e01313c7336657f0",
+  "record_hash": "d1b8809f20dc88ff4102eded25149e90fccf4c2ed5f93371a3f5aea8ecf2696c",
+  "record_id": "NEXTGEN_HISTORICAL_EVIDENCE_MANIFEST_V1_d1b8809f20dc88ff4102eded",
+  "research_period": "2016-01-01..2026-10-03",
+  "schema": "NEXTGEN_HISTORICAL_EVIDENCE_MANIFEST_V1",
+  "security_master_records": 2593,
+  "trading_authority": false
+}
