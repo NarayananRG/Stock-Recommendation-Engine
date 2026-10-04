@@ -1,0 +1,92 @@
+{
+  "active_prospective_authority": "NONE",
+  "active_recommendation_influence": "NONE",
+  "active_source_registry_authority": "NONE",
+  "authority": "RESEARCH_ONLY",
+  "authority_scope": "RESEARCH_ONLY",
+  "candidate_evidence_years": [
+    2026
+  ],
+  "challenger_trained": false,
+  "failed_required_gates": [
+    "pit_universe_coverage_sufficient",
+    "survivorship_distortion_materially_reduced",
+    "identity_history_sufficient",
+    "features_pit_safe"
+  ],
+  "fully_research_eligible_years": [],
+  "gates": {
+    "benchmark_prices_available": true,
+    "calibration_and_challenger_governance_ready": true,
+    "execution_cost_coverage_sufficient": true,
+    "features_pit_safe": false,
+    "historical_sector_available_when_required": true,
+    "identity_history_sufficient": false,
+    "index_membership_available_when_required": true,
+    "pit_universe_coverage_sufficient": false,
+    "survivorship_distortion_materially_reduced": false
+  },
+  "ml_authority": "NONE",
+  "model_promoted": false,
+  "model_promotion_authority": "NONE",
+  "partial_snapshot_years": [
+    2026
+  ],
+  "proposed_research_period": {
+    "benchmark_coverage": "SUFFICIENT",
+    "end_date": "2026-10-03",
+    "execution_cost_coverage": "SUFFICIENT",
+    "failed_required_gates": [
+      "pit_universe_coverage_sufficient",
+      "survivorship_distortion_materially_reduced",
+      "identity_history_sufficient",
+      "features_pit_safe"
+    ],
+    "feature_pit_coverage": "INSUFFICIENT",
+    "identity_coverage": "INSUFFICIENT",
+    "required_profile_gates": [
+      "pit_universe_coverage_sufficient",
+      "survivorship_distortion_materially_reduced",
+      "identity_history_sufficient",
+      "execution_cost_coverage_sufficient",
+      "benchmark_prices_available",
+      "features_pit_safe",
+      "calibration_and_challenger_governance_ready"
+    ],
+    "start_date": "2026-01-01",
+    "universe_evidence_coverage": "INSUFFICIENT",
+    "years": [
+      2026
+    ]
+  },
+  "reasons": [
+    "FEATURE_PIT_SAFETY_NOT_ESTABLISHED",
+    "HISTORICAL_IDENTITY_COVERAGE_INSUFFICIENT",
+    "NO_APPROVED_ADVANCED_RESEARCH_PERIOD",
+    "NO_FULLY_RESEARCH_ELIGIBLE_YEARS",
+    "NO_SUFFICIENT_DATED_PIT_HISTORICAL_UNIVERSE",
+    "SURVIVORSHIP_DISTORTION_NOT_MATERIALLY_REDUCED"
+  ],
+  "recommended_safe_research_period": null,
+  "record_hash": "499077786d402ba6d053f73fbe52f5a5a604760318264cf3041524fc3eaf28a9",
+  "record_id": "ADVANCED_RESEARCH_READINESS_V2_499077786d402ba6d053f73f",
+  "required_gates": [
+    "pit_universe_coverage_sufficient",
+    "survivorship_distortion_materially_reduced",
+    "identity_history_sufficient",
+    "execution_cost_coverage_sufficient",
+    "benchmark_prices_available",
+    "features_pit_safe",
+    "calibration_and_challenger_governance_ready"
+  ],
+  "research_profile": {
+    "profile_id": "CROSS_SECTIONAL_STOCK_SELECTION",
+    "requires_historical_index_membership": false,
+    "requires_historical_sector": false,
+    "universe_definition": "EXCHANGE_WIDE_PIT"
+  },
+  "schema": "ADVANCED_RESEARCH_READINESS_V2",
+  "status": "NOT_READY",
+  "trading_authority": false,
+  "training_started": false
+}

@@ -11,6 +11,7 @@
     "historical_cost_book": "5418699fc01f902a22fc82d87b37af1209a8903ec2a3cf50f0a4d7ecb407c805",
     "pit_coverage": "f63d788fd49accf17c6f933341d09006a7e056231533eb3c1bbb7b9e4ca9c856",
     "readiness": "70b603aecd427e9947d4fbf4a68b9eb6f32ff2c1151a930049300d343c5ba6b4",
+    "readiness_v2": "7ec465cdf4178593d48dc7b89b690b581cd31ce97f06b505c04158da0244b1fb",
     "source_manifest": "87a01a43e2a0e76e7a860483e562e87d72115f8ae3aa30cc7a0a7292f9b714e5"
   },
   "dated_security_master_status": "DATED_SECURITY_MASTER_DATA_GAP",
@@ -23,8 +24,8 @@
   "model_training": false,
   "network_calls_in_tests": 0,
   "parent_commit": "354eb36e3383e5de303b1189e01313c7336657f0",
-  "record_hash": "d1b8809f20dc88ff4102eded25149e90fccf4c2ed5f93371a3f5aea8ecf2696c",
-  "record_id": "NEXTGEN_HISTORICAL_EVIDENCE_MANIFEST_V1_d1b8809f20dc88ff4102eded",
+  "record_hash": "f22e959af8898aa70209900ed27d86708ce2c067728ad7c5819c8819cf968e49",
+  "record_id": "NEXTGEN_HISTORICAL_EVIDENCE_MANIFEST_V1_f22e959af8898aa70209900e",
   "research_period": "2016-01-01..2026-10-03",
   "schema": "NEXTGEN_HISTORICAL_EVIDENCE_MANIFEST_V1",
   "security_master_records": 2593,

@@ -287,3 +287,133 @@ def advanced_research_readiness(pit_audit: dict, cost_matrix: dict, *, leakage_s
         "authority_scope": AUTHORITY, "trading_authority": False, "ml_authority": "NONE",
         "reason": "No year has comprehensive dated investable-universe evidence; advanced cross-sectional research remains blocked.",
     })
+
+
+def advanced_research_readiness_v2(
+        pit_audit: dict, cost_matrix: dict, *, research_profile: dict,
+        proposed_period: dict | None, features_pit_safe: bool,
+        governance_ready: bool, benchmark_prices_available: bool,
+        identity_history_sufficient: bool,
+        survivorship_distortion_materially_reduced: bool,
+        index_membership_available: bool,
+        historical_sector_available: bool) -> dict:
+    """Fail-closed, profile-aware readiness decision for an explicit period.
+
+    Partial universe evidence is reportable but never sufficient.  Every gate
+    required by the selected profile must pass before restricted readiness can
+    open.  This function creates evidence only; it cannot train or promote.
+    """
+    if research_profile.get("profile_id") != "CROSS_SECTIONAL_STOCK_SELECTION":
+        raise ValueError("UNSUPPORTED_RESEARCH_PROFILE")
+    universe_definition = research_profile.get("universe_definition")
+    if universe_definition not in {"EXCHANGE_WIDE_PIT", "INDEX_CONSTITUENT_PIT"}:
+        raise ValueError("UNSUPPORTED_UNIVERSE_DEFINITION")
+    requires_sector = bool(research_profile.get("requires_historical_sector", False))
+    requires_index = universe_definition == "INDEX_CONSTITUENT_PIT"
+
+    pit_by_year = {int(row["year"]): row for row in pit_audit["years"]}
+    cost_by_year = {int(row["year"]): row for row in cost_matrix["years"]}
+    partial_years = sorted(year for year, row in pit_by_year.items()
+                           if row["cross_sectional_research_status"] == "PARTIAL_USE_WITH_CAUTION")
+    candidate_years = sorted(year for year, row in pit_by_year.items()
+                             if row["cross_sectional_research_status"] in {
+                                 "PARTIAL_USE_WITH_CAUTION", "SUFFICIENT_FOR_RESEARCH"})
+    fully_eligible_years = sorted(
+        year for year, row in pit_by_year.items()
+        if row["cross_sectional_research_status"] == "SUFFICIENT_FOR_RESEARCH"
+        and cost_by_year.get(year, {}).get("status") == "COMPLETE_VERIFIED"
+    )
+
+    period_years: list[int] = []
+    period_descriptor = None
+    if proposed_period is not None:
+        start = parse_date(proposed_period.get("start_date"))
+        end = parse_date(proposed_period.get("end_date"))
+        if not start or not end or start > end:
+            raise ValueError("INVALID_PROPOSED_RESEARCH_PERIOD")
+        period_years = list(range(start.year, end.year + 1))
+        period_descriptor = {"start_date": start.isoformat(), "end_date": end.isoformat()}
+
+    pit_sufficient = bool(period_years) and all(
+        pit_by_year.get(year, {}).get("cross_sectional_research_status") == "SUFFICIENT_FOR_RESEARCH"
+        for year in period_years
+    )
+    execution_sufficient = bool(period_years) and all(
+        cost_by_year.get(year, {}).get("status") == "COMPLETE_VERIFIED"
+        for year in period_years
+    )
+    gates = {
+        "pit_universe_coverage_sufficient": pit_sufficient,
+        "survivorship_distortion_materially_reduced": bool(survivorship_distortion_materially_reduced),
+        "identity_history_sufficient": bool(identity_history_sufficient),
+        "execution_cost_coverage_sufficient": execution_sufficient,
+        "benchmark_prices_available": bool(benchmark_prices_available),
+        "features_pit_safe": bool(features_pit_safe),
+        "calibration_and_challenger_governance_ready": bool(governance_ready),
+        "index_membership_available_when_required": bool(index_membership_available) if requires_index else True,
+        "historical_sector_available_when_required": bool(historical_sector_available) if requires_sector else True,
+    }
+    required = [
+        "pit_universe_coverage_sufficient",
+        "survivorship_distortion_materially_reduced",
+        "identity_history_sufficient",
+        "execution_cost_coverage_sufficient",
+        "benchmark_prices_available",
+        "features_pit_safe",
+        "calibration_and_challenger_governance_ready",
+    ]
+    if requires_index:
+        required.append("index_membership_available_when_required")
+    if requires_sector:
+        required.append("historical_sector_available_when_required")
+    failed = [name for name in required if not gates[name]]
+    ready = period_descriptor is not None and not failed
+
+    period_evidence = None
+    if period_descriptor is not None:
+        period_evidence = {
+            **period_descriptor, "years": period_years,
+            "universe_evidence_coverage": "SUFFICIENT" if pit_sufficient else "INSUFFICIENT",
+            "execution_cost_coverage": "SUFFICIENT" if execution_sufficient else "INSUFFICIENT",
+            "feature_pit_coverage": "SUFFICIENT" if features_pit_safe else "INSUFFICIENT",
+            "identity_coverage": "SUFFICIENT" if identity_history_sufficient else "INSUFFICIENT",
+            "benchmark_coverage": "SUFFICIENT" if benchmark_prices_available else "INSUFFICIENT",
+            "required_profile_gates": required,
+            "failed_required_gates": failed,
+        }
+    reasons = []
+    reason_map = {
+        "pit_universe_coverage_sufficient": "NO_SUFFICIENT_DATED_PIT_HISTORICAL_UNIVERSE",
+        "survivorship_distortion_materially_reduced": "SURVIVORSHIP_DISTORTION_NOT_MATERIALLY_REDUCED",
+        "identity_history_sufficient": "HISTORICAL_IDENTITY_COVERAGE_INSUFFICIENT",
+        "execution_cost_coverage_sufficient": "EXECUTION_COST_COVERAGE_INSUFFICIENT_FOR_PERIOD",
+        "benchmark_prices_available": "BENCHMARK_PRICE_COVERAGE_INSUFFICIENT",
+        "features_pit_safe": "FEATURE_PIT_SAFETY_NOT_ESTABLISHED",
+        "calibration_and_challenger_governance_ready": "CALIBRATION_OR_CHALLENGER_GOVERNANCE_NOT_READY",
+        "index_membership_available_when_required": "HISTORICAL_INDEX_MEMBERSHIP_REQUIRED_BUT_UNAVAILABLE",
+        "historical_sector_available_when_required": "HISTORICAL_SECTOR_EVIDENCE_REQUIRED_BUT_UNAVAILABLE",
+    }
+    if not ready:
+        reasons.append("NO_APPROVED_ADVANCED_RESEARCH_PERIOD")
+    reasons.extend(reason_map[name] for name in failed)
+    if not fully_eligible_years:
+        reasons.append("NO_FULLY_RESEARCH_ELIGIBLE_YEARS")
+
+    return record("ADVANCED_RESEARCH_READINESS_V2", {
+        "status": "READY_WITH_RESTRICTED_PERIOD" if ready else "NOT_READY",
+        "research_profile": {
+            "profile_id": "CROSS_SECTIONAL_STOCK_SELECTION",
+            "universe_definition": universe_definition,
+            "requires_historical_index_membership": requires_index,
+            "requires_historical_sector": requires_sector,
+        },
+        "candidate_evidence_years": candidate_years,
+        "partial_snapshot_years": partial_years,
+        "fully_research_eligible_years": fully_eligible_years,
+        "proposed_research_period": period_evidence,
+        "recommended_safe_research_period": period_descriptor if ready else None,
+        "gates": gates, "required_gates": required, "failed_required_gates": failed,
+        "reasons": sorted(set(reasons)), "training_started": False,
+        "challenger_trained": False, "model_promoted": False,
+        "authority_scope": AUTHORITY, "trading_authority": False, "ml_authority": "NONE",
+    })

@@ -15,6 +15,7 @@ from .evidence import (
     build_execution_coverage_matrix,
     build_pit_coverage_audit,
     advanced_research_readiness,
+    advanced_research_readiness_v2,
 )
 
 __all__ = [name for name in globals() if not name.startswith("_")]

@@ -12,7 +12,7 @@ sys.path.insert(0, str(ROOT))
 from common import file_sha256, load_json, record
 from real_data_foundation import parse_nse_security_master, parse_nse_delistings_xlsx
 from historical_evidence import (
-    advanced_research_readiness, build_execution_coverage_matrix,
+    advanced_research_readiness, advanced_research_readiness_v2, build_execution_coverage_matrix,
     build_pit_coverage_audit, load_historical_cost_book, parse_index_change_events,
 )
 
@@ -54,10 +54,19 @@ audit = build_pit_coverage_audit(
 readiness = advanced_research_readiness(
     audit, matrix, leakage_safe=False, governance_ready=True, benchmark_prices_available=True
 )
+readiness_v2 = advanced_research_readiness_v2(
+    audit, matrix,
+    research_profile={"profile_id":"CROSS_SECTIONAL_STOCK_SELECTION", "universe_definition":"EXCHANGE_WIDE_PIT", "requires_historical_sector":False},
+    proposed_period={"start_date":"2026-01-01", "end_date":"2026-10-03"},
+    features_pit_safe=False, governance_ready=True, benchmark_prices_available=True,
+    identity_history_sufficient=False, survivorship_distortion_materially_reduced=False,
+    index_membership_available=False, historical_sector_available=False,
+)
 
 write(ROOT / "results/execution_cost_coverage_matrix_v1.json", matrix)
 write(ROOT / "results/pit_universe_coverage_audit_v1.json", audit)
 write(ROOT / "results/advanced_research_readiness_v1.json", readiness)
+write(ROOT / "results/advanced_research_readiness_v2.json", readiness_v2)
 
 manifest = record("NEXTGEN_HISTORICAL_EVIDENCE_MANIFEST_V1", {
     "parent_commit": "354eb36e3383e5de303b1189e01313c7336657f0",
@@ -71,10 +80,11 @@ manifest = record("NEXTGEN_HISTORICAL_EVIDENCE_MANIFEST_V1", {
         "execution_coverage": file_sha256(ROOT / "results/execution_cost_coverage_matrix_v1.json"),
         "pit_coverage": file_sha256(ROOT / "results/pit_universe_coverage_audit_v1.json"),
         "readiness": file_sha256(ROOT / "results/advanced_research_readiness_v1.json"),
+        "readiness_v2": file_sha256(ROOT / "results/advanced_research_readiness_v2.json"),
     },
     "fixture_only_tests": True, "network_calls_in_tests": 0, "live_connectors": 0,
     "active_lane_changed_files": 0, "authority_scope": "RESEARCH_ONLY",
     "model_training": False, "trading_authority": False, "ml_authority": "NONE",
 })
 write(ROOT / "historical_evidence_manifest_v1.json", manifest)
-print(json.dumps({"securities": len(securities), "delistings": len(delistings), "index_events": len(index_events), "readiness": readiness["status"]}, sort_keys=True))
+print(json.dumps({"securities": len(securities), "delistings": len(delistings), "index_events": len(index_events), "readiness_v1": readiness["status"], "readiness_v2": readiness_v2["status"]}, sort_keys=True))
