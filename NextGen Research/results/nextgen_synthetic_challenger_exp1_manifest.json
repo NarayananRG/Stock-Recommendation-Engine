@@ -1,0 +1,303 @@
+{
+  "artifact_type": "NEXTGEN_SYNTHETIC_CHALLENGER_EXPERIMENT_MANIFEST_V1",
+  "authority": "SHADOW_ONLY_SYNTHETIC_RESEARCH",
+  "classification": "SYNTHETIC_PIPELINE_VALIDATED_WITH_LIMITATIONS",
+  "code_identity": "NEXTGEN_SIMPLE_CHALLENGER_SYNTHETIC_EXP1",
+  "dataset_hashes": [
+    {
+      "dataset_hash": "7cd79c034d95488c9e71ef44b957409c8052c626d686148fd34a6b25cea9f7d5",
+      "rows": 2700,
+      "scenario": "ADVERSARIAL_DECEPTIVE",
+      "seed": 11
+    },
+    {
+      "dataset_hash": "c45f1fa303b2ea41cacf911fff82609aebc62e6dd9472aea62e45a2b78cd9a15",
+      "rows": 2700,
+      "scenario": "ADVERSARIAL_DECEPTIVE",
+      "seed": 29
+    },
+    {
+      "dataset_hash": "c3d5454c1deb2c50e05b73eac1745cbb1258e4db4127b95917cd6781040fc749",
+      "rows": 2700,
+      "scenario": "ADVERSARIAL_DECEPTIVE",
+      "seed": 47
+    },
+    {
+      "dataset_hash": "2e05d157ae540f9856a2f74a5170e49a20037caf9089c3b14c24855cf99b1adb",
+      "rows": 2700,
+      "scenario": "ADVERSARIAL_DECEPTIVE",
+      "seed": 83
+    },
+    {
+      "dataset_hash": "f63d08cca90d5fb5bd4c8265a65830423a7331b4af3a52cbdea4019d3689fe03",
+      "rows": 2700,
+      "scenario": "ADVERSARIAL_DECEPTIVE",
+      "seed": 101
+    },
+    {
+      "dataset_hash": "dd656761ac17a4d40a43cfdd33c50c653f855f25e69c973c0cab250a4b1f1125",
+      "rows": 2700,
+      "scenario": "NOISY_WEAK_SIGNAL",
+      "seed": 11
+    },
+    {
+      "dataset_hash": "1ffbcc2655339fb86256cdcc75115bb434bfa7ed3abee6f67f42528468537ac6",
+      "rows": 2700,
+      "scenario": "NOISY_WEAK_SIGNAL",
+      "seed": 29
+    },
+    {
+      "dataset_hash": "3f09e0421d2859d4b6ca0771d55926660ec816faee51f32578c5164d25549db1",
+      "rows": 2700,
+      "scenario": "NOISY_WEAK_SIGNAL",
+      "seed": 47
+    },
+    {
+      "dataset_hash": "dd8a7791db19c99cb8584d4046b25051193cf0b4777f049ce1f0e7ccc56e239f",
+      "rows": 2700,
+      "scenario": "NOISY_WEAK_SIGNAL",
+      "seed": 83
+    },
+    {
+      "dataset_hash": "bc00de3ae6a3399cb14e744ec09332c3a38bad15a5563a133c8797aa45ac533f",
+      "rows": 2700,
+      "scenario": "NOISY_WEAK_SIGNAL",
+      "seed": 101
+    },
+    {
+      "dataset_hash": "f468f1e60f8d73661fa3290ac23fbb46d4d28cef97b27cb9a8b7ca0986514738",
+      "rows": 2700,
+      "scenario": "NONLINEAR_SIGNAL",
+      "seed": 11
+    },
+    {
+      "dataset_hash": "7a8fa629b3d370656c8db650ea1725ff1f6dd860326121cfe9779e911d17d7ae",
+      "rows": 2700,
+      "scenario": "NONLINEAR_SIGNAL",
+      "seed": 29
+    },
+    {
+      "dataset_hash": "ee84157a92a85fc2a8fe0aa9ef18fe1eafc9d6718c312db0c661f4c80bc7c7e3",
+      "rows": 2700,
+      "scenario": "NONLINEAR_SIGNAL",
+      "seed": 47
+    },
+    {
+      "dataset_hash": "176d02d5f53fddfb2aedb391622ea3237fa159d674502e46d61e76e9df5ab32d",
+      "rows": 2700,
+      "scenario": "NONLINEAR_SIGNAL",
+      "seed": 83
+    },
+    {
+      "dataset_hash": "20bf2f1b52eececfd656965679038e724cf909285e8000096e23ae00397e9eef",
+      "rows": 2700,
+      "scenario": "NONLINEAR_SIGNAL",
+      "seed": 101
+    },
+    {
+      "dataset_hash": "29250618c2796c3df14449e8f01454ac12ae0390d88d4624437cf2008d9c7b9b",
+      "rows": 2700,
+      "scenario": "NULL_NO_SIGNAL",
+      "seed": 11
+    },
+    {
+      "dataset_hash": "a386f44071c017d18b3191bd559f081d230c648a056d9f1954b0fe8fb32d7f4b",
+      "rows": 2700,
+      "scenario": "NULL_NO_SIGNAL",
+      "seed": 29
+    },
+    {
+      "dataset_hash": "91cf9ec7adff3bf3b31fa48df9614f57d3b3dcc44f66a726cbd5cdba1a390bef",
+      "rows": 2700,
+      "scenario": "NULL_NO_SIGNAL",
+      "seed": 47
+    },
+    {
+      "dataset_hash": "65742085b80cc9ec0ad3d4357d4b060af635818bd0b9d14db4b2f5b5d390d351",
+      "rows": 2700,
+      "scenario": "NULL_NO_SIGNAL",
+      "seed": 83
+    },
+    {
+      "dataset_hash": "7aa4510f9d2b699b1b75d650ae828060d2b694ed047675c8c0d86d001496c694",
+      "rows": 2700,
+      "scenario": "NULL_NO_SIGNAL",
+      "seed": 101
+    },
+    {
+      "dataset_hash": "836111411284fba0085f510075e2943b821c68523121a4af71df560f22907eee",
+      "rows": 2700,
+      "scenario": "REGIME_SHIFT",
+      "seed": 11
+    },
+    {
+      "dataset_hash": "007b81ff3285f6127d3a065c1b77676eb46d4c0737c11db8a0b9c097a14b1ca9",
+      "rows": 2700,
+      "scenario": "REGIME_SHIFT",
+      "seed": 29
+    },
+    {
+      "dataset_hash": "32a4296a07b7dbdaf4fc2ce7df19898fef21e350b5fc1a13cb0d9382039c2cc9",
+      "rows": 2700,
+      "scenario": "REGIME_SHIFT",
+      "seed": 47
+    },
+    {
+      "dataset_hash": "df6deb6735f15fd3dc38cfb8b2f33d8538e5b939a1c9d82b5ba0555f94580ecf",
+      "rows": 2700,
+      "scenario": "REGIME_SHIFT",
+      "seed": 83
+    },
+    {
+      "dataset_hash": "80c472a18140a71e2cd6b534d1332e3d89e67f810af12873586f48796bc6537b",
+      "rows": 2700,
+      "scenario": "REGIME_SHIFT",
+      "seed": 101
+    },
+    {
+      "dataset_hash": "5d3b4813fe39fa9621c8980574e426afd0d016622b3aef93767df37117e26445",
+      "rows": 2700,
+      "scenario": "SIMPLE_LINEAR_SIGNAL",
+      "seed": 11
+    },
+    {
+      "dataset_hash": "1cc100385eb6f90dce94f843ae6fd5e1d79e544445a40d13a52c62dfb1857db5",
+      "rows": 2700,
+      "scenario": "SIMPLE_LINEAR_SIGNAL",
+      "seed": 29
+    },
+    {
+      "dataset_hash": "81ce1ecf0d1d01267150d828b2c883b6b14d16ff4290f35525d7d94a2e254736",
+      "rows": 2700,
+      "scenario": "SIMPLE_LINEAR_SIGNAL",
+      "seed": 47
+    },
+    {
+      "dataset_hash": "930a461bbceb353c65be53e7ad8224e4664f636514beca4ab5dff8a6d1c28cc7",
+      "rows": 2700,
+      "scenario": "SIMPLE_LINEAR_SIGNAL",
+      "seed": 83
+    },
+    {
+      "dataset_hash": "f1c744ff2c931bae05dcc3db80d4cdcb1b1eebc0e934d8aead0057882debf2eb",
+      "rows": 2700,
+      "scenario": "SIMPLE_LINEAR_SIGNAL",
+      "seed": 101
+    }
+  ],
+  "evaluation_configuration": {
+    "final_test_confirmatory": true,
+    "hyperparameter_search": false,
+    "top_k": [
+      5,
+      10,
+      20,
+      0.1
+    ]
+  },
+  "experiment_config_hash": "68bf5571b15ae4d7930a79d1ab17fd4249974e090a4d133b80235fb2850cd594",
+  "experiment_contract": "NEXTGEN_SYNTHETIC_CHALLENGER_EXPERIMENT_V1",
+  "experiment_id": "NEXTGEN_SYNTHETIC_CHALLENGER_EXP1_68BF5571B15AE4D7",
+  "experiment_manifest_hash": "5047d4d1e37db49338aaba95d1af821a8985a7cb29d0b4cbd4cb7a25ff0bfa7b",
+  "feature_contract_hash": "99152948fcbf59e7fb69aef3b2517091bbc3ec7efb82704bc552ff34fa5c7dd8",
+  "generator_configuration_hash": "cc026034203601bdcca231cf92c78c1b50c6f874fa8704de2c0f15cce69d5484",
+  "generator_identity": "DETERMINISTIC_SYNTHETIC_V1",
+  "label_contract_hash": "20229152352089745d1f69a7b58324a2f77ff150d349a0da9e49955b24954078",
+  "metric_definitions": [
+    "ROC_AUC",
+    "PR_AUC",
+    "BRIER",
+    "BRIER_SKILL",
+    "IC",
+    "RANK_IC",
+    "PRECISION_AT_K",
+    "SYNTHETIC_TOP_K_RETURNS"
+  ],
+  "model_configurations": {
+    "DETERMINISTIC_REFERENCE": {
+      "configuration": {},
+      "seed_offset": 0
+    },
+    "GRADIENT_BOOSTING": {
+      "configuration": {
+        "learning_rate": 0.25,
+        "rounds": 8
+      },
+      "seed_offset": 3000
+    },
+    "LOGISTIC_REGRESSION": {
+      "configuration": {
+        "iterations": 180,
+        "learning_rate": 0.08
+      },
+      "seed_offset": 1000
+    },
+    "RANDOM_FOREST": {
+      "configuration": {
+        "trees": 9
+      },
+      "seed_offset": 2000
+    }
+  },
+  "random_seeds": [
+    11,
+    29,
+    47,
+    83,
+    101
+  ],
+  "ranking_definitions": {
+    "tie_break": [
+      "MODEL_SCORE_DESC",
+      "SECURITY_ID_ASC"
+    ],
+    "top_k": [
+      5,
+      10,
+      20,
+      0.1
+    ]
+  },
+  "real_data_training": "BLOCKED",
+  "result_artifact_hashes": {
+    "ablation": "ab7084c29ab26d450b8545b604816b99a2171b434800f2fa1aaef371de096b0d",
+    "run_results": "6de20c7ea2843966c5d65452f3296c895e9a7b5b4088d0d4f3a90c22fee4a6ca",
+    "summary": "0794e01df2a2ff962dbbf472963303ab13cef6c306ba7777df2925ee7bc00916"
+  },
+  "rights_state": "LICENSE_REQUIRED",
+  "scenario_definitions": [
+    {
+      "description": "Features contain no true predictive relation to future synthetic outcomes.",
+      "scenario_id": "NULL_NO_SIGNAL",
+      "synthetic_only": true
+    },
+    {
+      "description": "Technical and momentum features carry a controlled linear signal.",
+      "scenario_id": "SIMPLE_LINEAR_SIGNAL",
+      "synthetic_only": true
+    },
+    {
+      "description": "Synthetic outcome depends on feature interactions and nonlinear thresholds.",
+      "scenario_id": "NONLINEAR_SIGNAL",
+      "synthetic_only": true
+    },
+    {
+      "description": "The sign and strength of the feature/outcome relation changes over time.",
+      "scenario_id": "REGIME_SHIFT",
+      "synthetic_only": true
+    },
+    {
+      "description": "A weak signal is present but dominated by synthetic noise.",
+      "scenario_id": "NOISY_WEAK_SIGNAL",
+      "synthetic_only": true
+    },
+    {
+      "description": "Development-period correlation does not persist in final evaluation.",
+      "scenario_id": "ADVERSARIAL_DECEPTIVE",
+      "synthetic_only": true
+    }
+  ],
+  "split_contract_hash": "b7fa9776df3ed32e3cf62cca7040c4390613c3da40f9f528da16dfef51d2246a",
+  "synthetic_only": true,
+  "timestamp_utc": "2026-10-05T00:00:00Z"
+}
