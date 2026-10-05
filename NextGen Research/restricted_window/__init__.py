@@ -15,3 +15,15 @@ from .core import (  # noqa: F401
     split_or_bonus_factor,
     tracked_runtime_artifacts,
 )
+from .closure import (  # noqa: F401
+    CONTINUITY_STATES,
+    RIGHTS_STATES,
+    SECURITY_STATES,
+    action_continuity,
+    action_safe_for_feature,
+    decision_v3,
+    feature_eligibility,
+    in_period,
+    readiness_v6,
+    security_state,
+)
