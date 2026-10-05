@@ -1,0 +1,21 @@
+{
+  "artifact_type": "BENCHMARK_DATA_USAGE_RIGHTS_V1",
+  "authority": "SHADOW_ONLY",
+  "series": {
+    "NIFTY_50": {
+      "classification": "LICENSE_REQUIRED",
+      "sessions": 497
+    },
+    "NIFTY_500": {
+      "classification": "LICENSE_REQUIRED",
+      "sessions": 497
+    }
+  },
+  "source": {
+    "sha256": "86cb98760e289034b64b917881a3bd9cdaae65071dfc64dfa0422055b1f66cbc",
+    "url": "https://www.niftyindices.com/offerings/data-subscription"
+  },
+  "status": "LICENSE_REQUIRED",
+  "stock_data_policy_not_reused_for_benchmark": true,
+  "training_gate_ready": false
+}

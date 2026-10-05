@@ -1,0 +1,45 @@
+{
+  "artifact_sha256": "7be48a112cb988d71e4c26015dbf61fab77aa1493cbf5bcb6355905d528e065e",
+  "artifact_type": "NIFTY500_LIFECYCLE_SIEMENS_ENERGY_V1",
+  "authority": "SHADOW_ONLY",
+  "dummy": {
+    "classification": "INDEX_ACCOUNTING_PLACEHOLDER_NONTRADABLE",
+    "effective_from": "2025-04-07",
+    "effective_to": "2025-06-18",
+    "symbol": "DUMMYSIEMS"
+  },
+  "predecessor": {
+    "isin": "INE003A01024",
+    "legal_name": "Siemens Ltd.",
+    "symbol": "SIEMENS"
+  },
+  "regular_nifty500_reentry_effective": "2025-09-30",
+  "sources": [
+    {
+      "publisher": "NSE_INDICES_OR_NSE",
+      "purpose": "TEMP-SIEMENS-ENERGY-ADD",
+      "sha256": "4c3f4315e94ddb8919bb947bd06c858244256f66e39e264b655b0a08f78ab99b",
+      "url": "https://www.niftyindices.com/Press_Release/ind_prs02042025.pdf"
+    },
+    {
+      "publisher": "NSE_INDICES_OR_NSE",
+      "purpose": "SIEMENS_ABLBL_EXIT",
+      "sha256": "dd21c18f5dfcc014cd045c6a574097a8d5cf3f0ef076005bc67f18bab65c883f",
+      "url": "https://www.niftyindices.com/Press_Release/ind_prs25062025_2.pdf"
+    },
+    {
+      "publisher": "NSE_INDICES_OR_NSE",
+      "purpose": "2025_SEPTEMBER_REGULAR_REVIEW",
+      "sha256": "731113af85aad6b54cce359d5465d84e6062b28b03c21cd9922a20a3f44d2de1",
+      "url": "https://www.niftyindices.com/Press_Release/ind_prs22082025.pdf"
+    }
+  ],
+  "status": "RESOLVED",
+  "successor": {
+    "isin": "INE1NPP01017",
+    "legal_name": "Siemens Energy India Ltd.",
+    "listing_date": "2025-06-19",
+    "symbol": "ENRIN"
+  },
+  "temporary_index_exit_effective": "2025-06-27"
+}

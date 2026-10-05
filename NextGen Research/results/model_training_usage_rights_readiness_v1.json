@@ -1,0 +1,10 @@
+{
+  "artifact_type": "MODEL_TRAINING_USAGE_RIGHTS_READINESS_V1",
+  "authority": "SHADOW_ONLY",
+  "benchmark": "LICENSE_REQUIRED",
+  "legal_advice": false,
+  "market_panel": "PERMISSION_REQUIRED",
+  "mcp_rows": 0,
+  "ready": false,
+  "status": "LICENSE_REQUIRED"
+}

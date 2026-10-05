@@ -1,0 +1,32 @@
+{
+  "active_lane_changed_files": 0,
+  "artifact_type": "NEXTGEN_RESTRICTED_CLOSURE_CONTRACT_V1",
+  "authority": "SHADOW_ONLY",
+  "baseline": "19c5d0823c30947c5fdeec3bba4e7738cd343436",
+  "branch": "nextgen-research-restricted-window-closure",
+  "decision_v3": "LICENSE_REQUIRED_FOR_MODEL_TRAINING",
+  "focused_tests": {
+    "failed": 0,
+    "passed": 140,
+    "status": "PASS"
+  },
+  "focused_tests_expected_minimum": 77,
+  "model_promoted": false,
+  "model_training_started": false,
+  "paid_purchase_performed": false,
+  "raw_bulk_files_committed": 0,
+  "regressions": {
+    "authoritative_data": "83/83 PASS",
+    "free_reconstruction": "131/131 PASS",
+    "other_nextgen": "247/247 PASS",
+    "restricted_window": "128/128 PASS",
+    "stage5d": "606/606 PASS",
+    "stage6_0c": "PASS / 10 schemas",
+    "stage6_8c": "170/170 PASS"
+  },
+  "rights_status": "LICENSE_REQUIRED",
+  "tags_created": 0,
+  "technical_status": "TECHNICALLY_READY_WITH_RESTRICTED_PERIOD",
+  "trading_authority": false,
+  "v6_status": "TECHNICALLY_READY_RIGHTS_PENDING"
+}

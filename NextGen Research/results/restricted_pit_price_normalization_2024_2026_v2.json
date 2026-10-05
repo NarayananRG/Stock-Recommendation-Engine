@@ -1,0 +1,16 @@
+{
+  "artifact_type": "RESTRICTED_PIT_PRICE_NORMALIZATION_2024_2026_V2",
+  "authority": "SHADOW_ONLY",
+  "dividends_reinvested": false,
+  "end_date": "2026-10-01",
+  "feature_reset_actions": 21,
+  "future_action_use": "PROHIBITED",
+  "new_resulting_entities": 7,
+  "parent_demerger_policy": "FEATURE_HISTORY_RESET_REQUIRED",
+  "parsed_factor_actions": 55,
+  "resulting_entity_policy": "SECURITY_NEW_HISTORY_REQUIRED",
+  "return_profile": "PRICE_RETURN_ONLY",
+  "start_date": "2024-10-01",
+  "status": "COMPLETE_PIT_SAFE_WITH_RESETS",
+  "unresolved_blocking_actions": 0
+}

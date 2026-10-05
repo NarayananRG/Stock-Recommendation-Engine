@@ -1,0 +1,39 @@
+{
+  "artifact_type": "ADVANCED_RESEARCH_READINESS_V6",
+  "authority": "SHADOW_ONLY",
+  "challenger_trained": false,
+  "failed_technical_gates": [],
+  "ml_authority": "NONE",
+  "model_promoted": false,
+  "model_training_usage_rights_gate": false,
+  "model_training_usage_rights_status": "LICENSE_REQUIRED",
+  "preserved_readiness_hashes": {
+    "v1": "70b603aecd427e9947d4fbf4a68b9eb6f32ff2c1151a930049300d343c5ba6b4",
+    "v2": "7ec465cdf4178593d48dc7b89b690b581cd31ce97f06b505c04158da0244b1fb",
+    "v3": "67cf2cafee7d7beab308440f8bc4b9c6d1df85bd8608d9b540074211a600ce74",
+    "v4": "f85e4af7ee5ab832da15a3be1b356c659e5cbe0adac3dfd4b2fc5d36205b7b57",
+    "v5": "fc67f9d02804a3cc1bdfb04237ad37fdfe4229c4850f980eb22317bbd2f51b49"
+  },
+  "profile": "FREE_OFFICIAL_RESTRICTED_NIFTY500_PIT",
+  "restricted_period": {
+    "duration_months": 24.0,
+    "end_date": "2026-10-01",
+    "start_date": "2024-10-01",
+    "trading_sessions": 497
+  },
+  "status": "TECHNICALLY_READY_RIGHTS_PENDING",
+  "technical_gates": {
+    "benchmark": true,
+    "constituent_reconstruction": true,
+    "execution_costs": true,
+    "features": true,
+    "governance": true,
+    "identity": true,
+    "investable_universe": true,
+    "market_data": true,
+    "price_normalization": true,
+    "survivorship": true
+  },
+  "trading_authority": false,
+  "training_started": false
+}

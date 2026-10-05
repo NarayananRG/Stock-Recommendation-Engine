@@ -1,0 +1,46 @@
+{
+  "artifact_sha256": "93985ecebba69393f9400c2fc1dd266646816e24258ef4a66090638bfb2a7d7d",
+  "artifact_type": "NIFTY500_LIFECYCLE_ABLBL_V1",
+  "authority": "SHADOW_ONLY",
+  "dummy": {
+    "classification": "INDEX_ACCOUNTING_PLACEHOLDER_NONTRADABLE",
+    "effective_from": "2025-05-22",
+    "effective_to": "2025-06-22",
+    "symbol": "DUMMYABFRL"
+  },
+  "predecessor": {
+    "isin": "INE647O01011",
+    "legal_name": "Aditya Birla Fashion and Retail Ltd.",
+    "symbol": "ABFRL"
+  },
+  "regular_nifty500_inclusion_effective": "2025-09-30",
+  "sources": [
+    {
+      "publisher": "NSE_INDICES_OR_NSE",
+      "purpose": "TEMP-ABFRL-ADD",
+      "sha256": "801f434cfb152028915b491124d60308e6533a9c7f3862f7009d88b5d36dc61a",
+      "url": "https://www.niftyindices.com/Press_Release/ind_prs19052025.pdf"
+    },
+    {
+      "publisher": "NSE_INDICES_OR_NSE",
+      "purpose": "SIEMENS_ABLBL_EXIT",
+      "sha256": "dd21c18f5dfcc014cd045c6a574097a8d5cf3f0ef076005bc67f18bab65c883f",
+      "url": "https://www.niftyindices.com/Press_Release/ind_prs25062025_2.pdf"
+    },
+    {
+      "publisher": "NSE_INDICES_OR_NSE",
+      "purpose": "2025_SEPTEMBER_REGULAR_REVIEW",
+      "sha256": "731113af85aad6b54cce359d5465d84e6062b28b03c21cd9922a20a3f44d2de1",
+      "url": "https://www.niftyindices.com/Press_Release/ind_prs22082025.pdf"
+    }
+  ],
+  "status": "RESOLVED",
+  "successor": {
+    "isin": "INE14LE01019",
+    "legal_name": "Aditya Birla Lifestyle Brands Ltd.",
+    "listing_date": "2025-06-23",
+    "record_date": "2025-05-22",
+    "symbol": "ABLBL"
+  },
+  "temporary_index_exit_effective": "2025-06-27"
+}
