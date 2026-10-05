@@ -1,0 +1,21 @@
+{
+  "ablations": [
+    "TECHNICAL",
+    "TECHNICAL_MOMENTUM",
+    "TECHNICAL_MOMENTUM_VOLATILITY",
+    "PLUS_LIQUIDITY",
+    "PLUS_MARKET_CONTEXT"
+  ],
+  "artifact_type": "NEXTGEN_ABLATION_FRAMEWORK_V1",
+  "authority": "RESEARCH_ONLY",
+  "automatic_feature_acceptance": false,
+  "incremental_metrics": [
+    "IC",
+    "RANK_IC",
+    "TOP_K_RELATIVE_RETURN",
+    "NET_RETURN",
+    "TURNOVER",
+    "DRAWDOWN",
+    "BRIER"
+  ]
+}

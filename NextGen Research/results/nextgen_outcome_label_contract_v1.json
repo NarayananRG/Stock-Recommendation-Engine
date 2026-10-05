@@ -1,0 +1,18 @@
+{
+  "artifact_type": "NEXTGEN_OUTCOME_LABEL_CONTRACT_V1",
+  "authority": "RESEARCH_ONLY",
+  "future_label_use": "PROHIBITED",
+  "horizons": [
+    5,
+    20,
+    60
+  ],
+  "labels": [
+    "ABSOLUTE_RETURN",
+    "BENCHMARK_RELATIVE_RETURN",
+    "POSITIVE_RELATIVE_OUTCOME",
+    "RANKING_TARGET"
+  ],
+  "maturity_rule": "COMPLETE_OUTCOME_HORIZON_REQUIRED",
+  "return_profile": "PRICE_RETURN_ONLY"
+}

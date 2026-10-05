@@ -1,0 +1,11 @@
+{
+  "artifact_type": "NEXTGEN_LARGE_ARTIFACT_POLICY_V1",
+  "authority": "RESEARCH_ONLY",
+  "committed": [
+    "MANIFEST",
+    "SHA256",
+    "COMPACT_SUMMARY"
+  ],
+  "existing_immutable_artifacts_rewritten": false,
+  "future_row_level_storage": "GITIGNORED_CONTENT_ADDRESSED"
+}

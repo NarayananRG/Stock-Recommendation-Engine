@@ -1,0 +1,17 @@
+{
+  "authority": "RESEARCH_ONLY",
+  "benchmark_relative_return": 0.027999999999999997,
+  "expectancy": 0.012333333333333333,
+  "gross_return": 0.04,
+  "identical_assumptions_required": true,
+  "maximum_drawdown": -0.011,
+  "net_return": 0.037,
+  "number_of_positions": 15,
+  "profit_factor": 4.363636363636364,
+  "rejected_untradeable_selections": 3,
+  "schema": "NEXTGEN_ECONOMIC_EVALUATION_V1",
+  "synthetic_execution_fixture_only": true,
+  "transaction_costs": 0.003,
+  "turnover": 1.2,
+  "win_rate": 0.6666666666666666
+}

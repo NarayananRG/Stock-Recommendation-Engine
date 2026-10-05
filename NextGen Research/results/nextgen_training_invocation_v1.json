@@ -1,0 +1,16 @@
+{
+  "artifact_type": "NEXTGEN_TRAINING_INVOCATION_V1",
+  "authority": "RESEARCH_ONLY",
+  "fields": [
+    "dataset_id",
+    "dataset_classification",
+    "model_family",
+    "rights_gate_state",
+    "allowed",
+    "reason",
+    "timestamp",
+    "code_version"
+  ],
+  "production_runtime_artifact": false,
+  "storage": "APPEND_ONLY_TEMPORARY_RESEARCH_STORE"
+}

@@ -1,0 +1,100 @@
+{
+  "artifact_type": "NEXTGEN_CHALLENGER_COMPARISON_V1",
+  "authority": "RESEARCH_ONLY",
+  "automatic_winner_selection": false,
+  "identical_assumptions": true,
+  "models": [
+    {
+      "automatic_winner": false,
+      "calibration_state": "UNCALIBRATED_MODEL_SCORE",
+      "classification": {
+        "baseline_brier": 0.24995177469135804,
+        "brier": 0.04896643593975757,
+        "brier_skill": 0.8040964662074449,
+        "calibration_state": "UNCALIBRATED_MODEL_SCORE",
+        "pr_auc": 0.9619941736968083,
+        "roc_auc": 0.9754968165155316
+      },
+      "family": "DETERMINISTIC_REFERENCE",
+      "model_id": "reference-v1",
+      "ranking": {
+        "hit_rate": 1.0,
+        "ic": 0.8988482288639853,
+        "mean_rank_spread": 0.03271593960862935,
+        "precision_at_k": 1.0,
+        "rank_ic": 0.871304347826087,
+        "top_k_mean_return": 0.016895838997528882,
+        "top_k_relative_return": 0.017406921201582548
+      }
+    },
+    {
+      "automatic_winner": false,
+      "calibration_state": "UNCALIBRATED_MODEL_SCORE",
+      "classification": {
+        "baseline_brier": 0.24995177469135804,
+        "brier": 0.06372201012495632,
+        "brier_skill": 0.7450627817960459,
+        "calibration_state": "UNCALIBRATED_MODEL_SCORE",
+        "pr_auc": 0.9818485159874785,
+        "roc_auc": 0.9832143546208759
+      },
+      "family": "LOGISTIC_REGRESSION",
+      "model_id": "logistic-v1",
+      "ranking": {
+        "hit_rate": 1.0,
+        "ic": 0.9085611296074624,
+        "mean_rank_spread": 0.03059887888575162,
+        "precision_at_k": 1.0,
+        "rank_ic": 0.8939130434782608,
+        "top_k_mean_return": 0.01477877827465116,
+        "top_k_relative_return": 0.015289860478704823
+      }
+    },
+    {
+      "automatic_winner": false,
+      "calibration_state": "UNCALIBRATED_MODEL_SCORE",
+      "classification": {
+        "baseline_brier": 0.24995177469135804,
+        "brier": 0.09089236248156536,
+        "brier_skill": 0.636360403546645,
+        "calibration_state": "UNCALIBRATED_MODEL_SCORE",
+        "pr_auc": 0.9427658328029959,
+        "roc_auc": 0.9661393015628015
+      },
+      "family": "RANDOM_FOREST",
+      "model_id": "rf-v1",
+      "ranking": {
+        "hit_rate": 1.0,
+        "ic": 0.8820684430355438,
+        "mean_rank_spread": 0.029065723455606096,
+        "precision_at_k": 1.0,
+        "rank_ic": 0.8653285321964514,
+        "top_k_mean_return": 0.01249604692007367,
+        "top_k_relative_return": 0.013007129124127334
+      }
+    },
+    {
+      "automatic_winner": false,
+      "calibration_state": "UNCALIBRATED_MODEL_SCORE",
+      "classification": {
+        "baseline_brier": 0.24995177469135804,
+        "brier": 0.08672854939903608,
+        "brier_skill": 0.6530188693153749,
+        "calibration_state": "UNCALIBRATED_MODEL_SCORE",
+        "pr_auc": 0.885107565026317,
+        "roc_auc": 0.9370055952151264
+      },
+      "family": "GRADIENT_BOOSTING",
+      "model_id": "gb-v1",
+      "ranking": {
+        "hit_rate": 0.8,
+        "ic": 0.846474368876064,
+        "mean_rank_spread": 0.016688961337602837,
+        "precision_at_k": 0.8,
+        "rank_ic": 0.8275214377942854,
+        "top_k_mean_return": 0.00586256694104215,
+        "top_k_relative_return": 0.006373649145095812
+      }
+    }
+  ]
+}
