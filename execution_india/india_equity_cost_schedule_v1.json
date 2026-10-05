@@ -1,0 +1,18 @@
+{
+  "artifact_id": "INDIA_EQUITY_COST_SCHEDULE_V1",
+  "verification_state": "VERIFIED",
+  "effective_from": "2024-10-01",
+  "effective_to": null,
+  "market": "NSE_CASH_EQUITY_DELIVERY_RESEARCH",
+  "components": [
+    {"component":"NSE_EXCHANGE_TRANSACTION_CHARGE","cost_class":"MARKET_STATUTORY_COST","sides":["BUY","SELL"],"rate_bps":"0.297","calculation_base":"GROSS_TRADED_VALUE","gst_taxable":true,"rounding_unit":"0.01","source_authority":"NSE","source_reference":"https://nsearchives.nseindia.com/content/circulars/FA64232.pdf","source_publication_date":"2024-09-27"},
+    {"component":"SEBI_TURNOVER_FEE","cost_class":"MARKET_STATUTORY_COST","sides":["BUY","SELL"],"rate_bps":"0.01","calculation_base":"GROSS_TRADED_VALUE","gst_taxable":true,"rounding_unit":"0.01","source_authority":"NSE/SEBI","source_reference":"https://www.nseindia.com/static/invest/first-time-investor-sebi-turnover-fees-stt-other-levies","source_publication_date":"2026-04-17"},
+    {"component":"STT_DELIVERY","cost_class":"MARKET_STATUTORY_COST","sides":["BUY","SELL"],"rate_bps":"10","calculation_base":"GROSS_TRADED_VALUE","gst_taxable":false,"rounding_unit":"0.01","source_authority":"Income Tax Department/NSE","source_reference":"https://www.nseindia.com/static/invest/first-time-investor-sebi-turnover-fees-stt-other-levies","source_publication_date":"2026-04-17"},
+    {"component":"STAMP_DUTY_DELIVERY","cost_class":"MARKET_STATUTORY_COST","sides":["BUY"],"rate_bps":"1.5","calculation_base":"GROSS_TRADED_VALUE","gst_taxable":false,"rounding_unit":"0.01","source_authority":"NSE","source_reference":"https://www.nseindia.com/static/invest/first-time-investor-sebi-turnover-fees-stt-other-levies","source_publication_date":"2026-04-17"}
+  ],
+  "gst": {"rate_percent":"18","taxable_base_components":["BROKERAGE","NSE_EXCHANGE_TRANSACTION_CHARGE","SEBI_TURNOVER_FEE"],"base_limitation":"Broker invoice treatment must be verified before production use","source_authority":"NSE","source_reference":"https://www.nseindia.com/static/invest/first-time-investor-sebi-turnover-fees-stt-other-levies"},
+  "brokerage": {"cost_class":"BROKER_SPECIFIC_COST","default_bps":"0","configuration_required":true},
+  "rounding_limitation": "Component-specific statutory precision was not independently verified; research calculation rounds each component to INR 0.01.",
+  "retrieved_at": "2026-10-03T00:00:00Z",
+  "canonical_hash": "07a13200b53ec82a36d4a100bc8914789d3525539fb83762c5074d85cbe01afa"
+}
