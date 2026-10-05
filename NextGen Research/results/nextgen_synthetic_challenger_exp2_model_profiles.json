@@ -1,0 +1,75 @@
+{
+  "artifact_type": "NEXTGEN_SYNTHETIC_CHALLENGER_EXP2_MODEL_PROFILES_V1",
+  "experiment_id": "NEXTGEN_SYNTHETIC_CHALLENGER_EXP2_B652CEFAA6316720",
+  "profiles": {
+    "DETERMINISTIC_REFERENCE": {
+      "calibration_behavior": "not probability-calibrated",
+      "complexity_cost": "lowest",
+      "known_failure_modes": [
+        "misses nonlinear and drift-specific patterns"
+      ],
+      "ranking_behavior": "baseline ranking only",
+      "regime_behavior": "not adaptive",
+      "stability": "CONTROL",
+      "strengths": [
+        "transparent baseline"
+      ],
+      "weaknesses": [
+        "not a challenger"
+      ]
+    },
+    "GRADIENT_BOOSTING": {
+      "calibration_behavior": "ranking can exceed calibration quality",
+      "complexity_cost": "highest",
+      "known_failure_modes": [
+        "overconfident validation under spurious signals"
+      ],
+      "ranking_behavior": "best suited to nonlinear/interaction controls",
+      "regime_behavior": "can fail under structural breaks",
+      "selection": false,
+      "stability": "requires material advantage to justify",
+      "strengths": [
+        "strong nonlinear ranking candidate"
+      ],
+      "weaknesses": [
+        "highest complexity among allowed families"
+      ]
+    },
+    "LOGISTIC_REGRESSION": {
+      "calibration_behavior": "still uncalibrated research score",
+      "complexity_cost": "low",
+      "known_failure_modes": [
+        "interaction-heavy scenarios"
+      ],
+      "ranking_behavior": "strong for linear/relative signals",
+      "regime_behavior": "degrades under breaks",
+      "selection": true,
+      "stability": "preferred when similar to complex models",
+      "strengths": [
+        "least complex challenger",
+        "interpretable fixed configuration"
+      ],
+      "weaknesses": [
+        "limited nonlinear capacity"
+      ]
+    },
+    "RANDOM_FOREST": {
+      "calibration_behavior": "uncalibrated score",
+      "complexity_cost": "medium",
+      "known_failure_modes": [
+        "spurious development structure"
+      ],
+      "ranking_behavior": "useful in nonlinear controls",
+      "regime_behavior": "fixed model degrades under breaks",
+      "selection": false,
+      "stability": "seed-sensitive in low signal",
+      "strengths": [
+        "bounded nonlinear capacity"
+      ],
+      "weaknesses": [
+        "less transparent than logistic"
+      ]
+    }
+  },
+  "selected_family": "SIMPLE_CHALLENGER_LOGISTIC_PREFERRED"
+}

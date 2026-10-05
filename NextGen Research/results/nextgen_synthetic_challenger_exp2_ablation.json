@@ -1,0 +1,1631 @@
+{
+  "artifact_type": "NEXTGEN_SYNTHETIC_CHALLENGER_EXP2_ABLATION_V1",
+  "experiment_id": "NEXTGEN_SYNTHETIC_CHALLENGER_EXP2_B652CEFAA6316720",
+  "records": [
+    {
+      "full_top5": 0.009218632721216499,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.009218632721216499,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 11,
+      "signal_removed_top5": 0.009218632721216499
+    },
+    {
+      "full_top5": 0.009218632721216499,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.009218632721216499,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 11,
+      "signal_removed_top5": 0.009218632721216499
+    },
+    {
+      "full_top5": 0.009218632721216499,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.009218632721216499,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 11,
+      "signal_removed_top5": 0.009218632721216499
+    },
+    {
+      "full_top5": 0.06398223590858416,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.06436154412500203,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 29,
+      "signal_removed_top5": 0.06436154412500203
+    },
+    {
+      "full_top5": 0.058683395614343485,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.06320074180641627,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 29,
+      "signal_removed_top5": 0.05814067548747926
+    },
+    {
+      "full_top5": 0.06453121561621401,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.06453121561621401,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 29,
+      "signal_removed_top5": 0.06453121561621401
+    },
+    {
+      "full_top5": 0.05458763697287463,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.05458763697287463,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 47,
+      "signal_removed_top5": 0.05458763697287463
+    },
+    {
+      "full_top5": 0.053931904575629304,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.054459178850118785,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 47,
+      "signal_removed_top5": 0.05458763697287463
+    },
+    {
+      "full_top5": 0.053618108746670584,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.053618108746670584,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 47,
+      "signal_removed_top5": 0.053736159098461606
+    },
+    {
+      "full_top5": 0.05373225742852805,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.053582548125866804,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 83,
+      "signal_removed_top5": 0.053582548125866804
+    },
+    {
+      "full_top5": 0.05373225742852805,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.0532126965857744,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 83,
+      "signal_removed_top5": 0.051033050366022494
+    },
+    {
+      "full_top5": 0.0541451944798858,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.0541451944798858,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 83,
+      "signal_removed_top5": 0.05373225742852805
+    },
+    {
+      "full_top5": 0.06481792277083555,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.06538497568259653,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 101,
+      "signal_removed_top5": 0.06538497568259653
+    },
+    {
+      "full_top5": 0.06229160563912304,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.057586475129560576,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 101,
+      "signal_removed_top5": 0.06537315669019712
+    },
+    {
+      "full_top5": 0.06639862016973429,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.06639862016973429,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 101,
+      "signal_removed_top5": 0.06337058172230842
+    },
+    {
+      "full_top5": 0.06270949282077831,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.06270949282077831,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 131,
+      "signal_removed_top5": 0.06236426399211754
+    },
+    {
+      "full_top5": 0.061459638992081435,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.06195157442104877,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 131,
+      "signal_removed_top5": 0.06195157442104877
+    },
+    {
+      "full_top5": 0.06270949282077831,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.06270949282077831,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 131,
+      "signal_removed_top5": 0.06270949282077831
+    },
+    {
+      "full_top5": -0.005981059604982513,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": -0.006211455232640685,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 167,
+      "signal_removed_top5": -0.006211455232640685
+    },
+    {
+      "full_top5": -0.007348597880623954,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": -0.006066945662342903,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 167,
+      "signal_removed_top5": -0.0060500205100656535
+    },
+    {
+      "full_top5": -0.00875038818050229,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": -0.00832452052022785,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 167,
+      "signal_removed_top5": -0.008545803029311082
+    },
+    {
+      "full_top5": 0.023340632513103542,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.023340632513103542,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 211,
+      "signal_removed_top5": 0.023340632513103542
+    },
+    {
+      "full_top5": 0.023340632513103542,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.023340632513103542,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 211,
+      "signal_removed_top5": 0.023340632513103542
+    },
+    {
+      "full_top5": 0.023340632513103542,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.023340632513103542,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 211,
+      "signal_removed_top5": 0.023340632513103542
+    },
+    {
+      "full_top5": 0.058601337991093884,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.059705363772171414,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 257,
+      "signal_removed_top5": 0.05978455549050172
+    },
+    {
+      "full_top5": 0.058601337991093884,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.058601337991093884,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 257,
+      "signal_removed_top5": 0.058601337991093884
+    },
+    {
+      "full_top5": 0.058601337991093884,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.058601337991093884,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 257,
+      "signal_removed_top5": 0.058601337991093884
+    },
+    {
+      "full_top5": 0.06707927128686109,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.06657497433713963,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 307,
+      "signal_removed_top5": 0.06526226361266473
+    },
+    {
+      "full_top5": 0.06639558298742429,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.06670919390468276,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 307,
+      "signal_removed_top5": 0.06661600680988318
+    },
+    {
+      "full_top5": 0.06602005499145588,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.06602005499145588,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 307,
+      "signal_removed_top5": 0.06736913206415207
+    },
+    {
+      "full_top5": 0.016671740429976576,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.014918722826032708,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 11,
+      "signal_removed_top5": 0.015248760811858969
+    },
+    {
+      "full_top5": 0.013864755344106939,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.013261968451022892,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 11,
+      "signal_removed_top5": 0.015870231901855193
+    },
+    {
+      "full_top5": 0.013864755344106939,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.013864755344106939,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 11,
+      "signal_removed_top5": 0.013864755344106939
+    },
+    {
+      "full_top5": 0.06832653536490749,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.06687302780105035,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 29,
+      "signal_removed_top5": 0.06687302780105035
+    },
+    {
+      "full_top5": 0.061952339653780254,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.054737559365464206,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 29,
+      "signal_removed_top5": 0.06841114640740655
+    },
+    {
+      "full_top5": 0.06071829049430486,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.06089792089285348,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 29,
+      "signal_removed_top5": 0.06071829049430486
+    },
+    {
+      "full_top5": 0.06525596565207979,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.0647583131482291,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 47,
+      "signal_removed_top5": 0.0647583131482291
+    },
+    {
+      "full_top5": 0.06357766309031199,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.06426630105268585,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 47,
+      "signal_removed_top5": 0.0629596690334347
+    },
+    {
+      "full_top5": 0.06398200388393281,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.06398200388393281,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 47,
+      "signal_removed_top5": 0.06398200388393281
+    },
+    {
+      "full_top5": 0.050899292032279886,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.050899292032279886,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 83,
+      "signal_removed_top5": 0.050899292032279886
+    },
+    {
+      "full_top5": 0.050899292032279886,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.050899292032279886,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 83,
+      "signal_removed_top5": 0.050899292032279886
+    },
+    {
+      "full_top5": 0.050899292032279886,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.050899292032279886,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 83,
+      "signal_removed_top5": 0.050899292032279886
+    },
+    {
+      "full_top5": 0.06460919698698007,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.063993280060565,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 101,
+      "signal_removed_top5": 0.06421763140893427
+    },
+    {
+      "full_top5": 0.06359143039486075,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.06359143039486075,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 101,
+      "signal_removed_top5": 0.061615073055615345
+    },
+    {
+      "full_top5": 0.06389798164656206,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.06358796742002888,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 101,
+      "signal_removed_top5": 0.06460017532836888
+    },
+    {
+      "full_top5": 0.06466072048560606,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.06466072048560606,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 131,
+      "signal_removed_top5": 0.06466072048560606
+    },
+    {
+      "full_top5": 0.06250037326435069,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.06466072048560606,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 131,
+      "signal_removed_top5": 0.057136729216297845
+    },
+    {
+      "full_top5": 0.06466072048560606,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.06466072048560606,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 131,
+      "signal_removed_top5": 0.06466072048560606
+    },
+    {
+      "full_top5": 0.035446763650062996,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.035446763650062996,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 167,
+      "signal_removed_top5": 0.035446763650062996
+    },
+    {
+      "full_top5": 0.026719367731102422,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.026719367731102422,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 167,
+      "signal_removed_top5": 0.018532315370713374
+    },
+    {
+      "full_top5": 0.010902401692992945,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.012005389654121915,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 167,
+      "signal_removed_top5": 0.010902401692992945
+    },
+    {
+      "full_top5": 0.024398670351282445,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.024398670351282445,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 211,
+      "signal_removed_top5": 0.024398670351282445
+    },
+    {
+      "full_top5": 0.02099277347538458,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.019857891160324128,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 211,
+      "signal_removed_top5": 0.024398670351282445
+    },
+    {
+      "full_top5": 0.024398670351282445,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.024398670351282445,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 211,
+      "signal_removed_top5": 0.024398670351282445
+    },
+    {
+      "full_top5": 0.06256796577547834,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.06256796577547834,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 257,
+      "signal_removed_top5": 0.06252724944677515
+    },
+    {
+      "full_top5": 0.06256796577547834,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.06256796577547834,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 257,
+      "signal_removed_top5": 0.06256796577547834
+    },
+    {
+      "full_top5": 0.06256796577547834,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.06256796577547834,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 257,
+      "signal_removed_top5": 0.06256796577547834
+    },
+    {
+      "full_top5": 0.06721042159966362,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.0671314700092673,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 307,
+      "signal_removed_top5": 0.06721042159966362
+    },
+    {
+      "full_top5": 0.0619265710149777,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.06331009178727798,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 307,
+      "signal_removed_top5": 0.058001330250657575
+    },
+    {
+      "full_top5": 0.06721042159966362,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.06721042159966362,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 307,
+      "signal_removed_top5": 0.06721042159966362
+    },
+    {
+      "full_top5": 0.01571354402470129,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.013875394174385313,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 11,
+      "signal_removed_top5": 0.013875394174385313
+    },
+    {
+      "full_top5": 0.013477617529292345,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.01466444258440749,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 11,
+      "signal_removed_top5": 0.013606840013159456
+    },
+    {
+      "full_top5": 0.01466444258440749,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.014854603429471957,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 11,
+      "signal_removed_top5": 0.013341245085768172
+    },
+    {
+      "full_top5": 0.08272165767641833,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.07958037821453261,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 29,
+      "signal_removed_top5": 0.07896308973230176
+    },
+    {
+      "full_top5": 0.08402650600053274,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.08429836523591716,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 29,
+      "signal_removed_top5": 0.08049317008992762
+    },
+    {
+      "full_top5": 0.08417962827517093,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.08417962827517093,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 29,
+      "signal_removed_top5": 0.08439104123163799
+    },
+    {
+      "full_top5": 0.061868213932134736,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.061868213932134736,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 47,
+      "signal_removed_top5": 0.061868213932134736
+    },
+    {
+      "full_top5": 0.061868213932134736,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.061868213932134736,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 47,
+      "signal_removed_top5": 0.061868213932134736
+    },
+    {
+      "full_top5": 0.061868213932134736,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.061868213932134736,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 47,
+      "signal_removed_top5": 0.061868213932134736
+    },
+    {
+      "full_top5": 0.052615316969394,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.04990049446879216,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 83,
+      "signal_removed_top5": 0.04990049446879216
+    },
+    {
+      "full_top5": 0.05254664692309189,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.05254664692309189,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 83,
+      "signal_removed_top5": 0.053396167314848676
+    },
+    {
+      "full_top5": 0.05254664692309189,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.05254664692309189,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 83,
+      "signal_removed_top5": 0.05254664692309189
+    },
+    {
+      "full_top5": 0.08408432108548873,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.08453339039393577,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 101,
+      "signal_removed_top5": 0.08453339039393577
+    },
+    {
+      "full_top5": 0.08052012569707719,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.07870827467979159,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 101,
+      "signal_removed_top5": 0.08457167903897056
+    },
+    {
+      "full_top5": 0.07971303412237667,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.08008833959347975,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 101,
+      "signal_removed_top5": 0.07953658657608755
+    },
+    {
+      "full_top5": 0.07765461571174048,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.07644196790300138,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 131,
+      "signal_removed_top5": 0.07644196790300138
+    },
+    {
+      "full_top5": 0.07867241143028715,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.07898676175120653,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 131,
+      "signal_removed_top5": 0.07867241143028715
+    },
+    {
+      "full_top5": 0.07906634895406421,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.07906634895406421,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 131,
+      "signal_removed_top5": 0.07867241143028715
+    },
+    {
+      "full_top5": 0.01261937694561979,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.011478802205387549,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 167,
+      "signal_removed_top5": 0.011478802205387549
+    },
+    {
+      "full_top5": 0.012673553023509152,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.01160280085929856,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 167,
+      "signal_removed_top5": 0.01323726757282654
+    },
+    {
+      "full_top5": 0.012679116123210024,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.013165491632289925,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 167,
+      "signal_removed_top5": 0.011057383172379948
+    },
+    {
+      "full_top5": 0.013537680550932673,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.012917005207597311,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 211,
+      "signal_removed_top5": 0.012752760907773471
+    },
+    {
+      "full_top5": 0.008955868809434891,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.009643967536179162,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 211,
+      "signal_removed_top5": 0.011367889199142967
+    },
+    {
+      "full_top5": 0.008970870703249478,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.008970870703249478,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 211,
+      "signal_removed_top5": 0.008970870703249478
+    },
+    {
+      "full_top5": 0.0779030762698549,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.07713328964098977,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 257,
+      "signal_removed_top5": 0.07713328964098977
+    },
+    {
+      "full_top5": 0.07890233870052847,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.07890233870052847,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 257,
+      "signal_removed_top5": 0.07884555442231739
+    },
+    {
+      "full_top5": 0.07884555442231739,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.07884555442231739,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 257,
+      "signal_removed_top5": 0.07884555442231739
+    },
+    {
+      "full_top5": 0.07891429387339056,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.07891429387339056,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 307,
+      "signal_removed_top5": 0.07891429387339056
+    },
+    {
+      "full_top5": 0.07891429387339056,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.07636418498982551,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 307,
+      "signal_removed_top5": 0.07891429387339056
+    },
+    {
+      "full_top5": 0.07891429387339056,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.07891429387339056,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 307,
+      "signal_removed_top5": 0.07891429387339056
+    },
+    {
+      "full_top5": 0.011689770798036148,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.011124497254926709,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 11,
+      "signal_removed_top5": 0.010801936427608577
+    },
+    {
+      "full_top5": 0.009556027115309512,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.010419722977308457,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 11,
+      "signal_removed_top5": 0.00996267685861319
+    },
+    {
+      "full_top5": 0.011167765773068822,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.011815624494724791,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 11,
+      "signal_removed_top5": 0.011167765773068822
+    },
+    {
+      "full_top5": 0.08894232717188767,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.08665833748735091,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 29,
+      "signal_removed_top5": 0.0865767095557008
+    },
+    {
+      "full_top5": 0.0826433231005279,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.07827313200136941,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 29,
+      "signal_removed_top5": 0.08906356538575151
+    },
+    {
+      "full_top5": 0.08906356538575151,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.08906356538575151,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 29,
+      "signal_removed_top5": 0.08906356538575151
+    },
+    {
+      "full_top5": 0.08107928698018789,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.07976841800915134,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 47,
+      "signal_removed_top5": 0.07976841800915134
+    },
+    {
+      "full_top5": 0.07582544847563515,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.08292469781672406,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 47,
+      "signal_removed_top5": 0.07348446509924386
+    },
+    {
+      "full_top5": 0.08206131512339393,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.08078926060102497,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 47,
+      "signal_removed_top5": 0.08206131512339393
+    },
+    {
+      "full_top5": 0.04989912764662489,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.03837330452389306,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 83,
+      "signal_removed_top5": 0.03837330452389306
+    },
+    {
+      "full_top5": 0.028114030289356693,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.029595795689102974,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 83,
+      "signal_removed_top5": 0.028128082181747
+    },
+    {
+      "full_top5": 0.05521581630012578,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.05521581630012578,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 83,
+      "signal_removed_top5": 0.05521581630012578
+    },
+    {
+      "full_top5": 0.08292194731015433,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.0800118143147683,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 101,
+      "signal_removed_top5": 0.0796906566029764
+    },
+    {
+      "full_top5": 0.07884040912381908,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.07884040912381908,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 101,
+      "signal_removed_top5": 0.07314981462072813
+    },
+    {
+      "full_top5": 0.0763217927472669,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.07667835519776615,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 101,
+      "signal_removed_top5": 0.0763217927472669
+    },
+    {
+      "full_top5": 0.07194291459353007,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.07097064820923822,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 131,
+      "signal_removed_top5": 0.07097064820923822
+    },
+    {
+      "full_top5": 0.07398224487793754,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.07721743929260606,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 131,
+      "signal_removed_top5": 0.0693490113050608
+    },
+    {
+      "full_top5": 0.07721743929260606,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.07721743929260606,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 131,
+      "signal_removed_top5": 0.07721743929260606
+    },
+    {
+      "full_top5": 0.02892878928959496,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.026253795205196277,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 167,
+      "signal_removed_top5": 0.026253795205196277
+    },
+    {
+      "full_top5": 0.018627372310039546,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.01624533271172612,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 167,
+      "signal_removed_top5": 0.009330032402961248
+    },
+    {
+      "full_top5": 0.0057739023313563625,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.0057739023313563625,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 167,
+      "signal_removed_top5": 0.0057739023313563625
+    },
+    {
+      "full_top5": 0.01431665954366551,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.01431665954366551,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 211,
+      "signal_removed_top5": 0.01431665954366551
+    },
+    {
+      "full_top5": 0.01466362992996668,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.01466362992996668,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 211,
+      "signal_removed_top5": 0.01364681665735204
+    },
+    {
+      "full_top5": 0.01431665954366551,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.01431665954366551,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 211,
+      "signal_removed_top5": 0.01431665954366551
+    },
+    {
+      "full_top5": 0.08273082865880928,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.08273082865880928,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 257,
+      "signal_removed_top5": 0.08273082865880928
+    },
+    {
+      "full_top5": 0.08273082865880928,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.07058338304810068,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 257,
+      "signal_removed_top5": 0.08273082865880928
+    },
+    {
+      "full_top5": 0.08273082865880928,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.08273082865880928,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 257,
+      "signal_removed_top5": 0.07221936165299096
+    },
+    {
+      "full_top5": 0.07958405409399842,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.07336376512385064,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 307,
+      "signal_removed_top5": 0.07223807943366291
+    },
+    {
+      "full_top5": 0.07958405409399842,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.07958405409399842,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 307,
+      "signal_removed_top5": 0.07274820463856133
+    },
+    {
+      "full_top5": 0.07958405409399842,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.07958405409399842,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 307,
+      "signal_removed_top5": 0.07958405409399842
+    },
+    {
+      "full_top5": 0.021973181605218852,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.021973181605218852,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 11,
+      "signal_removed_top5": 0.021973181605218852
+    },
+    {
+      "full_top5": 0.021991836431997525,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.021991836431997525,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 11,
+      "signal_removed_top5": 0.020506287200408927
+    },
+    {
+      "full_top5": 0.021991836431997525,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.021991836431997525,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 11,
+      "signal_removed_top5": 0.021991836431997525
+    },
+    {
+      "full_top5": 0.10885364304751521,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.10575873751436239,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 29,
+      "signal_removed_top5": 0.10575873751436239
+    },
+    {
+      "full_top5": 0.11036508630470042,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.11133431166275526,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 29,
+      "signal_removed_top5": 0.0906988888895202
+    },
+    {
+      "full_top5": 0.10136374355681606,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.10136374355681606,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 29,
+      "signal_removed_top5": 0.10202287771769503
+    },
+    {
+      "full_top5": 0.09620734950293795,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.09526740558146941,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 47,
+      "signal_removed_top5": 0.09526740558146941
+    },
+    {
+      "full_top5": 0.09507787016404469,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.09451349942703298,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 47,
+      "signal_removed_top5": 0.09446936524202681
+    },
+    {
+      "full_top5": 0.09382460817304909,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.09382460817304909,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 47,
+      "signal_removed_top5": 0.09382460817304909
+    },
+    {
+      "full_top5": 0.09153241805326817,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.09153241805326817,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 83,
+      "signal_removed_top5": 0.09153241805326817
+    },
+    {
+      "full_top5": 0.09031572212089907,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.09094230469849866,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 83,
+      "signal_removed_top5": 0.08943488596125089
+    },
+    {
+      "full_top5": 0.09153241805326817,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.09153241805326817,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 83,
+      "signal_removed_top5": 0.09153241805326817
+    },
+    {
+      "full_top5": 0.10961937773994296,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.10761001776060165,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 101,
+      "signal_removed_top5": 0.10761001776060165
+    },
+    {
+      "full_top5": 0.086063049661923,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.08749866245483419,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 101,
+      "signal_removed_top5": "INSUFFICIENT_SAMPLE"
+    },
+    {
+      "full_top5": 0.09575369780259851,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.09575369780259851,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 101,
+      "signal_removed_top5": 0.09575369780259851
+    },
+    {
+      "full_top5": 0.10847279879536892,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.10750374351360491,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 131,
+      "signal_removed_top5": 0.10750374351360491
+    },
+    {
+      "full_top5": 0.10786139055865794,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.10847279879536892,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 131,
+      "signal_removed_top5": 0.1069062179721283
+    },
+    {
+      "full_top5": 0.10705745385586951,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.10698463129228097,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 131,
+      "signal_removed_top5": 0.10650595872854646
+    },
+    {
+      "full_top5": -0.005658515591211114,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": -0.006698738706574957,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 167,
+      "signal_removed_top5": -0.006698738706574957
+    },
+    {
+      "full_top5": -0.0041941961565916406,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": -0.005380025417808003,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 167,
+      "signal_removed_top5": -0.004582938490647839
+    },
+    {
+      "full_top5": -0.005443508320720762,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": -0.006363994710573074,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 167,
+      "signal_removed_top5": -0.007303002427364273
+    },
+    {
+      "full_top5": 0.043624551631970016,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.043624551631970016,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 211,
+      "signal_removed_top5": 0.043624551631970016
+    },
+    {
+      "full_top5": 0.04468918469367855,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.04468918469367855,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 211,
+      "signal_removed_top5": 0.043700740730506386
+    },
+    {
+      "full_top5": 0.04476537379221492,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.04476537379221492,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 211,
+      "signal_removed_top5": 0.043700740730506386
+    },
+    {
+      "full_top5": 0.10385071897458746,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.10385071897458746,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 257,
+      "signal_removed_top5": 0.10385071897458746
+    },
+    {
+      "full_top5": 0.10385071897458746,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.10340866379034319,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 257,
+      "signal_removed_top5": 0.09357456260787006
+    },
+    {
+      "full_top5": 0.10385071897458746,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.10385071897458746,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 257,
+      "signal_removed_top5": 0.10385071897458746
+    },
+    {
+      "full_top5": 0.10593301192660537,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.10084301516836025,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 307,
+      "signal_removed_top5": 0.10096247886858391
+    },
+    {
+      "full_top5": 0.10708271422381348,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.10706926213410943,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 307,
+      "signal_removed_top5": 0.10706926213410943
+    },
+    {
+      "full_top5": 0.10708271422381348,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.10648322197146186,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 307,
+      "signal_removed_top5": 0.10708271422381348
+    },
+    {
+      "full_top5": 0.02698438297241935,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.026862093179119594,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 11,
+      "signal_removed_top5": 0.0277241155892758
+    },
+    {
+      "full_top5": 0.025356234849142196,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.021982571638631213,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 11,
+      "signal_removed_top5": 0.0146111194210018
+    },
+    {
+      "full_top5": 0.022036493313418472,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.022036493313418472,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 11,
+      "signal_removed_top5": 0.022036493313418472
+    },
+    {
+      "full_top5": 0.11065721598688959,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.11069867112360292,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 29,
+      "signal_removed_top5": 0.11069867112360292
+    },
+    {
+      "full_top5": 0.10611550347412636,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.10611550347412636,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 29,
+      "signal_removed_top5": 0.1109724840374265
+    },
+    {
+      "full_top5": 0.1109724840374265,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.1109724840374265,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 29,
+      "signal_removed_top5": 0.1109724840374265
+    },
+    {
+      "full_top5": 0.11121499594564986,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.11065420887099824,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 47,
+      "signal_removed_top5": 0.11065420887099824
+    },
+    {
+      "full_top5": 0.11047130340063284,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.10917447453934483,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 47,
+      "signal_removed_top5": 0.10768052050156844
+    },
+    {
+      "full_top5": 0.10811120779956344,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.10811120779956344,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 47,
+      "signal_removed_top5": 0.10811120779956344
+    },
+    {
+      "full_top5": 0.08477944581386093,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.08477944581386093,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 83,
+      "signal_removed_top5": 0.08477944581386093
+    },
+    {
+      "full_top5": 0.08477944581386093,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.07632365273168341,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 83,
+      "signal_removed_top5": 0.07798639228745029
+    },
+    {
+      "full_top5": 0.08477944581386093,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.08477944581386093,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 83,
+      "signal_removed_top5": 0.08477944581386093
+    },
+    {
+      "full_top5": 0.11032921162597975,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.10377614340595977,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 101,
+      "signal_removed_top5": 0.10377614340595977
+    },
+    {
+      "full_top5": 0.11002080461190888,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.10765000923495789,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 101,
+      "signal_removed_top5": 0.10982277639131229
+    },
+    {
+      "full_top5": 0.10740399257818396,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.10740399257818396,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 101,
+      "signal_removed_top5": 0.110273645119937
+    },
+    {
+      "full_top5": 0.10954639284860808,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.10954639284860808,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 131,
+      "signal_removed_top5": 0.10954639284860808
+    },
+    {
+      "full_top5": 0.1013447500826714,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.10954639284860808,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 131,
+      "signal_removed_top5": 0.10532024416412185
+    },
+    {
+      "full_top5": 0.10954639284860808,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.10954639284860808,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 131,
+      "signal_removed_top5": 0.10954639284860808
+    },
+    {
+      "full_top5": 0.07258153656496948,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.07258153656496948,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 167,
+      "signal_removed_top5": 0.07258153656496948
+    },
+    {
+      "full_top5": 0.046495112868565704,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.046495112868565704,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 167,
+      "signal_removed_top5": 0.042631557191345065
+    },
+    {
+      "full_top5": 0.035543963195605904,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.035543963195605904,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 167,
+      "signal_removed_top5": 0.035543963195605904
+    },
+    {
+      "full_top5": 0.04285280872162078,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.04285280872162078,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 211,
+      "signal_removed_top5": 0.04330121574186022
+    },
+    {
+      "full_top5": 0.04333046184145553,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.04333046184145553,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 211,
+      "signal_removed_top5": 0.04333046184145553
+    },
+    {
+      "full_top5": 0.04285280872162078,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.04285280872162078,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 211,
+      "signal_removed_top5": 0.04285280872162078
+    },
+    {
+      "full_top5": 0.10946808309152219,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.10946808309152219,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 257,
+      "signal_removed_top5": 0.10946808309152219
+    },
+    {
+      "full_top5": 0.10946808309152219,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.1000691635749938,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 257,
+      "signal_removed_top5": 0.10946808309152219
+    },
+    {
+      "full_top5": 0.10946808309152219,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.10946808309152219,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 257,
+      "signal_removed_top5": 0.10946808309152219
+    },
+    {
+      "full_top5": 0.10538534683869695,
+      "model": "LOGISTIC_REGRESSION",
+      "redundant_removed_top5": 0.10538534683869695,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 307,
+      "signal_removed_top5": 0.10538534683869695
+    },
+    {
+      "full_top5": 0.10122497746515992,
+      "model": "RANDOM_FOREST",
+      "redundant_removed_top5": 0.09686590729286793,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 307,
+      "signal_removed_top5": 0.10375663671233215
+    },
+    {
+      "full_top5": 0.10538534683869695,
+      "model": "GRADIENT_BOOSTING",
+      "redundant_removed_top5": 0.10538534683869695,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 307,
+      "signal_removed_top5": 0.10538534683869695
+    }
+  ],
+  "summary": {
+    "conclusion": "SIGNAL_FEATURE_REMOVAL_REDUCES_SYNTHETIC_EVIDENCE",
+    "mean_full_minus_signal_removed_top5": 0.0008524192266099665,
+    "records": 180
+  }
+}

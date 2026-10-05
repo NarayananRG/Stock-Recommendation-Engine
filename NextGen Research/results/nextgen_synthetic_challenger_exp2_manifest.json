@@ -1,0 +1,1566 @@
+{
+  "artifact_type": "NEXTGEN_SYNTHETIC_CHALLENGER_EXP2_MANIFEST_V1",
+  "authority": "RESEARCH_ONLY_SYNTHETIC_SHADOW",
+  "classification": "SYNTHETIC_ROBUSTNESS_VALIDATED_WITH_LIMITATIONS",
+  "dataset_hashes": [
+    {
+      "dataset_hash": "005942cbdf5372c6a422dae0276f6efae2fb2c99ecc027c58cea42a4865916a4",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "NULL_NO_SIGNAL_V2",
+      "seed": 11
+    },
+    {
+      "dataset_hash": "1c1a0db8a4168cccc55d1bd4b5c5209f1b289cd4591bcacfe96a6d1b64693146",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "NULL_NO_SIGNAL_V2",
+      "seed": 29
+    },
+    {
+      "dataset_hash": "6e9863afa5ca399d9c1c359e6cf451580b2c4170f2ae2c31b16bf147b4063be7",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "NULL_NO_SIGNAL_V2",
+      "seed": 47
+    },
+    {
+      "dataset_hash": "dd83a8582ae0a8b60267117a38d57ad1f4fb1f08e8c84d091ef7dff3f17295b1",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "NULL_NO_SIGNAL_V2",
+      "seed": 83
+    },
+    {
+      "dataset_hash": "823a9830bdf53f49164c2a0b619546d5254ff0bed16fd61c6280560b5fd23f60",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "NULL_NO_SIGNAL_V2",
+      "seed": 101
+    },
+    {
+      "dataset_hash": "55c65ca3d70135d1a19ca78a6a4bd423562b5c1178048f9eeb8172269de2a28e",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "NULL_NO_SIGNAL_V2",
+      "seed": 131
+    },
+    {
+      "dataset_hash": "b91e3373c665194c1f9fe7cf5a0f5762933132e640215ef4110515e4b01fb418",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "NULL_NO_SIGNAL_V2",
+      "seed": 167
+    },
+    {
+      "dataset_hash": "163d60bd7d3d2f46d214a82e11a01ee517e6466cb614845a1a8e96aa24a8aca7",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "NULL_NO_SIGNAL_V2",
+      "seed": 211
+    },
+    {
+      "dataset_hash": "76243c1c65e2316528d50b16a0894d874a57623450cf5b5b2f6978c3b824a72f",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "NULL_NO_SIGNAL_V2",
+      "seed": 257
+    },
+    {
+      "dataset_hash": "055e5d91e429dc6ad6b48593fd14a9776ef79c66c9779908be1f6f0e27fbc431",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "NULL_NO_SIGNAL_V2",
+      "seed": 307
+    },
+    {
+      "dataset_hash": "1bcfb54d20d6363d8237bc08e21b92d3f19e214dc057fb07f51011b8e152f067",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "NULL_NO_SIGNAL_V2",
+      "seed": 11
+    },
+    {
+      "dataset_hash": "ec89d1e92cf3d3406d2a92c9d6b634ccc20a079a9400cb5787eb2b78f99547ae",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "NULL_NO_SIGNAL_V2",
+      "seed": 29
+    },
+    {
+      "dataset_hash": "b955a53f5f50ceaea00f452f7123ceacfd19d5cbe715b928d8d6606f6bdc007d",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "NULL_NO_SIGNAL_V2",
+      "seed": 47
+    },
+    {
+      "dataset_hash": "4a6d51ee0da4217a010f44be030cddc275c9af2b50548413849f023e0839707a",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "NULL_NO_SIGNAL_V2",
+      "seed": 83
+    },
+    {
+      "dataset_hash": "185ba8ef951bb6a6345d345ef84de81d4d48418e94b7672124a6dfc023d09655",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "NULL_NO_SIGNAL_V2",
+      "seed": 101
+    },
+    {
+      "dataset_hash": "600b7b6daaf4aad5cf69e94468b7baabad262a54cdc6a70760d661c2928d5b6a",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "NULL_NO_SIGNAL_V2",
+      "seed": 131
+    },
+    {
+      "dataset_hash": "639f02ad6209b956daf26e381fbe43abc9ebdb7e9a6c40fcbedb809cb82f729b",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "NULL_NO_SIGNAL_V2",
+      "seed": 167
+    },
+    {
+      "dataset_hash": "69a98303819eceacc933f9478077989e04435873936984b03e7cc70d86318303",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "NULL_NO_SIGNAL_V2",
+      "seed": 211
+    },
+    {
+      "dataset_hash": "7d4afe4e0c82cb3b6b02831a3308833c9852cf086a3cac1f1a88fd5a5a38f1ac",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "NULL_NO_SIGNAL_V2",
+      "seed": 257
+    },
+    {
+      "dataset_hash": "a70069d16a48e43cbf1f2462179403526da95af85c921d6ce2ed14e61956aa33",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "NULL_NO_SIGNAL_V2",
+      "seed": 307
+    },
+    {
+      "dataset_hash": "cf29f56ebf5873bb77b26408ac29dcc679f7ac76858526c4bb9e53993660148b",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 11
+    },
+    {
+      "dataset_hash": "734b3b68275263ca59074c895338b1442c1c3a13b28c63ffe301f134a66f28b4",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 29
+    },
+    {
+      "dataset_hash": "28fdae7a7c1cf0c70c4234d8873e36210913488d2eef1f2937741a3f7f337e49",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 47
+    },
+    {
+      "dataset_hash": "faea3b406732962ba4883d998c93d07276e530321f102435e50d0edc4974ca48",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 83
+    },
+    {
+      "dataset_hash": "4788ed42cee245f469b634820623315280264335ddebdfa5161ce55de3375cf8",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 101
+    },
+    {
+      "dataset_hash": "c7c46094d932b16f1f5ad056c1e313072870d27e64cde9bb9a3fa7c0aa94b441",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 131
+    },
+    {
+      "dataset_hash": "d30b3b593007d6d2b2ba3c523797fcf0ce56a08101c7b7b92405ab8fa1d9eab0",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 167
+    },
+    {
+      "dataset_hash": "957cbef02bca360d4f5d384d956e38d00837f395b28c60a08fa542be0ec8cdee",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 211
+    },
+    {
+      "dataset_hash": "175270e60d18ad9ca4462b0b3fd22d4580e8c422e5c0c7e49a6f53a2d6cf9ead",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 257
+    },
+    {
+      "dataset_hash": "ccf93a6ae250c3c733f51823a25ade64f25c65fabb23a1a9e9c7a2ea206c5c7c",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 307
+    },
+    {
+      "dataset_hash": "2cf499c7f4ef1e6fc27e830c09b173ec8fe69a5be2ad6aa3f35f3a3bac2d92da",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 11
+    },
+    {
+      "dataset_hash": "e3d6a71a815e2f991ea511a2665f5456806700afb0964bf0ce32a3e33816868f",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 29
+    },
+    {
+      "dataset_hash": "0e7bf236c724bc872719fd9240f4b842e8ba56060c48dccbcd9251c504aba8e4",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 47
+    },
+    {
+      "dataset_hash": "52b1584ec08ef3dadac8c1287bd635497d28ef974e08de0c0b2fdd61a79c5096",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 83
+    },
+    {
+      "dataset_hash": "99a4f5a9356ca0aaf44bd268ec7fb9609564ede596923d2d5f26230e485478ae",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 101
+    },
+    {
+      "dataset_hash": "beab9ce9e8a4ec6efdf8c597ff46742d984f1d5415ef2456f451278c4fcbfa28",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 131
+    },
+    {
+      "dataset_hash": "ff18cfa3795043816e43c9a76eeca0ded2207e0f1f12f7eb8f88e4dfeedd1f0d",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 167
+    },
+    {
+      "dataset_hash": "d677cfb6d1b3da19b8c9d9a27602779c8bc84e0562129d122eb6b090f74c96d6",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 211
+    },
+    {
+      "dataset_hash": "0b1dfeb39f0b4d7e1d2fb9f7cf34fb106131c1b5db9722c83e8252f7b4e34b03",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 257
+    },
+    {
+      "dataset_hash": "726fed7e824ef4d879e58c93e3e4095b1443d09616631e0bca84e5edb9be31ab",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_LINEAR_WEAK",
+      "seed": 307
+    },
+    {
+      "dataset_hash": "4f1af829f91fbef966b6e602c23e72cecbbc388f365258be27213adff656af44",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 11
+    },
+    {
+      "dataset_hash": "c32fb114ef4c9768376ab8f71078b39bff3f0b5ea0d4990b1921ace402a6d770",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 29
+    },
+    {
+      "dataset_hash": "e56d7715e50fdb58ff2130219ec611c660fe35456e7c4d612c620f68487e6ada",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 47
+    },
+    {
+      "dataset_hash": "4eb8a5f681ce9175a6a674655b72940bcf4b62df6de9ec00374047b19432aa0b",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 83
+    },
+    {
+      "dataset_hash": "e1fcb567bf1a1d3f294cdac0ba0aba75187d2d40ad84354758bd2d49514d9a15",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 101
+    },
+    {
+      "dataset_hash": "f75991cf96ac38539e7a2f22001119ef61dd70a75232ba6e01ccc9e42e1930b6",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 131
+    },
+    {
+      "dataset_hash": "da7976c68b19b729259a2afb558a297402d7e4eb0105afcdc3509c49b4ca880e",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 167
+    },
+    {
+      "dataset_hash": "0d00e62d345388edc47971ea976e30c2666b551dc7ff45542836609458a96ee6",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 211
+    },
+    {
+      "dataset_hash": "99afd81994f0dbe401203730e446dde055e32ffb25bc38ce78fec98b49405105",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 257
+    },
+    {
+      "dataset_hash": "17990b0c912ad04bec093f1f7b6720fbd79c88b6572e4da0c6395ed7c88f24f9",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 307
+    },
+    {
+      "dataset_hash": "2e5fc3cb2f1fad305a8bae24a03929f365e7c0cc6103b93d843aeb51ed077715",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 11
+    },
+    {
+      "dataset_hash": "a42ac223a3e1d2b5dd61a780089dbd45ede38c167277151d72dbe826f6532431",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 29
+    },
+    {
+      "dataset_hash": "376abf4e9fd31b7390cda0f7300181f819a10044872a66fca61f635d8d6b36f8",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 47
+    },
+    {
+      "dataset_hash": "b32fb2fd6717f03a94110b5794c8a5b0aa7eff341e097a8478ea7ca23a04e8c4",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 83
+    },
+    {
+      "dataset_hash": "22469fea05e0cc0d9836363515541b5005b990e58b69c7da0cf7db660e452521",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 101
+    },
+    {
+      "dataset_hash": "7e04c8ee16a7109b97da0c3dfb543cfff567d777058151f4955f50471441b6b2",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 131
+    },
+    {
+      "dataset_hash": "f7a36b9fef393601f8eb20dc50837bc3355acd61e45c3ef0d537de20bd71098b",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 167
+    },
+    {
+      "dataset_hash": "99c65535c000b4462ab4edd6a889b7b6935998933d6e020e33fc68fa7235c447",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 211
+    },
+    {
+      "dataset_hash": "16a5616a2b7b60a08d9bf42e6178d822e8dad4050211ad92abc6dc3bdedb12e5",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 257
+    },
+    {
+      "dataset_hash": "c1a72c5679421e25ab6ea52cf34931c76940d85cd9a5865d92bc33c2d63f4f08",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "STABLE_NONLINEAR_INTERACTION",
+      "seed": 307
+    },
+    {
+      "dataset_hash": "170fe24d8c3d66eb9a4b5f8ce7d154dd46090c6c97a3afd3ce3e9f97da54f5cc",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "GRADUAL_REGIME_DRIFT",
+      "seed": 11
+    },
+    {
+      "dataset_hash": "f273a1c2722ead0e107a9d861681e178e651169bff0267e005998267773f66e2",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "GRADUAL_REGIME_DRIFT",
+      "seed": 29
+    },
+    {
+      "dataset_hash": "4e89bc124673bc8f95e5d369a589dda68c05243ab750e5e127f6afeb3d499850",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "GRADUAL_REGIME_DRIFT",
+      "seed": 47
+    },
+    {
+      "dataset_hash": "264a023d523e94814bb9257ccc02aaae4f291d54122bbf9c4d8decbb5ae6ec3c",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "GRADUAL_REGIME_DRIFT",
+      "seed": 83
+    },
+    {
+      "dataset_hash": "6b3223c07e29f482c55a6bfed42654367229132d3c0e1cd5dce612199d9d0da1",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "GRADUAL_REGIME_DRIFT",
+      "seed": 101
+    },
+    {
+      "dataset_hash": "225d8668837d20d2cd5a7851487bc5bcb3bc25da0c59af667a616ce03114987c",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "GRADUAL_REGIME_DRIFT",
+      "seed": 131
+    },
+    {
+      "dataset_hash": "ff6acdfe38122bcd533c8b0a7f3a19afc82f49ad5daa8172a03405db556c914c",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "GRADUAL_REGIME_DRIFT",
+      "seed": 167
+    },
+    {
+      "dataset_hash": "2c8e8634a8045a35762eaa024def5d749e657a6a8c03eaf571fe0c5e36a20e87",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "GRADUAL_REGIME_DRIFT",
+      "seed": 211
+    },
+    {
+      "dataset_hash": "ebf05699ce1b8f0a08a8055b882adbf2e87943321ce99c8c052301075b61cbba",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "GRADUAL_REGIME_DRIFT",
+      "seed": 257
+    },
+    {
+      "dataset_hash": "046d4bfefb27a590bbe5f81e1082469ea78ae07a7868ae04b0651b392fc409d2",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "GRADUAL_REGIME_DRIFT",
+      "seed": 307
+    },
+    {
+      "dataset_hash": "79e3e5f4c7f087f5c87d185c3dd8e6bc5980929cf2df51202d94ae68096f15f7",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "GRADUAL_REGIME_DRIFT",
+      "seed": 11
+    },
+    {
+      "dataset_hash": "abefff162a43f6a1eb9054a1816cc6df3d648ab3bbf7baafeddf0f84632afb88",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "GRADUAL_REGIME_DRIFT",
+      "seed": 29
+    },
+    {
+      "dataset_hash": "845fe00a2420b97673f2a3ff015d71f96e779f46c815e1a9c512e8786b17656b",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "GRADUAL_REGIME_DRIFT",
+      "seed": 47
+    },
+    {
+      "dataset_hash": "87eff6933770109620c05a7337fe166bf76cbbe74b2438357ab1836d31a5a717",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "GRADUAL_REGIME_DRIFT",
+      "seed": 83
+    },
+    {
+      "dataset_hash": "fce2e6118c39afc3808499650e65ff52a858818078421f6191939cf2fc6f566a",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "GRADUAL_REGIME_DRIFT",
+      "seed": 101
+    },
+    {
+      "dataset_hash": "4ea650d61206ca5a092ef2096ffe6475be416f84a96efb03cd324dbcc1737b5e",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "GRADUAL_REGIME_DRIFT",
+      "seed": 131
+    },
+    {
+      "dataset_hash": "e2b25ecaf901c45b37925c7dd25996940f8942cdad98844b6e5239f6dad90965",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "GRADUAL_REGIME_DRIFT",
+      "seed": 167
+    },
+    {
+      "dataset_hash": "89abca45bd32637b827182bfd38c2ab66b4614b5be010f94c5c91ed1379404f9",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "GRADUAL_REGIME_DRIFT",
+      "seed": 211
+    },
+    {
+      "dataset_hash": "3ce6f96b972e78c00748fc56f9c6008ec52ee55ca52b8e8c7c9cf5bac2e692d6",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "GRADUAL_REGIME_DRIFT",
+      "seed": 257
+    },
+    {
+      "dataset_hash": "83fc4b034f3f599c0be287000538802460bb55e112361f51ce0e0d027ab00da3",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "GRADUAL_REGIME_DRIFT",
+      "seed": 307
+    },
+    {
+      "dataset_hash": "fc0fec7cedccc5e7d1cfd7828d931530ed6572636dcf4d574f149c2ecd561365",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "ABRUPT_REGIME_BREAK",
+      "seed": 11
+    },
+    {
+      "dataset_hash": "ea06018caa8b72d9808170403c31a1cff3b9f7932334c1719eb628ff9db1cd66",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "ABRUPT_REGIME_BREAK",
+      "seed": 29
+    },
+    {
+      "dataset_hash": "c96261ef14c3dc2c34c4f43a6d530c62d69601e3008475dd95115875fde53b19",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "ABRUPT_REGIME_BREAK",
+      "seed": 47
+    },
+    {
+      "dataset_hash": "bee7f91fb572c6bf8b67053f131aa2b1c6103f5d5b771e000342df86d5c7baa3",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "ABRUPT_REGIME_BREAK",
+      "seed": 83
+    },
+    {
+      "dataset_hash": "1113a89046057c559c0b010824e7058529648f69343c9e1c621dd6731e0a9ee4",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "ABRUPT_REGIME_BREAK",
+      "seed": 101
+    },
+    {
+      "dataset_hash": "25d1d7cae08d7896dbb874b301e8a3588d0c5c3806faf67e5328741ccbead51e",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "ABRUPT_REGIME_BREAK",
+      "seed": 131
+    },
+    {
+      "dataset_hash": "efb3daddf7eb09ec15d8bfec104e61a4a9418e664bdec02697b7101a1d214926",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "ABRUPT_REGIME_BREAK",
+      "seed": 167
+    },
+    {
+      "dataset_hash": "bf060d44b3c1dcdf8064b47ab10ae8deea27e67b572a4922a6c85b2e5ff1e531",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "ABRUPT_REGIME_BREAK",
+      "seed": 211
+    },
+    {
+      "dataset_hash": "c1ec24e46a60867eb193ade1e9ba3d7adc07ed9489d77055b3cd7d6f7dcda81c",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "ABRUPT_REGIME_BREAK",
+      "seed": 257
+    },
+    {
+      "dataset_hash": "08e3cd3f312e2025b9fa4e880a9556d57215d464e37cefcd16c846a4c5b526ef",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "ABRUPT_REGIME_BREAK",
+      "seed": 307
+    },
+    {
+      "dataset_hash": "e45371fdaf2cb4a64b3f56817791848c92df5e10276681546ab65ec76202fee6",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "ABRUPT_REGIME_BREAK",
+      "seed": 11
+    },
+    {
+      "dataset_hash": "30a35799a15efcaecef5324f0f891f6f80843a796075bc2fa745f6aa93bec86a",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "ABRUPT_REGIME_BREAK",
+      "seed": 29
+    },
+    {
+      "dataset_hash": "a12437058c7671e6c537ab5cd671a3baad402b66ed64466906c0a26962a64b99",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "ABRUPT_REGIME_BREAK",
+      "seed": 47
+    },
+    {
+      "dataset_hash": "fe7687f170de70319523b109188fbd16ba5f18b2cf19b6333f166d1a5e4590c3",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "ABRUPT_REGIME_BREAK",
+      "seed": 83
+    },
+    {
+      "dataset_hash": "506b4421ed8d6cdca9ceb3eca816bdb20aecfbd4a909e7c5544b5ba897a05f0b",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "ABRUPT_REGIME_BREAK",
+      "seed": 101
+    },
+    {
+      "dataset_hash": "bf6149b1e1c0c869ea4d58ab7bcc864214fa17cc8738c05c3a0fbb5fb31bd63c",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "ABRUPT_REGIME_BREAK",
+      "seed": 131
+    },
+    {
+      "dataset_hash": "0546702478e5138e00801acd407c2d96239112f1dac081b4554189fb5e1c411a",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "ABRUPT_REGIME_BREAK",
+      "seed": 167
+    },
+    {
+      "dataset_hash": "b8cf8a38db5eb0aecf397a806e8cabd9e54cacea127f85c066c953a056a8ba21",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "ABRUPT_REGIME_BREAK",
+      "seed": 211
+    },
+    {
+      "dataset_hash": "5c23b6fa0363857f6f8ed83151c313d5e161c9a193ddcf3ba6aaf0f4f7821f06",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "ABRUPT_REGIME_BREAK",
+      "seed": 257
+    },
+    {
+      "dataset_hash": "620b4bd1b2a6a9e797e6f144a1e911f2ad6c712882269a6a78b6e7f824cde688",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "ABRUPT_REGIME_BREAK",
+      "seed": 307
+    },
+    {
+      "dataset_hash": "511d88805149c204f6cc4030a0eaa06bdfce8932856a289a94f60d512c87acae",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "SPURIOUS_DEVELOPMENT_SIGNAL",
+      "seed": 11
+    },
+    {
+      "dataset_hash": "9a1c10c97d6d880ec2e9f497f1811fb0f819183e900ce002bcd34fa22d5b64ba",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "SPURIOUS_DEVELOPMENT_SIGNAL",
+      "seed": 29
+    },
+    {
+      "dataset_hash": "c3f42e217898a61f1be2c65a8f13b83ac842ae54e54b2d5d604b11cab1b69ccf",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "SPURIOUS_DEVELOPMENT_SIGNAL",
+      "seed": 47
+    },
+    {
+      "dataset_hash": "14e2faa901d3240d76c531aff863bd69c558f453ca1f36955733f17bc17f89b6",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "SPURIOUS_DEVELOPMENT_SIGNAL",
+      "seed": 83
+    },
+    {
+      "dataset_hash": "ba3777ae1013916f6ca170b4a1d32a10937298db5f359e1ccdc95e7321717eac",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "SPURIOUS_DEVELOPMENT_SIGNAL",
+      "seed": 101
+    },
+    {
+      "dataset_hash": "e0095184b9bf9c66cda4da0837ac1980cc74dfc2025563023cef9e5cc5c0d1d4",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "SPURIOUS_DEVELOPMENT_SIGNAL",
+      "seed": 131
+    },
+    {
+      "dataset_hash": "f61ccdfbba3a08acd306707c759b5ba665f7738467d64b863d12f5f48ead86bc",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "SPURIOUS_DEVELOPMENT_SIGNAL",
+      "seed": 167
+    },
+    {
+      "dataset_hash": "e9f475a644e94607355862b376fe336466fb8f6dada8962e7d12a507043279d0",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "SPURIOUS_DEVELOPMENT_SIGNAL",
+      "seed": 211
+    },
+    {
+      "dataset_hash": "3c9d0d9cd5a926a4d16e1e3325003a4bf3a835b2316fcd3c84e707674c9b5df1",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "SPURIOUS_DEVELOPMENT_SIGNAL",
+      "seed": 257
+    },
+    {
+      "dataset_hash": "213cadc0588e6b6e5d8237bc4bb942709a0b4bf092b93c7a7c56d91e44752e91",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "SPURIOUS_DEVELOPMENT_SIGNAL",
+      "seed": 307
+    },
+    {
+      "dataset_hash": "f3c10cb286b5c1d200d78a6addba7c1fadaccc49a4f9607e7b0f3ccd0f7795f9",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "SPURIOUS_DEVELOPMENT_SIGNAL",
+      "seed": 11
+    },
+    {
+      "dataset_hash": "2a9301dfab5c416873f2b69e896538574ab2e058242127926005257d8830a4b9",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "SPURIOUS_DEVELOPMENT_SIGNAL",
+      "seed": 29
+    },
+    {
+      "dataset_hash": "2bc9b71c0d13fbfd3ad96fe03383d2cef56aaed3965116c0d4afbda96c351e03",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "SPURIOUS_DEVELOPMENT_SIGNAL",
+      "seed": 47
+    },
+    {
+      "dataset_hash": "91fc9f22be01db7938befebf5ade2bb9c5437d5242ec512c9a2b26cf2caf707a",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "SPURIOUS_DEVELOPMENT_SIGNAL",
+      "seed": 83
+    },
+    {
+      "dataset_hash": "62248461e66f15907b607b43125d28635e1467262b6234c79122d6bf73fe0241",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "SPURIOUS_DEVELOPMENT_SIGNAL",
+      "seed": 101
+    },
+    {
+      "dataset_hash": "caae7b5feb4072a79122e5559c5d62b08702a9ddd9193b4de0e4be2b659c1d76",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "SPURIOUS_DEVELOPMENT_SIGNAL",
+      "seed": 131
+    },
+    {
+      "dataset_hash": "c3d84181d431c5c232c7ac8351b572822a9f1967455349d436067123b6e3a1bb",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "SPURIOUS_DEVELOPMENT_SIGNAL",
+      "seed": 167
+    },
+    {
+      "dataset_hash": "5a05864404ab0d886e5db135f60fb98e130d1a4b31e099bf922388296ef6c6aa",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "SPURIOUS_DEVELOPMENT_SIGNAL",
+      "seed": 211
+    },
+    {
+      "dataset_hash": "8ccda9bba98983b0d3eb782d60283a21e5d153236764c32cd1229739bdd73655",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "SPURIOUS_DEVELOPMENT_SIGNAL",
+      "seed": 257
+    },
+    {
+      "dataset_hash": "1ed5c529858790f2f587176f5eba8bf263b8176cf3f532d89fa9b8c9f80fc3be",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "SPURIOUS_DEVELOPMENT_SIGNAL",
+      "seed": 307
+    },
+    {
+      "dataset_hash": "caa121d524b4d96e5f00c49812bf9bb18934b5ea7e3a4447955f184784a3c427",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "HIGH_NOISE_LOW_SIGNAL",
+      "seed": 11
+    },
+    {
+      "dataset_hash": "f1e0a6f25f8b6d0e6b6e09cc65795d12f1d49cbc1430a094c880ec8825893b60",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "HIGH_NOISE_LOW_SIGNAL",
+      "seed": 29
+    },
+    {
+      "dataset_hash": "a8ffe1c2bd2bf5889337bc31d5e591834de7de8e676c143e4a807d05b9511b4f",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "HIGH_NOISE_LOW_SIGNAL",
+      "seed": 47
+    },
+    {
+      "dataset_hash": "954d23a9ca6409063cf9fddf5baf1eecfe3120ee75d3141771961573b9f2938b",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "HIGH_NOISE_LOW_SIGNAL",
+      "seed": 83
+    },
+    {
+      "dataset_hash": "82608acbbfeae899fae95cf270cf5c9c0f4f8a07d61a0105ae66f10e1b19fefb",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "HIGH_NOISE_LOW_SIGNAL",
+      "seed": 101
+    },
+    {
+      "dataset_hash": "1596abdb8541920b88acf7c6e5da9d43c91718edf2b8f3464c70b62cd6b9cd84",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "HIGH_NOISE_LOW_SIGNAL",
+      "seed": 131
+    },
+    {
+      "dataset_hash": "7e50e5badb9afe3650be5b9f963b031b17c4eccc91b493caa10900fa9824fc9c",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "HIGH_NOISE_LOW_SIGNAL",
+      "seed": 167
+    },
+    {
+      "dataset_hash": "7b42eccf19c50beb75682ab04c67d9dadc6738919743d65bf96569e93c77e15b",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "HIGH_NOISE_LOW_SIGNAL",
+      "seed": 211
+    },
+    {
+      "dataset_hash": "8f87e4ebea773fc26ccb79410c20aa3c38c8ab5ef9fabc18ba45e7206ab458a8",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "HIGH_NOISE_LOW_SIGNAL",
+      "seed": 257
+    },
+    {
+      "dataset_hash": "6ff8f10780613c842d2b2d2dcaa6ade80da45c55a5b9200aac6e1d29990d77bb",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "HIGH_NOISE_LOW_SIGNAL",
+      "seed": 307
+    },
+    {
+      "dataset_hash": "889aecfffe5ead915cd8d18c863d73da0b4ac6be6e72be53839ab99416bc1db2",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "HIGH_NOISE_LOW_SIGNAL",
+      "seed": 11
+    },
+    {
+      "dataset_hash": "629def0c38420a51de6fd69d2c4a86149d1201c25a656bfa7fee17872d34d73a",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "HIGH_NOISE_LOW_SIGNAL",
+      "seed": 29
+    },
+    {
+      "dataset_hash": "524cee824609c725cf5cab192135ea94892f6877f05347bed685ef4b42448094",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "HIGH_NOISE_LOW_SIGNAL",
+      "seed": 47
+    },
+    {
+      "dataset_hash": "a2ecc4c482a39e1e3c4bdf4d0f055cc6f4701605eba039e56469854b98fc01bb",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "HIGH_NOISE_LOW_SIGNAL",
+      "seed": 83
+    },
+    {
+      "dataset_hash": "7f9f22067ed7f84d402e35c4d4e6356eaa3ba76fe1e4fb9b1ba89baf051d37ff",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "HIGH_NOISE_LOW_SIGNAL",
+      "seed": 101
+    },
+    {
+      "dataset_hash": "dfce963f7217052dca65abe0696cceda1cebcdff9346c2abce820c2e340171bd",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "HIGH_NOISE_LOW_SIGNAL",
+      "seed": 131
+    },
+    {
+      "dataset_hash": "f2e5e6469a95da8e703c057b1dd66977f335b3d7d29544b1b765c654e861ad4f",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "HIGH_NOISE_LOW_SIGNAL",
+      "seed": 167
+    },
+    {
+      "dataset_hash": "89c8c7142bf941b67c8fb6c3dfe0f1d3485f7ab909ce16c911703186bc3c5aa8",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "HIGH_NOISE_LOW_SIGNAL",
+      "seed": 211
+    },
+    {
+      "dataset_hash": "beabd71e51ae25feae865c141eb8c78da9eafe7d81ef5a56970e329feb8ddc92",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "HIGH_NOISE_LOW_SIGNAL",
+      "seed": 257
+    },
+    {
+      "dataset_hash": "35c951783fc4bb9b59cd4a8396894ca4e9c0bd98b9af7bb62b982284d4cf2506",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "HIGH_NOISE_LOW_SIGNAL",
+      "seed": 307
+    },
+    {
+      "dataset_hash": "b615a6ec5ed31ddddcc84883cfc2ff7d7b960fba322272e396e355792328250c",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "CROSS_SECTIONAL_RELATIVE_SIGNAL",
+      "seed": 11
+    },
+    {
+      "dataset_hash": "b1b997b02df774e4032f7fae11f93754da3ef5dbdd1b34fb421bf8592493febd",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "CROSS_SECTIONAL_RELATIVE_SIGNAL",
+      "seed": 29
+    },
+    {
+      "dataset_hash": "099e275593b467288ebee867769545e187c2bed29c705d234036a68575a9c990",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "CROSS_SECTIONAL_RELATIVE_SIGNAL",
+      "seed": 47
+    },
+    {
+      "dataset_hash": "978d6b14d542e0cb89d679a597120da675f793c71bd7b1adc9a0a24319e53482",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "CROSS_SECTIONAL_RELATIVE_SIGNAL",
+      "seed": 83
+    },
+    {
+      "dataset_hash": "6d115eb4e1511eaf0bae5d453a12e5ea78764941a4a48898e0efb3da42e889b2",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "CROSS_SECTIONAL_RELATIVE_SIGNAL",
+      "seed": 101
+    },
+    {
+      "dataset_hash": "e96d062dac9fd9efbadb06e14d105fb5b7148d0c6f53524274841d03f866ffeb",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "CROSS_SECTIONAL_RELATIVE_SIGNAL",
+      "seed": 131
+    },
+    {
+      "dataset_hash": "0febf4d88d1bede3b82c93ae29595d695847f0b55f2494338baae65e788a65b3",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "CROSS_SECTIONAL_RELATIVE_SIGNAL",
+      "seed": 167
+    },
+    {
+      "dataset_hash": "3bb16b9dbb70a10157a1ec0982627deaed4ae2f4226434bb696985ce56412968",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "CROSS_SECTIONAL_RELATIVE_SIGNAL",
+      "seed": 211
+    },
+    {
+      "dataset_hash": "1d066fdf6454ff1278cb7dcf0771cb068f84609c812489276f7fa922ae774c25",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "CROSS_SECTIONAL_RELATIVE_SIGNAL",
+      "seed": 257
+    },
+    {
+      "dataset_hash": "b7142957001285248378bf70db62dce0384131b7f7d3b0d12621979c4bec90cb",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "CROSS_SECTIONAL_RELATIVE_SIGNAL",
+      "seed": 307
+    },
+    {
+      "dataset_hash": "a0948aa59c45ab066f031ecc74190c77022ede6297c15cd3800ad2d5b1720688",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "CROSS_SECTIONAL_RELATIVE_SIGNAL",
+      "seed": 11
+    },
+    {
+      "dataset_hash": "e936c2f2d0780ae408d06e0cd30231872f11b8393e90ae2fdc3b6b1d3cf6a75d",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "CROSS_SECTIONAL_RELATIVE_SIGNAL",
+      "seed": 29
+    },
+    {
+      "dataset_hash": "73c5880ff996f76e236ba2db890ad1df733d7d1cb6ec3e5697a22dd937c0be66",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "CROSS_SECTIONAL_RELATIVE_SIGNAL",
+      "seed": 47
+    },
+    {
+      "dataset_hash": "0222c0eeed7d4afc99e664b47e145ec40cc38d07226411b44442c9b0c23b3b90",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "CROSS_SECTIONAL_RELATIVE_SIGNAL",
+      "seed": 83
+    },
+    {
+      "dataset_hash": "78c037708e8272e1b69769f091b919ad437595b712e75c767cab15de72ed0628",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "CROSS_SECTIONAL_RELATIVE_SIGNAL",
+      "seed": 101
+    },
+    {
+      "dataset_hash": "6cf8037b063a544b17329eb836d2b6d912eba4902c6d79495f3e9491ba16ab2a",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "CROSS_SECTIONAL_RELATIVE_SIGNAL",
+      "seed": 131
+    },
+    {
+      "dataset_hash": "28856cc2eb460863674810a5a49a92448528b4e9895b8e30cbd1c273d4855e39",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "CROSS_SECTIONAL_RELATIVE_SIGNAL",
+      "seed": 167
+    },
+    {
+      "dataset_hash": "7549603be894c8ec605123c3f09959e22ee63b054fb30484bdc6da0069e9725d",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "CROSS_SECTIONAL_RELATIVE_SIGNAL",
+      "seed": 211
+    },
+    {
+      "dataset_hash": "7d0b8e3637a68f2db8e54d0696a8da5758edd1ece7b539fc9c6bdf976006d7a1",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "CROSS_SECTIONAL_RELATIVE_SIGNAL",
+      "seed": 257
+    },
+    {
+      "dataset_hash": "799b52ed17f4ff58177d29079d1722fd89d06bb86876299d0d8dbee6a613b20b",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "CROSS_SECTIONAL_RELATIVE_SIGNAL",
+      "seed": 307
+    },
+    {
+      "dataset_hash": "34569ba04a550972c227b4c99cc9875b73e866dc357520ec4692aa120375c826",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "CALIBRATION_STRESS",
+      "seed": 11
+    },
+    {
+      "dataset_hash": "ddb96e29c7bcb628493912190524fbe303a71563dc65cf800f85ad8250e293a7",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "CALIBRATION_STRESS",
+      "seed": 29
+    },
+    {
+      "dataset_hash": "62a5dfd56af2fc627e58a4253bb7cf44e011c1e4fdab4b12ecc845358f31bc7c",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "CALIBRATION_STRESS",
+      "seed": 47
+    },
+    {
+      "dataset_hash": "5c8ee69e45d26bb73acece8c2d489d2bd7491a25354b60804181657af5c11d67",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "CALIBRATION_STRESS",
+      "seed": 83
+    },
+    {
+      "dataset_hash": "7e7bda93cee13cfd9fbe0c07b208ec67d0585521611fecb7b736df72b8ea1c4d",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "CALIBRATION_STRESS",
+      "seed": 101
+    },
+    {
+      "dataset_hash": "84842d68ec2b6a275e3858cfeadb69eb209b5940e30b433d49aa5f41c4070924",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "CALIBRATION_STRESS",
+      "seed": 131
+    },
+    {
+      "dataset_hash": "3eb3308dc755db70a5cf95b7eab30679465d8b1bf9707d9a7c2a7a79e7d92d1c",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "CALIBRATION_STRESS",
+      "seed": 167
+    },
+    {
+      "dataset_hash": "4b4a463122388cb2342dfd941b5e95138977f71d29b2fb448ac22d50bb02191b",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "CALIBRATION_STRESS",
+      "seed": 211
+    },
+    {
+      "dataset_hash": "c17f0c106d0fbf87c4748c81db6372fe7831c12ca1d3ca42b7b57f3d93d76a9c",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "CALIBRATION_STRESS",
+      "seed": 257
+    },
+    {
+      "dataset_hash": "f6e18f8d7f420ca0a454c38a3a84a0c32354f3a1929e7f2f731a5d671d2faeab",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "CALIBRATION_STRESS",
+      "seed": 307
+    },
+    {
+      "dataset_hash": "c3fbed227042718d185c4d364cb7fb09bc08ef040f0ab657593021a59150131b",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "CALIBRATION_STRESS",
+      "seed": 11
+    },
+    {
+      "dataset_hash": "65555a6393dbf3775ca6b8537f3ef4852ceddb65ebf0fa40095c66e31897f1ed",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "CALIBRATION_STRESS",
+      "seed": 29
+    },
+    {
+      "dataset_hash": "60282bd9a7cb38940a3a5fe612e5b8d8e07c664731999af55f66bb66687f6959",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "CALIBRATION_STRESS",
+      "seed": 47
+    },
+    {
+      "dataset_hash": "fae65413130160ec7aa0a0162cc4e5506e7614d9533429bd28ade79f6292bf50",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "CALIBRATION_STRESS",
+      "seed": 83
+    },
+    {
+      "dataset_hash": "5a151d7072cb272eb780db77f9a6ae7670a38cf997beb48c1fc61d21cf6aa835",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "CALIBRATION_STRESS",
+      "seed": 101
+    },
+    {
+      "dataset_hash": "b22247470d0e80ab1e3f38db9095de820f1e689306b4cd91689d21086b9c7467",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "CALIBRATION_STRESS",
+      "seed": 131
+    },
+    {
+      "dataset_hash": "9f73be09c824bbfd1aef4543ce2f9880f1f0056cb3b55b61ccaa26ab76b0ac18",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "CALIBRATION_STRESS",
+      "seed": 167
+    },
+    {
+      "dataset_hash": "c6b1fb0cb045369b5ea07d5632ea94906375c1022ebbd2748045d1e7f1701a29",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "CALIBRATION_STRESS",
+      "seed": 211
+    },
+    {
+      "dataset_hash": "e372ac3b199b98b6828f594b932d1cf40d4c9c69614f2daed407b04a3eb302aa",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "CALIBRATION_STRESS",
+      "seed": 257
+    },
+    {
+      "dataset_hash": "887a58451fc397dea28a131267684a4d71f6b29362c95a3bb9e607cde68b3109",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "CALIBRATION_STRESS",
+      "seed": 307
+    },
+    {
+      "dataset_hash": "fbe27aad62a0394d36515ed8216782c1cc627405593ff59545b054e0e8fef715",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 11
+    },
+    {
+      "dataset_hash": "53ac5abb506cf4c7df5dfa4cbf336ec2a9d97c608a00a4cc83d80d1614454c5e",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 29
+    },
+    {
+      "dataset_hash": "5283de3e33b156f8f31370ba2a15031b383856ed81159932b7c6e904d0adaf5b",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 47
+    },
+    {
+      "dataset_hash": "27a60dc6bdde2b811ae815c44641df0cbd47c8677303cc13a94dd81df7c93c47",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 83
+    },
+    {
+      "dataset_hash": "968ae9e9fcd6d53424c30a650da9dbbf19b0e8beafaf3bd1f99e04a6b38b9248",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 101
+    },
+    {
+      "dataset_hash": "350cce93bc00fa6e16992405d6673e6385a1eaeba866a3e4a5c711e252cf4c48",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 131
+    },
+    {
+      "dataset_hash": "2a045ecf2e540e4656350fd59ebd6d723f08b68b9bcd8cac69c2ef7c14c15374",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 167
+    },
+    {
+      "dataset_hash": "c84221de1b5da09e7a7a45a8b96409869bc7fd3e749a9c55647ad2f99cb2591c",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 211
+    },
+    {
+      "dataset_hash": "8dd930be117baf1749e512353d7604f955529ffecb78d3b6636b40fcd85aa160",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 257
+    },
+    {
+      "dataset_hash": "9cdb69475b626db0fb571a51d1b78fd5b1187ab43e7b617971369e1a4e8c3df1",
+      "rows": 450,
+      "sample_regime": "SMALL_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 307
+    },
+    {
+      "dataset_hash": "905bb52ecea6d66c8d9bc4ef7fdf5cd126b3c6c3074ce20b2cf4244ea32123c3",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 11
+    },
+    {
+      "dataset_hash": "07a66d72b916f16d7f0b4e61174479ce2b844f9787d195e085c9df4345a5b0f5",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 29
+    },
+    {
+      "dataset_hash": "3994b640d005e10c79163a2906382aaaffae0fca6f8629d5704d293b4693f433",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 47
+    },
+    {
+      "dataset_hash": "fdc1194b347f1e750a769ec87bbc756faac2d6726509d80a9f5e204effce8024",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 83
+    },
+    {
+      "dataset_hash": "68f5e2c5210b339c817143c1da9457efbcd1d5b55de8f75c73431b52597dfd8d",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 101
+    },
+    {
+      "dataset_hash": "2b59d0c33bcf8a7ca4f00dd0e0ccf4bb28c6a503745c1ca737e608ea83891937",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 131
+    },
+    {
+      "dataset_hash": "1f48d4d10ba805713c24408a3f39fa9925a539ec44452196f9d95b20856951e6",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 167
+    },
+    {
+      "dataset_hash": "c8f3ae9d3fe59666982111f1dea0fd7ff7c9c43fc6b7c0a01d7c2322d4f68a75",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 211
+    },
+    {
+      "dataset_hash": "11de70b199ce2efab867ff372c5ae9df142e2b9f55b40407ad51b3c5b29cbcbf",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 257
+    },
+    {
+      "dataset_hash": "ce2f55837691ecdd8eb5fca898e8cb6c61d35dba120e27f738e332e3af77b802",
+      "rows": 630,
+      "sample_regime": "LARGER_RESEARCH_SAMPLE",
+      "scenario": "REDUNDANT_CORRELATED_FEATURES",
+      "seed": 307
+    }
+  ],
+  "exp1_dependency": "NEXTGEN_SYNTHETIC_CHALLENGER_EXP1_68BF5571B15AE4D7",
+  "experiment_contract": "NEXTGEN_SYNTHETIC_CHALLENGER_EXPERIMENT_V2_ROBUSTNESS",
+  "experiment_id": "NEXTGEN_SYNTHETIC_CHALLENGER_EXP2_B652CEFAA6316720",
+  "manifest_hash": "d1e309617c53cf5fe4c40d6d978a5cc7dc063f7c8488abab7d0a0865765de9db",
+  "real_data_training": "BLOCKED",
+  "result_artifact_hashes": {
+    "ablation": "a8c1b295104ba83a9f7f7d2e91857c8b9a35ce880b83ba362b0ae2b946173479",
+    "degradation": "5d9104f36ed7b7a88cc8bd0c2f4858476747f209cc4d490219e923e41966ed17",
+    "profiles": "f79f6609468e7976e1600257082d56ebea0619fb7302e40132c4977839647ce5",
+    "results": "ceb621143c4d0e1695ee2e178c8d3ac415f6eb495c0fdaab93d9c26f95a0114e",
+    "summary": "8e9a8099875005c084f80d09b344551d83c1ea88a90086170407e460240eaead"
+  },
+  "rights_status": "LICENSE_REQUIRED",
+  "selected_family": "SIMPLE_CHALLENGER_LOGISTIC_PREFERRED",
+  "selection_evidence": {
+    "model_scores": {
+      "GRADIENT_BOOSTING": {
+        "complexity": 3,
+        "degradation": 0.006057382373790093,
+        "rank_ic": 0.3174224638842532,
+        "top5": 0.03636734323589888
+      },
+      "LOGISTIC_REGRESSION": {
+        "complexity": 1,
+        "degradation": 0.003212247385222932,
+        "rank_ic": 0.3507778024444691,
+        "top5": 0.038167876115016014
+      },
+      "RANDOM_FOREST": {
+        "complexity": 2,
+        "degradation": 0.004998040549796901,
+        "rank_ic": 0.3177511508321899,
+        "top5": 0.03646590104445921
+      }
+    },
+    "reason": "least complex robust candidate"
+  },
+  "specification": {
+    "authority": "RESEARCH_ONLY_SYNTHETIC_SHADOW",
+    "contract": "NEXTGEN_SYNTHETIC_CHALLENGER_EXPERIMENT_V2_ROBUSTNESS",
+    "exp1_dependency": "NEXTGEN_SYNTHETIC_CHALLENGER_EXP1_68BF5571B15AE4D7",
+    "features": [
+      "technical_5",
+      "momentum_20",
+      "volatility_20",
+      "liquidity_20",
+      "market_20",
+      "redundant_signal_1",
+      "redundant_signal_2"
+    ],
+    "metrics": [
+      "ROC_AUC",
+      "PR_AUC",
+      "BRIER",
+      "BRIER_SKILL",
+      "IC",
+      "RANK_IC",
+      "PRECISION_AT_K",
+      "TOP_K_SYNTHETIC_RETURN"
+    ],
+    "model_configurations": {
+      "DETERMINISTIC_REFERENCE": {
+        "complexity": 0,
+        "config": {},
+        "seed_offset": 0
+      },
+      "GRADIENT_BOOSTING": {
+        "complexity": 3,
+        "config": {
+          "learning_rate": 0.22,
+          "max_depth": 1,
+          "rounds": 4
+        },
+        "seed_offset": 3000
+      },
+      "LOGISTIC_REGRESSION": {
+        "complexity": 1,
+        "config": {
+          "iterations": 50,
+          "learning_rate": 0.06,
+          "regularization": "L2_FIXED_LIGHT"
+        },
+        "seed_offset": 1000
+      },
+      "RANDOM_FOREST": {
+        "complexity": 2,
+        "config": {
+          "max_depth": 1,
+          "min_leaf": 8,
+          "trees": 5
+        },
+        "seed_offset": 2000
+      }
+    },
+    "null_warning_rule": {
+      "challenger_roc_auc_mean_gt": 0.62,
+      "challenger_top5_relative_mean_gt": 0.02
+    },
+    "real_data_training": "BLOCKED",
+    "rights_status": "LICENSE_REQUIRED",
+    "robustness": [
+      "SIGN_CONSISTENCY",
+      "PCT_SEEDS_OUTPERFORMING_REFERENCE",
+      "WORST_SEED",
+      "VALIDATION_TO_FINAL_TEST_DEGRADATION"
+    ],
+    "sample_regimes": {
+      "LARGER_RESEARCH_SAMPLE": {
+        "days": 45,
+        "securities": 14
+      },
+      "SMALL_RESEARCH_SAMPLE": {
+        "days": 45,
+        "securities": 10
+      }
+    },
+    "scenarios": {
+      "ABRUPT_REGIME_BREAK": "Useful relation becomes invalid after a structural break.",
+      "CALIBRATION_STRESS": "Ranking useful while calibration is intentionally difficult.",
+      "CROSS_SECTIONAL_RELATIVE_SIGNAL": "Primarily within-session relative signal.",
+      "GRADUAL_REGIME_DRIFT": "Feature/outcome relation changes gradually through time.",
+      "HIGH_NOISE_LOW_SIGNAL": "Very low signal-to-noise ratio.",
+      "NULL_NO_SIGNAL_V2": "No true predictive relationship.",
+      "REDUNDANT_CORRELATED_FEATURES": "Correlated features represent the same underlying signal.",
+      "SPURIOUS_DEVELOPMENT_SIGNAL": "Development-period signal disappears in final test.",
+      "STABLE_LINEAR_WEAK": "Persistent modest linear signal.",
+      "STABLE_NONLINEAR_INTERACTION": "Material nonlinear interactions."
+    },
+    "seeds": [
+      11,
+      29,
+      47,
+      83,
+      101,
+      131,
+      167,
+      211,
+      257,
+      307
+    ],
+    "selection_outcomes": [
+      "SIMPLE_CHALLENGER_LOGISTIC_PREFERRED",
+      "SIMPLE_CHALLENGER_RANDOM_FOREST_PREFERRED",
+      "SIMPLE_CHALLENGER_GRADIENT_BOOSTING_PREFERRED",
+      "NO_SIMPLE_MODEL_FAMILY_PREFERRED",
+      "INSUFFICIENT_SYNTHETIC_EVIDENCE"
+    ],
+    "selection_rule": "Prefer the least complex challenger with robust stable/cross-sectional value, acceptable null/spurious/regime behavior, and no severe validation-to-test collapse.",
+    "temporal_boundaries": {
+      "embargo_sessions": 5,
+      "horizon": 5,
+      "method": "EXPANDING_WINDOW",
+      "test_end": "2026-02-14",
+      "train_end": "2026-01-20",
+      "validation_end": "2026-02-02"
+    }
+  },
+  "specification_hash": "b652cefaa6316720cd8ac0a81db70e0e71c13797c93f91e42006078f85a35ace",
+  "synthetic_only": true
+}
