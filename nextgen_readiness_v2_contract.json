@@ -1,0 +1,48 @@
+{
+  "contract_id": "NEXTGEN_ADVANCED_RESEARCH_READINESS_V2_CONTRACT",
+  "result": "PASS_FAIL_CLOSED",
+  "branch": "nextgen-research-historical-evidence",
+  "parent_commit": "c00853e15e6d3496f06bb7151808c6da48d0cbd6",
+  "v1_artifact_preserved": true,
+  "v1_file_sha256": "70b603aecd427e9947d4fbf4a68b9eb6f32ff2c1151a930049300d343c5ba6b4",
+  "v2_schema": "ADVANCED_RESEARCH_READINESS_V2",
+  "v2_status": "NOT_READY",
+  "candidate_evidence_years": [2026],
+  "partial_snapshot_years": [2026],
+  "fully_research_eligible_years": [],
+  "recommended_safe_research_period": null,
+  "current_required_gates": {
+    "pit_universe_coverage_sufficient": false,
+    "survivorship_distortion_materially_reduced": false,
+    "identity_history_sufficient": false,
+    "execution_cost_coverage_sufficient": true,
+    "benchmark_prices_available": true,
+    "features_pit_safe": false,
+    "calibration_and_challenger_governance_ready": true
+  },
+  "profile_dependencies": {
+    "index_constituent_pit_requires_historical_index_membership": true,
+    "sector_neutral_or_relative_research_requires_historical_sector": true,
+    "exchange_wide_pit_does_not_unconditionally_require_index_membership": true
+  },
+  "counterfactual_tests": "22/22 PASS",
+  "regressions": {
+    "historical_evidence": "63/63 PASS",
+    "real_data": "58/58 PASS",
+    "nextgen_foundation": "104/104 PASS",
+    "stage6_8c": "170/170 PASS",
+    "stage5d": "606/606 PASS",
+    "stage6_0c": "PASS / 10 schemas",
+    "full_stage6": "FROZEN_TEST_HARNESS_BRANCH_CONSTRAINT",
+    "stage6_4a_classification": "FROZEN_TEST_HARNESS_BRANCH_CONSTRAINT"
+  },
+  "boundaries": {
+    "active_lane_changed_files": 0,
+    "active_model_changed": false,
+    "training_started": false,
+    "challenger_promoted": false,
+    "prospective_runtime_changed": false,
+    "runtime_artifacts_committed": 0,
+    "tags_created": 0
+  }
+}

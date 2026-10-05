@@ -1,0 +1,38 @@
+{
+  "artifact_sha256": "869a3615b5e4b06b97acca0ebeb28315619bfc01c924a1e9f389dcced56d20b5",
+  "artifact_type": "NIFTY500_LIFECYCLE_TATA_MOTORS_DEMERGER_V1",
+  "authority": "SHADOW_ONLY",
+  "dummy": {
+    "classification": "INDEX_ACCOUNTING_PLACEHOLDER_NONTRADABLE",
+    "effective_from": "2025-10-14",
+    "effective_to": "2025-11-11",
+    "symbol": "DUMMYTATAM"
+  },
+  "predecessor": {
+    "isin": "INE155A01022",
+    "legal_name": "Tata Motors Passenger Vehicles Ltd. (formerly Tata Motors Ltd.)",
+    "symbol_after_scheme": "TMPV"
+  },
+  "sources": [
+    {
+      "publisher": "NSE_INDICES_OR_NSE",
+      "purpose": "TEMP-TATA-MOTORS-ADD",
+      "sha256": "58bafe38fcb153c8ee2794589497b452484b53f3a8c77247d7434368967b2459",
+      "url": "https://www.niftyindices.com/Press_Release/ind_prs07102025.pdf"
+    },
+    {
+      "publisher": "NSE_INDICES_OR_NSE",
+      "purpose": "TATA_MOTORS_EXIT",
+      "sha256": "57dd346835e402f5f5384672f7f7beb71ddf4d67e1af604251fa2ce27b286ea4",
+      "url": "https://www.niftyindices.com/Press_Release/ind_prs13112025.pdf"
+    }
+  ],
+  "status": "RESOLVED",
+  "successor": {
+    "isin": "INE1TAE01010",
+    "legal_name": "Tata Motors Ltd. (formerly TML Commercial Vehicles Ltd.)",
+    "listing_date": "2025-11-12",
+    "symbol": "TMCV"
+  },
+  "temporary_index_exit_effective": "2025-11-17"
+}

@@ -1,0 +1,29 @@
+{
+  "artifact_type": "NEXTGEN_CROSS_SECTIONAL_DATASET_CONTRACT_V1",
+  "authority": "RESEARCH_ONLY",
+  "classifications": [
+    "SYNTHETIC_TEST_FIXTURE",
+    "REAL_RESTRICTED_RESEARCH_DATASET"
+  ],
+  "current_survivor_universe": "PROHIBITED",
+  "pit_rules": [
+    "FEATURE_AVAILABLE_AT_LE_DECISION_CUTOFF",
+    "LABEL_AVAILABLE_AT_LE_TRAINING_CUTOFF"
+  ],
+  "required_fields": [
+    "decision_date",
+    "security_id",
+    "isin",
+    "symbol",
+    "pit_universe_member",
+    "investability_status",
+    "warmup_status",
+    "feature_available_at",
+    "label_available_at",
+    "benchmark_binding",
+    "execution_policy_binding",
+    "source_manifest_binding",
+    "dataset_classification"
+  ],
+  "row_grain": "SECURITY_X_DECISION_DATE"
+}

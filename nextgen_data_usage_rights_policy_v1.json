@@ -1,0 +1,46 @@
+{
+  "artifact_type": "NEXTGEN_DATA_USAGE_RIGHTS_POLICY_V1",
+  "authority": "SHADOW_ONLY",
+  "benchmark": {
+    "classification": "LICENSE_REQUIRED",
+    "permission_action": "OBTAIN_NSE_INDICES_DATA_SUBSCRIPTION_OR_WRITTEN_SCOPE_CONFIRMATION"
+  },
+  "governance_not_legal_advice": true,
+  "market_panel": {
+    "channel": "PUBLIC_HISTORICAL_REPORT_ARCHIVE",
+    "classification": "MODEL_TRAINING_RIGHTS_NOT_ESTABLISHED",
+    "permission_action": "OBTAIN_EXPLICIT_NSE_DATA_AGREEMENT_OR_WRITTEN_PERMISSION"
+  },
+  "mcp": {
+    "classification": "PROHIBITED_FOR_MODEL_TRAINING_WITHOUT_SEPARATE_PERMISSION",
+    "official_terms_explicit": true,
+    "rows_used": 0
+  },
+  "public_access_does_not_imply_training_permission": true,
+  "sources": {
+    "NIFTY_DATA_SUBSCRIPTION": {
+      "sha256": "86cb98760e289034b64b917881a3bd9cdaae65071dfc64dfa0422055b1f66cbc",
+      "url": "https://www.niftyindices.com/offerings/data-subscription"
+    },
+    "NIFTY_TERMS_OF_USE": {
+      "sha256": "11e46d44f7d11f1969e428cb6f3bc8e1b397578d066609e720bc9372a3197437",
+      "url": "https://www.niftyindices.com/terms-of-use"
+    },
+    "NSE_DATA_POLICY": {
+      "sha256": "effd4929e17209e19c018f2d4bb87b6c7339fdaa2943bad0d10fdc45274f5135",
+      "url": "https://www.nseindia.com/static/market-data/nse-data-policy"
+    },
+    "NSE_MCP_TERMS": {
+      "sha256": "57a5cddb470e4c9dcea09255cfc14f58ffe0e67f8f519592180c6e50efdb8970",
+      "url": "https://www.nseindia.com/nse-mcp"
+    }
+  },
+  "states": [
+    "EXPLICITLY_PERMITTED_FOR_INTENDED_RESEARCH",
+    "RESEARCH_ANALYSIS_ONLY",
+    "MODEL_TRAINING_RIGHTS_NOT_ESTABLISHED",
+    "PERMISSION_REQUIRED",
+    "LICENSE_REQUIRED",
+    "PROHIBITED_FOR_MODEL_TRAINING"
+  ]
+}

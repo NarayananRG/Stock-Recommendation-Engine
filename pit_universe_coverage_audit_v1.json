@@ -1,0 +1,215 @@
+{
+  "active_prospective_authority": "NONE",
+  "active_recommendation_influence": "NONE",
+  "active_source_registry_authority": "NONE",
+  "authority": "RESEARCH_ONLY",
+  "authority_scope": "RESEARCH_ONLY",
+  "dated_security_master_status": "DATED_SECURITY_MASTER_DATA_GAP",
+  "model_promotion_authority": "NONE",
+  "record_hash": "e1a8039bfac85a6d6ce9147803ec02637a7f395e9f48ba9456b61bbb96a02451",
+  "record_id": "PIT_UNIVERSE_COVERAGE_AUDIT_V1_e1a8039bfac85a6d6ce91478",
+  "research_period": "2016-01-01..2026-10-03",
+  "schema": "PIT_UNIVERSE_COVERAGE_AUDIT_V1",
+  "survivorship_bias_fully_solved": false,
+  "trading_authority": false,
+  "years": [
+    {
+      "as_of_date": "2016-12-31",
+      "criteria": "SUFFICIENT requires exact-date comprehensive master, stable identity, and bounded unknown share; no year meets it.",
+      "cross_sectional_research_status": "INSUFFICIENT",
+      "evidence_sources_used": [
+        "NSE_EQUITY_SECURITY_MASTER_20261003",
+        "NSE_DELISTED_COMPANIES_20260910"
+      ],
+      "historical_index_membership_coverage": "DATA_GAP",
+      "historical_sector_coverage": "UNKNOWN",
+      "known_delisted_securities": 132,
+      "known_listed_securities": 1248,
+      "symbol_history_coverage": "PARTIAL_EVENT_EVIDENCE",
+      "unknown_eligibility_count": 1248,
+      "verified_eligibility_count": 0,
+      "verified_not_yet_listed_count": 1345,
+      "year": 2016
+    },
+    {
+      "as_of_date": "2017-12-31",
+      "criteria": "SUFFICIENT requires exact-date comprehensive master, stable identity, and bounded unknown share; no year meets it.",
+      "cross_sectional_research_status": "INSUFFICIENT",
+      "evidence_sources_used": [
+        "NSE_EQUITY_SECURITY_MASTER_20261003",
+        "NSE_DELISTED_COMPANIES_20260910"
+      ],
+      "historical_index_membership_coverage": "DATA_GAP",
+      "historical_sector_coverage": "UNKNOWN",
+      "known_delisted_securities": 207,
+      "known_listed_securities": 1322,
+      "symbol_history_coverage": "PARTIAL_EVENT_EVIDENCE",
+      "unknown_eligibility_count": 1322,
+      "verified_eligibility_count": 0,
+      "verified_not_yet_listed_count": 1271,
+      "year": 2017
+    },
+    {
+      "as_of_date": "2018-12-31",
+      "criteria": "SUFFICIENT requires exact-date comprehensive master, stable identity, and bounded unknown share; no year meets it.",
+      "cross_sectional_research_status": "INSUFFICIENT",
+      "evidence_sources_used": [
+        "NSE_EQUITY_SECURITY_MASTER_20261003",
+        "NSE_DELISTED_COMPANIES_20260910"
+      ],
+      "historical_index_membership_coverage": "DATA_GAP",
+      "historical_sector_coverage": "UNKNOWN",
+      "known_delisted_securities": 300,
+      "known_listed_securities": 1362,
+      "symbol_history_coverage": "PARTIAL_EVENT_EVIDENCE",
+      "unknown_eligibility_count": 1362,
+      "verified_eligibility_count": 0,
+      "verified_not_yet_listed_count": 1231,
+      "year": 2018
+    },
+    {
+      "as_of_date": "2019-12-31",
+      "criteria": "SUFFICIENT requires exact-date comprehensive master, stable identity, and bounded unknown share; no year meets it.",
+      "cross_sectional_research_status": "INSUFFICIENT",
+      "evidence_sources_used": [
+        "NSE_EQUITY_SECURITY_MASTER_20261003",
+        "NSE_DELISTED_COMPANIES_20260910"
+      ],
+      "historical_index_membership_coverage": "DATA_GAP",
+      "historical_sector_coverage": "UNKNOWN",
+      "known_delisted_securities": 318,
+      "known_listed_securities": 1423,
+      "symbol_history_coverage": "PARTIAL_EVENT_EVIDENCE",
+      "unknown_eligibility_count": 1422,
+      "verified_eligibility_count": 0,
+      "verified_not_yet_listed_count": 1170,
+      "year": 2019
+    },
+    {
+      "as_of_date": "2020-12-31",
+      "criteria": "SUFFICIENT requires exact-date comprehensive master, stable identity, and bounded unknown share; no year meets it.",
+      "cross_sectional_research_status": "INSUFFICIENT",
+      "evidence_sources_used": [
+        "NSE_EQUITY_SECURITY_MASTER_20261003",
+        "NSE_DELISTED_COMPANIES_20260910"
+      ],
+      "historical_index_membership_coverage": "CHANGE_EVENTS_ONLY",
+      "historical_sector_coverage": "UNKNOWN",
+      "known_delisted_securities": 342,
+      "known_listed_securities": 1500,
+      "symbol_history_coverage": "PARTIAL_EVENT_EVIDENCE",
+      "unknown_eligibility_count": 1499,
+      "verified_eligibility_count": 0,
+      "verified_not_yet_listed_count": 1093,
+      "year": 2020
+    },
+    {
+      "as_of_date": "2021-12-31",
+      "criteria": "SUFFICIENT requires exact-date comprehensive master, stable identity, and bounded unknown share; no year meets it.",
+      "cross_sectional_research_status": "INSUFFICIENT",
+      "evidence_sources_used": [
+        "NSE_EQUITY_SECURITY_MASTER_20261003",
+        "NSE_DELISTED_COMPANIES_20260910"
+      ],
+      "historical_index_membership_coverage": "DATA_GAP",
+      "historical_sector_coverage": "UNKNOWN",
+      "known_delisted_securities": 387,
+      "known_listed_securities": 1649,
+      "symbol_history_coverage": "PARTIAL_EVENT_EVIDENCE",
+      "unknown_eligibility_count": 1648,
+      "verified_eligibility_count": 0,
+      "verified_not_yet_listed_count": 944,
+      "year": 2021
+    },
+    {
+      "as_of_date": "2022-12-31",
+      "criteria": "SUFFICIENT requires exact-date comprehensive master, stable identity, and bounded unknown share; no year meets it.",
+      "cross_sectional_research_status": "INSUFFICIENT",
+      "evidence_sources_used": [
+        "NSE_EQUITY_SECURITY_MASTER_20261003",
+        "NSE_DELISTED_COMPANIES_20260910"
+      ],
+      "historical_index_membership_coverage": "DATA_GAP",
+      "historical_sector_coverage": "UNKNOWN",
+      "known_delisted_securities": 407,
+      "known_listed_securities": 1766,
+      "symbol_history_coverage": "PARTIAL_EVENT_EVIDENCE",
+      "unknown_eligibility_count": 1765,
+      "verified_eligibility_count": 0,
+      "verified_not_yet_listed_count": 827,
+      "year": 2022
+    },
+    {
+      "as_of_date": "2023-12-31",
+      "criteria": "SUFFICIENT requires exact-date comprehensive master, stable identity, and bounded unknown share; no year meets it.",
+      "cross_sectional_research_status": "INSUFFICIENT",
+      "evidence_sources_used": [
+        "NSE_EQUITY_SECURITY_MASTER_20261003",
+        "NSE_DELISTED_COMPANIES_20260910"
+      ],
+      "historical_index_membership_coverage": "DATA_GAP",
+      "historical_sector_coverage": "UNKNOWN",
+      "known_delisted_securities": 426,
+      "known_listed_securities": 1897,
+      "symbol_history_coverage": "PARTIAL_EVENT_EVIDENCE",
+      "unknown_eligibility_count": 1896,
+      "verified_eligibility_count": 0,
+      "verified_not_yet_listed_count": 696,
+      "year": 2023
+    },
+    {
+      "as_of_date": "2024-12-31",
+      "criteria": "SUFFICIENT requires exact-date comprehensive master, stable identity, and bounded unknown share; no year meets it.",
+      "cross_sectional_research_status": "INSUFFICIENT",
+      "evidence_sources_used": [
+        "NSE_EQUITY_SECURITY_MASTER_20261003",
+        "NSE_DELISTED_COMPANIES_20260910"
+      ],
+      "historical_index_membership_coverage": "DATA_GAP",
+      "historical_sector_coverage": "UNKNOWN",
+      "known_delisted_securities": 435,
+      "known_listed_securities": 2041,
+      "symbol_history_coverage": "PARTIAL_EVENT_EVIDENCE",
+      "unknown_eligibility_count": 2040,
+      "verified_eligibility_count": 0,
+      "verified_not_yet_listed_count": 552,
+      "year": 2024
+    },
+    {
+      "as_of_date": "2025-12-31",
+      "criteria": "SUFFICIENT requires exact-date comprehensive master, stable identity, and bounded unknown share; no year meets it.",
+      "cross_sectional_research_status": "INSUFFICIENT",
+      "evidence_sources_used": [
+        "NSE_EQUITY_SECURITY_MASTER_20261003",
+        "NSE_DELISTED_COMPANIES_20260910"
+      ],
+      "historical_index_membership_coverage": "DATA_GAP",
+      "historical_sector_coverage": "UNKNOWN",
+      "known_delisted_securities": 448,
+      "known_listed_securities": 2217,
+      "symbol_history_coverage": "PARTIAL_EVENT_EVIDENCE",
+      "unknown_eligibility_count": 2216,
+      "verified_eligibility_count": 0,
+      "verified_not_yet_listed_count": 376,
+      "year": 2025
+    },
+    {
+      "as_of_date": "2026-10-03",
+      "criteria": "SUFFICIENT requires exact-date comprehensive master, stable identity, and bounded unknown share; no year meets it.",
+      "cross_sectional_research_status": "PARTIAL_USE_WITH_CAUTION",
+      "evidence_sources_used": [
+        "NSE_EQUITY_SECURITY_MASTER_20261003",
+        "NSE_DELISTED_COMPANIES_20260910"
+      ],
+      "historical_index_membership_coverage": "DATA_GAP",
+      "historical_sector_coverage": "UNKNOWN",
+      "known_delisted_securities": 457,
+      "known_listed_securities": 2593,
+      "symbol_history_coverage": "PARTIAL_EVENT_EVIDENCE",
+      "unknown_eligibility_count": 0,
+      "verified_eligibility_count": 2589,
+      "verified_not_yet_listed_count": 0,
+      "year": 2026
+    }
+  ]
+}

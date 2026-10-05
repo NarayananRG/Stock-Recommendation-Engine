@@ -1,0 +1,12 @@
+{
+  "artifact_type": "PIT_PRICE_NORMALIZATION_POLICY_V1",
+  "authority": "SHADOW_ONLY",
+  "future_action_use": "PROHIBITED",
+  "rule": "only actions known and effective by feature date may normalize earlier raw prices",
+  "states": [
+    "RAW_OFFICIAL_PRICE",
+    "PIT_NORMALIZED_PRICE",
+    "RETROSPECTIVELY_ADJUSTED_NOT_ALLOWED_FOR_PIT_FEATURES"
+  ],
+  "unknown_terms": "FAIL_CLOSED"
+}

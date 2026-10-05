@@ -1,0 +1,16 @@
+{
+  "artifact_type": "RESTRICTED_FEATURE_HISTORY_POLICY_V1",
+  "authority": "SHADOW_ONLY",
+  "dummy_price_splicing": "PROHIBITED",
+  "eligible_after_valid_session_count": 60,
+  "horizons_sessions": [
+    5,
+    10,
+    20,
+    60
+  ],
+  "maximum_lookback_sessions": 60,
+  "new_security_policy": "REAL_POST_LISTING_HISTORY_ONLY",
+  "pre_listing_history": "PROHIBITED",
+  "warmup_state": "FEATURE_WARMUP_NOT_COMPLETE"
+}

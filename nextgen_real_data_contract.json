@@ -1,0 +1,96 @@
+{
+  "contract_id": "NEXTGEN_REAL_DATA_FOUNDATION_CONTRACT_V1",
+  "result": "PASS_WITH_EXPLICIT_DATA_GAPS",
+  "authority": "RESEARCH_ONLY",
+  "parent_commit": "c6e03f9e1ee3cab6600e441ebc7390819716fdb2",
+  "branch": "nextgen-research-real-data-foundation",
+  "active_lane_changed_files": 0,
+  "real_security_master": {
+    "source": "NSE_OFFICIAL_EQUITY_SECURITY_MASTER",
+    "archive_records": 2593,
+    "archive_sha256": "95f0d731f5858f71e876c45377dcefa79bc7a8db1e8161d0c92320252af4aa8f",
+    "status": "REAL_VERIFIED_CURRENT_SNAPSHOT_PARTIAL_HISTORY",
+    "historical_security_master": "HISTORICAL_SECURITY_MASTER_NOT_AVAILABLE",
+    "historical_index_membership": "DATA_GAP",
+    "historical_sector_membership": "UNKNOWN",
+    "survivorship_bias_fully_solved": false
+  },
+  "real_delistings": {
+    "source": "NSE_OFFICIAL_DELISTED_COMPANIES",
+    "archive_records": 457,
+    "earliest_effective_date": "2002-04-15",
+    "latest_effective_date": "2026-09-02",
+    "archive_sha256": "fcc27d5850f381fa0193003ddbd4d2f7724c770e9082d7fbbad6b97dd87f1664",
+    "status": "REAL_VERIFIED_PARTIAL_HISTORY"
+  },
+  "india_cost_schedule": {
+    "artifact_id": "INDIA_EQUITY_COST_SCHEDULE_V1",
+    "canonical_hash": "07a13200b53ec82a36d4a100bc8914789d3525539fb83762c5074d85cbe01afa",
+    "effective_from": "2024-10-01",
+    "effective_to": null,
+    "uncovered_dates_fail_closed": "COST_SCHEDULE_NOT_VERIFIED_FOR_DATE",
+    "brokerage": "BROKER_SPECIFIC_CONFIGURABLE_INPUT",
+    "historical_coverage": "PARTIAL"
+  },
+  "future_sources": {
+    "live_connectors": 0,
+    "nse_announcements": "VERIFIED_NOT_IMPLEMENTED_AUTOMATION_RESTRICTED",
+    "nse_corporate_actions": "VERIFIED_NOT_IMPLEMENTED",
+    "bse_filings": "VERIFIED_NOT_IMPLEMENTED_AUTOMATION_RESTRICTED",
+    "activated_into_stage6_v1": false
+  },
+  "calibration": {
+    "audit_record_id": "REAL_CALIBRATION_AUDIT_V1_e83c661b3281a0b90fcbb31c",
+    "audit_record_hash": "e83c661b3281a0b90fcbb31cf1dc47f448ab9d4d3415f9127f7c533738da0afe",
+    "model_bundle_hash": "4631eb8a1d0b34212252df3b1aae180f64ec98ba5e7955a84729df0a471c62da",
+    "evaluated_models": 7,
+    "models_promoted_to_calibrated_probability": 0,
+    "model_retraining": false
+  },
+  "drift": {
+    "schema": "MODEL_DRIFT_ASSESSMENT_V1",
+    "policy_id": "MODEL_DRIFT_RESEARCH_POLICY_V1",
+    "statuses": [
+      "STABLE",
+      "POSSIBLE_DRIFT",
+      "MATERIAL_DRIFT",
+      "INSUFFICIENT_DATA"
+    ],
+    "automatic_action": "NONE",
+    "automatic_retraining": false
+  },
+  "coverage_report": {
+    "artifact_id": "NEXTGEN_DATA_COVERAGE_REPORT_V1",
+    "file_sha256": "9111991a9483cc908e1f52bf8e15bafd024d1b6fb6f08173901ea516c9773349"
+  },
+  "tests": {
+    "focused": "58/58 PASS",
+    "nextgen_foundation": "104/104 PASS",
+    "stage6_8c": "170/170 PASS",
+    "full_stage6": "5908/5908 PASS",
+    "stage5d": "606/606 PASS",
+    "stage6_0c": "PASS / 10 schemas"
+  },
+  "active_identities": {
+    "stage4a3_model_bundle_hash": "4631eb8a1d0b34212252df3b1aae180f64ec98ba5e7955a84729df0a471c62da",
+    "stage4a3_source_package_hash": "cc1b7bfc85c77e40f029a5ccff670e531445e5051932dab7e7e8abd2116bdc2f",
+    "stage6_v1_source_registry_hash": "7d91f4c72365757b6cdfaef0c4027c46bfbdb11c3541c229e828f9ee28d58e90",
+    "stage6_8c_policy_hash": "78f0d43da4826896801f030646622fe1324101b592cd178642c67120bdfbfa94",
+    "stage6_8c_contract_hash": "8f7fce02be208cfbe2c0c6e95f5127323b5b871c50ff3fa68a451c418ace093e",
+    "activation_id": "S6PROSACT_7a2195d6a80d73508727c088",
+    "activation_hash": "0f3e6f69de267a85d6fd9f1937bc71f926a01fdfad162d18b5c2401275e64336"
+  },
+  "boundaries": {
+    "active_model_retrained": false,
+    "challenger_trained": false,
+    "challenger_promoted": false,
+    "recommendation_logic_changed": false,
+    "live_prospective_runtime_mutated": false,
+    "network_calls_in_tests": 0,
+    "runtime_artifacts_committed": 0,
+    "raw_bulk_archives_committed": 0,
+    "trading_authority": false,
+    "model_authority": false,
+    "tags_created": 0
+  }
+}

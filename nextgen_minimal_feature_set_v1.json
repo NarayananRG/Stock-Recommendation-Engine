@@ -1,0 +1,77 @@
+{
+  "artifact_type": "NEXTGEN_MINIMAL_FEATURE_SET_V1",
+  "authority": "RESEARCH_ONLY",
+  "canonical_hash": "b984d4c751bbeb9471c7ac3a52f97df6c982b60dbaf7e5a6889dce54e7acc48d",
+  "definitions": [
+    {
+      "availability_rule": "AFTER_CLOSE_T",
+      "calculation_version": "V1",
+      "feature_id": "technical_5",
+      "feature_version": 1,
+      "lookback": 5,
+      "required_source_fields": [
+        "close"
+      ]
+    },
+    {
+      "availability_rule": "AFTER_CLOSE_T",
+      "calculation_version": "V1",
+      "feature_id": "momentum_20",
+      "feature_version": 1,
+      "lookback": 20,
+      "required_source_fields": [
+        "close"
+      ]
+    },
+    {
+      "availability_rule": "AFTER_CLOSE_T",
+      "calculation_version": "V1",
+      "feature_id": "volatility_20",
+      "feature_version": 1,
+      "lookback": 20,
+      "required_source_fields": [
+        "high",
+        "low",
+        "close"
+      ]
+    },
+    {
+      "availability_rule": "AFTER_CLOSE_T",
+      "calculation_version": "V1",
+      "feature_id": "liquidity_20",
+      "feature_version": 1,
+      "lookback": 20,
+      "required_source_fields": [
+        "volume",
+        "turnover"
+      ]
+    },
+    {
+      "availability_rule": "AFTER_CLOSE_T",
+      "calculation_version": "V1",
+      "feature_id": "market_20",
+      "feature_version": 1,
+      "lookback": 20,
+      "required_source_fields": [
+        "benchmark_close"
+      ]
+    }
+  ],
+  "horizons_sessions": [
+    5,
+    10,
+    20,
+    60
+  ],
+  "optional_families": [
+    "fundamentals",
+    "stage6_events"
+  ],
+  "required_families": [
+    "technical",
+    "momentum",
+    "volatility",
+    "liquidity",
+    "market"
+  ]
+}

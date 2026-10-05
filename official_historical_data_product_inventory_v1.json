@@ -1,0 +1,348 @@
+{
+  "active_prospective_authority": "NONE",
+  "active_recommendation_influence": "NONE",
+  "active_source_registry_authority": "NONE",
+  "authority": "RESEARCH_ONLY",
+  "model_promotion_authority": "NONE",
+  "official_sources_only": true,
+  "products": [
+    {
+      "acquisition_mechanism": "official subscription",
+      "acquisition_status": "SUBSCRIPTION_REQUIRED",
+      "dataset_purpose": "Official EOD bhavcopy, security and trade-detail history",
+      "delivery_format": "SFTP or online product delivery",
+      "derived_data_commit_allowed": false,
+      "fields_advertised": [
+        "EOD bhavcopy",
+        "security details",
+        "trade details"
+      ],
+      "granularity": "daily and trade/order detail by product",
+      "historical_coverage_advertised": "Historical; exact deliverable coverage subject to provider",
+      "licence_status": "OFFICIAL_COMMERCIAL_LICENCE_REQUIRED",
+      "machine_readable": true,
+      "market_scope": "NSE Capital Market",
+      "official_reference": "https://betanseapi.nseindia.com/static/market-data/eod-historical-data-subscription",
+      "product_id": "NSE_CM_EOD_HISTORICAL",
+      "product_name": "EOD / Historical Data - Capital Market",
+      "provider": "National Stock Exchange of India",
+      "raw_data_commit_allowed": false,
+      "readiness_gates": [
+        "market_data",
+        "security_reference",
+        "liquidity"
+      ],
+      "redistribution_status": "RESTRICTED",
+      "research_profiles": [
+        "EXCHANGE_WIDE_PIT",
+        "INDEX_CONSTITUENT_PIT"
+      ],
+      "source_classification": "OFFICIAL_SUBSCRIPTION_REQUIRED",
+      "usage_scope": "LICENSE_TERMS_CONTROLLED_RESEARCH",
+      "verification_date": "2026-10-04"
+    },
+    {
+      "acquisition_mechanism": "official report download",
+      "acquisition_status": "PUBLICLY_ACQUIRED",
+      "dataset_purpose": "Security identity and reference fields",
+      "delivery_format": "CSV/report",
+      "derived_data_commit_allowed": true,
+      "fields_advertised": [
+        "symbol",
+        "ISIN",
+        "company",
+        "series",
+        "listing date"
+      ],
+      "granularity": "snapshot",
+      "historical_coverage_advertised": "Current report; complete dated historical series not established",
+      "licence_status": "PUBLIC_ACCESS_TERMS_APPLY",
+      "machine_readable": true,
+      "market_scope": "NSE Capital Market",
+      "official_reference": "https://www.nseindia.com/static/products-services/equity-market-data-reports-download",
+      "product_id": "NSE_SECURITIES_MASTER",
+      "product_name": "Securities master / equity security list",
+      "provider": "National Stock Exchange of India",
+      "raw_data_commit_allowed": false,
+      "readiness_gates": [
+        "identity",
+        "current_snapshot"
+      ],
+      "redistribution_status": "LICENCE_RESTRICTIONS_UNKNOWN",
+      "research_profiles": [
+        "EXCHANGE_WIDE_PIT"
+      ],
+      "source_classification": "OFFICIAL_PUBLIC_VERIFIED",
+      "usage_scope": "RESEARCH_ONLY",
+      "verification_date": "2026-10-04"
+    },
+    {
+      "acquisition_mechanism": "official report interface",
+      "acquisition_status": "MANUAL_REQUEST_REQUIRED",
+      "dataset_purpose": "Public daily and historical exchange reports",
+      "delivery_format": "CSV/ZIP/PDF",
+      "derived_data_commit_allowed": true,
+      "fields_advertised": [
+        "bhavcopy",
+        "price-volume",
+        "reference reports"
+      ],
+      "granularity": "daily/monthly/report",
+      "historical_coverage_advertised": "Varies by report",
+      "licence_status": "PUBLIC_ACCESS_TERMS_APPLY",
+      "machine_readable": true,
+      "market_scope": "NSE markets",
+      "official_reference": "https://www.nseindia.com/all-reports",
+      "product_id": "NSE_PUBLIC_REPORT_ARCHIVE",
+      "product_name": "All Reports / historical reports",
+      "provider": "National Stock Exchange of India",
+      "raw_data_commit_allowed": false,
+      "readiness_gates": [
+        "prices",
+        "liquidity",
+        "reference"
+      ],
+      "redistribution_status": "LICENCE_RESTRICTIONS_UNKNOWN",
+      "research_profiles": [
+        "EXCHANGE_WIDE_PIT",
+        "INDEX_CONSTITUENT_PIT"
+      ],
+      "source_classification": "OFFICIAL_MANUAL_ACQUISITION_REQUIRED",
+      "usage_scope": "RESEARCH_ONLY",
+      "verification_date": "2026-10-04"
+    },
+    {
+      "acquisition_mechanism": "official subscription",
+      "acquisition_status": "SUBSCRIPTION_REQUIRED",
+      "dataset_purpose": "Corporate announcements, fundamentals and shareholding data",
+      "delivery_format": "SFTP",
+      "derived_data_commit_allowed": false,
+      "fields_advertised": [
+        "announcements",
+        "fundamentals",
+        "shareholding"
+      ],
+      "granularity": "event/EOD",
+      "historical_coverage_advertised": "EOD subscription; exact history subject to provider",
+      "licence_status": "OFFICIAL_COMMERCIAL_LICENCE_REQUIRED",
+      "machine_readable": true,
+      "market_scope": "NSE listed issuers",
+      "official_reference": "https://betansearchives.nseindia.com/static/market-data/corporate-data-subscription",
+      "product_id": "NSE_CORPORATE_DATA",
+      "product_name": "Corporate Data Subscription",
+      "provider": "National Stock Exchange of India",
+      "raw_data_commit_allowed": false,
+      "readiness_gates": [
+        "corporate_actions",
+        "optional_fundamentals"
+      ],
+      "redistribution_status": "RESTRICTED",
+      "research_profiles": [
+        "EXCHANGE_WIDE_PIT",
+        "INDEX_CONSTITUENT_PIT"
+      ],
+      "source_classification": "OFFICIAL_SUBSCRIPTION_REQUIRED",
+      "usage_scope": "LICENSE_TERMS_CONTROLLED_RESEARCH",
+      "verification_date": "2026-10-04"
+    },
+    {
+      "acquisition_mechanism": "official data subscription/request",
+      "acquisition_status": "SUBSCRIPTION_REQUIRED",
+      "dataset_purpose": "Authoritative historical index membership",
+      "delivery_format": "licensed data delivery",
+      "derived_data_commit_allowed": false,
+      "fields_advertised": [
+        "index constituents",
+        "effective composition"
+      ],
+      "granularity": "constituent snapshot/effective membership",
+      "historical_coverage_advertised": "Historical constituent data; coverage subject to product quote",
+      "licence_status": "OFFICIAL_COMMERCIAL_LICENCE_REQUIRED",
+      "machine_readable": true,
+      "market_scope": "NIFTY indices",
+      "official_reference": "https://www.niftyindices.com/offerings/data-subscription",
+      "product_id": "NIFTY_HISTORICAL_CONSTITUENTS",
+      "product_name": "Historical constituent data subscription",
+      "provider": "NSE Indices Limited",
+      "raw_data_commit_allowed": false,
+      "readiness_gates": [
+        "index_membership",
+        "survivorship",
+        "universe"
+      ],
+      "redistribution_status": "RESTRICTED",
+      "research_profiles": [
+        "INDEX_CONSTITUENT_PIT"
+      ],
+      "source_classification": "OFFICIAL_SUBSCRIPTION_REQUIRED",
+      "usage_scope": "LICENSE_TERMS_CONTROLLED_RESEARCH",
+      "verification_date": "2026-10-04"
+    },
+    {
+      "acquisition_mechanism": "official public download",
+      "acquisition_status": "PUBLICLY_ACQUIRED",
+      "dataset_purpose": "Official index reconstitution change notices",
+      "delivery_format": "PDF",
+      "derived_data_commit_allowed": true,
+      "fields_advertised": [
+        "adds",
+        "removes",
+        "effective dates"
+      ],
+      "granularity": "change event",
+      "historical_coverage_advertised": "Historical notices, not proven complete continuous constituents",
+      "licence_status": "PUBLIC_ACCESS_TERMS_APPLY",
+      "machine_readable": false,
+      "market_scope": "NIFTY indices",
+      "official_reference": "https://www.niftyindices.com/press-release",
+      "product_id": "NIFTY_PRESS_RELEASE_ARCHIVE",
+      "product_name": "Index press release archive",
+      "provider": "NSE Indices Limited",
+      "raw_data_commit_allowed": false,
+      "readiness_gates": [
+        "change_event_evidence_only"
+      ],
+      "redistribution_status": "LICENCE_RESTRICTIONS_UNKNOWN",
+      "research_profiles": [
+        "INDEX_CONSTITUENT_PIT"
+      ],
+      "source_classification": "OFFICIAL_PUBLIC_VERIFIED",
+      "usage_scope": "RESEARCH_ONLY",
+      "verification_date": "2026-10-04"
+    },
+    {
+      "acquisition_mechanism": "official report download",
+      "acquisition_status": "MANUAL_REQUEST_REQUIRED",
+      "dataset_purpose": "Benchmark index prices",
+      "delivery_format": "CSV/report",
+      "derived_data_commit_allowed": true,
+      "fields_advertised": [
+        "index values"
+      ],
+      "granularity": "daily",
+      "historical_coverage_advertised": "Historical index values by report",
+      "licence_status": "PUBLIC_ACCESS_TERMS_APPLY",
+      "machine_readable": true,
+      "market_scope": "NIFTY indices",
+      "official_reference": "https://www.niftyindices.com/reports",
+      "product_id": "NIFTY_HISTORICAL_INDEX_PRICES",
+      "product_name": "Historical index data / reports",
+      "provider": "NSE Indices Limited",
+      "raw_data_commit_allowed": false,
+      "readiness_gates": [
+        "benchmark"
+      ],
+      "redistribution_status": "LICENCE_RESTRICTIONS_UNKNOWN",
+      "research_profiles": [
+        "INDEX_CONSTITUENT_PIT",
+        "EXCHANGE_WIDE_PIT"
+      ],
+      "source_classification": "OFFICIAL_PUBLIC_VERIFIED",
+      "usage_scope": "RESEARCH_ONLY",
+      "verification_date": "2026-10-04"
+    },
+    {
+      "acquisition_mechanism": "official commercial product",
+      "acquisition_status": "SUBSCRIPTION_REQUIRED",
+      "dataset_purpose": "Alternative official market, reference, corporate action and historical trading data",
+      "delivery_format": "licensed data delivery",
+      "derived_data_commit_allowed": false,
+      "fields_advertised": [
+        "EOD/reference",
+        "historical trading",
+        "corporate data",
+        "corporate actions"
+      ],
+      "granularity": "EOD/event/reference",
+      "historical_coverage_advertised": "Historical products available; exact coverage by product",
+      "licence_status": "OFFICIAL_COMMERCIAL_LICENCE_REQUIRED",
+      "machine_readable": true,
+      "market_scope": "BSE markets",
+      "official_reference": "https://www.bseindia.com/downloads1/Information_Products_Pricing_Sheet.pdf",
+      "product_id": "BSE_INFORMATION_PRODUCTS",
+      "product_name": "Information Products - historical/EOD/reference/corporate data",
+      "provider": "BSE Limited",
+      "raw_data_commit_allowed": false,
+      "readiness_gates": [
+        "secondary_exchange_reference",
+        "corporate_actions",
+        "prices"
+      ],
+      "redistribution_status": "RESTRICTED",
+      "research_profiles": [
+        "EXCHANGE_WIDE_PIT"
+      ],
+      "source_classification": "OFFICIAL_SUBSCRIPTION_REQUIRED",
+      "usage_scope": "LICENSE_TERMS_CONTROLLED_RESEARCH",
+      "verification_date": "2026-10-04"
+    },
+    {
+      "acquisition_mechanism": "manual official interface/export",
+      "acquisition_status": "AUTOMATION_RESTRICTED",
+      "dataset_purpose": "Official corporate-action lookup",
+      "delivery_format": "web/CSV",
+      "derived_data_commit_allowed": true,
+      "fields_advertised": [
+        "security",
+        "purpose",
+        "ex date",
+        "record date"
+      ],
+      "granularity": "event",
+      "historical_coverage_advertised": "Date-filtered public interface; complete coverage not established",
+      "licence_status": "PUBLIC_ACCESS_TERMS_APPLY",
+      "machine_readable": true,
+      "market_scope": "BSE listed issuers",
+      "official_reference": "https://www.bseindia.com/corporates/corporates_act.html",
+      "product_id": "BSE_PUBLIC_CORPORATE_ACTIONS",
+      "product_name": "Corporate Actions public interface",
+      "provider": "BSE Limited",
+      "raw_data_commit_allowed": false,
+      "readiness_gates": [
+        "corporate_actions"
+      ],
+      "redistribution_status": "LICENCE_RESTRICTIONS_UNKNOWN",
+      "research_profiles": [
+        "EXCHANGE_WIDE_PIT"
+      ],
+      "source_classification": "OFFICIAL_AUTOMATION_RESTRICTED",
+      "usage_scope": "RESEARCH_ONLY",
+      "verification_date": "2026-10-04"
+    },
+    {
+      "acquisition_mechanism": "manual official interface",
+      "acquisition_status": "MANUAL_REQUEST_REQUIRED",
+      "dataset_purpose": "Official historical security price lookup",
+      "delivery_format": "web report",
+      "derived_data_commit_allowed": true,
+      "fields_advertised": [
+        "price history"
+      ],
+      "granularity": "daily",
+      "historical_coverage_advertised": "User-selected history; bulk completeness not established",
+      "licence_status": "PUBLIC_ACCESS_TERMS_APPLY",
+      "machine_readable": false,
+      "market_scope": "BSE equity",
+      "official_reference": "https://www.bseindia.com/markets/equity/EQReports/StockPrcHistori.aspx",
+      "product_id": "BSE_PUBLIC_PRICE_HISTORY",
+      "product_name": "Stock price historical interface",
+      "provider": "BSE Limited",
+      "raw_data_commit_allowed": false,
+      "readiness_gates": [
+        "prices"
+      ],
+      "redistribution_status": "LICENCE_RESTRICTIONS_UNKNOWN",
+      "research_profiles": [
+        "EXCHANGE_WIDE_PIT"
+      ],
+      "source_classification": "OFFICIAL_MANUAL_ACQUISITION_REQUIRED",
+      "usage_scope": "RESEARCH_ONLY",
+      "verification_date": "2026-10-04"
+    }
+  ],
+  "record_hash": "5fa3065321d6364db9a54b6d59d94d3abd7dcd82362a3612849598fb4e7602c4",
+  "record_id": "OFFICIAL_HISTORICAL_DATA_PRODUCT_INVENTORY_V1_5fa3065321d6364db9a54b6d",
+  "schema": "OFFICIAL_HISTORICAL_DATA_PRODUCT_INVENTORY_V1",
+  "trading_authority": false,
+  "verification_date": "2026-10-04"
+}

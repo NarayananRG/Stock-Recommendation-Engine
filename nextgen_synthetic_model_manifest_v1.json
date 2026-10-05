@@ -1,0 +1,312 @@
+{
+  "artifact_type": "NEXTGEN_SYNTHETIC_MODEL_MANIFEST_V1",
+  "authority": "RESEARCH_ONLY",
+  "marker": "SYNTHETIC_TEST_MODEL_ONLY",
+  "models": [
+    {
+      "artifact_hash": "4ebf7bd1c45a1bf8574b957c946eacd1078018989a4464f052c503fb500fe0ab",
+      "authority": "RESEARCH_ONLY",
+      "configuration": {
+        "fixed_weights": {
+          "liquidity_20": 0.25,
+          "market_20": 0.2,
+          "momentum_20": 0.5,
+          "technical_5": 1.0,
+          "volatility_20": 0.3333333333333333
+        }
+      },
+      "family": "DETERMINISTIC_REFERENCE",
+      "feature_ids": [
+        "technical_5",
+        "momentum_20",
+        "volatility_20",
+        "liquidity_20",
+        "market_20"
+      ],
+      "marker": "SYNTHETIC_TEST_MODEL_ONLY",
+      "model_id": "reference-v1",
+      "promotion_authority": "NONE",
+      "seed": 1729,
+      "state": {
+        "weights": {
+          "liquidity_20": 0.25,
+          "market_20": 0.2,
+          "momentum_20": 0.5,
+          "technical_5": 1.0,
+          "volatility_20": 0.3333333333333333
+        }
+      },
+      "target": "positive_relative_outcome",
+      "trading_authority": false
+    },
+    {
+      "artifact_hash": "159ea46326e4947aa73491ec6e413f957f10de59c994121212ecdf4c53793702",
+      "authority": "RESEARCH_ONLY",
+      "configuration": {
+        "hyperparameter_search": false,
+        "iterations": 180,
+        "learning_rate": 0.08,
+        "score_semantics": "UNCALIBRATED_MODEL_SCORE"
+      },
+      "family": "LOGISTIC_REGRESSION",
+      "feature_ids": [
+        "technical_5",
+        "momentum_20",
+        "volatility_20",
+        "liquidity_20",
+        "market_20"
+      ],
+      "marker": "SYNTHETIC_TEST_MODEL_ONLY",
+      "model_id": "logistic-v1",
+      "promotion_authority": "NONE",
+      "seed": 1729,
+      "state": {
+        "weights": [
+          -0.06387545173737154,
+          1.8247237716279456,
+          1.269196662021996,
+          -0.022470499240213066,
+          -0.09859839795820678,
+          0.03911630978218656
+        ]
+      },
+      "target": "positive_relative_outcome",
+      "trading_authority": false
+    },
+    {
+      "artifact_hash": "b59be2fe46e9b916822c5570c5ea9a049e471b4e56f1856effe3fae2df8edd5e",
+      "authority": "RESEARCH_ONLY",
+      "configuration": {
+        "hyperparameter_search": false,
+        "max_depth": 1,
+        "score_semantics": "UNCALIBRATED_MODEL_SCORE",
+        "trees": 17
+      },
+      "family": "RANDOM_FOREST",
+      "feature_ids": [
+        "technical_5",
+        "momentum_20",
+        "volatility_20",
+        "liquidity_20",
+        "market_20"
+      ],
+      "marker": "SYNTHETIC_TEST_MODEL_ONLY",
+      "model_id": "rf-v1",
+      "promotion_authority": "NONE",
+      "seed": 1729,
+      "state": {
+        "stumps": [
+          {
+            "feature": "momentum_20",
+            "left": 0.10273972602739725,
+            "right": 0.9084507042253521,
+            "threshold": -0.014969342244243462
+          },
+          {
+            "feature": "liquidity_20",
+            "left": 0.47586206896551725,
+            "right": 0.4405594405594406,
+            "threshold": 1.5571838106281737
+          },
+          {
+            "feature": "liquidity_20",
+            "left": 0.45517241379310347,
+            "right": 0.48951048951048953,
+            "threshold": 1.5837421507319305
+          },
+          {
+            "feature": "momentum_20",
+            "left": 0.08275862068965517,
+            "right": 0.9020979020979021,
+            "threshold": 0.016375045608384514
+          },
+          {
+            "feature": "momentum_20",
+            "left": 0.02702702702702703,
+            "right": 0.8714285714285714,
+            "threshold": -0.07601619609999873
+          },
+          {
+            "feature": "technical_5",
+            "left": 0.07432432432432433,
+            "right": 0.8142857142857143,
+            "threshold": -0.002252874704870539
+          },
+          {
+            "feature": "technical_5",
+            "left": 0.034482758620689655,
+            "right": 0.8671328671328671,
+            "threshold": -0.12263404243888454
+          },
+          {
+            "feature": "momentum_20",
+            "left": 0.04827586206896552,
+            "right": 0.8741258741258742,
+            "threshold": -0.05284450529166851
+          },
+          {
+            "feature": "liquidity_20",
+            "left": 0.4068965517241379,
+            "right": 0.45454545454545453,
+            "threshold": 1.5156512157798878
+          },
+          {
+            "feature": "technical_5",
+            "left": 0.13793103448275862,
+            "right": 0.9020979020979021,
+            "threshold": 0.14891171303483006
+          },
+          {
+            "feature": "volatility_20",
+            "left": 0.5205479452054794,
+            "right": 0.43661971830985913,
+            "threshold": 0.2696965816118134
+          },
+          {
+            "feature": "momentum_20",
+            "left": 0.06896551724137931,
+            "right": 0.8951048951048951,
+            "threshold": -0.014969342244243462
+          },
+          {
+            "feature": "technical_5",
+            "left": 0.05517241379310345,
+            "right": 0.8601398601398601,
+            "threshold": -0.14430733486348143
+          },
+          {
+            "feature": "volatility_20",
+            "left": 0.46206896551724136,
+            "right": 0.35664335664335667,
+            "threshold": 0.2551552523492323
+          },
+          {
+            "feature": "momentum_20",
+            "left": 0.07482993197278912,
+            "right": 0.8226950354609929,
+            "threshold": -0.05284450529166851
+          },
+          {
+            "feature": "liquidity_20",
+            "left": 0.496551724137931,
+            "right": 0.4405594405594406,
+            "threshold": 1.5329102284053175
+          },
+          {
+            "feature": "momentum_20",
+            "left": 0.04827586206896552,
+            "right": 0.8181818181818182,
+            "threshold": -0.07601619609999873
+          }
+        ]
+      },
+      "target": "positive_relative_outcome",
+      "trading_authority": false
+    },
+    {
+      "artifact_hash": "a4c04e3476c9e6b35e5e6fad4bcf9155edb7f074426d6abf948779978774e990",
+      "authority": "RESEARCH_ONLY",
+      "configuration": {
+        "hyperparameter_search": false,
+        "learning_rate": 0.1,
+        "max_depth": 1,
+        "rounds": 12,
+        "score_semantics": "UNCALIBRATED_MODEL_SCORE"
+      },
+      "family": "GRADIENT_BOOSTING",
+      "feature_ids": [
+        "technical_5",
+        "momentum_20",
+        "volatility_20",
+        "liquidity_20",
+        "market_20"
+      ],
+      "marker": "SYNTHETIC_TEST_MODEL_ONLY",
+      "model_id": "gb-v1",
+      "promotion_authority": "NONE",
+      "seed": 1729,
+      "state": {
+        "base": 0.4583333333333333,
+        "learning_rate": 0.1,
+        "stumps": [
+          {
+            "feature": "momentum_20",
+            "left": -0.389367816091954,
+            "right": 0.39481351981351986,
+            "threshold": -0.05284450529166851
+          },
+          {
+            "feature": "momentum_20",
+            "left": -0.35043103448275864,
+            "right": 0.3553321678321678,
+            "threshold": -0.05284450529166851
+          },
+          {
+            "feature": "momentum_20",
+            "left": -0.3153879310344827,
+            "right": 0.31979895104895106,
+            "threshold": -0.05284450529166851
+          },
+          {
+            "feature": "momentum_20",
+            "left": -0.28384913793103445,
+            "right": 0.28781905594405605,
+            "threshold": -0.05284450529166851
+          },
+          {
+            "feature": "momentum_20",
+            "left": -0.255464224137931,
+            "right": 0.25903715034965036,
+            "threshold": -0.05284450529166851
+          },
+          {
+            "feature": "momentum_20",
+            "left": -0.22991780172413795,
+            "right": 0.2331334353146854,
+            "threshold": -0.05284450529166851
+          },
+          {
+            "feature": "momentum_20",
+            "left": -0.20692602155172415,
+            "right": 0.20982009178321684,
+            "threshold": -0.05284450529166851
+          },
+          {
+            "feature": "momentum_20",
+            "left": -0.18623341939655172,
+            "right": 0.18883808260489512,
+            "threshold": -0.05284450529166851
+          },
+          {
+            "feature": "momentum_20",
+            "left": -0.16761007745689654,
+            "right": 0.1699542743444056,
+            "threshold": -0.05284450529166851
+          },
+          {
+            "feature": "momentum_20",
+            "left": -0.1508490697112069,
+            "right": 0.152958846909965,
+            "threshold": -0.05284450529166851
+          },
+          {
+            "feature": "technical_5",
+            "left": -0.13591249668417477,
+            "right": 0.13781337076367364,
+            "threshold": -0.06085923873948729
+          },
+          {
+            "feature": "momentum_20",
+            "left": -0.12255046599228644,
+            "right": 0.124264458523647,
+            "threshold": -0.05284450529166851
+          }
+        ]
+      },
+      "target": "positive_relative_outcome",
+      "trading_authority": false
+    }
+  ],
+  "real_models": 0,
+  "synthetic_model_count": 4
+}

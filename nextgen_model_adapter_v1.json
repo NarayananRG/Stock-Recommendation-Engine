@@ -1,0 +1,21 @@
+{
+  "artifact_type": "NEXTGEN_MODEL_ADAPTER_V1",
+  "authority": "RESEARCH_ONLY",
+  "incumbent_eligible": false,
+  "interface": [
+    "fit(train_dataset)",
+    "predict(dataset)",
+    "describe()"
+  ],
+  "prospective_validation_eligible": false,
+  "required_bindings": [
+    "model_family",
+    "configuration",
+    "feature_set_hash",
+    "target",
+    "seed",
+    "code_identity",
+    "authority"
+  ],
+  "trained_marker": "SYNTHETIC_TEST_MODEL_ONLY"
+}

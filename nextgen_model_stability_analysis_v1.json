@@ -1,0 +1,32 @@
+{
+  "automatic_acceptance": false,
+  "groups": {
+    "market_direction": {
+      "DOWN": {
+        "count": 48,
+        "ic": 0.8344049248889578
+      },
+      "UP": {
+        "count": 96,
+        "ic": 0.8395457709303072
+      }
+    },
+    "temporal_segment": {
+      "LATE": {
+        "count": 144,
+        "ic": 0.8376100263905707
+      }
+    },
+    "volatility_regime": {
+      "HIGH": {
+        "count": 79,
+        "ic": 0.8318501420456882
+      },
+      "LOW": {
+        "count": 65,
+        "ic": 0.8477358575418146
+      }
+    }
+  },
+  "schema": "NEXTGEN_MODEL_STABILITY_ANALYSIS_V1"
+}

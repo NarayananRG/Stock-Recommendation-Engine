@@ -1,0 +1,81 @@
+{
+  "artifact_type": "NEXTGEN_EXPERIMENT_MANIFEST_V1",
+  "authority": "RESEARCH_ONLY",
+  "benchmark": "SYNTHETIC_BENCHMARK_V1",
+  "code_hash": "44ffb9ac222f53a588ddc3ae7087d3cd94fe9db34a58f15735d4f57c98068a9f",
+  "creation_timestamp": "2026-10-05T00:00:00Z",
+  "dataset_classification": "SYNTHETIC_TEST_FIXTURE",
+  "dataset_hash": "5561125f328e1c454bce66e9cc5fa43423c47f6238f3a5290a157206c8828b80",
+  "dataset_id": "synthetic-challenger-v1",
+  "execution_policy": "SYNTHETIC_EXECUTION_V1",
+  "experiment_id": "e2560cfdb46ba30be95e98ffaafa185bdbc8a9565bf26e6d53ba0b4be773c5c6",
+  "feature_set_hash": "b984d4c751bbeb9471c7ac3a52f97df6c982b60dbaf7e5a6889dce54e7acc48d",
+  "label_contract": "NEXTGEN_OUTCOME_LABEL_CONTRACT_V1",
+  "model_configurations": [
+    {
+      "authority": "RESEARCH_ONLY",
+      "configuration": {},
+      "family": "DETERMINISTIC_REFERENCE",
+      "features": [
+        "technical_5",
+        "momentum_20",
+        "volatility_20",
+        "liquidity_20",
+        "market_20"
+      ],
+      "interface": "NEXTGEN_MODEL_ADAPTER_V1",
+      "seed": 1729,
+      "target": "positive_relative_outcome"
+    },
+    {
+      "authority": "RESEARCH_ONLY",
+      "configuration": {},
+      "family": "LOGISTIC_REGRESSION",
+      "features": [
+        "technical_5",
+        "momentum_20",
+        "volatility_20",
+        "liquidity_20",
+        "market_20"
+      ],
+      "interface": "NEXTGEN_MODEL_ADAPTER_V1",
+      "seed": 1729,
+      "target": "positive_relative_outcome"
+    },
+    {
+      "authority": "RESEARCH_ONLY",
+      "configuration": {},
+      "family": "RANDOM_FOREST",
+      "features": [
+        "technical_5",
+        "momentum_20",
+        "volatility_20",
+        "liquidity_20",
+        "market_20"
+      ],
+      "interface": "NEXTGEN_MODEL_ADAPTER_V1",
+      "seed": 1729,
+      "target": "positive_relative_outcome"
+    },
+    {
+      "authority": "RESEARCH_ONLY",
+      "configuration": {},
+      "family": "GRADIENT_BOOSTING",
+      "features": [
+        "technical_5",
+        "momentum_20",
+        "volatility_20",
+        "liquidity_20",
+        "market_20"
+      ],
+      "interface": "NEXTGEN_MODEL_ADAPTER_V1",
+      "seed": 1729,
+      "target": "positive_relative_outcome"
+    }
+  ],
+  "promotion_authority": "NONE",
+  "seed": 1729,
+  "source_commit": "48c95246851fc6af67228f663ddb475b79c2c821",
+  "temporal_split": "d4bb564504530db323f87d473b792bd5012382ba829d6dd1ed390105361c5bcd",
+  "trading_authority": false
+}

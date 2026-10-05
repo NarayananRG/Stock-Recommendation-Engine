@@ -1,0 +1,80 @@
+{
+  "artifact_sha256": "d41ee379513a963168e9e3ec63bb2a89f4fdfbba964940e7f5e30afb8dc571d7",
+  "artifact_type": "NIFTY500_LIFECYCLE_VEDANTA_DEMERGER_V1",
+  "authority": "SHADOW_ONLY",
+  "dummy_effective_from": "2026-04-30",
+  "dummy_effective_to": "2026-06-14",
+  "mapping_basis": "EXPLICIT_ORDER_IN_OFFICIAL_NSE_INDICES_RELEASE",
+  "predecessor": {
+    "isin": "INE205A01025",
+    "legal_name": "Vedanta Ltd.",
+    "symbol": "VEDL"
+  },
+  "resulting_entities": [
+    {
+      "dummy_symbol": "DUMMYVEDL1",
+      "exit_effective": "2026-06-23",
+      "isin": "INE1CDF01017",
+      "legal_name": "Vedanta Aluminium Metal Ltd.",
+      "listing_date": "2026-06-15",
+      "symbol": "VAML"
+    },
+    {
+      "dummy_symbol": "DUMMYVEDL2",
+      "exit_effective": "2026-06-19",
+      "isin": "INE694L01019",
+      "legal_name": "Vedanta Power Ltd.",
+      "listing_date": "2026-06-15",
+      "symbol": "VEDPOWER"
+    },
+    {
+      "dummy_symbol": "DUMMYVEDL3",
+      "exit_effective": "2026-06-24",
+      "isin": "INE704J01044",
+      "legal_name": "Vedanta Oil and Gas Ltd.",
+      "listing_date": "2026-06-15",
+      "symbol": "VOGL"
+    },
+    {
+      "dummy_symbol": "DUMMYVEDL4",
+      "exit_effective": "2026-06-19",
+      "isin": "INE1CLE01013",
+      "legal_name": "Vedanta Iron and Steel Ltd.",
+      "listing_date": "2026-06-15",
+      "symbol": "VISL"
+    }
+  ],
+  "sources": [
+    {
+      "publisher": "NSE_INDICES_OR_NSE",
+      "purpose": "TEMP-VEDANTA-ADD",
+      "sha256": "434aa85ef5ed3ff3f59826e2ed029de39f298173a1cdaa737b4989491d045c03",
+      "url": "https://www.niftyindices.com/Press_Release/ind_prs23042026.pdf"
+    },
+    {
+      "publisher": "NSE_INDICES_OR_NSE",
+      "purpose": "VEDANTA_POWER_STEEL_EXIT",
+      "sha256": "185014a4ecdf0a01416517a9339c0b32d946f1e56d35002c64121833edf0eca5",
+      "url": "https://www.niftyindices.com/Press_Release/ind_prs17062026.pdf"
+    },
+    {
+      "publisher": "NSE_INDICES_OR_NSE",
+      "purpose": "VEDANTA_OIL_GAS_EXIT",
+      "sha256": "758d548d5ee3ffd0a90229561aa9c150a889f6d8d257129ed306fe1d1eb3c7fb",
+      "url": "https://www.niftyindices.com/Press_Release/ind_prs22062026.pdf"
+    },
+    {
+      "publisher": "NSE_INDICES_OR_NSE",
+      "purpose": "SIEMENS_ABLBL_EXIT",
+      "sha256": "dd21c18f5dfcc014cd045c6a574097a8d5cf3f0ef076005bc67f18bab65c883f",
+      "url": "https://www.niftyindices.com/Press_Release/ind_prs25062025_2.pdf"
+    },
+    {
+      "publisher": "NSE_INDICES_OR_NSE",
+      "purpose": "VEDANTA_ALUMINIUM_EXIT",
+      "sha256": "e27f1d4502fc367c78a113cf55224742e767327e6d7c2f8c90d899213dd7a874",
+      "url": "https://www.niftyindices.com/Press_Release/ind_prs19062026.pdf"
+    }
+  ],
+  "status": "RESOLVED"
+}

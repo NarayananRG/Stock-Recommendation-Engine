@@ -1,0 +1,11 @@
+{
+  "artifact_type": "OFFICIAL_BENCHMARK_SERIES_V1",
+  "authority": "SHADOW_ONLY",
+  "reason": "NO_BULK_FREE_OFFICIAL_BENCHMARK_SERIES_ACQUIRED_FOR_JOINT_WINDOW",
+  "required_indices": [
+    "NIFTY 50",
+    "NIFTY 500"
+  ],
+  "series": [],
+  "status": "NOT_ACQUIRED"
+}

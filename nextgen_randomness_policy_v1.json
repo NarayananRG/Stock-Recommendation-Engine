@@ -1,0 +1,13 @@
+{
+  "artifact_type": "NEXTGEN_RANDOMNESS_POLICY_V1",
+  "authority": "RESEARCH_ONLY",
+  "deterministic_flags": [
+    "STABLE_TIE_BREAK",
+    "FIXED_ITERATIONS"
+  ],
+  "explicit_seed_required": true,
+  "hidden_randomness": "PROHIBITED",
+  "library": "PYTHON_STANDARD_LIBRARY",
+  "seed": 1729,
+  "version": "3.14.3"
+}

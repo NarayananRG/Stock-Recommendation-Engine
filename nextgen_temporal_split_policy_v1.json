@@ -1,0 +1,20 @@
+{
+  "allowed": [
+    "EXPANDING_WINDOW",
+    "ROLLING_WINDOW"
+  ],
+  "artifact_type": "NEXTGEN_TEMPORAL_SPLIT_POLICY_V1",
+  "authority": "RESEARCH_ONLY",
+  "embargo_supported": true,
+  "label_maturity_required": true,
+  "prohibited": [
+    "RANDOM_SPLIT",
+    "SHUFFLED_K_FOLD",
+    "RANDOMIZED_CV"
+  ],
+  "required_partitions": [
+    "TRAIN",
+    "VALIDATION",
+    "UNTOUCHED_TEST"
+  ]
+}
