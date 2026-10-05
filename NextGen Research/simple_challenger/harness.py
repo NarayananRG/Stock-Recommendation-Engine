@@ -21,6 +21,13 @@ BLOCKED = "REAL_DATA_MODEL_TRAINING_BLOCKED_RIGHTS_NOT_READY"
 RIGHTS_BLOCKING = {"LICENSE_REQUIRED", "PERMISSION_REQUIRED", "NOT_ESTABLISHED"}
 REAL_SOURCE_TOKENS = ("NSE", "NIFTY", "BHAVCOPY", "RESTRICTED_MARKET_PANEL", "NSE_INDICES")
 REQUIRED_FAMILIES = ("technical", "momentum", "volatility", "liquidity", "market")
+APPROVED_SYNTHETIC_SOURCES = {"SYNTHETIC_GENERATOR_V1"}
+APPROVED_SYNTHETIC_GENERATORS = {"DETERMINISTIC_SYNTHETIC_V1"}
+PROHIBITED_TRAINING_SOURCE_TOKENS = (
+    "MCP", "LIVE", "MARKET_DATA", "STAGE4A3", "STAGE_4A3", "STAGE5D", "STAGE_5D",
+    "STAGE6", "STAGE_6", "PROSPECTIVE", "ACTIVATION", "RUNTIME", "BROKER",
+)
+PROHIBITED_FEATURE_TOKENS = ("label", "outcome", "return", "future", "target")
 
 
 def canonical_json(value) -> str:
@@ -40,6 +47,34 @@ def source_is_real(manifest: dict) -> bool:
     return manifest.get("classification") == REAL or any(token in bindings for token in REAL_SOURCE_TOKENS)
 
 
+def source_is_prohibited_training_input(manifest: dict) -> bool:
+    bindings = canonical_json(manifest.get("source_manifest_bindings", [])).upper()
+    bindings += canonical_json(manifest.get("provenance", {})).upper()
+    return any(token in bindings for token in PROHIBITED_TRAINING_SOURCE_TOKENS)
+
+
+def validate_synthetic_source_identity(manifest: dict) -> None:
+    bindings = set(manifest.get("source_manifest_bindings", []))
+    if manifest.get("classification") != SYNTHETIC:
+        raise ValueError("SYNTHETIC_CLASSIFICATION_REQUIRED")
+    if source_is_prohibited_training_input(manifest):
+        raise ValueError("PROHIBITED_TRAINING_SOURCE")
+    if not bindings or not bindings.issubset(APPROVED_SYNTHETIC_SOURCES):
+        raise ValueError("UNAPPROVED_SYNTHETIC_SOURCE")
+    provenance = manifest.get("provenance", {})
+    if provenance.get("synthetic_generation") is not True:
+        raise ValueError("SYNTHETIC_PROVENANCE_REQUIRED")
+    if provenance.get("generator_id") not in APPROVED_SYNTHETIC_GENERATORS:
+        raise ValueError("SYNTHETIC_SOURCE_IDENTITY_REQUIRED")
+
+
+def validate_feature_namespace(row: dict) -> None:
+    for name in row.get("features", {}):
+        lowered = str(name).lower()
+        if any(token in lowered for token in PROHIBITED_FEATURE_TOKENS):
+            raise ValueError("FUTURE_OUTCOME_FEATURE_PROHIBITED")
+
+
 def validate_dataset_manifest(manifest: dict, rows: list[dict]) -> str:
     if manifest.get("universe_method") == "CURRENT_SURVIVOR_UNIVERSE":
         raise ValueError("CURRENT_SURVIVOR_UNIVERSE_PROHIBITED")
@@ -49,9 +84,9 @@ def validate_dataset_manifest(manifest: dict, rows: list[dict]) -> str:
     if source_is_real(manifest) and manifest.get("classification") == SYNTHETIC:
         raise ValueError("REAL_DATA_SYNTHETIC_SPOOF_BLOCKED")
     if manifest.get("classification") == SYNTHETIC:
-        provenance = manifest.get("provenance", {})
-        if provenance.get("synthetic_generation") is not True or not provenance.get("generator_id"):
-            raise ValueError("SYNTHETIC_PROVENANCE_REQUIRED")
+        validate_synthetic_source_identity(manifest)
+    for row in rows:
+        validate_feature_namespace(row)
     return expected
 
 
@@ -60,6 +95,9 @@ def row_eligible(row: dict, training_cutoff: str | None = None) -> bool:
         raise ValueError("CURRENT_SURVIVOR_UNIVERSE_PROHIBITED")
     if row["feature_available_at"] > row["decision_cutoff"]:
         raise ValueError("FUTURE_FEATURE_PROHIBITED")
+    if row["label_available_at"] <= row["feature_available_at"]:
+        raise ValueError("LABEL_MUST_FOLLOW_INFORMATION_TIME")
+    validate_feature_namespace(row)
     if training_cutoff and row["label_available_at"] > training_cutoff:
         raise ValueError("LABEL_NOT_MATURE")
     return all((
@@ -74,6 +112,8 @@ def row_eligible(row: dict, training_cutoff: str | None = None) -> bool:
 
 def training_guard(manifest: dict, rows: list[dict], rights_state: str) -> None:
     validate_dataset_manifest(manifest, rows)
+    if source_is_prohibited_training_input(manifest):
+        raise ValueError("PROHIBITED_TRAINING_SOURCE")
     if source_is_real(manifest) or manifest.get("classification") != SYNTHETIC:
         if rights_state != "READY":
             raise PermissionError(BLOCKED)
@@ -113,6 +153,7 @@ def guarded_fit(adapter, manifest: dict, rows: list[dict], rights_state: str, au
 
 
 def feature_vector(row: dict, feature_ids: list[str]) -> list[float]:
+    validate_feature_namespace(row)
     return [float(row["features"][name]) for name in feature_ids]
 
 
@@ -268,6 +309,7 @@ def temporal_fold(rows: list[dict], policy: dict) -> dict:
     train_cutoff = train_end - timedelta(days=embargo)
     partitions = {"train": [], "validation": [], "test": [], "excluded_immature": []}
     for row in sorted(rows, key=lambda value: (value["decision_date"], value["security_id"])):
+        row_eligible(row)
         day = iso_day(row["decision_date"])
         if day <= train_end:
             if iso_day(row["label_available_at"]) <= train_cutoff:
@@ -282,6 +324,31 @@ def temporal_fold(rows: list[dict], policy: dict) -> dict:
             "counts": {key: len(value) for key, value in partitions.items()},
             "row_ids": {key: [row["row_id"] for row in value] for key, value in partitions.items()},
             "dataset_hash": canonical_hash(rows), "fold_hash": canonical_hash(partitions)}
+
+
+def assert_disjoint_partitions(fold: dict) -> None:
+    seen = {}
+    for partition, identities in fold["row_ids"].items():
+        if partition == "excluded_immature":
+            continue
+        for identity in identities:
+            if identity in seen:
+                raise ValueError("TEMPORAL_PARTITION_OVERLAP")
+            seen[identity] = partition
+
+
+def assert_comparison_population_equal(baseline: list[dict], challenger: list[dict]) -> None:
+    def identity(row):
+        return (
+            row.get("decision_date"),
+            row.get("security_id"),
+            row.get("feature_set_hash"),
+            row.get("dataset_hash"),
+            row.get("eligible_universe_size"),
+            row.get("target"),
+        )
+    if sorted(identity(row) for row in baseline) != sorted(identity(row) for row in challenger):
+        raise ValueError("COMPARISON_POPULATION_MISMATCH")
 
 
 def rank_predictions(rows: list[dict], scores: list[float], experiment_id: str, model: ModelArtifact,
@@ -374,6 +441,14 @@ def pr_auc(labels, scores):
 
 
 def classification_metrics(labels, scores):
+    if len(labels) != len(scores):
+        raise ValueError("CLASSIFICATION_LENGTH_MISMATCH")
+    if not labels:
+        return {"roc_auc": "INSUFFICIENT_SAMPLE", "pr_auc": "INSUFFICIENT_SAMPLE", "brier": "INSUFFICIENT_SAMPLE",
+                "baseline_brier": "INSUFFICIENT_SAMPLE", "brier_skill": "INSUFFICIENT_SAMPLE",
+                "calibration_state": "UNCALIBRATED_MODEL_SCORE"}
+    if any(not math.isfinite(float(score)) for score in scores):
+        raise ValueError("NONFINITE_SCORE")
     brier = _mean([(float(y) - score) ** 2 for y, score in zip(labels, scores)])
     base = _mean(labels)
     baseline = _mean([(float(y) - base) ** 2 for y in labels])
@@ -383,6 +458,9 @@ def classification_metrics(labels, scores):
 
 
 def economic_evaluation(returns, costs, benchmark_returns, positions, rejected, turnovers):
+    lengths = {len(values) for values in (returns, costs, benchmark_returns, positions, rejected, turnovers)}
+    if len(lengths) != 1:
+        raise ValueError("ECONOMIC_SERIES_LENGTH_MISMATCH")
     gross = sum(returns)
     total_cost = sum(costs)
     net_series = [ret - cost for ret, cost in zip(returns, costs)]
@@ -411,6 +489,16 @@ class ExperimentRegistry:
         state = "IDEMPOTENT_SUCCESS" if identity in self.records else "CREATED"
         self.records[identity] = payload_hash
         return state
+
+
+def deterministic_experiment_signature(adapter, rows: list[dict], manifest: dict, feature_ids: list[str], seed: int = 1729) -> dict:
+    train_rows = rows[: max(1, len(rows) // 2)]
+    train_manifest = dict(manifest, dataset_id=manifest["dataset_id"] + "-determinism", dataset_hash=canonical_hash(train_rows))
+    model = guarded_fit(adapter(feature_ids, seed=seed), train_manifest, train_rows, "LICENSE_REQUIRED")
+    test_rows = rows[max(1, len(rows) // 2):]
+    scores = adapter.predict(model, test_rows)
+    predictions = rank_predictions(test_rows, scores, "determinism-check", model, manifest["dataset_hash"], canonical_hash(feature_ids))
+    return {"model": model.describe(), "prediction_hash": canonical_hash(predictions), "dataset_hash": manifest["dataset_hash"]}
 
 
 def synthetic_fixture(days=18, securities=24, seed=1729):

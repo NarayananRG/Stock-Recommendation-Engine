@@ -38,7 +38,7 @@ rights for real NSE/NSE Indices data and no recommendation, promotion, trading, 
 33. **Real NIFTY data fit:** NO.
 34. **Current rights status before/after:** `LICENSE_REQUIRED` → `LICENSE_REQUIRED` (unchanged).
 35. **Real-data bypass attempts tested:** YES — wrong classifications, source-binding spoofing, hash mismatch, and three blocked rights states.
-36. **Focused test result:** 155/155 PASS.
+36. **Focused test result:** 178/178 PASS after remediation hardening.
 37. **Regression results:** restricted closure 140/140; restricted window 128/128; free reconstruction 131/131; authoritative data 83/83; other NextGen 247/247; Stage 6.8C 170/170; Stage 5D 606/606; Stage 6.0C PASS / 10 schemas.
 38. **Active Stage 4A.3 changes:** 0.
 39. **Stage 5D changes:** 0.

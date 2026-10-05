@@ -148,7 +148,7 @@ contract = {"artifact_type": "NEXTGEN_SIMPLE_CHALLENGER_HARNESS_CONTRACT_V1", "b
             "real_nifty_fit": False, "rights_before": rights["status"], "rights_after": rights["status"],
             "active_lane_changed_files": 0, "raw_real_data_committed": 0, "model_promoted": False,
             "trading_authority": False, "promotion_authority": "NONE", "network_calls": 0,
-            "focused_tests": "155/155 PASS",
+            "focused_tests": "178/178 PASS",
             "regressions": {"restricted_closure": "140/140 PASS", "restricted_window": "128/128 PASS",
                             "free_reconstruction": "131/131 PASS", "authoritative_data": "83/83 PASS",
                             "other_nextgen": "247/247 PASS", "stage6_8c": "170/170 PASS",

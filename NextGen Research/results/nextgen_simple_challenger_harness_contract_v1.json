@@ -6,7 +6,7 @@
   "baseline": "48c95246851fc6af67228f663ddb475b79c2c821",
   "branch": "nextgen-research-simple-challenger-harness",
   "fixture_only": true,
-  "focused_tests": "155/155 PASS",
+  "focused_tests": "178/178 PASS",
   "model_promoted": false,
   "network_calls": 0,
   "promotion_authority": "NONE",

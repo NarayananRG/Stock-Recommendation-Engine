@@ -27,8 +27,11 @@ from simple_challenger.harness import (  # noqa: E402
     LogisticAdapter,
     RandomForestAdapter,
     ReferenceAdapter,
+    assert_comparison_population_equal,
+    assert_disjoint_partitions,
     canonical_hash,
     classification_metrics,
+    deterministic_experiment_signature,
     economic_evaluation,
     guarded_fit,
     pearson,
@@ -39,12 +42,14 @@ from simple_challenger.harness import (  # noqa: E402
     roc_auc,
     row_eligible,
     source_is_real,
+    source_is_prohibited_training_input,
     stability_analysis,
     synthetic_fixture,
     temporal_fold,
     top_k,
     training_guard,
     validate_dataset_manifest,
+    validate_synthetic_source_identity,
 )
 
 BASE = "48c95246851fc6af67228f663ddb475b79c2c821"
@@ -113,6 +118,19 @@ for field, bad_value, ident in (("pit_universe_member", False, "DS16"), ("identi
                                 ("corporate_action_state", "UNSAFE", "DS18"), ("feature_history_available", False, "DS19")):
     changed = copy.deepcopy(sample); changed[field] = bad_value
     case(ident, f"{field} eligibility enforced", lambda row=changed: require(row_eligible(row) is False))
+mcp_manifest = copy.deepcopy(manifest); mcp_manifest["source_manifest_bindings"] = ["MCP_LIVE_MARKET_DATA"]
+case("DS20", "MCP/live-market training input rejected", lambda: raises(ValueError, "PROHIBITED_TRAINING_SOURCE", lambda: validate_dataset_manifest(mcp_manifest, rows)))
+stage_manifest = copy.deepcopy(manifest); stage_manifest["provenance"]["source_path"] = "Stage 4A.3/runtime/snapshot.json"
+case("DS21", "active prospective runtime source rejected", lambda: raises(ValueError, "PROHIBITED_TRAINING_SOURCE", lambda: validate_dataset_manifest(stage_manifest, rows)))
+unknown_synth = copy.deepcopy(manifest); unknown_synth["source_manifest_bindings"] = ["SYNTHETIC_UNKNOWN"]
+case("DS22", "unapproved synthetic source rejected", lambda: raises(ValueError, "UNAPPROVED_SYNTHETIC_SOURCE", lambda: validate_dataset_manifest(unknown_synth, rows)))
+wrong_generator = copy.deepcopy(manifest); wrong_generator["provenance"]["generator_id"] = "OTHER_GENERATOR"
+case("DS23", "synthetic generator identity exact", lambda: raises(ValueError, "SYNTHETIC_SOURCE_IDENTITY_REQUIRED", lambda: validate_synthetic_source_identity(wrong_generator)))
+leaky = copy.deepcopy(sample); leaky["features"]["future_return_5d"] = leaky["relative_return"]
+case("DS24", "future outcome field cannot enter features", lambda: raises(ValueError, "FUTURE_OUTCOME_FEATURE_PROHIBITED", lambda: row_eligible(leaky)))
+same_time_label = copy.deepcopy(sample); same_time_label["label_available_at"] = same_time_label["feature_available_at"]
+case("DS25", "label must follow information timestamp", lambda: raises(ValueError, "LABEL_MUST_FOLLOW_INFORMATION_TIME", lambda: row_eligible(same_time_label)))
+case("DS26", "prohibited source helper detects MCP", lambda: require(source_is_prohibited_training_input(mcp_manifest)))
 
 # Label maturity and semantics.
 for index, horizon in enumerate((5, 20, 60), 1):
@@ -140,6 +158,10 @@ no_embargo = temporal_fold(rows, dict(policy, embargo_sessions=0))
 case("TM08", "embargo excludes at least as many rows", lambda: require(fold["counts"]["excluded_immature"] >= no_embargo["counts"]["excluded_immature"]))
 case("TM09", "fold binds dataset hash", lambda: require(fold["dataset_hash"] == canonical_hash(rows)))
 case("TM10", "fold hash deterministic", lambda: require(fold["fold_hash"] == temporal_fold(rows, policy)["fold_hash"]))
+case("TM11", "train validation test partitions disjoint", lambda: require(assert_disjoint_partitions(fold) is None))
+overlap_fold = copy.deepcopy(fold); overlap_fold["row_ids"]["validation"].append(overlap_fold["row_ids"]["train"][0])
+case("TM12", "partition overlap rejected", lambda: raises(ValueError, "TEMPORAL_PARTITION_OVERLAP", lambda: assert_disjoint_partitions(overlap_fold)))
+case("TM13", "test rows absent from train partition", lambda: require(not set(fold["row_ids"]["train"]).intersection(fold["row_ids"]["test"])))
 
 # Model adapters and training audit.
 adapters = [ReferenceAdapter(FEATURES), LogisticAdapter(FEATURES), RandomForestAdapter(FEATURES), GradientBoostingAdapter(FEATURES)]
@@ -158,6 +180,8 @@ case("MD17", "model promotion authority none", lambda: require(all(model.promoti
 case("MD18", "logistic score semantics uncalibrated", lambda: require(models[1].configuration["score_semantics"] == "UNCALIBRATED_MODEL_SCORE"))
 case("MD19", "synthetic guarded fit allowed", lambda: require(guarded_fit(ReferenceAdapter(FEATURES), training_manifest, training_rows, "LICENSE_REQUIRED").marker == MODEL_MARKER))
 case("MD20", "ready rights still cannot train real data in synthetic harness", lambda: raises(PermissionError, "REAL_DATA_TRAINING_OUT_OF_SCOPE", lambda: training_guard(dict(training_manifest, classification=REAL, source_manifest_bindings=["NSE"]), training_rows, "READY")))
+case("MD21", "deterministic repeated experiment signature", lambda: require(deterministic_experiment_signature(RandomForestAdapter, rows, manifest, FEATURES) == deterministic_experiment_signature(RandomForestAdapter, copy.deepcopy(rows), copy.deepcopy(manifest), copy.deepcopy(FEATURES))))
+case("MD22", "model configuration hash stable", lambda: require(canonical_hash(adapters[1].describe()) == canonical_hash(copy.deepcopy(adapters[1].describe()))))
 
 # Ranking and Top-K.
 rank_rows = rows[-24:]
@@ -195,6 +219,11 @@ case("MT17", "single-class ROC insufficient", lambda: require(roc_auc([1, 1], [.
 case("MT18", "single-class PR insufficient without positives", lambda: require(pr_auc([0, 0], [.2, .8]) == "INSUFFICIENT_SAMPLE"))
 case("MT19", "constant label Brier skill insufficient", lambda: require(classification_metrics([1, 1], [.5, .5])["brier_skill"] == "INSUFFICIENT_SAMPLE"))
 case("MT20", "scores not called calibrated probability", lambda: require(classification["calibration_state"] == "UNCALIBRATED_MODEL_SCORE"))
+case("MT21", "classification rejects denominator mismatch", lambda: raises(ValueError, "CLASSIFICATION_LENGTH_MISMATCH", lambda: classification_metrics([0, 1], [.2])))
+case("MT22", "classification rejects nonfinite score", lambda: raises(ValueError, "NONFINITE_SCORE", lambda: classification_metrics([0, 1], [.2, float("nan")])))
+case("MT23", "empty classification fail-closed", lambda: require(classification_metrics([], [])["brier"] == "INSUFFICIENT_SAMPLE"))
+case("MT24", "Brier hand fixture", lambda: require(math.isclose(classification_metrics([0, 1], [.25, .75])["brier"], .0625)))
+case("MT25", "RankIC reverse fixture", lambda: require(math.isclose(rank_ic([1, 2, 3], [3, 2, 1]), -1)))
 
 # Economic metrics.
 econ = economic_evaluation([.02, -.01, .03], [.001, .001, .001], [.005, -.002, .006], [5, 5, 5], [1, 0, 2], [.4, .3, .5])
@@ -205,6 +234,9 @@ for index, (key, value) in enumerate(expected.items(), 1):
 for index, key in enumerate(("benchmark_relative_return", "maximum_drawdown", "win_rate", "expectancy", "profit_factor"), 7):
     case(f"EC{index:02d}", f"economic metric {key}", lambda name=key: require(name in econ))
 case("EC12", "profit factor handles no losses", lambda: require(economic_evaluation([.1], [0], [0], [1], [0], [0])["profit_factor"] == "INFINITE"))
+case("EC13", "economic series alignment enforced", lambda: raises(ValueError, "ECONOMIC_SERIES_LENGTH_MISMATCH", lambda: economic_evaluation([.1, .2], [0], [0], [1], [0], [0])))
+case("EC14", "benchmark relative hand fixture", lambda: require(math.isclose(economic_evaluation([.05], [.01], [.02], [1], [0], [0])["benchmark_relative_return"], .02)))
+case("EC15", "drawdown hand fixture", lambda: require(math.isclose(economic_evaluation([.1, -.2, .05], [0, 0, 0], [0, 0, 0], [1, 1, 1], [0, 0, 0], [0, 0, 0])["maximum_drawdown"], -.2)))
 
 # Ablation and stability artifacts.
 ablation = json.loads((RESULTS / "nextgen_ablation_framework_v1.json").read_text())
@@ -229,6 +261,12 @@ for index, key in enumerate(("dataset_hash", "feature_set_hash", "label_contract
     case(f"MF{index:02d}", f"manifest binds {key}", lambda name=key: require(experiment.get(name) not in (None, "")))
 case("MF14", "manifest trading authority false", lambda: require(experiment["trading_authority"] is False))
 case("MF15", "manifest promotion authority none", lambda: require(experiment["promotion_authority"] == "NONE"))
+same_population = [dict(row, model_id="challenger") for row in ranked]
+case("MF16", "baseline challenger identical population accepted", lambda: require(assert_comparison_population_equal(ranked, same_population) is None))
+different_population = copy.deepcopy(same_population); different_population.pop()
+case("MF17", "different comparison population rejected", lambda: raises(ValueError, "COMPARISON_POPULATION_MISMATCH", lambda: assert_comparison_population_equal(ranked, different_population)))
+different_boundary = copy.deepcopy(same_population); different_boundary[0]["dataset_hash"] = "different"
+case("MF18", "different dataset boundary rejected", lambda: raises(ValueError, "COMPARISON_POPULATION_MISMATCH", lambda: assert_comparison_population_equal(ranked, different_boundary)))
 
 # Rights audit and anti-bypass behavior.
 rights = json.loads((RESULTS / "model_training_usage_rights_readiness_v1.json").read_text())
