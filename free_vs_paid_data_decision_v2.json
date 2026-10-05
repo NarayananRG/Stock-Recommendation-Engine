@@ -1,0 +1,40 @@
+{
+  "artifact_type": "FREE_VS_PAID_DATA_DECISION_V2",
+  "authority": "SHADOW_ONLY",
+  "blocker_count_not_used_as_paid_rule": true,
+  "decision": "FREE_OFFICIAL_RECONSTRUCTION_INCOMPLETE",
+  "previous_v1_sha256": "afba30e325b6924286e0f8e2bcc7edcf2b9f779fb2f4ac966333d29e925a2c3d",
+  "purchase_performed": false,
+  "remaining_blockers": [
+    {
+      "detail": "temporary corporate-action lifecycles are not fully paired to official exits/conversions",
+      "free_routes_attempted": [
+        "NSE_INDICES_PRESS_ARCHIVE",
+        "NSE_CM_UDIFF_IDENTITY"
+      ],
+      "free_routes_exhausted": false,
+      "gate": "constituent_reconstruction",
+      "licensed_only_proven": false
+    },
+    {
+      "detail": "material demerger/rights normalization terms remain unresolved for price-return continuity",
+      "free_routes_attempted": [
+        "NSE_CORPORATE_ACTIONS_PUBLIC_API",
+        "NSE_INDICES_CORPORATE_ADJUSTMENT_NOTICES"
+      ],
+      "free_routes_exhausted": false,
+      "gate": "price_adjustment",
+      "licensed_only_proven": false
+    },
+    {
+      "detail": "public report access supports this audit, but future model-training rights were not established",
+      "free_routes_attempted": [
+        "NSE_PUBLIC_REPORTS",
+        "NSE_MCP_DOCUMENTATION"
+      ],
+      "free_routes_exhausted": false,
+      "gate": "source_usage_rights",
+      "licensed_only_proven": false
+    }
+  ]
+}

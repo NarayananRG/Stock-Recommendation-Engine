@@ -1,0 +1,128 @@
+{
+  "acquired_sessions": 497,
+  "artifact_type": "FREE_RESTRICTED_MARKET_PANEL_COVERAGE_V1",
+  "authority": "SHADOW_ONLY",
+  "constituent_security_session_observations": 287629,
+  "criterion_classification": "RESEARCH_GOVERNANCE_THRESHOLD",
+  "duplicate_rows": 0,
+  "end_date": "2026-10-01",
+  "expected_sessions": 497,
+  "invalid_ohlc_examples": [
+    {
+      "date": "2024-12-17",
+      "series": "T0",
+      "symbol": "SBIN"
+    },
+    {
+      "date": "2024-12-18",
+      "series": "T0",
+      "symbol": "SBIN"
+    },
+    {
+      "date": "2025-01-08",
+      "series": "T0",
+      "symbol": "SBIN"
+    },
+    {
+      "date": "2025-01-20",
+      "series": "T0",
+      "symbol": "VEDL"
+    },
+    {
+      "date": "2025-01-28",
+      "series": "T0",
+      "symbol": "PETRONET"
+    },
+    {
+      "date": "2025-01-29",
+      "series": "T0",
+      "symbol": "PETRONET"
+    },
+    {
+      "date": "2025-02-12",
+      "series": "T0",
+      "symbol": "NSLNISP"
+    },
+    {
+      "date": "2025-03-19",
+      "series": "T0",
+      "symbol": "AMBUJACEM"
+    },
+    {
+      "date": "2025-03-28",
+      "series": "T0",
+      "symbol": "NCC"
+    },
+    {
+      "date": "2025-04-04",
+      "series": "T0",
+      "symbol": "AMBUJACEM"
+    },
+    {
+      "date": "2025-04-04",
+      "series": "T0",
+      "symbol": "NSLNISP"
+    },
+    {
+      "date": "2025-04-08",
+      "series": "T0",
+      "symbol": "SBIN"
+    },
+    {
+      "date": "2025-04-09",
+      "series": "T0",
+      "symbol": "CEATLTD"
+    },
+    {
+      "date": "2025-04-17",
+      "series": "T0",
+      "symbol": "NSLNISP"
+    },
+    {
+      "date": "2025-04-24",
+      "series": "T0",
+      "symbol": "BANKBARODA"
+    },
+    {
+      "date": "2025-04-25",
+      "series": "T0",
+      "symbol": "BANKBARODA"
+    },
+    {
+      "date": "2025-04-28",
+      "series": "T0",
+      "symbol": "NMDC"
+    },
+    {
+      "date": "2025-04-30",
+      "series": "T0",
+      "symbol": "NBCC"
+    },
+    {
+      "date": "2025-05-15",
+      "series": "T0",
+      "symbol": "BPCL"
+    },
+    {
+      "date": "2025-05-16",
+      "series": "T0",
+      "symbol": "NMDC"
+    }
+  ],
+  "invalid_ohlc_rows": 192,
+  "invalid_required_constituent_ohlc_rows": 0,
+  "maximum_rows_in_session": 3712,
+  "minimum_rows_in_session": 2746,
+  "missing_sessions": [],
+  "ohlc_complete": true,
+  "restricted_historical_symbols": 620,
+  "start_date": "2024-10-01",
+  "status": "COMPLETE_FOR_RESTRICTED_PERIOD",
+  "stock_rows": 1579133,
+  "total_rows": 1579133,
+  "turnover_complete": true,
+  "unique_isins": 5827,
+  "unique_symbols": 5820,
+  "volume_complete": true,
+  "zero_volume_untraded_rows": 0
+}

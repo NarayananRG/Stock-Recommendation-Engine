@@ -1,0 +1,42 @@
+{
+  "artifact_hashes": {
+    "advanced_research_readiness_v3.json": "67cf2cafee7d7beab308440f8bc4b9c6d1df85bd8608d9b540074211a600ce74",
+    "authoritative_data_archive_manifest_v1.json": "e9fe3cb99a9bf12b82273b50ceaaff5dc14da3a899303c0bda505822c3ae25c5",
+    "market_data_source_readiness_v1.json": "604ae2a8909df1b636972591d7c2ff9a132db369410f8efadd0c7dbeb1327cd7",
+    "minimum_data_purchase_plan_v1.json": "779d395c871b48cbbe918abd774df425d700a5e402a87e8ce65e27910c9085df",
+    "nextgen_data_acquisition_decision_v1.json": "46f6593faa7360f691e6ff9c77b8b02f6fe5a075d668e890f4629044810b1df3",
+    "nextgen_feature_pit_readiness_v1.json": "8560f03ba484eeafcd5b1cc0773cacc37fadd15ce8a705272443cdd56df7a352",
+    "nextgen_price_adjustment_policy_v1.json": "7562b49e12a539a849cd316b679f0b6c9586b2198bbad5be3e62096f0549a8ef",
+    "official_data_acquisition_requirements_v1.json": "1121d991520eca4329155bfd31f0fc26d6e42392ba03716309012e13bb5ef297",
+    "official_historical_data_product_inventory_v1.json": "dc8d893178a725faee945d476472f099ea5db2c19ae57a89ee5005ad9399ab27",
+    "survivorship_coverage_policy_v1.json": "85a013fe743701500b48a758cfdfaa83986ee21c57d331deb9da67329a844aac"
+  },
+  "branch": "nextgen-research-authoritative-data",
+  "contract_id": "NEXTGEN_AUTHORITATIVE_DATA_CONTRACT_V1",
+  "fixture_only_tests": true,
+  "model_training": false,
+  "network_calls_in_tests": 0,
+  "parent_commit": "986f9e6cae2574246fa56ec8f7084addc8bcc58b",
+  "products_investigated": 10,
+  "public_archives_recorded": 4,
+  "raw_files_committed": 0,
+  "regressions": {
+    "focused": "83/83 PASS",
+    "full_stage6": "FROZEN_TEST_HARNESS_BRANCH_CONSTRAINT",
+    "historical_evidence": "63/63 PASS",
+    "nextgen_foundation": "104/104 PASS",
+    "readiness_v2": "22/22 PASS",
+    "real_data": "58/58 PASS",
+    "stage5d": "606/606 PASS",
+    "stage6_0c": "PASS / 10 schemas",
+    "stage6_8c": "170/170 PASS"
+  },
+  "research_period": "2016-01-01..2026-10-03",
+  "result": "PASS_FAIL_CLOSED",
+  "tags_created": 0,
+  "trading_authority": false,
+  "v1_sha256": "70b603aecd427e9947d4fbf4a68b9eb6f32ff2c1151a930049300d343c5ba6b4",
+  "v2_sha256": "7ec465cdf4178593d48dc7b89b690b581cd31ce97f06b505c04158da0244b1fb",
+  "v3_reason": "OFFICIAL_DATA_ACQUISITION_REQUIRED",
+  "v3_status": "NOT_READY"
+}

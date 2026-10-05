@@ -1,0 +1,25 @@
+{
+  "artifact_type": "TECHNICAL_RESEARCH_DATA_READINESS_V1",
+  "authority": "SHADOW_ONLY",
+  "candidate_rows_subject_to_60_session_warmup": true,
+  "failed_gates": [],
+  "gates": {
+    "benchmark": true,
+    "constituent_reconstruction": true,
+    "execution_costs": true,
+    "features": true,
+    "governance": true,
+    "identity": true,
+    "investable_universe": true,
+    "market_data": true,
+    "price_normalization": true,
+    "survivorship": true
+  },
+  "restricted_period": {
+    "duration_months": 24.0,
+    "end_date": "2026-10-01",
+    "start_date": "2024-10-01",
+    "trading_sessions": 497
+  },
+  "status": "TECHNICALLY_READY_WITH_RESTRICTED_PERIOD"
+}

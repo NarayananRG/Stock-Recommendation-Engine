@@ -1,0 +1,12 @@
+{
+  "artifact_type": "RESTRICTED_SURVIVORSHIP_ASSESSMENT_V2",
+  "authority": "SHADOW_ONLY",
+  "current_survivors": 501,
+  "dummy_placeholders_excluded_from_investable_survivors": true,
+  "historical_investable_symbols": 620,
+  "historical_non_current_securities": 119,
+  "new_listing_count": 7,
+  "predecessor_successor_chain_count": 7,
+  "status": "COMPLETE_FOR_RESTRICTED_INVESTABLE_UNIVERSE",
+  "unknown_investable_identity_share_percentage": 0.0
+}

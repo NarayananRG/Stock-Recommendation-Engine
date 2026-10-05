@@ -1,0 +1,14 @@
+{
+  "artifact_type": "FREE_VS_PAID_DATA_DECISION_V3",
+  "authority": "SHADOW_ONLY",
+  "decision": "LICENSE_REQUIRED_FOR_MODEL_TRAINING",
+  "model_training_usage_rights": "LICENSE_REQUIRED",
+  "paid_historical_constituent_data_technically_required": false,
+  "permission_or_license_scope": "MODEL_TRAINING_USE_OF_NSE_MARKET_AND_NSE_INDICES_BENCHMARK_DATA",
+  "previous_decision_hashes": {
+    "v1": "afba30e325b6924286e0f8e2bcc7edcf2b9f779fb2f4ac966333d29e925a2c3d",
+    "v2": "f573b8b28ecb5fa15db36be2e8dc4b655ed22134fed7a073cfe3d4b045090dd1"
+  },
+  "purchase_performed": false,
+  "technical_data_status": "TECHNICALLY_READY_WITH_RESTRICTED_PERIOD"
+}

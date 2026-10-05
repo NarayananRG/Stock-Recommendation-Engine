@@ -1,0 +1,25 @@
+{
+  "acceptable_fallback": "NIFTY_200 if coverage/licence is materially more obtainable",
+  "active_prospective_authority": "NONE",
+  "active_recommendation_influence": "NONE",
+  "active_source_registry_authority": "NONE",
+  "authority": "RESEARCH_ONLY",
+  "exact_price_estimate": null,
+  "exchange_wide_purchase_deferred": true,
+  "minimum_actions": [
+    "Obtain one-time authoritative broad-index constituent history for a continuous bounded period",
+    "Establish official NSE EOD/security coverage for the identical period; purchase only if public official archive cannot be legitimately completed",
+    "Obtain matching corporate-action history if EOD delivery does not include adjustment/reference support"
+  ],
+  "model_promotion_authority": "NONE",
+  "ongoing_subscription_required_for_retrospective_research": false,
+  "preferred_first_profile": "INDEX_CONSTITUENT_PIT",
+  "preferred_universe": "NIFTY_500",
+  "price_note": "No price estimate asserted; request current official quote/terms.",
+  "rationale": "A broad official index history is the lowest-scope route to a defensible cross-sectional PIT universe; full exchange-wide master history is not required for the first bounded challenger.",
+  "recommendation": "ONE_TIME_HISTORICAL_CONSTITUENT_DATA_REQUIRED",
+  "record_hash": "5787cd8a6f26230ec6835e9b04f1a4d879b25b2c2d5f920db4ed43cb80d2e1f8",
+  "record_id": "MINIMUM_DATA_PURCHASE_PLAN_V1_5787cd8a6f26230ec6835e9b",
+  "schema": "MINIMUM_DATA_PURCHASE_PLAN_V1",
+  "trading_authority": false
+}

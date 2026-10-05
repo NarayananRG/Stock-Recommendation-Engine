@@ -1,0 +1,49 @@
+{
+  "artifact_type": "ADVANCED_RESEARCH_READINESS_V4",
+  "authority": "SHADOW_ONLY",
+  "challenger_trained": false,
+  "failed_gates": [
+    "benchmark",
+    "constituent_reconstruction",
+    "execution_costs",
+    "features",
+    "identity",
+    "market_data",
+    "pit_universe",
+    "price_adjustment",
+    "survivorship"
+  ],
+  "gates": {
+    "benchmark": false,
+    "constituent_reconstruction": false,
+    "execution_costs": false,
+    "features": false,
+    "governance": true,
+    "identity": false,
+    "market_data": false,
+    "pit_universe": false,
+    "price_adjustment": false,
+    "survivorship": false
+  },
+  "ml_authority": "NONE",
+  "model_promoted": false,
+  "preserved_readiness_hashes": {
+    "v1": "70b603aecd427e9947d4fbf4a68b9eb6f32ff2c1151a930049300d343c5ba6b4",
+    "v2": "7ec465cdf4178593d48dc7b89b690b581cd31ce97f06b505c04158da0244b1fb",
+    "v3": "67cf2cafee7d7beab308440f8bc4b9c6d1df85bd8608d9b540074211a600ce74"
+  },
+  "profile": "FREE_OFFICIAL_INDEX_CONSTITUENT_PIT",
+  "reason": "FREE_OFFICIAL_EVIDENCE_EXHAUSTED_BUT_JOINT_RESEARCH_WINDOW_NOT_PROVEN",
+  "restricted_period": null,
+  "source_hashes": {
+    "anchor": "1d0a8ca2e5ebaac9762c014eea1671c75884a2de54198ccb36e6d58a8613242b",
+    "benchmark": "cd8904da1809a8ded9c8b191f3fd16d1abc669a56b81944dbbae6aea6e5602fd",
+    "change_ledger": "db67576d4463bc102e7896ae6ac28648421f7368be731c29eef9472947cd4a4c",
+    "corporate_action_ledger": "eedd0d9129cf812f375027272a59ce56fb0342afb5fa02e612e2092c48a6e215",
+    "feature_readiness": "7c3d90f453c54e85c101ee48b8f977ff0668b798a36dc778c584497a9498ddd6",
+    "market_panel_manifest": "a77723c12ed1a65b742e981368a1f745a16fbe91eb61db46cfa042856bfcc12a"
+  },
+  "status": "NOT_READY",
+  "trading_authority": false,
+  "training_started": false
+}

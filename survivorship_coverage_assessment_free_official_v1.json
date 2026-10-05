@@ -1,0 +1,34 @@
+{
+  "artifact_type": "SURVIVORSHIP_COVERAGE_ASSESSMENT_FREE_OFFICIAL_V1",
+  "authority": "SHADOW_ONLY",
+  "coverage_percentage": null,
+  "delisted_historical_members_retained": 0,
+  "historical_non_current_members_retained": 249,
+  "survivorship_distortion_materially_reduced": false,
+  "years": [
+    {
+      "status": "UNKNOWN_DUE_TO_INCOMPLETE_RECONSTRUCTION",
+      "year": 2021
+    },
+    {
+      "status": "UNKNOWN_DUE_TO_INCOMPLETE_RECONSTRUCTION",
+      "year": 2022
+    },
+    {
+      "status": "UNKNOWN_DUE_TO_INCOMPLETE_RECONSTRUCTION",
+      "year": 2023
+    },
+    {
+      "status": "UNKNOWN_DUE_TO_INCOMPLETE_RECONSTRUCTION",
+      "year": 2024
+    },
+    {
+      "status": "UNKNOWN_DUE_TO_INCOMPLETE_RECONSTRUCTION",
+      "year": 2025
+    },
+    {
+      "status": "UNKNOWN_DUE_TO_INCOMPLETE_RECONSTRUCTION",
+      "year": 2026
+    }
+  ]
+}

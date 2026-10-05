@@ -1,0 +1,1125 @@
+{
+  "artifact_type": "RESTRICTED_PIT_PRICE_NORMALIZATION_2024_2026_V1",
+  "authority": "SHADOW_ONLY",
+  "dividends_excluded": true,
+  "future_action_use": "PROHIBITED",
+  "material_unresolved_actions": [
+    {
+      "adjustment_factor": null,
+      "classification": "RIGHTS",
+      "effective_date": "2024-11-26",
+      "isin": "INE628A01036",
+      "normalization_status": "TERMS_UNRESOLVED",
+      "record_date": "26-Nov-2024",
+      "subject": "Rights 1:8 @ Premium Rs 358/-",
+      "symbol": "UPL"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "DEMERGER",
+      "effective_date": "2025-01-06",
+      "isin": "INE154A01025",
+      "normalization_status": "IDENTITY_TRANSITION_LEDGER",
+      "record_date": "06-Jan-2025",
+      "subject": "Demerger",
+      "symbol": "ITC"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "RIGHTS",
+      "effective_date": "2025-02-11",
+      "isin": "INE085J01014",
+      "normalization_status": "TERMS_UNRESOLVED",
+      "record_date": "11-Feb-2025",
+      "subject": "Rights 2:15 @ Premium Rs 1390/-",
+      "symbol": "THANGAMAYL"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "DEMERGER",
+      "effective_date": "2025-04-07",
+      "isin": "INE003A01024",
+      "normalization_status": "IDENTITY_TRANSITION_LEDGER",
+      "record_date": "07-Apr-2025",
+      "subject": "Demerger",
+      "symbol": "SIEMENS"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "DEMERGER",
+      "effective_date": "2025-04-15",
+      "isin": "INE615P01015",
+      "normalization_status": "IDENTITY_TRANSITION_LEDGER",
+      "record_date": "15-Apr-2025",
+      "subject": "Demerger",
+      "symbol": "QUESS"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "DEMERGER",
+      "effective_date": "2025-04-24",
+      "isin": "INE089C01029",
+      "normalization_status": "IDENTITY_TRANSITION_LEDGER",
+      "record_date": "24-Apr-2025",
+      "subject": "Demerger",
+      "symbol": "STLTECH"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "DEMERGER",
+      "effective_date": "2025-05-14",
+      "isin": "INE301A01014",
+      "normalization_status": "IDENTITY_TRANSITION_LEDGER",
+      "record_date": "14-May-2025",
+      "subject": "Demerger",
+      "symbol": "RAYMOND"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "RIGHTS",
+      "effective_date": "2025-05-14",
+      "isin": "INE774D01016",
+      "normalization_status": "TERMS_UNRESOLVED",
+      "record_date": "14-May-2025",
+      "subject": "Rights 1:8 @ Premium Rs 192/-",
+      "symbol": "M&MFIN"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "DEMERGER",
+      "effective_date": "2025-05-22",
+      "isin": "INE647O01011",
+      "normalization_status": "IDENTITY_TRANSITION_LEDGER",
+      "record_date": "22-May-2025",
+      "subject": "Demerger",
+      "symbol": "ABFRL"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "RIGHTS",
+      "effective_date": "2025-05-23",
+      "isin": "INE813A01018",
+      "normalization_status": "TERMS_UNRESOLVED",
+      "record_date": "23-May-2025",
+      "subject": "Rights 3:8 @ Premium Rs 247/-",
+      "symbol": "MAHLIFE"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "DEMERGER",
+      "effective_date": "2025-07-18",
+      "isin": "INE879I01012",
+      "normalization_status": "IDENTITY_TRANSITION_LEDGER",
+      "record_date": "18-Jul-2025",
+      "subject": "Demerger",
+      "symbol": "DBREALTY"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "RIGHTS",
+      "effective_date": "2025-07-29",
+      "isin": "INE066P01011",
+      "normalization_status": "TERMS_UNRESOLVED",
+      "record_date": "29-Jul-2025",
+      "subject": "Rights 5:78 @ Premium Rs 110/-",
+      "symbol": "INOXWIND"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "BONUS",
+      "effective_date": "2025-08-25",
+      "isin": "INE494B01015",
+      "normalization_status": "TERMS_UNRESOLVED",
+      "record_date": "25-Aug-2025",
+      "subject": "Scheme Of Arrangement - Bonus Ncrps 4:1",
+      "symbol": "TVSMOTOR"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "DEMERGER",
+      "effective_date": "2025-10-14",
+      "isin": "INE155A01022",
+      "normalization_status": "IDENTITY_TRANSITION_LEDGER",
+      "record_date": "14-Oct-2025",
+      "subject": "Demerger",
+      "symbol": "TMPV"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "DEMERGER",
+      "effective_date": "2025-10-15",
+      "isin": "INE640A01023",
+      "normalization_status": "IDENTITY_TRANSITION_LEDGER",
+      "record_date": "15-Oct-2025",
+      "subject": "Demerger",
+      "symbol": "SKFINDIA"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "RIGHTS",
+      "effective_date": "2025-11-17",
+      "isin": "INE423A01024",
+      "normalization_status": "TERMS_UNRESOLVED",
+      "record_date": "17-Nov-2025",
+      "subject": "Rights 3:25 @ Premium Rs 1799/-",
+      "symbol": "ADANIENT"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "DEMERGER",
+      "effective_date": "2025-12-05",
+      "isin": "INE030A01027",
+      "normalization_status": "IDENTITY_TRANSITION_LEDGER",
+      "record_date": "05-Dec-2025",
+      "subject": "Demerger",
+      "symbol": "HINDUNILVR"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "DEMERGER",
+      "effective_date": "2026-04-30",
+      "isin": "INE205A01025",
+      "normalization_status": "IDENTITY_TRANSITION_LEDGER",
+      "record_date": "01-May-2026",
+      "subject": "Demerger",
+      "symbol": "VEDL"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "DEMERGER",
+      "effective_date": "2026-07-22",
+      "isin": "INE256C01024",
+      "normalization_status": "IDENTITY_TRANSITION_LEDGER",
+      "record_date": "22-Jul-2026",
+      "subject": "Demerger",
+      "symbol": "TRIVENI"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "DEMERGER",
+      "effective_date": "2026-09-07",
+      "isin": "INE545A01024",
+      "normalization_status": "IDENTITY_TRANSITION_LEDGER",
+      "record_date": "07-Sep-2026",
+      "subject": "Demerger",
+      "symbol": "HEGAM"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "RIGHTS",
+      "effective_date": "2026-10-01",
+      "isin": "INE987B01018",
+      "normalization_status": "TERMS_UNRESOLVED",
+      "record_date": "01-Oct-2026",
+      "subject": "Rights 2:21 @ Premium Rs 748/-",
+      "symbol": "NATCOPHARM"
+    }
+  ],
+  "relevant_non_dividend_actions": [
+    {
+      "adjustment_factor": 0.2,
+      "classification": "SPLIT",
+      "effective_date": "2024-10-04",
+      "isin": "INE177H01013",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "04-Oct-2024",
+      "subject": "Face Value Split (Sub-Division) - From Rs 5/- Per Share To Re 1/- Per Share",
+      "symbol": "GPIL"
+    },
+    {
+      "adjustment_factor": 0.6666666666666666,
+      "classification": "BONUS",
+      "effective_date": "2024-10-07",
+      "isin": "INE095N01015",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "07-Oct-2024",
+      "subject": "Bonus 1:2",
+      "symbol": "NBCC"
+    },
+    {
+      "adjustment_factor": 0.5,
+      "classification": "SPLIT",
+      "effective_date": "2024-10-09",
+      "isin": "INE324A01024",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "09-Oct-2024",
+      "subject": "Face Value Split (Sub-Division) - From Rs 2/- Per Share To Re 1/- Per Share",
+      "symbol": "JINDALSAW"
+    },
+    {
+      "adjustment_factor": 0.2,
+      "classification": "SPLIT",
+      "effective_date": "2024-10-18",
+      "isin": "INE545A01024",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "18-Oct-2024",
+      "subject": "Face Value Split (Sub-Division) - From Rs 10/- Per Share To Rs 2/- Per Share",
+      "symbol": "HEGAM"
+    },
+    {
+      "adjustment_factor": 0.5,
+      "classification": "BONUS",
+      "effective_date": "2024-10-28",
+      "isin": "INE002A01018",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "28-Oct-2024",
+      "subject": "Bonus 1:1",
+      "symbol": "RELIANCE"
+    },
+    {
+      "adjustment_factor": 0.2,
+      "classification": "SPLIT",
+      "effective_date": "2024-10-28",
+      "isin": "INE089A01023",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "28-Oct-2024",
+      "subject": "Face Value Split (Sub-Division) - From Rs 5/- Per Share To Re 1/- Per Share",
+      "symbol": "DRREDDY"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "OTHER",
+      "effective_date": "2024-10-31",
+      "isin": "INE248A01017",
+      "normalization_status": "TERMS_UNRESOLVED",
+      "record_date": "-",
+      "subject": "Annual General Meeting",
+      "symbol": "ITI"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "RIGHTS",
+      "effective_date": "2024-11-26",
+      "isin": "INE628A01036",
+      "normalization_status": "TERMS_UNRESOLVED",
+      "record_date": "26-Nov-2024",
+      "subject": "Rights 1:8 @ Premium Rs 358/-",
+      "symbol": "UPL"
+    },
+    {
+      "adjustment_factor": 0.5,
+      "classification": "BONUS",
+      "effective_date": "2024-11-29",
+      "isin": "INE07O001018",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "29-Nov-2024",
+      "subject": "Bonus 1:1",
+      "symbol": "EASEMYTRIP"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "OTHER",
+      "effective_date": "2024-11-29",
+      "isin": "INE324A01024",
+      "normalization_status": "TERMS_UNRESOLVED",
+      "record_date": "-",
+      "subject": "Extra Ordinary General Meeting",
+      "symbol": "JINDALSAW"
+    },
+    {
+      "adjustment_factor": 0.5,
+      "classification": "BONUS",
+      "effective_date": "2024-12-03",
+      "isin": "INE075A01022",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "03-Dec-2024",
+      "subject": "Bonus 1:1",
+      "symbol": "WIPRO"
+    },
+    {
+      "adjustment_factor": 0.3333333333333333,
+      "classification": "BONUS",
+      "effective_date": "2024-12-27",
+      "isin": "INE584A01023",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "27-Dec-2024",
+      "subject": "Bonus 2:1",
+      "symbol": "NMDC"
+    },
+    {
+      "adjustment_factor": 0.5,
+      "classification": "SPLIT",
+      "effective_date": "2024-12-27",
+      "isin": "INE249Z01012",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "27-Dec-2024",
+      "subject": "Face Value Split (Sub-Division) - From Rs 10/- Per Share To Rs 5/- Per Share",
+      "symbol": "MAZDOCK"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "DEMERGER",
+      "effective_date": "2025-01-06",
+      "isin": "INE154A01025",
+      "normalization_status": "IDENTITY_TRANSITION_LEDGER",
+      "record_date": "06-Jan-2025",
+      "subject": "Demerger",
+      "symbol": "ITC"
+    },
+    {
+      "adjustment_factor": 0.2,
+      "classification": "SPLIT",
+      "effective_date": "2025-01-10",
+      "isin": "INE721A01013",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "10-Jan-2025",
+      "subject": "Face Value Split (Sub-Division) - From Rs 10/- Per Share To Rs 2/- Per Share",
+      "symbol": "SHRIRAMFIN"
+    },
+    {
+      "adjustment_factor": 0.5,
+      "classification": "SPLIT",
+      "effective_date": "2025-01-20",
+      "isin": "INE725A01022",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "20-Jan-2025",
+      "subject": "Face Value Split (Sub-Division) - From Rs 2/- Per Share To Re 1/- Per Share",
+      "symbol": "NAVA"
+    },
+    {
+      "adjustment_factor": 0.5,
+      "classification": "SPLIT",
+      "effective_date": "2025-01-31",
+      "isin": "INE927D01010",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "31-Jan-2025",
+      "subject": "Face Value Split (Sub-Division) - From Rs 2/- Per Share To Re 1/- Per Share",
+      "symbol": "JBMA"
+    },
+    {
+      "adjustment_factor": 0.5,
+      "classification": "BONUS",
+      "effective_date": "2025-01-31",
+      "isin": "INE203G01019",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "31-Jan-2025",
+      "subject": "Bonus 1:1",
+      "symbol": "IGL"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "RIGHTS",
+      "effective_date": "2025-02-11",
+      "isin": "INE085J01014",
+      "normalization_status": "TERMS_UNRESOLVED",
+      "record_date": "11-Feb-2025",
+      "subject": "Rights 2:15 @ Premium Rs 1390/-",
+      "symbol": "THANGAMAYL"
+    },
+    {
+      "adjustment_factor": 0.5,
+      "classification": "BONUS",
+      "effective_date": "2025-02-14",
+      "isin": "INE763I01026",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "14-Feb-2025",
+      "subject": "Bonus 1:1",
+      "symbol": "TARIL"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "OTHER",
+      "effective_date": "2025-02-28",
+      "isin": "INE725A01022",
+      "normalization_status": "TERMS_UNRESOLVED",
+      "record_date": "28-Feb-2025",
+      "subject": "Buy Back",
+      "symbol": "NAVA"
+    },
+    {
+      "adjustment_factor": 0.5,
+      "classification": "BONUS",
+      "effective_date": "2025-03-05",
+      "isin": "INE463V01026",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "05-Mar-2025",
+      "subject": "Bonus 1:1",
+      "symbol": "ANANDRATHI"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "DEMERGER",
+      "effective_date": "2025-04-07",
+      "isin": "INE003A01024",
+      "normalization_status": "IDENTITY_TRANSITION_LEDGER",
+      "record_date": "07-Apr-2025",
+      "subject": "Demerger",
+      "symbol": "SIEMENS"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "DEMERGER",
+      "effective_date": "2025-04-15",
+      "isin": "INE615P01015",
+      "normalization_status": "IDENTITY_TRANSITION_LEDGER",
+      "record_date": "15-Apr-2025",
+      "subject": "Demerger",
+      "symbol": "QUESS"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "DEMERGER",
+      "effective_date": "2025-04-24",
+      "isin": "INE089C01029",
+      "normalization_status": "IDENTITY_TRANSITION_LEDGER",
+      "record_date": "24-Apr-2025",
+      "subject": "Demerger",
+      "symbol": "STLTECH"
+    },
+    {
+      "adjustment_factor": 0.5,
+      "classification": "SPLIT",
+      "effective_date": "2025-04-25",
+      "isin": "INE00FF01025",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "25-Apr-2025",
+      "subject": "Face Value Split (Sub-Division) - From Rs 10/- Per Share To Rs 5/- Per Share",
+      "symbol": "ACUTAAS"
+    },
+    {
+      "adjustment_factor": 0.2,
+      "classification": "SPLIT",
+      "effective_date": "2025-05-07",
+      "isin": "INE663F01024",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "07-May-2025",
+      "subject": "Face Value Split (Sub-Division) - From Rs 10/- Per Share To Rs 2/- Per Share",
+      "symbol": "NAUKRI"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "DEMERGER",
+      "effective_date": "2025-05-14",
+      "isin": "INE301A01014",
+      "normalization_status": "IDENTITY_TRANSITION_LEDGER",
+      "record_date": "14-May-2025",
+      "subject": "Demerger",
+      "symbol": "RAYMOND"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "RIGHTS",
+      "effective_date": "2025-05-14",
+      "isin": "INE774D01016",
+      "normalization_status": "TERMS_UNRESOLVED",
+      "record_date": "14-May-2025",
+      "subject": "Rights 1:8 @ Premium Rs 192/-",
+      "symbol": "M&MFIN"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "DEMERGER",
+      "effective_date": "2025-05-22",
+      "isin": "INE647O01011",
+      "normalization_status": "IDENTITY_TRANSITION_LEDGER",
+      "record_date": "22-May-2025",
+      "subject": "Demerger",
+      "symbol": "ABFRL"
+    },
+    {
+      "adjustment_factor": 0.3333333333333333,
+      "classification": "BONUS",
+      "effective_date": "2025-05-23",
+      "isin": "INE118H01025",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "23-May-2025",
+      "subject": "Bonus 2:1",
+      "symbol": "BSE"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "RIGHTS",
+      "effective_date": "2025-05-23",
+      "isin": "INE813A01018",
+      "normalization_status": "TERMS_UNRESOLVED",
+      "record_date": "23-May-2025",
+      "subject": "Rights 3:8 @ Premium Rs 247/-",
+      "symbol": "MAHLIFE"
+    },
+    {
+      "adjustment_factor": 0.2,
+      "classification": "SPLIT",
+      "effective_date": "2025-06-04",
+      "isin": "INE591G01017",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "04-Jun-2025",
+      "subject": "Face Value Split (Sub-Division) - From Rs 10/- Per Share To Rs 2/- Per Share",
+      "symbol": "COFORGE"
+    },
+    {
+      "adjustment_factor": 0.2,
+      "classification": "BONUS",
+      "effective_date": "2025-06-16",
+      "isin": "INE296A01016",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "16-Jun-2025",
+      "subject": "Bonus 4:1",
+      "symbol": "BAJFINANCE"
+    },
+    {
+      "adjustment_factor": 0.5,
+      "classification": "SPLIT",
+      "effective_date": "2025-06-16",
+      "isin": "INE296A01016",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "16-Jun-2025",
+      "subject": "Face Value Split (Sub-Division) - From Rs 2/- Per Share To Re 1/- Per Share",
+      "symbol": "BAJFINANCE"
+    },
+    {
+      "adjustment_factor": 0.8,
+      "classification": "BONUS",
+      "effective_date": "2025-07-04",
+      "isin": "INE111A01017",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "04-Jul-2025",
+      "subject": "Bonus 1:4",
+      "symbol": "CONCOR"
+    },
+    {
+      "adjustment_factor": 0.5,
+      "classification": "BONUS",
+      "effective_date": "2025-07-16",
+      "isin": "INE208A01029",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "16-Jul-2025",
+      "subject": "Bonus 1:1",
+      "symbol": "ASHOKLEY"
+    },
+    {
+      "adjustment_factor": 0.6666666666666666,
+      "classification": "BONUS",
+      "effective_date": "2025-07-18",
+      "isin": "INE775A01035",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "18-Jul-2025",
+      "subject": "Bonus 1:2",
+      "symbol": "MOTHERSON"
+    },
+    {
+      "adjustment_factor": 0.6666666666666666,
+      "classification": "BONUS",
+      "effective_date": "2025-07-18",
+      "isin": "INE0FS801015",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "18-Jul-2025",
+      "subject": "Bonus 1:2",
+      "symbol": "MSUMI"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "DEMERGER",
+      "effective_date": "2025-07-18",
+      "isin": "INE879I01012",
+      "normalization_status": "IDENTITY_TRANSITION_LEDGER",
+      "record_date": "18-Jul-2025",
+      "subject": "Demerger",
+      "symbol": "DBREALTY"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "OTHER",
+      "effective_date": "2025-07-23",
+      "isin": "INE483C01032",
+      "normalization_status": "TERMS_UNRESOLVED",
+      "record_date": "23-Jul-2025",
+      "subject": "Buy Back",
+      "symbol": "TANLA"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "RIGHTS",
+      "effective_date": "2025-07-29",
+      "isin": "INE066P01011",
+      "normalization_status": "TERMS_UNRESOLVED",
+      "record_date": "29-Jul-2025",
+      "subject": "Rights 5:78 @ Premium Rs 110/-",
+      "symbol": "INOXWIND"
+    },
+    {
+      "adjustment_factor": 0.5,
+      "classification": "BONUS",
+      "effective_date": "2025-08-08",
+      "isin": "INE239A01016",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "08-Aug-2025",
+      "subject": "Bonus 1:1",
+      "symbol": "NESTLEIND"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "BONUS",
+      "effective_date": "2025-08-25",
+      "isin": "INE494B01015",
+      "normalization_status": "TERMS_UNRESOLVED",
+      "record_date": "25-Aug-2025",
+      "subject": "Scheme Of Arrangement - Bonus Ncrps 4:1",
+      "symbol": "TVSMOTOR"
+    },
+    {
+      "adjustment_factor": 0.5,
+      "classification": "BONUS",
+      "effective_date": "2025-08-26",
+      "isin": "INE040A01018",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "27-Aug-2025",
+      "subject": "Bonus 1:1",
+      "symbol": "HDFCBANK"
+    },
+    {
+      "adjustment_factor": 0.8333333333333334,
+      "classification": "BONUS",
+      "effective_date": "2025-08-26",
+      "isin": "INE036D01010",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "26-Aug-2025",
+      "subject": "Bonus 1:5",
+      "symbol": "KARURVYSYA"
+    },
+    {
+      "adjustment_factor": 0.3333333333333333,
+      "classification": "BONUS",
+      "effective_date": "2025-09-11",
+      "isin": "INE619A01035",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "11-Sep-2025",
+      "subject": "Bonus 2:1",
+      "symbol": "PATANJALI"
+    },
+    {
+      "adjustment_factor": 0.3333333333333333,
+      "classification": "BONUS",
+      "effective_date": "2025-09-16",
+      "isin": "INE260B01010",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "16-Sep-2025",
+      "subject": "Bonus 2:1",
+      "symbol": "GODFRYPHLP"
+    },
+    {
+      "adjustment_factor": 0.2,
+      "classification": "SPLIT",
+      "effective_date": "2025-09-18",
+      "isin": "INE768C01010",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "18-Sep-2025",
+      "subject": "Face Value Split (Sub-Division) - From Rs 10/- Per Share To Rs 2/- Per Share",
+      "symbol": "ZYDUSWELL"
+    },
+    {
+      "adjustment_factor": 0.2,
+      "classification": "SPLIT",
+      "effective_date": "2025-09-22",
+      "isin": "INE814H01011",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "22-Sep-2025",
+      "subject": "Face Value Split (Sub-Division) - From Rs 10/- Per Share To Rs 2/- Per Share",
+      "symbol": "ADANIPOWER"
+    },
+    {
+      "adjustment_factor": 0.5,
+      "classification": "BONUS",
+      "effective_date": "2025-09-23",
+      "isin": "INE318A01026",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "23-Sep-2025",
+      "subject": "Bonus 1:1",
+      "symbol": "PIDILITIND"
+    },
+    {
+      "adjustment_factor": 0.1,
+      "classification": "SPLIT",
+      "effective_date": "2025-10-14",
+      "isin": "INE672A01018",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "14-Oct-2025",
+      "subject": "Face Value Split (Sub-Division) - From Rs 10/- Per Share To Re 1/- Per Share",
+      "symbol": "TATAINVEST"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "DEMERGER",
+      "effective_date": "2025-10-14",
+      "isin": "INE155A01022",
+      "normalization_status": "IDENTITY_TRANSITION_LEDGER",
+      "record_date": "14-Oct-2025",
+      "subject": "Demerger",
+      "symbol": "TMPV"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "DEMERGER",
+      "effective_date": "2025-10-15",
+      "isin": "INE640A01023",
+      "normalization_status": "IDENTITY_TRANSITION_LEDGER",
+      "record_date": "15-Oct-2025",
+      "subject": "Demerger",
+      "symbol": "SKFINDIA"
+    },
+    {
+      "adjustment_factor": 0.5,
+      "classification": "SPLIT",
+      "effective_date": "2025-11-03",
+      "isin": "INE258A01016",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "03-Nov-2025",
+      "subject": "Face Value Split (Sub-Division) - From Rs 10/- Per Share To Rs 5/- Per Share",
+      "symbol": "BEML"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "OTHER",
+      "effective_date": "2025-11-14",
+      "isin": "INE009A01021",
+      "normalization_status": "TERMS_UNRESOLVED",
+      "record_date": "14-Nov-2025",
+      "subject": "Buy Back",
+      "symbol": "INFY"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "RIGHTS",
+      "effective_date": "2025-11-17",
+      "isin": "INE423A01024",
+      "normalization_status": "TERMS_UNRESOLVED",
+      "record_date": "17-Nov-2025",
+      "subject": "Rights 3:25 @ Premium Rs 1799/-",
+      "symbol": "ADANIENT"
+    },
+    {
+      "adjustment_factor": 0.5,
+      "classification": "BONUS",
+      "effective_date": "2025-11-26",
+      "isin": "INE127D01025",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "26-Nov-2025",
+      "subject": "Bonus 1:1",
+      "symbol": "HDFCAMC"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "DEMERGER",
+      "effective_date": "2025-12-05",
+      "isin": "INE030A01027",
+      "normalization_status": "IDENTITY_TRANSITION_LEDGER",
+      "record_date": "05-Dec-2025",
+      "subject": "Demerger",
+      "symbol": "HINDUNILVR"
+    },
+    {
+      "adjustment_factor": 0.2,
+      "classification": "SPLIT",
+      "effective_date": "2025-12-05",
+      "isin": "INE596I01012",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "05-Dec-2025",
+      "subject": "Face Value Split (Sub-Division) - From Rs 10/- Per Share To Rs 2/- Per Share",
+      "symbol": "CAMS"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "OTHER",
+      "effective_date": "2025-12-17",
+      "isin": "INE738I01010",
+      "normalization_status": "TERMS_UNRESOLVED",
+      "record_date": "17-Dec-2025",
+      "subject": "Buy Back",
+      "symbol": "ECLERX"
+    },
+    {
+      "adjustment_factor": 0.5,
+      "classification": "BONUS",
+      "effective_date": "2025-12-19",
+      "isin": "INE600L01024",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "19-Dec-2025",
+      "subject": "Bonus 1:1",
+      "symbol": "LALPATHLAB"
+    },
+    {
+      "adjustment_factor": 0.2,
+      "classification": "SPLIT",
+      "effective_date": "2025-12-26",
+      "isin": "INE531F01015",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "26-Dec-2025",
+      "subject": "Face Value Split (Sub-Division) - From Rs 10/- Per Share To Rs 2/- Per Share",
+      "symbol": "NUVAMA"
+    },
+    {
+      "adjustment_factor": 0.2,
+      "classification": "SPLIT",
+      "effective_date": "2026-01-02",
+      "isin": "INE745G01035",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "02-Jan-2026",
+      "subject": "Face Value Split (Sub-Division) - From Rs 10/- Per Share To Rs 2/- Per Share",
+      "symbol": "MCX"
+    },
+    {
+      "adjustment_factor": 0.2,
+      "classification": "BONUS",
+      "effective_date": "2026-01-13",
+      "isin": "INE206F01022",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "13-Jan-2026",
+      "subject": "Bonus 4:1",
+      "symbol": "AIIL"
+    },
+    {
+      "adjustment_factor": 0.2,
+      "classification": "SPLIT",
+      "effective_date": "2026-01-14",
+      "isin": "INE237A01010",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "14-Jan-2026",
+      "subject": "Face Value Split (Sub-Division) - From Rs 5/- Per Share To Re 1/- Per Share",
+      "symbol": "KOTAKBANK"
+    },
+    {
+      "adjustment_factor": 0.1,
+      "classification": "SPLIT",
+      "effective_date": "2026-02-26",
+      "isin": "INE732I01013",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "26-Feb-2026",
+      "subject": "Face Value Split (Sub-Division) - From Rs 10/- Per Share To Re 1/- Per Share",
+      "symbol": "ANGELONE"
+    },
+    {
+      "adjustment_factor": 0.2,
+      "classification": "BONUS",
+      "effective_date": "2026-03-09",
+      "isin": "INE509F01011",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "09-Mar-2026",
+      "subject": "Bonus 4:1",
+      "symbol": "CUPID"
+    },
+    {
+      "adjustment_factor": 0.5,
+      "classification": "BONUS",
+      "effective_date": "2026-03-13",
+      "isin": "INE738I01010",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "13-Mar-2026",
+      "subject": "Bonus 1:1",
+      "symbol": "ECLERX"
+    },
+    {
+      "adjustment_factor": 0.25,
+      "classification": "BONUS",
+      "effective_date": "2026-03-20",
+      "isin": "INE112L01020",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "20-Mar-2026",
+      "subject": "Bonus 3:1",
+      "symbol": "METROPOLIS"
+    },
+    {
+      "adjustment_factor": 0.5,
+      "classification": "BONUS",
+      "effective_date": "2026-03-30",
+      "isin": "INE821I01014",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "01-Apr-2026",
+      "subject": "Bonus 1:1",
+      "symbol": "IRB"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "OTHER",
+      "effective_date": "2026-04-17",
+      "isin": "INE406A01029",
+      "normalization_status": "TERMS_UNRESOLVED",
+      "record_date": "17-Apr-2026",
+      "subject": "Buy Back",
+      "symbol": "AUROPHARMA"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "DEMERGER",
+      "effective_date": "2026-04-30",
+      "isin": "INE205A01025",
+      "normalization_status": "IDENTITY_TRANSITION_LEDGER",
+      "record_date": "01-May-2026",
+      "subject": "Demerger",
+      "symbol": "VEDL"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "OTHER",
+      "effective_date": "2026-05-22",
+      "isin": "INE192B01031",
+      "normalization_status": "TERMS_UNRESOLVED",
+      "record_date": "22-May-2026",
+      "subject": "Buy Back",
+      "symbol": "WELSPUNLIV"
+    },
+    {
+      "adjustment_factor": 0.5,
+      "classification": "BONUS",
+      "effective_date": "2026-05-29",
+      "isin": "INE0J1Y01017",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "29-May-2026",
+      "subject": "Bonus 1:1",
+      "symbol": "LICI"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "OTHER",
+      "effective_date": "2026-05-29",
+      "isin": "INE010B01027",
+      "normalization_status": "TERMS_UNRESOLVED",
+      "record_date": "29-May-2026",
+      "subject": "Buy Back",
+      "symbol": "ZYDUSLIFE"
+    },
+    {
+      "adjustment_factor": 0.5,
+      "classification": "BONUS",
+      "effective_date": "2026-06-03",
+      "isin": "INE463V01026",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "03-Jun-2026",
+      "subject": "Bonus 1:1",
+      "symbol": "ANANDRATHI"
+    },
+    {
+      "adjustment_factor": 0.6666666666666666,
+      "classification": "BONUS",
+      "effective_date": "2026-06-04",
+      "isin": "INE849A01012",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "04-Jun-2026",
+      "subject": "Bonus 1:2",
+      "symbol": "TRENT"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "OTHER",
+      "effective_date": "2026-06-05",
+      "isin": "INE075A01022",
+      "normalization_status": "TERMS_UNRESOLVED",
+      "record_date": "05-Jun-2026",
+      "subject": "Buy Back",
+      "symbol": "WIPRO"
+    },
+    {
+      "adjustment_factor": 0.75,
+      "classification": "BONUS",
+      "effective_date": "2026-06-12",
+      "isin": "INE491A01021",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "12-Jun-2026",
+      "subject": "Bonus 1:3",
+      "symbol": "CUB"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "OTHER",
+      "effective_date": "2026-06-17",
+      "isin": "INE136B01020",
+      "normalization_status": "TERMS_UNRESOLVED",
+      "record_date": "17-Jun-2026",
+      "subject": "Buy Back",
+      "symbol": "CYIENT"
+    },
+    {
+      "adjustment_factor": 0.75,
+      "classification": "BONUS",
+      "effective_date": "2026-06-17",
+      "isin": "INE791I01019",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "17-Jun-2026",
+      "subject": "Bonus 1:3",
+      "symbol": "BRIGADE"
+    },
+    {
+      "adjustment_factor": 0.16666666666666666,
+      "classification": "BONUS",
+      "effective_date": "2026-06-24",
+      "isin": "INE342J01019",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "24-Jun-2026",
+      "subject": "Bonus 5:1",
+      "symbol": "ZFCVINDIA"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "OTHER",
+      "effective_date": "2026-06-24",
+      "isin": "INE917I01010",
+      "normalization_status": "TERMS_UNRESOLVED",
+      "record_date": "24-Jun-2026",
+      "subject": "Buy Back",
+      "symbol": "BAJAJ-AUTO"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "OTHER",
+      "effective_date": "2026-06-29",
+      "isin": "INE217B01028",
+      "normalization_status": "TERMS_UNRESOLVED",
+      "record_date": "29-Jun-2026",
+      "subject": "Buy Back",
+      "symbol": "KAJARIACER"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "DEMERGER",
+      "effective_date": "2026-07-22",
+      "isin": "INE256C01024",
+      "normalization_status": "IDENTITY_TRANSITION_LEDGER",
+      "record_date": "22-Jul-2026",
+      "subject": "Demerger",
+      "symbol": "TRIVENI"
+    },
+    {
+      "adjustment_factor": 0.5,
+      "classification": "SPLIT",
+      "effective_date": "2026-08-24",
+      "isin": "INE419M01019",
+      "normalization_status": "TERMS_PARSED",
+      "record_date": "24-Aug-2026",
+      "subject": "Face Value Split (Sub-Division) - From Rs 2/- Per Share To Re 1/- Per Share",
+      "symbol": "TDPOWERSYS"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "OTHER",
+      "effective_date": "2026-09-04",
+      "isin": "INE191H01014",
+      "normalization_status": "TERMS_UNRESOLVED",
+      "record_date": "04-Sep-2026",
+      "subject": "Buy Back",
+      "symbol": "PVRINOX"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "DEMERGER",
+      "effective_date": "2026-09-07",
+      "isin": "INE545A01024",
+      "normalization_status": "IDENTITY_TRANSITION_LEDGER",
+      "record_date": "07-Sep-2026",
+      "subject": "Demerger",
+      "symbol": "HEGAM"
+    },
+    {
+      "adjustment_factor": null,
+      "classification": "RIGHTS",
+      "effective_date": "2026-10-01",
+      "isin": "INE987B01018",
+      "normalization_status": "TERMS_UNRESOLVED",
+      "record_date": "01-Oct-2026",
+      "subject": "Rights 2:21 @ Premium Rs 748/-",
+      "symbol": "NATCOPHARM"
+    }
+  ],
+  "return_profile": "PRICE_RETURN_ONLY",
+  "source_sha256": "8a5895419f168e0ec69a8d5762bac1b99c9747be34abddaa049948f12571364a",
+  "source_url": "https://www.nseindia.com/api/corporates-corporateActions",
+  "status": "PARTIAL_WITH_GAPS",
+  "unknown_terms": "FAIL_CLOSED"
+}

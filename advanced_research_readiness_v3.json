@@ -1,0 +1,57 @@
+{
+  "active_prospective_authority": "NONE",
+  "active_recommendation_influence": "NONE",
+  "active_source_registry_authority": "NONE",
+  "authority": "RESEARCH_ONLY",
+  "challenger_trained": false,
+  "fully_research_eligible_period": null,
+  "ml_authority": "NONE",
+  "model_promoted": false,
+  "model_promotion_authority": "NONE",
+  "preserved_v1_file_sha256": "70b603aecd427e9947d4fbf4a68b9eb6f32ff2c1151a930049300d343c5ba6b4",
+  "preserved_v2_file_sha256": "7ec465cdf4178593d48dc7b89b690b581cd31ce97f06b505c04158da0244b1fb",
+  "profiles": {
+    "EXCHANGE_WIDE_PIT": {
+      "failed_gates": [
+        "features",
+        "identity",
+        "market_data",
+        "survivorship",
+        "universe"
+      ],
+      "identity_coverage": "PARTIAL",
+      "restricted_period": null,
+      "security_coverage": "CURRENT_SNAPSHOT_ONLY",
+      "source_manifests": [
+        "AUTHORITATIVE_DATA_ARCHIVE_MANIFEST_V1"
+      ],
+      "status": "NOT_READY",
+      "survivorship_assessment": "INSUFFICIENT"
+    },
+    "INDEX_CONSTITUENT_PIT": {
+      "failed_gates": [
+        "features",
+        "identity",
+        "index_membership",
+        "market_data",
+        "survivorship",
+        "universe"
+      ],
+      "identity_coverage": "PARTIAL",
+      "restricted_period": null,
+      "security_coverage": "CHANGE_EVENTS_ONLY",
+      "source_manifests": [
+        "AUTHORITATIVE_DATA_ARCHIVE_MANIFEST_V1"
+      ],
+      "status": "NOT_READY",
+      "survivorship_assessment": "INSUFFICIENT"
+    }
+  },
+  "reason": "OFFICIAL_DATA_ACQUISITION_REQUIRED",
+  "record_hash": "a8af6d18721045af0c82ec0cd7821301b80eb4500ce1805776060688feaf5f09",
+  "record_id": "ADVANCED_RESEARCH_READINESS_V3_a8af6d18721045af0c82ec0c",
+  "schema": "ADVANCED_RESEARCH_READINESS_V3",
+  "status": "NOT_READY",
+  "trading_authority": false,
+  "training_started": false
+}

@@ -1,0 +1,200 @@
+{
+  "artifact_type": "FREE_OFFICIAL_RESTRICTED_SOURCE_MANIFEST_V1",
+  "authority": "SHADOW_ONLY",
+  "bhavcopy": {
+    "archive_base": "https://nsearchives.nseindia.com/content/cm/",
+    "artifact_type": "FREE_RESTRICTED_MARKET_PANEL_MANIFEST_V1",
+    "authority": "SHADOW_ONLY",
+    "file_count": 497,
+    "files_sha256": "f580e399bb358c325b0fc89efc2bece312260384b1875e67c0473108eb7654a6",
+    "mcp_used_for_bulk_panel": false,
+    "model_training_rights": "NOT_ESTABLISHED",
+    "raw_files_committed": false,
+    "source": "NSE_PUBLIC_CM_UDIFF_COMMON_BHAVCOPY_FINAL",
+    "source_endpoint": "https://www.nseindia.com/api/reports",
+    "source_page": "https://www.nseindia.com/resources/historical-reports-capital-market-daily-monthly-archives",
+    "usage_classification": "RESEARCH_ANALYSIS_ALLOWED"
+  },
+  "mcp_bulk_data_used": false,
+  "paid_data_used": false,
+  "press_pdf_count": 129,
+  "raw_files_committed": false,
+  "sources": [
+    {
+      "bytes": 34640,
+      "file_name": "nse_trading_holidays_2024.json",
+      "http_status": 200,
+      "id": "NSE_TRADING_HOLIDAYS_2024",
+      "sha256": "362ccb232694b28865d1f0e61af3cc3df04e713ccb1769fc2b3bd19aa6614e20",
+      "url": "https://www.nseindia.com/api/holiday-master?type=trading&year=2024"
+    },
+    {
+      "bytes": 29521,
+      "file_name": "nse_trading_holidays_2025.json",
+      "http_status": 200,
+      "id": "NSE_TRADING_HOLIDAYS_2025",
+      "sha256": "39836991fe57220b1329452b8e5f3b264d4563238cea7939460529c328661189",
+      "url": "https://www.nseindia.com/api/holiday-master?type=trading&year=2025"
+    },
+    {
+      "bytes": 31501,
+      "file_name": "nse_trading_holidays_2026.json",
+      "http_status": 200,
+      "id": "NSE_TRADING_HOLIDAYS_2026",
+      "sha256": "b74dce8719ce64ee3655599d4821e6ace7a2e9a294b6a01a3fee93665c399094",
+      "url": "https://www.nseindia.com/api/holiday-master?type=trading&year=2026"
+    },
+    {
+      "bytes": 16848,
+      "file_name": "nifty_50_2024-10-01_2024-12-31.json",
+      "http_status": 200,
+      "id": "NIFTY 50_2024-10-01_2024-12-31",
+      "sha256": "438a6603956bb7f5cdc7089664d6c10c2e43ac8c91a1f92bde51d8b9a7f391bd",
+      "url": "https://www.nseindia.com/api/historicalOR/indicesHistory?indexType=NIFTY%2050&from=01-10-2024&to=31-12-2024"
+    },
+    {
+      "bytes": 16856,
+      "file_name": "nifty_50_2025-01-01_2025-03-31.json",
+      "http_status": 200,
+      "id": "NIFTY 50_2025-01-01_2025-03-31",
+      "sha256": "53cfde4be909bbc09985dbdb1b74c100de29b55a4b6674f13d8484811ca88769",
+      "url": "https://www.nseindia.com/api/historicalOR/indicesHistory?indexType=NIFTY%2050&from=01-01-2025&to=31-03-2025"
+    },
+    {
+      "bytes": 16564,
+      "file_name": "nifty_50_2025-04-01_2025-06-30.json",
+      "http_status": 200,
+      "id": "NIFTY 50_2025-04-01_2025-06-30",
+      "sha256": "fc493928877bf07a5d563f1c07809cf0e200beb706e4db27cea62dee955d2701",
+      "url": "https://www.nseindia.com/api/historicalOR/indicesHistory?indexType=NIFTY%2050&from=01-04-2025&to=30-06-2025"
+    },
+    {
+      "bytes": 17370,
+      "file_name": "nifty_50_2025-07-01_2025-09-30.json",
+      "http_status": 200,
+      "id": "NIFTY 50_2025-07-01_2025-09-30",
+      "sha256": "21e877951652db2d6082564ffcdda90ead9c2891743d6cf41b9f24a35e054159",
+      "url": "https://www.nseindia.com/api/historicalOR/indicesHistory?indexType=NIFTY%2050&from=01-07-2025&to=30-09-2025"
+    },
+    {
+      "bytes": 16843,
+      "file_name": "nifty_50_2025-10-01_2025-12-31.json",
+      "http_status": 200,
+      "id": "NIFTY 50_2025-10-01_2025-12-31",
+      "sha256": "b8e0c840b5ce6da1931653fd8ef762d164d40b5d5af386df68b2b85bc9b0a865",
+      "url": "https://www.nseindia.com/api/historicalOR/indicesHistory?indexType=NIFTY%2050&from=01-10-2025&to=31-12-2025"
+    },
+    {
+      "bytes": 16289,
+      "file_name": "nifty_50_2026-01-01_2026-03-31.json",
+      "http_status": 200,
+      "id": "NIFTY 50_2026-01-01_2026-03-31",
+      "sha256": "3e6cce89dcaf5c7c37a6e4b322a6ae55bce485d8118c56e8b83d69208b02fd47",
+      "url": "https://www.nseindia.com/api/historicalOR/indicesHistory?indexType=NIFTY%2050&from=01-01-2026&to=31-03-2026"
+    },
+    {
+      "bytes": 16286,
+      "file_name": "nifty_50_2026-04-01_2026-06-30.json",
+      "http_status": 200,
+      "id": "NIFTY 50_2026-04-01_2026-06-30",
+      "sha256": "aaea7ef5f45b999d81cba39b25bcafe97f7e14431e870484ad95bfda8990c399",
+      "url": "https://www.nseindia.com/api/historicalOR/indicesHistory?indexType=NIFTY%2050&from=01-04-2026&to=30-06-2026"
+    },
+    {
+      "bytes": 17650,
+      "file_name": "nifty_50_2026-07-01_2026-09-30.json",
+      "http_status": 200,
+      "id": "NIFTY 50_2026-07-01_2026-09-30",
+      "sha256": "24973e9632ae65f0b50fad7c93d1fe9f5222974fcc2620c65e9078d1d1844595",
+      "url": "https://www.nseindia.com/api/historicalOR/indicesHistory?indexType=NIFTY%2050&from=01-07-2026&to=30-09-2026"
+    },
+    {
+      "bytes": 281,
+      "file_name": "nifty_50_2026-10-01_2026-10-01.json",
+      "http_status": 200,
+      "id": "NIFTY 50_2026-10-01_2026-10-01",
+      "sha256": "ea32e7e59c8c7cd339f3e86f2fecd9149526a8fa2556c2072161a2dd63ffab5b",
+      "url": "https://www.nseindia.com/api/historicalOR/indicesHistory?indexType=NIFTY%2050&from=01-10-2026&to=01-10-2026"
+    },
+    {
+      "bytes": 16952,
+      "file_name": "nifty_500_2024-10-01_2024-12-31.json",
+      "http_status": 200,
+      "id": "NIFTY 500_2024-10-01_2024-12-31",
+      "sha256": "0848d077f60c2d1a43dfef9badd13ddec373fc2cdb4a5f72c1a037eaa9dfffaf",
+      "url": "https://www.nseindia.com/api/historicalOR/indicesHistory?indexType=NIFTY%20500&from=01-10-2024&to=31-12-2024"
+    },
+    {
+      "bytes": 16961,
+      "file_name": "nifty_500_2025-01-01_2025-03-31.json",
+      "http_status": 200,
+      "id": "NIFTY 500_2025-01-01_2025-03-31",
+      "sha256": "f7663b0e5d64f62fef3bc10444c6bb6735f45f60bc33e69e6318939b30a15fe9",
+      "url": "https://www.nseindia.com/api/historicalOR/indicesHistory?indexType=NIFTY%20500&from=01-01-2025&to=31-03-2025"
+    },
+    {
+      "bytes": 16721,
+      "file_name": "nifty_500_2025-04-01_2025-06-30.json",
+      "http_status": 200,
+      "id": "NIFTY 500_2025-04-01_2025-06-30",
+      "sha256": "e318549094b4b47de01b83db4d7555f9c0e3bb1c3e71fcc70a24a03e742a6c9e",
+      "url": "https://www.nseindia.com/api/historicalOR/indicesHistory?indexType=NIFTY%20500&from=01-04-2025&to=30-06-2025"
+    },
+    {
+      "bytes": 17513,
+      "file_name": "nifty_500_2025-07-01_2025-09-30.json",
+      "http_status": 200,
+      "id": "NIFTY 500_2025-07-01_2025-09-30",
+      "sha256": "4acf97c3ad64e0af4b6d62a57f3a8a8941f2e0dac4563a9d0614bdc1176e8056",
+      "url": "https://www.nseindia.com/api/historicalOR/indicesHistory?indexType=NIFTY%20500&from=01-07-2025&to=30-09-2025"
+    },
+    {
+      "bytes": 16991,
+      "file_name": "nifty_500_2025-10-01_2025-12-31.json",
+      "http_status": 200,
+      "id": "NIFTY 500_2025-10-01_2025-12-31",
+      "sha256": "8f372d4e1f321a394e160e05633c72ee2595c7ac941b612de599c7e253f6abb5",
+      "url": "https://www.nseindia.com/api/historicalOR/indicesHistory?indexType=NIFTY%20500&from=01-10-2025&to=31-12-2025"
+    },
+    {
+      "bytes": 16434,
+      "file_name": "nifty_500_2026-01-01_2026-03-31.json",
+      "http_status": 200,
+      "id": "NIFTY 500_2026-01-01_2026-03-31",
+      "sha256": "25540acaf479a22cf21a6888c973e1f1afc3ed5ff6ece93dc0838300dade797f",
+      "url": "https://www.nseindia.com/api/historicalOR/indicesHistory?indexType=NIFTY%20500&from=01-01-2026&to=31-03-2026"
+    },
+    {
+      "bytes": 16461,
+      "file_name": "nifty_500_2026-04-01_2026-06-30.json",
+      "http_status": 200,
+      "id": "NIFTY 500_2026-04-01_2026-06-30",
+      "sha256": "e36f1752b14a0146dbd9ca0e58585325a5f0269496dee2a2d205249b6b2dbe5d",
+      "url": "https://www.nseindia.com/api/historicalOR/indicesHistory?indexType=NIFTY%20500&from=01-04-2026&to=30-06-2026"
+    },
+    {
+      "bytes": 17813,
+      "file_name": "nifty_500_2026-07-01_2026-09-30.json",
+      "http_status": 200,
+      "id": "NIFTY 500_2026-07-01_2026-09-30",
+      "sha256": "7daff5dcbc3d09ce3a45b8207d0db5571d11904ea039410d41708eea73a4de31",
+      "url": "https://www.nseindia.com/api/historicalOR/indicesHistory?indexType=NIFTY%20500&from=01-07-2026&to=30-09-2026"
+    },
+    {
+      "bytes": 282,
+      "file_name": "nifty_500_2026-10-01_2026-10-01.json",
+      "http_status": 200,
+      "id": "NIFTY 500_2026-10-01_2026-10-01",
+      "sha256": "ec65e9e6bbea81a9d58e2112a4152acbe788e918edd0a6dc6815ae6acc4e738c",
+      "url": "https://www.nseindia.com/api/historicalOR/indicesHistory?indexType=NIFTY%20500&from=01-10-2026&to=01-10-2026"
+    },
+    {
+      "bytes": 1222603,
+      "file_name": "nse_corporate_actions_2024-10-01_2026-10-01.json",
+      "http_status": 200,
+      "id": "NSE_CORPORATE_ACTIONS_RESTRICTED_WINDOW",
+      "sha256": "8a5895419f168e0ec69a8d5762bac1b99c9747be34abddaa049948f12571364a",
+      "url": "https://www.nseindia.com/api/corporates-corporateActions?index=equities&from_date=01-10-2024&to_date=01-10-2026"
+    }
+  ]
+}

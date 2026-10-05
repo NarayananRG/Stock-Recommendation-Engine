@@ -1,0 +1,25 @@
+{
+  "artifact_type": "FREE_OFFICIAL_RESTRICTED_RESEARCH_WINDOW_V2",
+  "authority": "SHADOW_ONLY",
+  "candidate_continuous_period": {
+    "duration_months": 24.0,
+    "end_date": "2026-10-01",
+    "start_date": "2024-10-01",
+    "trading_sessions": 497
+  },
+  "failed_gates": [
+    "constituent_reconstruction",
+    "identity",
+    "survivorship",
+    "price_adjustment",
+    "features",
+    "source_usage_rights"
+  ],
+  "minimum_duration_months": 24,
+  "preferred_duration_months": 36,
+  "status": "NO_JOINTLY_VALID_WINDOW",
+  "target_end": "2026-10-01",
+  "target_start": "2024-10-01",
+  "threshold_classification": "RESEARCH_GOVERNANCE_THRESHOLD",
+  "validated_research_period": null
+}

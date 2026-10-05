@@ -1,0 +1,14 @@
+{
+  "allowed_classification": "SYNTHETIC_TEST_FIXTURE",
+  "anti_spoofing": [
+    "DATASET_HASH",
+    "SOURCE_MANIFEST",
+    "PROVENANCE",
+    "CLASSIFICATION"
+  ],
+  "artifact_type": "MODEL_TRAINING_RIGHTS_GUARD_V1",
+  "authority": "RESEARCH_ONLY",
+  "current_real_data_rights": "LICENSE_REQUIRED",
+  "real_data_error": "REAL_DATA_MODEL_TRAINING_BLOCKED_RIGHTS_NOT_READY",
+  "real_training_allowed": false
+}

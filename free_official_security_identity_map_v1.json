@@ -1,0 +1,4019 @@
+{
+  "ambiguous_event_count": 23,
+  "artifact_type": "FREE_OFFICIAL_SECURITY_IDENTITY_MAP_V1",
+  "authority": "SHADOW_ONLY",
+  "current_isin_coverage": 1.0,
+  "historical_event_symbols": 409,
+  "historical_isin_coverage": "INCOMPLETE",
+  "identities": [
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Dummy HEG Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "DUM545A01024",
+      "symbol": "DUMMYHEG"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Reliance Industries Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE002A01018",
+      "symbol": "RELIANCE"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "SJVN Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE002L01015",
+      "symbol": "SJVN"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Mahanagar Gas Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE002S01010",
+      "symbol": "MGL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Siemens Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE003A01024",
+      "symbol": "SIEMENS"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Astral Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE006I01046",
+      "symbol": "ASTRAL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "CRISIL Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE007A01025",
+      "symbol": "CRISIL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "IDBI Bank Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE008A01015",
+      "symbol": "IDBI"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Infosys Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE009A01021",
+      "symbol": "INFY"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Acutaas Chemicals Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE00FF01025",
+      "symbol": "ACUTAAS"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Swiggy Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE00H001014",
+      "symbol": "SWIGGY"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Craftsman Automation Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE00LO01017",
+      "symbol": "CRAFTSMAN"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Dalmia Bharat Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE00R701025",
+      "symbol": "DALBHARAT"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Affle 3i Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE00WC01027",
+      "symbol": "AFFLE"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Zydus Lifesciences Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE010B01027",
+      "symbol": "ZYDUSLIFE"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Tejas Networks Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE010J01012",
+      "symbol": "TEJASNET"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "L&T Technology Services Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE010V01017",
+      "symbol": "LTTS"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Tega Industries Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE011K01018",
+      "symbol": "TEGA"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "ACC Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE012A01025",
+      "symbol": "ACC"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Onesource Specialty Pharma Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE013P01021",
+      "symbol": "ONESOURCE"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Dabur India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE016A01026",
+      "symbol": "DABUR"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Great Eastern Shipping Co. Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE017A01032",
+      "symbol": "GESHIP"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Larsen & Toubro Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE018A01030",
+      "symbol": "LT"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "SBI Cards and Payment Services Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE018E01016",
+      "symbol": "SBICARD"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "JSW Steel Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE019A01038",
+      "symbol": "JSWSTEEL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Himadri Speciality Chemical Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE019C01026",
+      "symbol": "HSCL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Vishal Mega Mart Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE01EA01019",
+      "symbol": "VMM"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Canara HSBC Life Insurance Company Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE01TY01017",
+      "symbol": "CANHLIFE"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "REC Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE020B01018",
+      "symbol": "RECLTD"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Asian Paints Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE021A01026",
+      "symbol": "ASIANPAINT"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Indian Energy Exchange Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE022Q01020",
+      "symbol": "IEX"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Gravita India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE024L01027",
+      "symbol": "GRAVITA"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Max Healthcare Institute Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE027H01010",
+      "symbol": "MAXHEALTH"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Bank of Baroda",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE028A01039",
+      "symbol": "BANKBARODA"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Bharat Petroleum Corporation Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE029A01011",
+      "symbol": "BPCL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Azad Engineering Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE02IJ01035",
+      "symbol": "AZAD"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Brainbees Solutions Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE02RE01045",
+      "symbol": "FIRSTCRY"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Hindustan Unilever Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE030A01027",
+      "symbol": "HINDUNILVR"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Housing & Urban Development Corporation Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE031A01017",
+      "symbol": "HUDCO"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Ajanta Pharmaceuticals Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE031B01049",
+      "symbol": "AJANTPHARM"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Karur Vysya Bank Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE036D01028",
+      "symbol": "KARURVYSYA"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Hindalco Industries Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE038A01020",
+      "symbol": "HINDALCO"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "IFCI Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE039A01010",
+      "symbol": "IFCI"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Cohance Lifesciences Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE03QK01018",
+      "symbol": "COHANCE"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "HDFC Bank Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE040A01034",
+      "symbol": "HDFCBANK"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Suzlon Energy Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE040H01021",
+      "symbol": "SUZLON"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "EMBASSY OFFICE PARKS REIT",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE041025011",
+      "symbol": "EMBASSY"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Escorts Kubota Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE042A01014",
+      "symbol": "ESCORTS"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Vijaya Diagnostic Centre Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE043W01024",
+      "symbol": "VIJAYA"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Sun Pharmaceutical Industries Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE044A01036",
+      "symbol": "SUNPHARMA"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Grasim Industries Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE047A01021",
+      "symbol": "GRASIM"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Navin Fluorine International Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE048G01026",
+      "symbol": "NAVINFLUOR"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Wockhardt Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE049B01025",
+      "symbol": "WOCKPHARMA"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "KPIT Technologies Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE04I401011",
+      "symbol": "KPITTECH"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Indian Hotels Co. Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE053A01029",
+      "symbol": "INDHOTEL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Indian Railway Finance Corporation Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE053F01010",
+      "symbol": "IRFC"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Aditya Birla Real Estate Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE055A01016",
+      "symbol": "ABREL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Cipla Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE059A01026",
+      "symbol": "CIPLA"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Central Mine Planning & Design Institute Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE05HV01027",
+      "symbol": "CMPDI"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Bharat Coking Coal Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE05XR01022",
+      "symbol": "BHARATCOAL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Fortis Healthcare Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE061F01013",
+      "symbol": "FORTIS"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "State Bank of India",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE062A01020",
+      "symbol": "SBIN"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Trident Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE064C01022",
+      "symbol": "TRIDENT"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Eicher Motors Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE066A01021",
+      "symbol": "EICHERMOT"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Hindustan Aeronautics Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE066F01020",
+      "symbol": "HAL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Inox Wind Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE066P01011",
+      "symbol": "INOXWIND"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "CG Power and Industrial Solutions Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE067A01029",
+      "symbol": "CGPOWER"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Gland Pharma Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE068V01023",
+      "symbol": "GLAND"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Shree Cement Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE070A01015",
+      "symbol": "SHREECEM"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Sona BLW Precision Forgings Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE073K01018",
+      "symbol": "SONACOMS"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Wipro Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE075A01022",
+      "symbol": "WIPRO"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Ambuja Cements Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE079A01024",
+      "symbol": "AMBUJACEM"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Hitachi Energy India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE07Y701011",
+      "symbol": "POWERINDIA"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Tata Steel Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE081A01020",
+      "symbol": "TATASTEEL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Bank of India",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE084A01016",
+      "symbol": "BANKINDIA"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Chambal Fertilizers & Chemicals Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE085A01013",
+      "symbol": "CHAMBLFERT"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Thangamayil Jewellery Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE085J01014",
+      "symbol": "THANGAMAYL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Paradeep Phosphates Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE088F01024",
+      "symbol": "PARADEEP"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Dr. Reddy's Laboratories Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE089A01031",
+      "symbol": "DRREDDY"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Sterlite Technologies Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE089C01029",
+      "symbol": "STLTECH"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "ICICI Bank Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE090A01021",
+      "symbol": "ICICIBANK"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Tata Chemicals Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE092A01019",
+      "symbol": "TATACHEM"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "IDFC First Bank Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE092T01019",
+      "symbol": "IDFCFIRSTB"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Hexaware Technologies Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE093A01041",
+      "symbol": "HEXT"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Oberoi Realty Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE093I01010",
+      "symbol": "OBEROIRLTY"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Hindustan Petroleum Corporation Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE094A01015",
+      "symbol": "HINDPETRO"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "UTI Asset Management Company Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE094J01016",
+      "symbol": "UTIAMC"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "IndusInd Bank Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE095A01012",
+      "symbol": "INDUSINDBK"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "NBCC (India) Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE095N01031",
+      "symbol": "NBCC"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Gujarat Fluorochemicals Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE09N301011",
+      "symbol": "FLUOROCHEM"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Premier Energies Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE0BS701011",
+      "symbol": "PREMIERENE"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Aether Industries Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE0BWX01014",
+      "symbol": "AETHER"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Jubilant Ingrevia Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE0BY001018",
+      "symbol": "JUBLINGREA"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Urban Company Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE0CAZ01013",
+      "symbol": "URBANCO"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Anthem Biosciences Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE0CZ201020",
+      "symbol": "ANTHEM"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Railtel Corporation Of India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE0DD101019",
+      "symbol": "RAILTEL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Piramal Pharma Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE0DK501011",
+      "symbol": "PPLPHARMA"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Syrma SGS Technology Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE0DYJ01015",
+      "symbol": "SYRMA"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Brookfield India Real Estate Trust",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE0FDU25010",
+      "symbol": "BIRET"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Motherson Sumi Wiring India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE0FS801015",
+      "symbol": "MSUMI"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Billionbrains Garage Ventures Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE0HOQ01053",
+      "symbol": "GROWW"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Aegis Vopak Terminals Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE0INX01018",
+      "symbol": "AEGISVOPAK"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Data Patterns (India) Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE0IX101010",
+      "symbol": "DATAPATTNS"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Life Insurance Corporation of India",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE0J1Y01017",
+      "symbol": "LICI"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Honasa Consumer Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE0J5401028",
+      "symbol": "HONASA"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Ather Energy Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE0LEZ01016",
+      "symbol": "ATHERENERG"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Physicswallah Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE0LP301011",
+      "symbol": "PWL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Ola Electric Mobility Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE0LXG01040",
+      "symbol": "OLAELEC"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "NMDC Steel Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE0NNS01018",
+      "symbol": "NSLNISP"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Netweb Technologies India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE0NT901020",
+      "symbol": "NETWEB"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "NTPC Green Energy Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE0ONG01011",
+      "symbol": "NTPCGREEN"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "International Gemological Institute Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE0Q9301021",
+      "symbol": "IGIL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Hyundai Motor India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE0V6F01027",
+      "symbol": "HYUNDAI"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Meesho Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE0VDM01015",
+      "symbol": "MEESHO"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Sagility Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE0W2G01015",
+      "symbol": "SAGILITY"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Jain Resource Recycling Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE0YD401026",
+      "symbol": "JAINREC"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Atul Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE100A01010",
+      "symbol": "ATUL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Mahindra & Mahindra Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE101A01026",
+      "symbol": "M&M"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Granules India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE101D01020",
+      "symbol": "GRANULES"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Afcons Infrastructure Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE101I01011",
+      "symbol": "AFCONS"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Choice International Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE102B01014",
+      "symbol": "CHOICEIN"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Godrej Consumer Products Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE102D01028",
+      "symbol": "GODREJCP"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Mangalore Refinery & Petrochemicals Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE103A01014",
+      "symbol": "MRPL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Shipping Corporation of India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE109A01011",
+      "symbol": "SCI"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Container Corporation of India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE111A01025",
+      "symbol": "CONCOR"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Steel Authority of India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE114A01011",
+      "symbol": "SAIL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "LIC Housing Finance Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE115A01026",
+      "symbol": "LICHSGFIN"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Inventurus Knowledge Solutions Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE115Q01022",
+      "symbol": "IKS"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "ABB India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE117A01022",
+      "symbol": "ABB"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Bajaj Holdings & Investment Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE118A01012",
+      "symbol": "BAJAJHLDNG"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Nuvoco Vistas Corporation Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE118D01016",
+      "symbol": "NUVOCO"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "BSE Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE118H01025",
+      "symbol": "BSE"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Balrampur Chini Mills Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE119A01028",
+      "symbol": "BALRAMCHIN"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Carborundum Universal Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE120A01034",
+      "symbol": "CARBORUNIV"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Cholamandalam Investment and Finance Company Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE121A01024",
+      "symbol": "CHOLAFIN"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "JSW Energy Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE121E01018",
+      "symbol": "JSWENERGY"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Indus Towers Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE121J01017",
+      "symbol": "INDUSTOWER"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "MMTC Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE123F01029",
+      "symbol": "MMTC"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "SBI Life Insurance Company Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE123W01016",
+      "symbol": "SBILIFE"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "E.I.D. Parry (India) Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE126A01031",
+      "symbol": "EIDPARRY"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "HDFC Asset Management Company Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE127D01025",
+      "symbol": "HDFCAMC"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Five-Star Business Finance Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE128S01021",
+      "symbol": "FIVESTAR"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "GAIL (India) Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE129A01019",
+      "symbol": "GAIL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Gujarat Mineral Development Corporation Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE131A01031",
+      "symbol": "GMDCLTD"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Power Finance Corporation Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE134E01011",
+      "symbol": "PFC"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Cyient Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE136B01020",
+      "symbol": "CYIENT"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Kfin Technologies Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE138Y01010",
+      "symbol": "KFINTECH"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "National Aluminium Co. Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE139A01034",
+      "symbol": "NATIONALUM"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Tata Technologies Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE142M01025",
+      "symbol": "TATATECH"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Kirloskar Oil Eng Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE146L01010",
+      "symbol": "KIRLOSENG"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Sammaan Capital Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE148I01020",
+      "symbol": "SAMMAANCAP"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Delhivery Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE148O01028",
+      "symbol": "DELHIVERY"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Cholamandalam Financial Holdings Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE149A01033",
+      "symbol": "CHOLAHLDNG"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Tata Communications Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE151A01013",
+      "symbol": "TATACOMM"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Thermax Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE152A01029",
+      "symbol": "THERMAX"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Triveni Turbine Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE152M01016",
+      "symbol": "TRITURBINE"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "BLS International Services Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE153T01027",
+      "symbol": "BLS"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "ITC Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE154A01025",
+      "symbol": "ITC"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Tata Motors Passenger Vehicles Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE155A01022",
+      "symbol": "TMPV"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Hero MotoCorp Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE158A01026",
+      "symbol": "HEROMOTOCO"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Glaxosmithkline Pharmaceuticals Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE159A01016",
+      "symbol": "GLAXO"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Pine Labs Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE15B701018",
+      "symbol": "PINELABS"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Punjab National Bank",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE160A01022",
+      "symbol": "PNB"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Jammu & Kashmir Bank Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE168A01041",
+      "symbol": "J&KBANK"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Emcure Pharmaceuticals Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE168P01015",
+      "symbol": "EMCURE"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Coromandel International Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE169A01031",
+      "symbol": "COROMANDEL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Federal Bank Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE171A01029",
+      "symbol": "FEDERALBNK"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Bharat Dynamics Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE171Z01026",
+      "symbol": "BDL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Castrol India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE172A01027",
+      "symbol": "CASTROLIND"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Bata India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE176A01028",
+      "symbol": "BATAINDIA"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Havells India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE176B01034",
+      "symbol": "HAVELLS"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Godawari Power & Ispat Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE177H01039",
+      "symbol": "GPIL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Chennai Petroleum Corporation Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE178A01016",
+      "symbol": "CHENNPETRO"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Max Financial Services Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE180A01020",
+      "symbol": "MFSL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Capri Global Capital Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE180C01042",
+      "symbol": "CGCL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Fertilisers and Chemicals Travancore Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE188A01015",
+      "symbol": "FACT"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Welspun Corp Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE191B01025",
+      "symbol": "WELCORP"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "PVR INOX Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE191H01014",
+      "symbol": "PVRINOX"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Tata Consumer Products Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE192A01025",
+      "symbol": "TATACONSUM"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Welspun Living Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE192B01031",
+      "symbol": "WELSPUNLIV"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Avenue Supermarts Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE192R01011",
+      "symbol": "DMART"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Supreme Industries Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE195A01028",
+      "symbol": "SUPREMEIND"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Marico Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE196A01026",
+      "symbol": "MARICO"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Tenneco Clean Air India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE19RI01016",
+      "symbol": "TENNIND"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Emmvee Photovoltaic Power Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE1C6T01020",
+      "symbol": "EMMVEE"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Vedanta Aluminium Metal Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE1CDF01017",
+      "symbol": "VAML"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Vedanta Iron and Steel Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE1CLE01013",
+      "symbol": "VISL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Siemens Energy India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE1NPP01017",
+      "symbol": "ENRIN"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Tata Motors Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE1TAE01010",
+      "symbol": "TMCV"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "GE Vernova T&D India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE200A01026",
+      "symbol": "GVT&D"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Varun Beverages Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE200M01039",
+      "symbol": "VBL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Piramal Finance Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE202B01038",
+      "symbol": "PIRAMALFIN"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Indian Renewable Energy Development Agency Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE202E01016",
+      "symbol": "IREDA"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Indraprastha Gas Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE203G01027",
+      "symbol": "IGL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Vedanta Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE205A01025",
+      "symbol": "VEDL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Elecon Engineering Co. Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE205B01031",
+      "symbol": "ELECON"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Poly Medicure Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE205C01021",
+      "symbol": "POLYMED"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Authum Investment & Infrastructure Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE206F01022",
+      "symbol": "AIIL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Ashok Leyland Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE208A01029",
+      "symbol": "ASHOKLEY"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Aegis Logistics Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE208C01025",
+      "symbol": "AEGISLOG"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Jupiter Wagons Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE209L01016",
+      "symbol": "JWL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Phoenix Mills Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE211B01039",
+      "symbol": "PHOENIXLTD"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "AIA Engineering Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE212H01026",
+      "symbol": "AIAENG"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Fractal Analytics Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE212S01015",
+      "symbol": "FRACTAL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Oil & Natural Gas Corporation Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE213A01029",
+      "symbol": "ONGC"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "LTM Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE214T01019",
+      "symbol": "LTM"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Britannia Industries Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE216A01030",
+      "symbol": "BRITANNIA"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Aavas Financiers Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE216P01012",
+      "symbol": "AAVAS"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Kajaria Ceramics Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE217B01036",
+      "symbol": "KAJARIACER"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Kalpataru Projects International Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE220B01022",
+      "symbol": "KPIL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Jindal Stainless Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE220G01021",
+      "symbol": "JSL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Voltas Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE226A01021",
+      "symbol": "VOLTAS"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Clean Science and Technology Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE227W01023",
+      "symbol": "CLEAN"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Usha Martin Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE228A01035",
+      "symbol": "USHAMART"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "EIH Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE230A01023",
+      "symbol": "EIHOTEL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Godrej Industries Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE233A01035",
+      "symbol": "GODREJIND"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Finolex Cables Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE235A01022",
+      "symbol": "FINCABLES"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Kotak Mahindra Bank Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE237A01036",
+      "symbol": "KOTAKBANK"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Axis Bank Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE238A01034",
+      "symbol": "AXISBANK"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Nestle India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE239A01024",
+      "symbol": "NESTLEIND"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Indian Oil Corporation Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE242A01010",
+      "symbol": "IOC"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Anant Raj Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE242C01024",
+      "symbol": "ANANTRAJ"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Tata Power Co. Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE245A01021",
+      "symbol": "TATAPOWER"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "ITI Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE248A01017",
+      "symbol": "ITI"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Mazagoan Dock Shipbuilders Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE249Z01020",
+      "symbol": "MAZDOCK"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Zen Technologies Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE251B01027",
+      "symbol": "ZENTEC"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Zee Entertainment Enterprises Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE256A01028",
+      "symbol": "ZEEL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Bharat Heavy Electricals Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE257A01026",
+      "symbol": "BHEL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "BEML Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE258A01024",
+      "symbol": "BEML"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Sumitomo Chemical India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE258G01013",
+      "symbol": "SUMICHEM"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Colgate Palmolive (India) Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE259A01022",
+      "symbol": "COLPAL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Godfrey Phillips India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE260B01028",
+      "symbol": "GODFRYPHLP"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Olectra Greentech Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE260D01016",
+      "symbol": "OLECTRA"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Persistent Systems Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE262H01021",
+      "symbol": "PERSISTENT"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Bharat Electronics Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE263A01024",
+      "symbol": "BEL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Hindustan Zinc Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE267A01025",
+      "symbol": "HINDZINC"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "DLF Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE271C01023",
+      "symbol": "DLF"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Oil India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE274J01014",
+      "symbol": "OIL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Titan Company Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE280A01028",
+      "symbol": "TITAN"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Lloyds Metals And Energy Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE281B01032",
+      "symbol": "LLOYDSME"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Elgi Equipments Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE285A01027",
+      "symbol": "ELGIEQUIP"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Techno Electric & Engineering Company Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE285K01026",
+      "symbol": "TECHNOE"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Deepak Nitrite Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE288B01029",
+      "symbol": "DEEPAKNTR"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Cartrade Tech Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE290S01011",
+      "symbol": "CARTRADE"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "HBL Engineering Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE292B01021",
+      "symbol": "HBLENGINE"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Bajaj Finance Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE296A01032",
+      "symbol": "BAJFINANCE"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Gallantt Ispat Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE297H01019",
+      "symbol": "GALLANTT"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Cummins India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE298A01020",
+      "symbol": "CUMMINSIND"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Nippon Life India Asset Management Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE298J01013",
+      "symbol": "NAM-INDIA"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Crompton Greaves Consumer Electricals Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE299U01018",
+      "symbol": "CROMPTON"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Bagmane Prime Office REIT",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE2OVN25015",
+      "symbol": "BAGMANE"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Exide Industries Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE302A01020",
+      "symbol": "EXIDEIND"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Kalyan Jewellers India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE303R01014",
+      "symbol": "KALYANKJIL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Intellect Design Arena Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE306R01017",
+      "symbol": "INTELLECT"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Pidilite Industries Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE318A01026",
+      "symbol": "PIDILITIND"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "RITES Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE320J01015",
+      "symbol": "RITES"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "DOMS Industries Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE321T01012",
+      "symbol": "DOMS"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Gillette India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE322A01010",
+      "symbol": "GILLETTE"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Bosch Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE323A01026",
+      "symbol": "BOSCHLTD"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Jindal Saw Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE324A01032",
+      "symbol": "JINDALSAW"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "LG Electronics India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE324D01010",
+      "symbol": "LGEINDIA"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Timken India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE325A01013",
+      "symbol": "TIMKEN"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Lupin Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE326A01037",
+      "symbol": "LUPIN"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "The Ramco Cements Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE331A01037",
+      "symbol": "RAMCOCEM"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Indian Railway Catering And Tourism Corporation Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE335Y01020",
+      "symbol": "IRCTC"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Concord Biotech Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE338H01029",
+      "symbol": "CONCORDBIO"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Motilal Oswal Financial Services Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE338I01027",
+      "symbol": "MOTILALOFS"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "ZF Commercial Vehicle Control Systems India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE342J01019",
+      "symbol": "ZFCVINDIA"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Bharti Hexacom Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE343G01021",
+      "symbol": "BHARTIHEXA"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Solar Industries India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE343H01029",
+      "symbol": "SOLARINDS"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "ICICI Prudential Asset Management Company Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE346A01027",
+      "symbol": "ICICIAMC"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Petronet LNG Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE347G01014",
+      "symbol": "PETRONET"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Jaiprakash Power Ventures Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE351F01018",
+      "symbol": "JPPOWER"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "MphasiS Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE356A01018",
+      "symbol": "MPHASIS"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Abbott India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE358A01014",
+      "symbol": "ABBOTINDIA"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Divi's Laboratories Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE361B01024",
+      "symbol": "DIVISLAB"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Adani Green Energy Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE364U01010",
+      "symbol": "ADANIGREEN"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Prime Focus Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE367G01038",
+      "symbol": "PFOCUS"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Graphite India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE371A01025",
+      "symbol": "GRAPHITE"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Amber Enterprises India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE371P01015",
+      "symbol": "AMBER"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Apar Industries Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE372A01015",
+      "symbol": "APARINDS"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Biocon Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE376G01013",
+      "symbol": "BIOCON"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Waaree Energies Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE377N01017",
+      "symbol": "WAAREEENER"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Bajaj Housing Finance Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE377Y01014",
+      "symbol": "BAJAJHFL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "ITC Hotels Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE379A01028",
+      "symbol": "ITCHOTELS"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Garden Reach Shipbuilders & Engineers Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE382Z01011",
+      "symbol": "GRSE"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "India Cements Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE383A01012",
+      "symbol": "INDIACEM"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Sarda Energy and Minerals Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE385C01021",
+      "symbol": "SARDAEN"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "FSN E-Commerce Ventures Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE388Y01029",
+      "symbol": "NYKAA"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Kec International Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE389H01022",
+      "symbol": "KEC"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Bharti Airtel Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE397D01024",
+      "symbol": "BHARTIARTL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Syngene International Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE398R01022",
+      "symbol": "SYNGENE"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Ramkrishna Forgings Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE399G01023",
+      "symbol": "RKFORGE"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Adani Total Gas Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE399L01023",
+      "symbol": "ATGL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Aditya Birla Sun Life AMC Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE404A01024",
+      "symbol": "ABSLAMC"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "UNO Minda Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE405E01023",
+      "symbol": "UNOMINDA"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Aurobindo Pharma Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE406A01037",
+      "symbol": "AUROPHARMA"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Narayana Hrudayalaya Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE410P01011",
+      "symbol": "NH"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Muthoot Finance Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE414G01012",
+      "symbol": "MUTHOOTFIN"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Rail Vikas Nigam Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE415G01027",
+      "symbol": "RVNL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "PB Fintech Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE417T01026",
+      "symbol": "POLICYBZR"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "TD Power Systems Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE419M01035",
+      "symbol": "TDPOWERSYS"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "CCL Products (I) Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE421D01022",
+      "symbol": "CCL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Adani Enterprises Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE423A01024",
+      "symbol": "ADANIENT"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Sun TV Network Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE424H01027",
+      "symbol": "SUNTV"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Apollo Hospitals Enterprise Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE437A01024",
+      "symbol": "APOLLOHOSP"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Apollo Tyres Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE438A01022",
+      "symbol": "APOLLOTYRE"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Asahi India Glass Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE439A01020",
+      "symbol": "ASAHIINDIA"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Force Motors Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE451A01017",
+      "symbol": "FORCEMOT"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Polycab India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE455K01017",
+      "symbol": "POLYCAB"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Bank of Maharashtra",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE457A01014",
+      "symbol": "MAHABANK"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "PG Electroplast Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE457L01029",
+      "symbol": "PGEL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Berger Paints India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE463A01038",
+      "symbol": "BERGEPAINT"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Anand Rathi Wealth Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE463V01026",
+      "symbol": "ANANDRATHI"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Bharat Forge Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE465A01025",
+      "symbol": "BHARATFORG"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "360 ONE WAM Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE466L01038",
+      "symbol": "360ONE"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Tata Consultancy Services Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE467B01029",
+      "symbol": "TCS"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "The New India Assurance Company Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE470Y01017",
+      "symbol": "NIACL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Blue Star Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE472A01039",
+      "symbol": "BLUESTARCO"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Linde India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE473A01011",
+      "symbol": "LINDEINDIA"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Global Health Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE474Q01031",
+      "symbol": "MEDANTA"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Caplin Point Laboratories Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE475E01026",
+      "symbol": "CAPLIPOINT"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Canara Bank",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE476A01022",
+      "symbol": "CANBK"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Can Fin Homes Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE477A01020",
+      "symbol": "CANFINHOME"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "UltraTech Cement Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE481G01011",
+      "symbol": "ULTRACEMCO"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Home First Finance Company India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE481N01025",
+      "symbol": "HOMEFIRST"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "General Insurance Corporation of India",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE481Y01014",
+      "symbol": "GICRE"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Ceat Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE482A01020",
+      "symbol": "CEATLTD"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Central Bank of India",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE483A01010",
+      "symbol": "CENTRALBK"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Godrej Properties Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE484J01027",
+      "symbol": "GODREJPROP"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "CESC Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE486A01021",
+      "symbol": "CESC"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "City Union Bank Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE491A01021",
+      "symbol": "CUB"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "TVS Motor Company Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE494B01023",
+      "symbol": "TVSMOTOR"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "L&T Finance Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE498L01015",
+      "symbol": "LTF"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Deepak Fertilisers & Petrochemicals Corp. Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE501A01019",
+      "symbol": "DEEPAKFERT"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Rubicon Research Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE506V01022",
+      "symbol": "RUBICON"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Cupid Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE509F01029",
+      "symbol": "CUPID"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Engineers India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE510A01028",
+      "symbol": "ENGINERSIN"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Poonawalla Fincorp Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE511C01022",
+      "symbol": "POONAWALLA"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Schaeffler India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE513A01022",
+      "symbol": "SCHAEFFLER"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Tata Teleservices (Maharashtra) Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE517B01013",
+      "symbol": "TTML"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Zensar Technolgies Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE520A01027",
+      "symbol": "ZENSARTECH"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Manappuram Finance Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE522D01027",
+      "symbol": "MANAPPURAM"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Coal India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE522F01014",
+      "symbol": "COALINDIA"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Gabriel India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE524A01029",
+      "symbol": "GABRIEL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "SPR Auto Technologies Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE526E01018",
+      "symbol": "SHRIPISTON"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Yes Bank Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE528G01035",
+      "symbol": "YESBANK"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "IIFL Finance Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE530B01024",
+      "symbol": "IIFL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Hindustan Copper Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE531E01026",
+      "symbol": "HINDCOPPER"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Nuvama Wealth Management Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE531F01023",
+      "symbol": "NUVAMA"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "CIE Automotive India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE536H01010",
+      "symbol": "CIEINDIA"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Alkem Laboratories Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE540L01014",
+      "symbol": "ALKEM"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "HEG Advanced Materials Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE545A01024",
+      "symbol": "HEGAM"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Bandhan Bank Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE545U01014",
+      "symbol": "BANDHANBNK"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "HFCL Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE548A01028",
+      "symbol": "HFCL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Emami Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE548C01032",
+      "symbol": "EMAMILTD"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Allied Blenders and Distillers Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE552Z01027",
+      "symbol": "ABDL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Indian Bank",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE562A01011",
+      "symbol": "INDIANB"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Indian Overseas Bank",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE565A01014",
+      "symbol": "IOB"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Sai Life Sciences Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE570L01029",
+      "symbol": "SAILIFE"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Ipca Laboratories Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE571A01038",
+      "symbol": "IPCALAB"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "PNB Housing Finance Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE572E01012",
+      "symbol": "PNBHOUSING"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "JK Tyre & Industries Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE573A01042",
+      "symbol": "JKTYRE"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Star Health and Allied Insurance Company Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE575P01011",
+      "symbol": "STARHEALTH"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "NMDC Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE584A01023",
+      "symbol": "NMDC"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Maruti Suzuki India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE585B01010",
+      "symbol": "MARUTI"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "NLC India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE589A01014",
+      "symbol": "NLCINDIA"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Coforge Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE591G01025",
+      "symbol": "COFORGE"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "PTC Industries Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE596F01018",
+      "symbol": "PTCIL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Computer Age Management Services Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE596I01020",
+      "symbol": "CAMS"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Dr. Lal Path Labs Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE600L01024",
+      "symbol": "LALPATHLAB"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "PCBL Chemical Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE602A01031",
+      "symbol": "PCBL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "PI Industries Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE603J01030",
+      "symbol": "PIIND"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Reliance Power Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE614G01033",
+      "symbol": "RPOWER"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Titagarh Rail Systems Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE615H01020",
+      "symbol": "TITAGARH"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "INOX India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE616N01034",
+      "symbol": "INOXINDIA"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Patanjali Foods Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE619A01035",
+      "symbol": "PATANJALI"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "ACME Solar Holdings Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE622W01025",
+      "symbol": "ACMESOLAR"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "UPL Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE628A01036",
+      "symbol": "UPL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Mankind Pharma Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE634S01028",
+      "symbol": "MANKIND"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "InterGlobe Aviation Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE646L01027",
+      "symbol": "INDIGO"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "SRF Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE647A01010",
+      "symbol": "SRF"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Clean Max Enviro Energy Solutions Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE647U01026",
+      "symbol": "CLEANMAX"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Sundaram Finance Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE660A01013",
+      "symbol": "SUNDARMFIN"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Info Edge (India) Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE663F01032",
+      "symbol": "NAUKRI"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Swan Corp Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE665A01038",
+      "symbol": "SWANCORP"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Tech Mahindra Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE669C01036",
+      "symbol": "TECHM"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Vodafone Idea Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE669E01016",
+      "symbol": "IDEA"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Tata Elxsi Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE670A01012",
+      "symbol": "TATAELXSI"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Lodha Developers Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE670K01029",
+      "symbol": "LODHA"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Honeywell Automation India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE671A01010",
+      "symbol": "HONAUT"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Sobha Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE671H01015",
+      "symbol": "SOBHA"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Tata Investment Corporation Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE672A01026",
+      "symbol": "TATAINVEST"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "TBO Tek Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE673O01025",
+      "symbol": "TBOTEK"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Aditya Birla Capital Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE674K01013",
+      "symbol": "ABCAPITAL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Black Box Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE676A01027",
+      "symbol": "BBOX"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Firstsource Solutions Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE684F01012",
+      "symbol": "FSL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Torrent Pharmaceuticals Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE685A01028",
+      "symbol": "TORNTPHARM"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Cemindia Projects Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE686A01026",
+      "symbol": "CEMPRO"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "United Breweries Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE686F01025",
+      "symbol": "UBL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "UCO Bank",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE691A01018",
+      "symbol": "UCOBANK"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Union Bank of India",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE692A01016",
+      "symbol": "UNIONBANK"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Vedanta Power Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE694L01019",
+      "symbol": "VEDPOWER"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "AWL Agri Business Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE699H01024",
+      "symbol": "AWL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "APL Apollo Tubes Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE702C01027",
+      "symbol": "APLAPOLLO"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Vedanta Oil and Gas Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE704J01044",
+      "symbol": "VOGL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Cochin Shipyard Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE704P01025",
+      "symbol": "COCHINSHIP"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Whirlpool of India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE716A01013",
+      "symbol": "WHIRLPOOL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "JSW Cement Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE718I01012",
+      "symbol": "JSWCEMENT"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Shriram Finance Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE721A01047",
+      "symbol": "SHRIRAMFIN"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Nava Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE725A01030",
+      "symbol": "NAVA"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "ICICI Prudential Life Insurance Company Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE726G01019",
+      "symbol": "ICICIPRULI"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Action Construction Equipment Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE731H01025",
+      "symbol": "ACE"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Kirloskar Brothers Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE732A01036",
+      "symbol": "KIRLOSBROS"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Angel One Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE732I01021",
+      "symbol": "ANGELONE"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "NTPC Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE733E01010",
+      "symbol": "NTPC"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Central Depository Services (India) Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE736A01011",
+      "symbol": "CDSL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "eClerx Services Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE738I01010",
+      "symbol": "ECLERX"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "CreditAccess Grameen Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE741K01010",
+      "symbol": "CREDITACC"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Adani Ports and Special Economic Zone Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE742F01042",
+      "symbol": "ADANIPORTS"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "RHI MAGNESITA INDIA LTD.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE743M01012",
+      "symbol": "RHIM"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Multi Commodity Exchange of India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE745G01043",
+      "symbol": "MCX"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Jindal Steel Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE749A01030",
+      "symbol": "JINDALSTEL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Power Grid Corporation of India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE752E01010",
+      "symbol": "POWERGRID"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "HDB Financial Services Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE756I01012",
+      "symbol": "HDBFS"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Jio Financial Services Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE758E01017",
+      "symbol": "JIOFIN"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Eternal Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE758T01015",
+      "symbol": "ETERNAL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Page Industries Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE761H01022",
+      "symbol": "PAGEIND"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Transformers And Rectifiers (India) Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE763I01026",
+      "symbol": "TARIL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "ICICI Lombard General Insurance Company Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE765G01017",
+      "symbol": "ICICIGI"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Zydus Wellness Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE768C01028",
+      "symbol": "ZYDUSWELL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Aarti Industries Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE769A01020",
+      "symbol": "AARTIIND"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Mahindra & Mahindra Financial Services Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE774D01024",
+      "symbol": "M&MFIN"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Samvardhana Motherson International Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE775A01035",
+      "symbol": "MOTHERSON"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "GMR Airports Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE776C01039",
+      "symbol": "GMRAIRPORT"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "R R Kabel Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE777K01022",
+      "symbol": "RRKABEL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "JM Financial Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE780C01023",
+      "symbol": "JMFINANCIL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Balkrishna Industries Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE787D01026",
+      "symbol": "BALKRISIND"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Brigade Enterprises Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE791I01019",
+      "symbol": "BRIGADE"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Neuland Laboratories Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE794A01010",
+      "symbol": "NEULANDLAB"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "HDFC Life Insurance Company Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE795G01014",
+      "symbol": "HDFCLIFE"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Jubilant Foodworks Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE797F01020",
+      "symbol": "JUBLFOOD"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Shyam Metalics and Energy Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE810G01011",
+      "symbol": "SHYAMMETL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Prestige Estates Projects Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE811K01011",
+      "symbol": "PRESTIGE"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Torrent Power Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE813H01021",
+      "symbol": "TORNTPOWER"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Adani Power Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE814H01029",
+      "symbol": "ADANIPOWER"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "LT Foods Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE818H01020",
+      "symbol": "LTFOODS"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Aditya Infotech Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE819V01029",
+      "symbol": "CPPLUS"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "IRB Infrastructure Developers Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE821I01022",
+      "symbol": "IRB"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "J.K. Cement Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE823G01014",
+      "symbol": "JKCEMENT"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Vardhman Textiles Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE825A01020",
+      "symbol": "VTL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Birlasoft Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE836A01035",
+      "symbol": "BSOFT"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Schneider Electric Infrastructure Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE839M01018",
+      "symbol": "SCHNEIDER"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Minda Corporation Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE842C01021",
+      "symbol": "MINDACORP"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "NHPC Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE848E01016",
+      "symbol": "NHPC"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Trent Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE849A01020",
+      "symbol": "TRENT"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Aptus Value Housing Finance India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE852O01025",
+      "symbol": "APTUS"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "United Spirits Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE854D01024",
+      "symbol": "UNITDSPR"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "HCL Technologies Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE860A01027",
+      "symbol": "HCLTECH"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "MTAR Technologies Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE864I01014",
+      "symbol": "MTARTECH"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "NCC Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE868B01028",
+      "symbol": "NCC"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Avanti Feeds Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE871C01038",
+      "symbol": "AVANTIFEED"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Devyani International Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE872J01023",
+      "symbol": "DEVYANI"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "KEI Industries Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE878B01027",
+      "symbol": "KEI"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "JSW Infrastructure Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE880J01026",
+      "symbol": "JSWINFRA"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Oracle Financial Services Software Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE881D01027",
+      "symbol": "OFSS"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "MRF Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE883A01011",
+      "symbol": "MRF"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Aadhar Housing Finance Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE883F01010",
+      "symbol": "AADHARHFC"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Amara Raja Energy & Mobility Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE885A01032",
+      "symbol": "ARE&M"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Redington Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE891D01026",
+      "symbol": "REDINGTON"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Belrise Industries Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE894V01022",
+      "symbol": "BELRISE"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Signatureglobal (India) Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE903U01023",
+      "symbol": "SIGNATURE"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Endurance Technologies Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE913H01037",
+      "symbol": "ENDURANCE"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Aster DM Quality Care Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE914M01019",
+      "symbol": "ASTERDM"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Bajaj Auto Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE917I01010",
+      "symbol": "BAJAJ-AUTO"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Bajaj Finserv Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE918I01026",
+      "symbol": "BAJAJFINSV"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Kaynes Technology India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE918Z01012",
+      "symbol": "KAYNES"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "JBM Auto Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE927D01051",
+      "symbol": "JBMA"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "K.P.R. Mill Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE930H01031",
+      "symbol": "KPRMILL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Anupam Rasayan India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE930P01018",
+      "symbol": "ANURAS"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Adani Energy Solutions Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE931S01010",
+      "symbol": "ADANIENSOL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Indiamart Intermesh Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE933S01016",
+      "symbol": "INDIAMART"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Glenmark Pharmaceuticals Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE935A01035",
+      "symbol": "GLENMARK"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Dixon Technologies (India) Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE935N01020",
+      "symbol": "DIXON"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Radico Khaitan Ltd",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE944F01028",
+      "symbol": "RADICO"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Laurus Labs Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE947Q01028",
+      "symbol": "LAURUSLABS"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "AU Small Finance Bank Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE949L01017",
+      "symbol": "AUBANK"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Sansera Engineering Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE953O01021",
+      "symbol": "SANSERA"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Lenskart Solutions Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE956O01016",
+      "symbol": "LENSKART"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Privi Speciality Chemicals Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE959A01019",
+      "symbol": "PRIVISCL"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Rainbow Childrens Medicare Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE961O01016",
+      "symbol": "RAINBOW"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "IRCON International Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE962Y01021",
+      "symbol": "IRCON"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Krishna Institute of Medical Sciences Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE967H01025",
+      "symbol": "KIMS"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Lemon Tree Hotels Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE970X01018",
+      "symbol": "LEMONTREE"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Tube Investments of India Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE974X01010",
+      "symbol": "TIINDIA"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "RBL Bank Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE976G01028",
+      "symbol": "RBLBANK"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Tata Capital Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE976I01016",
+      "symbol": "TATACAP"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "Jyoti CNC Automation Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE980O01024",
+      "symbol": "JYOTICNC"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "One 97 Communications Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE982J01020",
+      "symbol": "PAYTM"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "NATCO Pharma Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE987B01026",
+      "symbol": "NATCOPHARM"
+    },
+    {
+      "basis": "CURRENT_OFFICIAL_CONSTITUENT_ANCHOR",
+      "company_name": "KSB Ltd.",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "isin": "INE999A01023",
+      "symbol": "KSB"
+    }
+  ],
+  "status": "PARTIAL_VERIFIED"
+}

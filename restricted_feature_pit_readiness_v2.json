@@ -1,0 +1,18 @@
+{
+  "artifact_type": "RESTRICTED_FEATURE_PIT_READINESS_V2",
+  "authority": "SHADOW_ONLY",
+  "families": {
+    "fundamentals": "OPTIONAL_NOT_REQUIRED",
+    "liquidity": "FULL_LIQUIDITY_AVAILABLE",
+    "market_index": "PIT_SAFE",
+    "momentum": "PIT_SAFE_FOR_ELIGIBLE_SECURITIES",
+    "stage6_events": "OPTIONAL_NOT_REQUIRED",
+    "technical": "PIT_SAFE",
+    "volatility": "PIT_SAFE_FOR_ELIGIBLE_SECURITIES"
+  },
+  "maximum_lookback_sessions": 60,
+  "minimal_profile_ready": true,
+  "status": "COMPLETE_PIT_SAFE_FOR_ELIGIBLE_SECURITIES",
+  "unresolved_action_contamination": 0,
+  "warmup_enforced": true
+}

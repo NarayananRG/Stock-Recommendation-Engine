@@ -1,0 +1,30 @@
+{
+  "artifact_type": "FREE_OFFICIAL_MARKET_PANEL_MANIFEST_V1",
+  "authority": "SHADOW_ONLY",
+  "documentation_sha256": "c23ae59a903088c73780ee520b16b55f64597942cfdb49c04160492a95be9696",
+  "documentation_url": "https://www.nseindia.com/nse-mcp",
+  "limitation": "tool exposes at most three months per symbol per call; full PIT constituent panel was not bulk-acquired",
+  "mcp_runtime_status": "OFFICIAL_MCP_RUNTIME_AVAILABLE",
+  "mcp_server": "nse-bhavcopy-redis-mcp/1.0.0",
+  "network_calls_bounded_to_official_documented_endpoints": true,
+  "panel_acquired": false,
+  "panel_committed": false,
+  "sample_query": {
+    "actual_first_date": "2026-07-03",
+    "actual_last_date": "2026-10-01",
+    "fields": [
+      "open",
+      "high",
+      "low",
+      "close",
+      "volume",
+      "totalTradedValue"
+    ],
+    "requested_end_date": "2026-10-03",
+    "symbol": "RELIANCE",
+    "trading_days": 64
+  },
+  "source": "NSE_BHAVCOPY_MCP",
+  "source_url": "https://mcp.nseindia.in/bhavcopy/cm/mcp",
+  "status": "BOUNDED_ADAPTER_VERIFIED_FULL_PANEL_NOT_ACQUIRED"
+}
