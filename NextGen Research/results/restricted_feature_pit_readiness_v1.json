@@ -1,0 +1,21 @@
+{
+  "artifact_type": "RESTRICTED_FEATURE_PIT_READINESS_V1",
+  "authority": "SHADOW_ONLY",
+  "families": {
+    "fundamentals": "OPTIONAL_NOT_REQUIRED",
+    "liquidity": "FULL_LIQUIDITY_AVAILABLE",
+    "market_index": "PIT_SAFE",
+    "momentum": "NOT_READY",
+    "stage6_events": "OPTIONAL_NOT_REQUIRED",
+    "technical": "PIT_SAFE",
+    "volatility": "NOT_READY"
+  },
+  "minimal_profile": [
+    "technical",
+    "momentum",
+    "volatility",
+    "liquidity",
+    "market_index"
+  ],
+  "minimal_profile_ready": false
+}

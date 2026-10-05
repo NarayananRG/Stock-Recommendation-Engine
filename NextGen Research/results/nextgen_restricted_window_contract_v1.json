@@ -1,0 +1,75 @@
+{
+  "artifact_type": "NEXTGEN_RESTRICTED_WINDOW_CONTRACT_V1",
+  "authority": "SHADOW_ONLY",
+  "baseline_commit": "f0a45b2da54a687353a9aeab5f4956d15176b70b",
+  "branch": "nextgen-research-free-window-2024-2026",
+  "decision_v2": "FREE_OFFICIAL_RECONSTRUCTION_INCOMPLETE",
+  "focused_tests": {
+    "failed": 0,
+    "passed": 128
+  },
+  "frozen_boundaries": {
+    "active_lane_changed_file_count": 0,
+    "recommendation_logic_changed": false,
+    "stage4a3_changed": false,
+    "stage5d_changed": false,
+    "stage6_changed": false
+  },
+  "market_panel": {
+    "acquired_sessions": 497,
+    "constituent_security_session_observations": 287629,
+    "expected_sessions": 497,
+    "missing_sessions": 0,
+    "status": "COMPLETE_FOR_RESTRICTED_PERIOD",
+    "total_rows": 1579133,
+    "unique_isins": 5827,
+    "unique_symbols": 5820
+  },
+  "model_controls": {
+    "active_model_trained": false,
+    "challenger_trained": false,
+    "model_promoted": false,
+    "training_started": false
+  },
+  "paid_purchase_performed": false,
+  "regressions": {
+    "authoritative_data": "83/83 PASS",
+    "free_reconstruction": "131/131 PASS",
+    "historical_evidence": "63/63 PASS",
+    "nextgen_foundation": "104/104 PASS",
+    "readiness_v2": "22/22 PASS",
+    "real_data": "58/58 PASS",
+    "stage5d": "606/606 PASS",
+    "stage6_0c": "PASS / 10 schemas",
+    "stage6_8c": "170/170 PASS"
+  },
+  "research_window": {
+    "candidate_duration_months": 24.0,
+    "candidate_end": "2026-10-01",
+    "candidate_start": "2024-10-01",
+    "candidate_trading_sessions": 497,
+    "status": "NO_JOINTLY_VALID_WINDOW",
+    "validated_period": null
+  },
+  "runtime_artifacts_committed": 0,
+  "source_controls": {
+    "bulk_mcp_used": false,
+    "fixture_only": false,
+    "free_official_public_sources_only": true,
+    "model_training_rights": "NOT_ESTABLISHED",
+    "raw_bulk_files_committed": 0,
+    "usage_classification": "RESEARCH_ANALYSIS_ALLOWED"
+  },
+  "status": "PASS_AUDIT_FAIL_CLOSED_NOT_RESEARCH_READY",
+  "tags_created": 0,
+  "trading_authority": false,
+  "v5_failed_gates": [
+    "constituent_reconstruction",
+    "features",
+    "identity",
+    "price_adjustment",
+    "source_usage_rights",
+    "survivorship"
+  ],
+  "v5_status": "NOT_READY"
+}

@@ -1,0 +1,90 @@
+{
+  "ad_hoc_events_classified": 14,
+  "all_required_cycles_found": true,
+  "artifact_type": "NIFTY500_RESTRICTED_RECONSTRUCTION_COMPLETENESS_V1",
+  "authority": "SHADOW_ONLY",
+  "located_cycles": [
+    "2025-MARCH",
+    "2025-SEPTEMBER",
+    "2026-MARCH",
+    "2026-SEPTEMBER"
+  ],
+  "pre_window_unresolved_events_do_not_block": true,
+  "required_cycles": [
+    "2025-MARCH",
+    "2025-SEPTEMBER",
+    "2026-MARCH",
+    "2026-SEPTEMBER"
+  ],
+  "status": "PARTIAL_WITH_GAPS",
+  "unresolved_relevant_events": [
+    {
+      "classification": "TEMPORARY_INDEX_TREATMENT",
+      "effective_date": "2025-04-07",
+      "event_id": "TEMP-SIEMENS-ENERGY-ADD",
+      "excluded": [],
+      "gap": "AUTOMATIC_DUMMY_TO_LISTED_ENTITY_EXIT_NOT_BOUND_TO_SEPARATE_OFFICIAL_NOTICE",
+      "included": [
+        "DUMMYSIEMS"
+      ],
+      "paired": false,
+      "source_sha256": "4c3f4315e94ddb8919bb947bd06c858244256f66e39e264b655b0a08f78ab99b",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs02042025.pdf"
+    },
+    {
+      "classification": "TEMPORARY_INDEX_TREATMENT",
+      "effective_date": "2025-05-22",
+      "event_id": "TEMP-ABFRL-ADD",
+      "excluded": [],
+      "gap": "AUTOMATIC_DUMMY_TO_LISTED_ENTITY_EXIT_NOT_BOUND_TO_SEPARATE_OFFICIAL_NOTICE",
+      "included": [
+        "DUMMYABFRL"
+      ],
+      "paired": false,
+      "source_sha256": "801f434cfb152028915b491124d60308e6533a9c7f3862f7009d88b5d36dc61a",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs19052025.pdf"
+    },
+    {
+      "classification": "TEMPORARY_INDEX_TREATMENT",
+      "effective_date": "2025-10-14",
+      "event_id": "TEMP-TATA-MOTORS-ADD",
+      "excluded": [],
+      "gap": "DUMMY_TO_TMPV_TMCV_IDENTITY_TRANSITION_NOT_FULLY_PAIRED",
+      "included": [
+        "DUMMYTATAM"
+      ],
+      "paired": false,
+      "source_sha256": "58bafe38fcb153c8ee2794589497b452484b53f3a8c77247d7434368967b2459",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs07102025.pdf"
+    },
+    {
+      "classification": "TEMPORARY_INDEX_TREATMENT",
+      "effective_date": "2026-04-30",
+      "event_id": "TEMP-VEDANTA-ADD",
+      "excluded": [],
+      "gap": "FOUR_DUMMY_TO_LISTED_ENTITY_TRANSITIONS_NOT_FULLY_PAIRED",
+      "included": [
+        "DUMMYVEDL1",
+        "DUMMYVEDL2",
+        "DUMMYVEDL3",
+        "DUMMYVEDL4"
+      ],
+      "paired": false,
+      "source_sha256": "434aa85ef5ed3ff3f59826e2ed029de39f298173a1cdaa737b4989491d045c03",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs23042026.pdf"
+    },
+    {
+      "classification": "TEMPORARY_INDEX_TREATMENT",
+      "effective_date": "2026-06-23",
+      "event_id": "TEMP-VEDANTA-ALUMINIUM-REMOVE",
+      "excluded": [
+        "VAML"
+      ],
+      "gap": "ONLY_ONE_OF_FOUR_RESULTING_ENTITY_EXITS_EXPLICITLY_PAIRED",
+      "included": [],
+      "paired": false,
+      "source_sha256": "e27f1d4502fc367c78a113cf55224742e767327e6d7c2f8c90d899213dd7a874",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs19062026.pdf"
+    }
+  ]
+}

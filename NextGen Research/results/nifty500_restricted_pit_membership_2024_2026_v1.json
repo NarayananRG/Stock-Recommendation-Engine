@@ -1,0 +1,1380 @@
+{
+  "ad_hoc_permanent_events": [
+    {
+      "announcement_date": "2024-10-04",
+      "effective_date": "2024-10-10",
+      "event_id": "N500-IND_PRS04102024",
+      "event_type": "SCHEME_OR_CORPORATE_RESTRUCTURING",
+      "excluded": [
+        {
+          "company_name": "IDFC Ltd.",
+          "symbol": "IDFC"
+        }
+      ],
+      "identity_basis": "OFFICIAL_SYMBOL_PLUS_EFFECTIVE_PERIOD",
+      "included": [
+        {
+          "company_name": "Emcure Pharmaceuticals Ltd.",
+          "symbol": "EMCURE"
+        }
+      ],
+      "reason": "Replacement in indices w.e.f. October 10, 2024",
+      "scheduled_cycle": null,
+      "source_classification": "OFFICIAL_PUBLIC_VERIFIED",
+      "source_sha256": "ef6e793102e20cb51d56a054e5413e0df6b995004b14fea7425e659c403650cf",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs04102024.pdf"
+    },
+    {
+      "announcement_date": "2024-10-10",
+      "effective_date": "2024-10-16",
+      "event_id": "N500-IND_PRS10102024",
+      "event_type": "SCHEME_OR_CORPORATE_RESTRUCTURING",
+      "excluded": [
+        {
+          "company_name": "TV18 Broadcast Ltd.",
+          "symbol": "TV18BRDCST"
+        }
+      ],
+      "identity_basis": "OFFICIAL_SYMBOL_PLUS_EFFECTIVE_PERIOD",
+      "included": [
+        {
+          "company_name": "Akums Drugs and Pharmaceuticals Ltd.",
+          "symbol": "AKUMS"
+        }
+      ],
+      "reason": "Replacement in indices w.e.f. October 16, 2024",
+      "scheduled_cycle": null,
+      "source_classification": "OFFICIAL_PUBLIC_VERIFIED",
+      "source_sha256": "415d454c98245950494cf51f2b3ceabdf80cf1fe28cabdcef63246d3cdb5d528",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs10102024.pdf"
+    },
+    {
+      "announcement_date": "2025-03-17",
+      "effective_date": "2025-03-21",
+      "event_id": "N500-IND_PRS17032025",
+      "event_type": "AD_HOC_REPLACEMENT",
+      "excluded": [
+        {
+          "company_name": "ICICI Securities Ltd.",
+          "symbol": "ISEC"
+        }
+      ],
+      "identity_basis": "OFFICIAL_SYMBOL_PLUS_EFFECTIVE_PERIOD",
+      "included": [
+        {
+          "company_name": "Raymond Lifestyle Ltd.",
+          "symbol": "RAYMONDLSL"
+        }
+      ],
+      "reason": "Replacement in indices",
+      "scheduled_cycle": null,
+      "source_classification": "OFFICIAL_PUBLIC_VERIFIED",
+      "source_sha256": "0e34d011886b0fd8142b7bde5c1cf345bd3816d18bee3ae3ee7558db727e9d9c",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs17032025.pdf"
+    },
+    {
+      "announcement_date": "2025-04-04",
+      "effective_date": "2025-04-11",
+      "event_id": "N500-IND_PRS04042025_2",
+      "event_type": "SCHEME_OR_CORPORATE_RESTRUCTURING",
+      "excluded": [
+        {
+          "company_name": "Quess Corp Ltd.",
+          "symbol": "QUESS"
+        }
+      ],
+      "identity_basis": "OFFICIAL_SYMBOL_PLUS_EFFECTIVE_PERIOD",
+      "included": [
+        {
+          "company_name": "Sundram Fasteners Ltd.",
+          "symbol": "SUNDRMFAST"
+        }
+      ],
+      "reason": "Replacement in indices w.e.f. April 11, 2025",
+      "scheduled_cycle": null,
+      "source_classification": "OFFICIAL_PUBLIC_VERIFIED",
+      "source_sha256": "05071b75b7edb04262a0503129397e4b231cfcf3ba118399057f7a76c949398d",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs04042025_2.pdf"
+    },
+    {
+      "announcement_date": "2025-09-15",
+      "effective_date": "2025-09-23",
+      "event_id": "N500-IND_PRS15092025_1",
+      "event_type": "SCHEME_OR_CORPORATE_RESTRUCTURING",
+      "excluded": [
+        {
+          "company_name": "Piramal Enterprises Ltd.",
+          "symbol": "PEL"
+        }
+      ],
+      "identity_basis": "OFFICIAL_SYMBOL_PLUS_EFFECTIVE_PERIOD",
+      "included": [
+        {
+          "company_name": "Reliance Infrastructure Ltd.",
+          "symbol": "RELINFRA"
+        }
+      ],
+      "reason": "Replacements in indices w.e.f. September 23, 2025",
+      "scheduled_cycle": null,
+      "source_classification": "OFFICIAL_PUBLIC_VERIFIED",
+      "source_sha256": "3e7fc25c2e90266a8201f31794595cb0855a3d9a6eb06d5437fd1a0c94112881",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs15092025_1.pdf"
+    },
+    {
+      "announcement_date": "2025-12-11",
+      "effective_date": "2025-12-31",
+      "event_id": "N500-IND_PRS11122025",
+      "event_type": "SCHEME_OR_CORPORATE_RESTRUCTURING",
+      "excluded": [
+        {
+          "company_name": "SKF India Ltd.",
+          "symbol": "SKFINDIA"
+        }
+      ],
+      "identity_basis": "OFFICIAL_SYMBOL_PLUS_EFFECTIVE_PERIOD",
+      "included": [
+        {
+          "company_name": "JSW Cement Ltd.",
+          "symbol": "JSWCEMENT"
+        }
+      ],
+      "reason": "Replacements in indices w.e.f. December 31, 2025",
+      "scheduled_cycle": null,
+      "source_classification": "OFFICIAL_PUBLIC_VERIFIED",
+      "source_sha256": "fe0137becd78f2771f448f19a85943ceaf5952375608c14094dda327d80d7091",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs11122025.pdf"
+    },
+    {
+      "announcement_date": "2026-05-04",
+      "effective_date": "2026-05-12",
+      "event_id": "N500-IND_PRS04052026",
+      "event_type": "SCHEME_OR_CORPORATE_RESTRUCTURING",
+      "excluded": [
+        {
+          "company_name": "Gujarat State Petronet Ltd.",
+          "symbol": "GSPL"
+        }
+      ],
+      "identity_basis": "OFFICIAL_SYMBOL_PLUS_EFFECTIVE_PERIOD",
+      "included": [
+        {
+          "company_name": "CIE Automotive India Ltd.",
+          "symbol": "CIEINDIA"
+        }
+      ],
+      "reason": "Replacement in indices w.e.f. May 12, 2026",
+      "scheduled_cycle": null,
+      "source_classification": "OFFICIAL_PUBLIC_VERIFIED",
+      "source_sha256": "686327d0d4c7d096cab36bdd2e548fdc4d5f0b18b402cc3f3038cfc62c2d23b6",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs04052026.pdf"
+    },
+    {
+      "announcement_date": "2026-07-13",
+      "effective_date": "2026-07-17",
+      "event_id": "N500-IND_PRS13072026_1",
+      "event_type": "SCHEME_OR_CORPORATE_RESTRUCTURING",
+      "excluded": [
+        {
+          "company_name": "J.B. Chemicals & Pharmaceuticals Ltd.",
+          "symbol": "JBCHEPHARM"
+        }
+      ],
+      "identity_basis": "OFFICIAL_SYMBOL_PLUS_EFFECTIVE_PERIOD",
+      "included": [
+        {
+          "company_name": "Prime Focus Ltd.",
+          "symbol": "PFOCUS"
+        }
+      ],
+      "reason": "Replacement in indices w.e.f. July 17, 2026",
+      "scheduled_cycle": null,
+      "source_classification": "OFFICIAL_PUBLIC_VERIFIED",
+      "source_sha256": "9787f269558fe9c112011671615700ae9effaec482aad18bfafeeb477104286e",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs13072026_1.pdf"
+    }
+  ],
+  "anchor_count": 501,
+  "artifact_sha256": "c85aa0fc3450cf0114cf7d6a7e31f6412c20e07efe44d9e2a054adf43cfec9d9",
+  "artifact_type": "NIFTY500_RESTRICTED_PIT_MEMBERSHIP_2024_2026_V1",
+  "authority": "SHADOW_ONLY",
+  "change_event_count": 26,
+  "continuity_gaps": [
+    "AUTOMATIC_DUMMY_TO_LISTED_ENTITY_EXIT_NOT_BOUND_TO_SEPARATE_OFFICIAL_NOTICE",
+    "AUTOMATIC_DUMMY_TO_LISTED_ENTITY_EXIT_NOT_BOUND_TO_SEPARATE_OFFICIAL_NOTICE",
+    "DUMMY_TO_TMPV_TMCV_IDENTITY_TRANSITION_NOT_FULLY_PAIRED",
+    "FOUR_DUMMY_TO_LISTED_ENTITY_TRANSITIONS_NOT_FULLY_PAIRED",
+    "ONLY_ONE_OF_FOUR_RESULTING_ENTITY_EXITS_EXPLICITLY_PAIRED"
+  ],
+  "current_survivor_symbols": 501,
+  "end_date": "2026-10-01",
+  "historical_unique_isins_observed": 629,
+  "historical_unique_symbols": 620,
+  "identity_basis": "ISIN_WITH_EFFECTIVE_SYMBOL_PERIOD_FROM_OFFICIAL_UDIFF",
+  "non_current_historical_symbols": 119,
+  "pre_window_unresolved_events_ignored": true,
+  "scheduled_events": [
+    {
+      "announcement_date": "2025-02-21",
+      "effective_date": "2025-03-28",
+      "event_id": "N500-2025-MARCH",
+      "event_type": "SCHEDULED_RECONSTITUTION",
+      "excluded": [
+        {
+          "company_name": "Archean Chemical Industries Ltd.",
+          "symbol": "ACI"
+        },
+        {
+          "company_name": "Avanti Feeds Ltd.",
+          "symbol": "AVANTIFEED"
+        },
+        {
+          "company_name": "Balaji Amines Ltd.",
+          "symbol": "BALAMINES"
+        },
+        {
+          "company_name": "Birla Corporation Ltd.",
+          "symbol": "BIRLACORPN"
+        },
+        {
+          "company_name": "Cello World Ltd.",
+          "symbol": "CELLO"
+        },
+        {
+          "company_name": "Chemplast Sanmar Ltd.",
+          "symbol": "CHEMPLASTS"
+        },
+        {
+          "company_name": "CIE Automotive India Ltd.",
+          "symbol": "CIEINDIA"
+        },
+        {
+          "company_name": "Easy Trip Planners Ltd.",
+          "symbol": "EASEMYTRIP"
+        },
+        {
+          "company_name": "Equitas Small Finance Bank Ltd.",
+          "symbol": "EQUITASBNK"
+        },
+        {
+          "company_name": "Fine Organic Industries Ltd.",
+          "symbol": "FINEORG"
+        },
+        {
+          "company_name": "G R Infraprojects Ltd.",
+          "symbol": "GRINFRA"
+        },
+        {
+          "company_name": "Grindwell Norton Ltd.",
+          "symbol": "GRINDWELL"
+        },
+        {
+          "company_name": "Gujarat Ambuja Exports Ltd.",
+          "symbol": "GAEL"
+        },
+        {
+          "company_name": "Gujarat State Fertilizers & Chemicals Ltd.",
+          "symbol": "GSFC"
+        },
+        {
+          "company_name": "JK Lakshmi Cement Ltd.",
+          "symbol": "JKLAKSHMI"
+        },
+        {
+          "company_name": "KSB Ltd.",
+          "symbol": "KSB"
+        },
+        {
+          "company_name": "Mahindra Lifespace Developers Ltd.",
+          "symbol": "MAHLIFE"
+        },
+        {
+          "company_name": "Metro Brands Ltd.",
+          "symbol": "METROBRAND"
+        },
+        {
+          "company_name": "Nuvoco Vistas Corporation Ltd.",
+          "symbol": "NUVOCO"
+        },
+        {
+          "company_name": "Procter & Gamble Hygiene & Health Care Ltd.",
+          "symbol": "PGHH"
+        },
+        {
+          "company_name": "Rajesh Exports Ltd.",
+          "symbol": "RAJESHEXPO"
+        },
+        {
+          "company_name": "Ratnamani Metals & Tubes Ltd.",
+          "symbol": "RATNAMANI"
+        },
+        {
+          "company_name": "Sanofi India Ltd.",
+          "symbol": "SANOFI"
+        },
+        {
+          "company_name": "Sun Pharma Advanced Research Company Ltd.",
+          "symbol": "SPARC"
+        },
+        {
+          "company_name": "Sundram Fasteners Ltd.",
+          "symbol": "SUNDRMFAST"
+        },
+        {
+          "company_name": "TVS Supply Chain Solutions Ltd.",
+          "symbol": "TVSSCS"
+        },
+        {
+          "company_name": "Ujjivan Small Finance Bank Ltd.",
+          "symbol": "UJJIVANSFB"
+        },
+        {
+          "company_name": "V.I.P. Industries Ltd.",
+          "symbol": "VIPIND"
+        },
+        {
+          "company_name": "Varroc Engineering Ltd.",
+          "symbol": "VARROC"
+        },
+        {
+          "company_name": "Vinati Organics Ltd.",
+          "symbol": "VINATIORGA"
+        }
+      ],
+      "identity_basis": "OFFICIAL_SYMBOL_PLUS_EFFECTIVE_PERIOD",
+      "included": [
+        {
+          "company_name": "ACME Solar Holdings Ltd.",
+          "symbol": "ACMESOLAR"
+        },
+        {
+          "company_name": "Afcons Infrastructure Ltd.",
+          "symbol": "AFCONS"
+        },
+        {
+          "company_name": "Alivus Life Sciences Ltd.",
+          "symbol": "ALIVUS"
+        },
+        {
+          "company_name": "Authum Investment & Infrastructure Ltd.",
+          "symbol": "AIIL"
+        },
+        {
+          "company_name": "Bajaj Housing Finance Ltd.",
+          "symbol": "BAJAJHFL"
+        },
+        {
+          "company_name": "Brainbees Solutions Ltd.",
+          "symbol": "FIRSTCRY"
+        },
+        {
+          "company_name": "DCM Shriram Ltd.",
+          "symbol": "DCMSHRIRAM"
+        },
+        {
+          "company_name": "Gravita India Ltd.",
+          "symbol": "GRAVITA"
+        },
+        {
+          "company_name": "Hyundai Motor India Ltd.",
+          "symbol": "HYUNDAI"
+        },
+        {
+          "company_name": "International Gemmological Institute (India) Ltd.",
+          "symbol": "IGIL"
+        },
+        {
+          "company_name": "Inventurus Knowledge Solutions Ltd.",
+          "symbol": "IKS"
+        },
+        {
+          "company_name": "JSW Holdings Ltd.",
+          "symbol": "JSWHL"
+        },
+        {
+          "company_name": "LT Foods Ltd.",
+          "symbol": "LTFOODS"
+        },
+        {
+          "company_name": "Nava Ltd.",
+          "symbol": "NAVA"
+        },
+        {
+          "company_name": "Neuland Laboratories Ltd.",
+          "symbol": "NEULANDLAB"
+        },
+        {
+          "company_name": "Niva Bupa Health Insurance Company Ltd.",
+          "symbol": "NIVABUPA"
+        },
+        {
+          "company_name": "NTPC Green Energy Ltd.",
+          "symbol": "NTPCGREEN"
+        },
+        {
+          "company_name": "Ola Electric Mobility Ltd.",
+          "symbol": "OLAELEC"
+        },
+        {
+          "company_name": "PG Electroplast Ltd.",
+          "symbol": "PGEL"
+        },
+        {
+          "company_name": "Premier Energies Ltd.",
+          "symbol": "PREMIERENE"
+        },
+        {
+          "company_name": "Reliance Power Ltd.",
+          "symbol": "RPOWER"
+        },
+        {
+          "company_name": "Sagility India Ltd.",
+          "symbol": "SAGILITY"
+        },
+        {
+          "company_name": "Sai Life Sciences Ltd.",
+          "symbol": "SAILIFE"
+        },
+        {
+          "company_name": "Sarda Energy and Minerals Ltd.",
+          "symbol": "SARDAEN"
+        },
+        {
+          "company_name": "Swiggy Ltd.",
+          "symbol": "SWIGGY"
+        },
+        {
+          "company_name": "Transformers And Rectifiers (India) Ltd.",
+          "symbol": "TARIL"
+        },
+        {
+          "company_name": "Vishal Mega Mart Ltd.",
+          "symbol": "VMM"
+        },
+        {
+          "company_name": "Waaree Energies Ltd.",
+          "symbol": "WAAREEENER"
+        },
+        {
+          "company_name": "Wockhardt Ltd.",
+          "symbol": "WOCKPHARMA"
+        },
+        {
+          "company_name": "Zen Technologies Ltd.",
+          "symbol": "ZENTEC"
+        }
+      ],
+      "reason": "SEMIANNUAL_RECONSTITUTION",
+      "scheduled_cycle": "2025-MARCH",
+      "source_classification": "OFFICIAL_PUBLIC_VERIFIED",
+      "source_sha256": "1b3a52abf5954f4b213f5b555ee8776ff596f0adde0612cfdd5409b109195370",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs21022025.pdf"
+    },
+    {
+      "announcement_date": "2025-08-22",
+      "effective_date": "2025-09-30",
+      "event_id": "N500-2025-SEPTEMBER",
+      "event_type": "SCHEDULED_RECONSTITUTION",
+      "excluded": [
+        {
+          "company_name": "Alivus Life Sciences Ltd.",
+          "symbol": "ALIVUS"
+        },
+        {
+          "company_name": "Gujarat Narmada Valley Fertilizers and Chemicals Ltd.",
+          "symbol": "GNFC"
+        },
+        {
+          "company_name": "Gujarat Pipavav Port Ltd.",
+          "symbol": "GPPL"
+        },
+        {
+          "company_name": "JSW Holdings Ltd.",
+          "symbol": "JSWHL"
+        },
+        {
+          "company_name": "Justdial Ltd.",
+          "symbol": "JUSTDIAL"
+        },
+        {
+          "company_name": "Kansai Nerolac Paints Ltd.",
+          "symbol": "KANSAINER"
+        },
+        {
+          "company_name": "KNR Constructions Ltd.",
+          "symbol": "KNRCON"
+        },
+        {
+          "company_name": "Mastek Ltd.",
+          "symbol": "MASTEK"
+        },
+        {
+          "company_name": "Network18 Media & Investments Ltd.",
+          "symbol": "NETWORK18"
+        },
+        {
+          "company_name": "PNC Infratech Ltd.",
+          "symbol": "PNCINFRA"
+        },
+        {
+          "company_name": "RattanIndia Enterprises Ltd.",
+          "symbol": "RTNINDIA"
+        },
+        {
+          "company_name": "Raymond Lifestyle Ltd.",
+          "symbol": "RAYMONDLSL"
+        },
+        {
+          "company_name": "Raymond Ltd.",
+          "symbol": "RAYMOND"
+        },
+        {
+          "company_name": "Route Mobile Ltd.",
+          "symbol": "ROUTE"
+        },
+        {
+          "company_name": "Shree Renuka Sugars Ltd.",
+          "symbol": "RENUKA"
+        },
+        {
+          "company_name": "Sterling and Wilson Renewable Energy Ltd.",
+          "symbol": "SWSOLAR"
+        },
+        {
+          "company_name": "Tanla Platforms Ltd.",
+          "symbol": "TANLA"
+        },
+        {
+          "company_name": "Westlife Foodworld Ltd.",
+          "symbol": "WESTLIFE"
+        }
+      ],
+      "identity_basis": "OFFICIAL_SYMBOL_PLUS_EFFECTIVE_PERIOD",
+      "included": [
+        {
+          "company_name": "Aditya Birla Lifestyle Brands Ltd.",
+          "symbol": "ABLBL"
+        },
+        {
+          "company_name": "Aegis Vopak Terminals Ltd.",
+          "symbol": "AEGISVOPAK"
+        },
+        {
+          "company_name": "Akzo Nobel India Ltd.",
+          "symbol": "AKZOINDIA"
+        },
+        {
+          "company_name": "Ather Energy Ltd.",
+          "symbol": "ATHERENERG"
+        },
+        {
+          "company_name": "Blue Jet Healthcare Ltd.",
+          "symbol": "BLUEJET"
+        },
+        {
+          "company_name": "Choice International Ltd.",
+          "symbol": "CHOICEIN"
+        },
+        {
+          "company_name": "Dr. Agarwal's Health Care Ltd.",
+          "symbol": "AGARWALEYE"
+        },
+        {
+          "company_name": "Force Motors Ltd.",
+          "symbol": "FORCEMOT"
+        },
+        {
+          "company_name": "Hexaware Technologies Ltd.",
+          "symbol": "HEXT"
+        },
+        {
+          "company_name": "ITC Hotels Ltd.",
+          "symbol": "ITCHOTELS"
+        },
+        {
+          "company_name": "KSB Ltd.",
+          "symbol": "KSB"
+        },
+        {
+          "company_name": "Maharashtra Scooters Ltd.",
+          "symbol": "MAHSCOOTER"
+        },
+        {
+          "company_name": "Nuvoco Vistas Corporation Ltd.",
+          "symbol": "NUVOCO"
+        },
+        {
+          "company_name": "Onesource Specialty Pharma Ltd.",
+          "symbol": "ONESOURCE"
+        },
+        {
+          "company_name": "Procter & Gamble Hygiene & Health Care Ltd.",
+          "symbol": "PGHH"
+        },
+        {
+          "company_name": "Schloss Bangalore Ltd.",
+          "symbol": "THELEELA"
+        },
+        {
+          "company_name": "Siemens Energy India Ltd.",
+          "symbol": "ENRIN"
+        },
+        {
+          "company_name": "Ventive Hospitality Ltd.",
+          "symbol": "VENTIVE"
+        }
+      ],
+      "reason": "SEMIANNUAL_RECONSTITUTION",
+      "scheduled_cycle": "2025-SEPTEMBER",
+      "source_classification": "OFFICIAL_PUBLIC_VERIFIED",
+      "source_sha256": "731113af85aad6b54cce359d5465d84e6062b28b03c21cd9922a20a3f44d2de1",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs22082025.pdf"
+    },
+    {
+      "announcement_date": "2026-02-23",
+      "effective_date": "2026-03-30",
+      "event_id": "N500-2026-MARCH",
+      "event_type": "SCHEDULED_RECONSTITUTION",
+      "excluded": [
+        {
+          "company_name": "Akums Drugs and Pharmaceuticals Ltd.",
+          "symbol": "AKUMS"
+        },
+        {
+          "company_name": "Alembic Pharmaceuticals Ltd.",
+          "symbol": "APLLTD"
+        },
+        {
+          "company_name": "Alkyl Amines Chemicals Ltd.",
+          "symbol": "ALKYLAMINE"
+        },
+        {
+          "company_name": "Alok Industries Ltd.",
+          "symbol": "ALOKINDS"
+        },
+        {
+          "company_name": "AstraZenca Pharma India Ltd.",
+          "symbol": "ASTRAZEN"
+        },
+        {
+          "company_name": "BASF India Ltd.",
+          "symbol": "BASF"
+        },
+        {
+          "company_name": "Campus Activewear Ltd.",
+          "symbol": "CAMPUS"
+        },
+        {
+          "company_name": "Century Plyboards (India) Ltd.",
+          "symbol": "CENTURYPLY"
+        },
+        {
+          "company_name": "Cera Sanitaryware Ltd",
+          "symbol": "CERA"
+        },
+        {
+          "company_name": "Dr. Agarwal's Health Care Ltd.",
+          "symbol": "AGARWALEYE"
+        },
+        {
+          "company_name": "Finolex Industries Ltd.",
+          "symbol": "FINPIPE"
+        },
+        {
+          "company_name": "Godrej Agrovet Ltd.",
+          "symbol": "GODREJAGRO"
+        },
+        {
+          "company_name": "Gujarat Gas Ltd.",
+          "symbol": "GUJGASLTD"
+        },
+        {
+          "company_name": "Happiest Minds Technologies Ltd.",
+          "symbol": "HAPPSTMNDS"
+        },
+        {
+          "company_name": "INOX India Ltd.",
+          "symbol": "INOXINDIA"
+        },
+        {
+          "company_name": "Jyothy Labs Ltd.",
+          "symbol": "JYOTHYLAB"
+        },
+        {
+          "company_name": "Kirloskar Brothers Ltd.",
+          "symbol": "KIRLOSBROS"
+        },
+        {
+          "company_name": "KSB Ltd.",
+          "symbol": "KSB"
+        },
+        {
+          "company_name": "Maharashtra Scooters Ltd.",
+          "symbol": "MAHSCOOTER"
+        },
+        {
+          "company_name": "Maharashtra Seamless Ltd.",
+          "symbol": "MAHSEAMLES"
+        },
+        {
+          "company_name": "Metropolis Healthcare Ltd.",
+          "symbol": "METROPOLIS"
+        },
+        {
+          "company_name": "Praj Industries Ltd.",
+          "symbol": "PRAJIND"
+        },
+        {
+          "company_name": "Procter & Gamble Hygiene & Health Care Ltd.",
+          "symbol": "PGHH"
+        },
+        {
+          "company_name": "Rashtriya Chemicals & Fertilizers Ltd.",
+          "symbol": "RCF"
+        },
+        {
+          "company_name": "Reliance Infrastructure Ltd.",
+          "symbol": "RELINFRA"
+        },
+        {
+          "company_name": "Sundram Fasteners Ltd.",
+          "symbol": "SUNDRMFAST"
+        },
+        {
+          "company_name": "Triveni Engineering & Industries Ltd.",
+          "symbol": "TRIVENI"
+        },
+        {
+          "company_name": "Valor Estate Ltd.",
+          "symbol": "DBREALTY"
+        },
+        {
+          "company_name": "Vedant Fashions Ltd.",
+          "symbol": "MANYAVAR"
+        },
+        {
+          "company_name": "Ventive Hospitality Ltd.",
+          "symbol": "VENTIVE"
+        },
+        {
+          "company_name": "V-Guard Industries Ltd.",
+          "symbol": "VGUARD"
+        }
+      ],
+      "identity_basis": "OFFICIAL_SYMBOL_PLUS_EFFECTIVE_PERIOD",
+      "included": [
+        {
+          "company_name": "Acutaas Chemicals Ltd.",
+          "symbol": "ACUTAAS"
+        },
+        {
+          "company_name": "Aditya Infotech Ltd.",
+          "symbol": "CPPLUS"
+        },
+        {
+          "company_name": "Allied Blenders and Distillers Ltd.",
+          "symbol": "ABDL"
+        },
+        {
+          "company_name": "Anthem Biosciences Ltd.",
+          "symbol": "ANTHEM"
+        },
+        {
+          "company_name": "Anupam Rasayan India Ltd.",
+          "symbol": "ANURAS"
+        },
+        {
+          "company_name": "Belrise Industries Ltd.",
+          "symbol": "BELRISE"
+        },
+        {
+          "company_name": "Billionbrains Garage Ventures Ltd.",
+          "symbol": "GROWW"
+        },
+        {
+          "company_name": "Canara HSBC Life Insurance Company Ltd.",
+          "symbol": "CANHLIFE"
+        },
+        {
+          "company_name": "Cartrade Tech Ltd.",
+          "symbol": "CARTRADE"
+        },
+        {
+          "company_name": "Cemindia Projects Ltd.",
+          "symbol": "CEMPRO"
+        },
+        {
+          "company_name": "Emmvee Photovoltaic Power Ltd.",
+          "symbol": "EMMVEE"
+        },
+        {
+          "company_name": "Gabriel India Ltd.",
+          "symbol": "GABRIEL"
+        },
+        {
+          "company_name": "Gallantt Ispat Ltd.",
+          "symbol": "GALLANTT"
+        },
+        {
+          "company_name": "HDB Financial Services Ltd.",
+          "symbol": "HDBFS"
+        },
+        {
+          "company_name": "ICICI Prudential Asset Management Company Ltd.",
+          "symbol": "ICICIAMC"
+        },
+        {
+          "company_name": "Jain Resource Recycling Ltd.",
+          "symbol": "JAINREC"
+        },
+        {
+          "company_name": "Lenskart Solutions Ltd.",
+          "symbol": "LENSKART"
+        },
+        {
+          "company_name": "LG Electronics India Ltd.",
+          "symbol": "LGEINDIA"
+        },
+        {
+          "company_name": "Meesho Ltd.",
+          "symbol": "MEESHO"
+        },
+        {
+          "company_name": "Paradeep Phosphates Ltd.",
+          "symbol": "PARADEEP"
+        },
+        {
+          "company_name": "Physicswallah Ltd.",
+          "symbol": "PWL"
+        },
+        {
+          "company_name": "Pine Labs Ltd.",
+          "symbol": "PINELABS"
+        },
+        {
+          "company_name": "Piramal Finance Ltd.",
+          "symbol": "PIRAMALFIN"
+        },
+        {
+          "company_name": "Supreme Petrochem Ltd.",
+          "symbol": "SPLPETRO"
+        },
+        {
+          "company_name": "Tata Capital Ltd.",
+          "symbol": "TATACAP"
+        },
+        {
+          "company_name": "Tata Motors Ltd.",
+          "symbol": "TMCV"
+        },
+        {
+          "company_name": "Tega Industries Ltd.",
+          "symbol": "TEGA"
+        },
+        {
+          "company_name": "Tenneco Clean Air India Ltd.",
+          "symbol": "TENNIND"
+        },
+        {
+          "company_name": "Travel Food Services Ltd.",
+          "symbol": "TRAVELFOOD"
+        },
+        {
+          "company_name": "Urban Company Ltd.",
+          "symbol": "URBANCO"
+        },
+        {
+          "company_name": "Zydus Wellness Ltd.",
+          "symbol": "ZYDUSWELL"
+        }
+      ],
+      "reason": "SEMIANNUAL_RECONSTITUTION",
+      "scheduled_cycle": "2026-MARCH",
+      "source_classification": "OFFICIAL_PUBLIC_VERIFIED",
+      "source_sha256": "cb5830aff1e8715997d9204509315f393ed961838ebc14e986fcb800c62e5a0b",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs23022026.pdf"
+    },
+    {
+      "announcement_date": "2026-08-10",
+      "effective_date": "2026-09-30",
+      "event_id": "N500-2026-SEPTEMBER",
+      "event_type": "SCHEDULED_RECONSTITUTION",
+      "excluded": [
+        {
+          "company_name": "3M India Ltd.",
+          "symbol": "3MINDIA"
+        },
+        {
+          "company_name": "Aditya Birla Fashion and Retail Ltd.",
+          "symbol": "ABFRL"
+        },
+        {
+          "company_name": "Aditya Birla Lifestyle Brands Ltd.",
+          "symbol": "ABLBL"
+        },
+        {
+          "company_name": "Bayer Cropscience Ltd.",
+          "symbol": "BAYERCROP"
+        },
+        {
+          "company_name": "Bikaji Foods International Ltd.",
+          "symbol": "BIKAJI"
+        },
+        {
+          "company_name": "Blue Dart Express Ltd.",
+          "symbol": "BLUEDART"
+        },
+        {
+          "company_name": "Blue Jet Healthcare Ltd.",
+          "symbol": "BLUEJET"
+        },
+        {
+          "company_name": "Bombay Burmah Trading Corporation Ltd.",
+          "symbol": "BBTC"
+        },
+        {
+          "company_name": "C.E. Info Systems Ltd.",
+          "symbol": "MAPMYINDIA"
+        },
+        {
+          "company_name": "Chalet Hotels Ltd.",
+          "symbol": "CHALET"
+        },
+        {
+          "company_name": "DCM Shriram Ltd.",
+          "symbol": "DCMSHRIRAM"
+        },
+        {
+          "company_name": "Eris Lifesciences Ltd.",
+          "symbol": "ERIS"
+        },
+        {
+          "company_name": "Go Digit General Insurance Ltd.",
+          "symbol": "GODIGIT"
+        },
+        {
+          "company_name": "Indegene Ltd.",
+          "symbol": "INDGN"
+        },
+        {
+          "company_name": "JSW Dulux Ltd.",
+          "symbol": "JSWDULUX"
+        },
+        {
+          "company_name": "Jubilant Pharmova Ltd.",
+          "symbol": "JUBLPHARMA"
+        },
+        {
+          "company_name": "Latent View Analytics Ltd.",
+          "symbol": "LATENTVIEW"
+        },
+        {
+          "company_name": "Leela Palaces Hotels & Resorts Ltd.",
+          "symbol": "THELEELA"
+        },
+        {
+          "company_name": "Newgen Software Technologies Ltd.",
+          "symbol": "NEWGEN"
+        },
+        {
+          "company_name": "Niva Bupa Health Insurance Company Ltd.",
+          "symbol": "NIVABUPA"
+        },
+        {
+          "company_name": "Pfizer Ltd.",
+          "symbol": "PFIZER"
+        },
+        {
+          "company_name": "Sapphire Foods India Ltd.",
+          "symbol": "SAPPHIRE"
+        },
+        {
+          "company_name": "Saregama India Ltd",
+          "symbol": "SAREGAMA"
+        },
+        {
+          "company_name": "SBFC Finance Ltd.",
+          "symbol": "SBFC"
+        },
+        {
+          "company_name": "Sonata Software Ltd.",
+          "symbol": "SONATSOFTW"
+        },
+        {
+          "company_name": "Supreme Petrochem Ltd.",
+          "symbol": "SPLPETRO"
+        },
+        {
+          "company_name": "Travel Food Services Ltd.",
+          "symbol": "TRAVELFOOD"
+        }
+      ],
+      "identity_basis": "OFFICIAL_SYMBOL_PLUS_EFFECTIVE_PERIOD",
+      "included": [
+        {
+          "company_name": "Aether Industries Ltd.",
+          "symbol": "AETHER"
+        },
+        {
+          "company_name": "Avanti Feeds Ltd.",
+          "symbol": "AVANTIFEED"
+        },
+        {
+          "company_name": "Azad Engineering Ltd.",
+          "symbol": "AZAD"
+        },
+        {
+          "company_name": "Bagmane Prime Office REIT",
+          "symbol": "BAGMANE"
+        },
+        {
+          "company_name": "Bharat Coking Coal Ltd.",
+          "symbol": "BHARATCOAL"
+        },
+        {
+          "company_name": "Black Box Ltd.",
+          "symbol": "BBOX"
+        },
+        {
+          "company_name": "Brookfield India Real Estate Trust",
+          "symbol": "BIRET"
+        },
+        {
+          "company_name": "Central Mine Planning & Design Institute Ltd.",
+          "symbol": "CMPDI"
+        },
+        {
+          "company_name": "Clean Max Enviro Energy Solutions Ltd.",
+          "symbol": "CLEANMAX"
+        },
+        {
+          "company_name": "Cupid Ltd.",
+          "symbol": "CUPID"
+        },
+        {
+          "company_name": "Embassy Office Parks REIT",
+          "symbol": "EMBASSY"
+        },
+        {
+          "company_name": "Fractal Analytics Ltd.",
+          "symbol": "FRACTAL"
+        },
+        {
+          "company_name": "INOX India Ltd.",
+          "symbol": "INOXINDIA"
+        },
+        {
+          "company_name": "Kirloskar Brothers Ltd.",
+          "symbol": "KIRLOSBROS"
+        },
+        {
+          "company_name": "KSB Ltd.",
+          "symbol": "KSB"
+        },
+        {
+          "company_name": "MTAR Technologies Ltd.",
+          "symbol": "MTARTECH"
+        },
+        {
+          "company_name": "Privi Speciality Chemicals Ltd.",
+          "symbol": "PRIVISCL"
+        },
+        {
+          "company_name": "Rubicon Research Ltd.",
+          "symbol": "RUBICON"
+        },
+        {
+          "company_name": "Sansera Engineering Ltd.",
+          "symbol": "SANSERA"
+        },
+        {
+          "company_name": "SPR Auto Technologies Ltd.",
+          "symbol": "SHRIPISTON"
+        },
+        {
+          "company_name": "Sterlite Technologies Ltd.",
+          "symbol": "STLTECH"
+        },
+        {
+          "company_name": "TD Power Systems Ltd.",
+          "symbol": "TDPOWERSYS"
+        },
+        {
+          "company_name": "Thangamayil Jewellery Ltd.",
+          "symbol": "THANGAMAYL"
+        },
+        {
+          "company_name": "Vedanta Aluminium Metal Ltd.",
+          "symbol": "VAML"
+        },
+        {
+          "company_name": "Vedanta Iron and Steel Ltd.",
+          "symbol": "VISL"
+        },
+        {
+          "company_name": "Vedanta Oil and Gas Ltd.",
+          "symbol": "VOGL"
+        },
+        {
+          "company_name": "Vedanta Power Ltd.",
+          "symbol": "VEDPOWER"
+        }
+      ],
+      "reason": "SEMIANNUAL_RECONSTITUTION",
+      "scheduled_cycle": "2026-SEPTEMBER",
+      "source_classification": "OFFICIAL_PUBLIC_VERIFIED",
+      "source_sha256": "56a3d162e4aabd8767686010afb01eb8dd21dc089d5cf8995a8a34091eef9bff",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs10082026.pdf"
+    }
+  ],
+  "start_date": "2024-10-01",
+  "status": "PARTIAL_WITH_GAPS",
+  "temporary_index_treatments": [
+    {
+      "classification": "TEMPORARY_INDEX_TREATMENT",
+      "effective_date": "2025-01-06",
+      "event_id": "TEMP-ITC-HOTELS-ADD",
+      "excluded": [],
+      "included": [
+        "DUMMYITC"
+      ],
+      "paired": true,
+      "source_sha256": "ed408284ea6d56b1e21bf1c0a20166b56546440587670b21f56cf57439322229",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs30122024.pdf"
+    },
+    {
+      "classification": "TEMPORARY_INDEX_TREATMENT",
+      "effective_date": "2025-02-10",
+      "event_id": "TEMP-ITC-HOTELS-REMOVE",
+      "excluded": [
+        "ITCHOTELS"
+      ],
+      "included": [],
+      "paired": true,
+      "source_sha256": "60f61a6f41b2aa2f9f769d8fc42c4c090f03ae84b44af62827ea46ccd4d88878",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs06022025_1.pdf"
+    },
+    {
+      "classification": "TEMPORARY_INDEX_TREATMENT",
+      "effective_date": "2025-04-07",
+      "event_id": "TEMP-SIEMENS-ENERGY-ADD",
+      "excluded": [],
+      "gap": "AUTOMATIC_DUMMY_TO_LISTED_ENTITY_EXIT_NOT_BOUND_TO_SEPARATE_OFFICIAL_NOTICE",
+      "included": [
+        "DUMMYSIEMS"
+      ],
+      "paired": false,
+      "source_sha256": "4c3f4315e94ddb8919bb947bd06c858244256f66e39e264b655b0a08f78ab99b",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs02042025.pdf"
+    },
+    {
+      "classification": "TEMPORARY_INDEX_TREATMENT",
+      "effective_date": "2025-05-14",
+      "event_id": "TEMP-RAYMOND-REALTY-ADD",
+      "excluded": [],
+      "included": [
+        "RAYMONDREL"
+      ],
+      "paired": true,
+      "source_sha256": "85caa260fac5d900736c4d001312304e8b9e57794630dd5ad2d962090501b575",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs09052025.pdf"
+    },
+    {
+      "classification": "TEMPORARY_INDEX_TREATMENT",
+      "effective_date": "2025-05-22",
+      "event_id": "TEMP-ABFRL-ADD",
+      "excluded": [],
+      "gap": "AUTOMATIC_DUMMY_TO_LISTED_ENTITY_EXIT_NOT_BOUND_TO_SEPARATE_OFFICIAL_NOTICE",
+      "included": [
+        "DUMMYABFRL"
+      ],
+      "paired": false,
+      "source_sha256": "801f434cfb152028915b491124d60308e6533a9c7f3862f7009d88b5d36dc61a",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs19052025.pdf"
+    },
+    {
+      "classification": "TEMPORARY_INDEX_TREATMENT",
+      "effective_date": "2025-07-10",
+      "event_id": "TEMP-RAYMOND-REALTY-REMOVE",
+      "excluded": [
+        "RAYMONDREL"
+      ],
+      "included": [],
+      "paired": true,
+      "source_sha256": "80eff6b898c415f692ab1312727bab04a952f825cd017c10544830f6f2b9fe52",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs08072025.pdf"
+    },
+    {
+      "classification": "TEMPORARY_INDEX_TREATMENT",
+      "effective_date": "2025-10-14",
+      "event_id": "TEMP-TATA-MOTORS-ADD",
+      "excluded": [],
+      "gap": "DUMMY_TO_TMPV_TMCV_IDENTITY_TRANSITION_NOT_FULLY_PAIRED",
+      "included": [
+        "DUMMYTATAM"
+      ],
+      "paired": false,
+      "source_sha256": "58bafe38fcb153c8ee2794589497b452484b53f3a8c77247d7434368967b2459",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs07102025.pdf"
+    },
+    {
+      "classification": "TEMPORARY_INDEX_TREATMENT",
+      "effective_date": "2025-10-15",
+      "event_id": "TEMP-SKF-ADD",
+      "excluded": [],
+      "included": [
+        "DUMMYSKFIN"
+      ],
+      "paired": true,
+      "source_sha256": "b86c35d2708a761bdc0f5bff35901cad75347dd9a4eba69fe48f59ee4bbccb90",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs10102025.pdf"
+    },
+    {
+      "classification": "TEMPORARY_INDEX_TREATMENT",
+      "effective_date": "2025-12-05",
+      "event_id": "TEMP-KWALITY-ADD",
+      "excluded": [],
+      "included": [
+        "DUMMYHDLVR"
+      ],
+      "paired": true,
+      "source_sha256": "078792ab1f1b61cdcb62c19c8f144143be3c7e7a5fc5ebe5f6834dbee9954200",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs28112025.pdf"
+    },
+    {
+      "classification": "TEMPORARY_INDEX_TREATMENT",
+      "effective_date": "2025-12-15",
+      "event_id": "TEMP-SKF-REMOVE",
+      "excluded": [
+        "SKFINDUS"
+      ],
+      "included": [],
+      "paired": true,
+      "source_sha256": "e506d84fd34deba08a4610bbf1d4c01fb49201f1ec81d4475fbd8d4d68e2e568",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs11122025_1.pdf"
+    },
+    {
+      "classification": "TEMPORARY_INDEX_TREATMENT",
+      "effective_date": "2026-02-24",
+      "event_id": "TEMP-KWALITY-REMOVE",
+      "excluded": [
+        "KWIL"
+      ],
+      "included": [],
+      "paired": true,
+      "source_sha256": "5782871a33c28f33ee64e6ce056d3ee863bc7805b38e42b8c262d92336abf46e",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs20022026_1.pdf"
+    },
+    {
+      "classification": "TEMPORARY_INDEX_TREATMENT",
+      "effective_date": "2026-04-30",
+      "event_id": "TEMP-VEDANTA-ADD",
+      "excluded": [],
+      "gap": "FOUR_DUMMY_TO_LISTED_ENTITY_TRANSITIONS_NOT_FULLY_PAIRED",
+      "included": [
+        "DUMMYVEDL1",
+        "DUMMYVEDL2",
+        "DUMMYVEDL3",
+        "DUMMYVEDL4"
+      ],
+      "paired": false,
+      "source_sha256": "434aa85ef5ed3ff3f59826e2ed029de39f298173a1cdaa737b4989491d045c03",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs23042026.pdf"
+    },
+    {
+      "classification": "TEMPORARY_INDEX_TREATMENT",
+      "effective_date": "2026-06-23",
+      "event_id": "TEMP-VEDANTA-ALUMINIUM-REMOVE",
+      "excluded": [
+        "VAML"
+      ],
+      "gap": "ONLY_ONE_OF_FOUR_RESULTING_ENTITY_EXITS_EXPLICITLY_PAIRED",
+      "included": [],
+      "paired": false,
+      "source_sha256": "e27f1d4502fc367c78a113cf55224742e767327e6d7c2f8c90d899213dd7a874",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs19062026.pdf"
+    },
+    {
+      "classification": "TEMPORARY_INDEX_TREATMENT",
+      "effective_date": "2026-09-07",
+      "event_id": "TEMP-HEG-GRAPHITE-ADD",
+      "excluded": [],
+      "included": [
+        "DUMMYHEG"
+      ],
+      "open_at_window_end": true,
+      "paired": true,
+      "source_sha256": "5086c32763739c50f450a6bbbf0c7fa648ea8ac918b4bb3748e96471c77a211a",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs03092026.pdf"
+    }
+  ],
+  "unresolved_relevant_events": [
+    {
+      "classification": "TEMPORARY_INDEX_TREATMENT",
+      "effective_date": "2025-04-07",
+      "event_id": "TEMP-SIEMENS-ENERGY-ADD",
+      "excluded": [],
+      "gap": "AUTOMATIC_DUMMY_TO_LISTED_ENTITY_EXIT_NOT_BOUND_TO_SEPARATE_OFFICIAL_NOTICE",
+      "included": [
+        "DUMMYSIEMS"
+      ],
+      "paired": false,
+      "source_sha256": "4c3f4315e94ddb8919bb947bd06c858244256f66e39e264b655b0a08f78ab99b",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs02042025.pdf"
+    },
+    {
+      "classification": "TEMPORARY_INDEX_TREATMENT",
+      "effective_date": "2025-05-22",
+      "event_id": "TEMP-ABFRL-ADD",
+      "excluded": [],
+      "gap": "AUTOMATIC_DUMMY_TO_LISTED_ENTITY_EXIT_NOT_BOUND_TO_SEPARATE_OFFICIAL_NOTICE",
+      "included": [
+        "DUMMYABFRL"
+      ],
+      "paired": false,
+      "source_sha256": "801f434cfb152028915b491124d60308e6533a9c7f3862f7009d88b5d36dc61a",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs19052025.pdf"
+    },
+    {
+      "classification": "TEMPORARY_INDEX_TREATMENT",
+      "effective_date": "2025-10-14",
+      "event_id": "TEMP-TATA-MOTORS-ADD",
+      "excluded": [],
+      "gap": "DUMMY_TO_TMPV_TMCV_IDENTITY_TRANSITION_NOT_FULLY_PAIRED",
+      "included": [
+        "DUMMYTATAM"
+      ],
+      "paired": false,
+      "source_sha256": "58bafe38fcb153c8ee2794589497b452484b53f3a8c77247d7434368967b2459",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs07102025.pdf"
+    },
+    {
+      "classification": "TEMPORARY_INDEX_TREATMENT",
+      "effective_date": "2026-04-30",
+      "event_id": "TEMP-VEDANTA-ADD",
+      "excluded": [],
+      "gap": "FOUR_DUMMY_TO_LISTED_ENTITY_TRANSITIONS_NOT_FULLY_PAIRED",
+      "included": [
+        "DUMMYVEDL1",
+        "DUMMYVEDL2",
+        "DUMMYVEDL3",
+        "DUMMYVEDL4"
+      ],
+      "paired": false,
+      "source_sha256": "434aa85ef5ed3ff3f59826e2ed029de39f298173a1cdaa737b4989491d045c03",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs23042026.pdf"
+    },
+    {
+      "classification": "TEMPORARY_INDEX_TREATMENT",
+      "effective_date": "2026-06-23",
+      "event_id": "TEMP-VEDANTA-ALUMINIUM-REMOVE",
+      "excluded": [
+        "VAML"
+      ],
+      "gap": "ONLY_ONE_OF_FOUR_RESULTING_ENTITY_EXITS_EXPLICITLY_PAIRED",
+      "included": [],
+      "paired": false,
+      "source_sha256": "e27f1d4502fc367c78a113cf55224742e767327e6d7c2f8c90d899213dd7a874",
+      "source_url": "https://www.niftyindices.com/Press_Release/ind_prs19062026.pdf"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "archive_base": "https://nsearchives.nseindia.com/content/cm/",
+  "artifact_type": "FREE_RESTRICTED_MARKET_PANEL_MANIFEST_V1",
+  "authority": "SHADOW_ONLY",
+  "file_count": 497,
+  "files_sha256": "f580e399bb358c325b0fc89efc2bece312260384b1875e67c0473108eb7654a6",
+  "mcp_used_for_bulk_panel": false,
+  "model_training_rights": "NOT_ESTABLISHED",
+  "raw_files_committed": false,
+  "source": "NSE_PUBLIC_CM_UDIFF_COMMON_BHAVCOPY_FINAL",
+  "source_endpoint": "https://www.nseindia.com/api/reports",
+  "source_page": "https://www.nseindia.com/resources/historical-reports-capital-market-daily-monthly-archives",
+  "usage_classification": "RESEARCH_ANALYSIS_ALLOWED"
+}

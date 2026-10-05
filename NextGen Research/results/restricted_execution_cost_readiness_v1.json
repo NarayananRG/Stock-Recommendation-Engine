@@ -1,0 +1,12 @@
+{
+  "artifact_type": "RESTRICTED_EXECUTION_COST_READINESS_V1",
+  "authority": "SHADOW_ONLY",
+  "brokerage": "EXTERNALLY_CONFIGURABLE",
+  "complete_verified_end": "2026-10-01",
+  "complete_verified_start": "2024-10-01",
+  "end_date": "2026-10-01",
+  "pre_window_missing_schedules_irrelevant": true,
+  "source_artifact_sha256": "b1e19878452949820f08e753daf1796db7ff8bf3c212c0365f80628eb2b02df2",
+  "start_date": "2024-10-01",
+  "status": "COMPLETE_VERIFIED"
+}
