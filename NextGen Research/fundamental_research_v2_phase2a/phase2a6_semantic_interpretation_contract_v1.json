@@ -1,0 +1,70 @@
+{
+  "artifact_type": "FUNDAMENTAL_RESEARCH_V2_PHASE2A6_SEMANTIC_INTERPRETATION_CONTRACT_V1",
+  "status": "STARTED",
+  "authority": "SHADOW_ONLY",
+  "objective": "Define conservative feature-specific interpretation semantics for the 17,253 PIT-safe derived fundamental events before any deterioration/risk signal is built.",
+  "evidence_boundary": {
+    "derived_event_count": 17253,
+    "pre_pit_candidate_count": 17402,
+    "pit_order_rejection_count": 149,
+    "note": "Distribution review is descriptive only; no market-outcome evidence has yet been used to validate whether any interpretation predicts returns."
+  },
+  "semantic_policies": {
+    "REVENUE": {
+      "policy": "DIRECT_DIRECTIONAL",
+      "allowed_interpretation": "INCREASE => IMPROVEMENT_CANDIDATE; DECREASE => DETERIORATION_CANDIDATE; UNCHANGED => NEUTRAL",
+      "guard": "If either value is non-positive or sign transition is not POSITIVE_TO_POSITIVE, require contextual review instead of directional interpretation."
+    },
+    "PAT": {
+      "policy": "PROFIT_SIGN_AWARE",
+      "allowed_interpretation": "Numeric increase => IMPROVEMENT_CANDIDATE; numeric decrease => DETERIORATION_CANDIDATE; NEGATIVE_TO_POSITIVE and POSITIVE_TO_NEGATIVE are explicit strong sign-transition candidates."
+    },
+    "PBT": {
+      "policy": "PROFIT_SIGN_AWARE",
+      "allowed_interpretation": "Numeric increase => IMPROVEMENT_CANDIDATE; numeric decrease => DETERIORATION_CANDIDATE; NEGATIVE_TO_POSITIVE and POSITIVE_TO_NEGATIVE are explicit strong sign-transition candidates."
+    },
+    "EPS": {
+      "policy": "PROFIT_SIGN_AWARE",
+      "allowed_interpretation": "Numeric increase => IMPROVEMENT_CANDIDATE; numeric decrease => DETERIORATION_CANDIDATE; NEGATIVE_TO_POSITIVE and POSITIVE_TO_NEGATIVE are explicit strong sign-transition candidates."
+    },
+    "OPERATING_CASH_FLOW": {
+      "policy": "CASHFLOW_SIGN_AWARE",
+      "allowed_interpretation": "Same-quarter YoY numeric increase => IMPROVEMENT_CANDIDATE; decrease => DETERIORATION_CANDIDATE; sign crossings are explicit strong candidates.",
+      "guard": "Only YOY_SAME_QUARTER_ONLY comparisons are permitted."
+    },
+    "FINANCE_COST": {
+      "policy": "INVERSE_DIRECTIONAL_WITH_SIGN_GUARD",
+      "allowed_interpretation": "When both values are positive, INCREASE => DETERIORATION_CANDIDATE and DECREASE => IMPROVEMENT_CANDIDATE.",
+      "guard": "Any zero/negative value or sign transition requires contextual review because reversals/reclassifications can invalidate simple inverse semantics."
+    },
+    "TAX": {
+      "policy": "CONTEXT_ONLY",
+      "reason": "Higher or lower tax can reflect profit level, effective tax rate, deferred tax, one-offs, or jurisdiction mix; direction alone is not a reliable deterioration semantic."
+    },
+    "DEPRECIATION": {
+      "policy": "CONTEXT_ONLY",
+      "reason": "Higher or lower depreciation can reflect capital intensity, new assets, useful-life changes, or disposals; direction alone is not reliably good or bad."
+    },
+    "CASH_AND_EQUIVALENTS": {
+      "policy": "CONTEXT_ONLY",
+      "reason": "Cash changes can reflect investment, distributions, financing, acquisitions, working capital, or operating stress; direction alone is not reliably good or bad."
+    },
+    "TOTAL_ASSETS": {
+      "policy": "CONTEXT_ONLY",
+      "reason": "Asset growth or shrinkage can arise from expansion, divestment, impairment, acquisitions, or balance-sheet structure; direction alone is not reliably good or bad."
+    },
+    "DEBT_EQUITY_RATIO": {
+      "policy": "EXCLUDED",
+      "reason": "No usable coverage in the frozen mapping."
+    }
+  },
+  "non_signal_rules": [
+    "IMPROVEMENT_CANDIDATE and DETERIORATION_CANDIDATE are semantic candidates only, not trading signals.",
+    "No feature weights, composite scores, thresholds, vetoes, rank changes, or portfolio actions are created in Phase 2A.6.",
+    "No market-return outcome is used in this run.",
+    "No model fitting, optimization, or production promotion."
+  ],
+  "next_gate": "PHASE2A6_SEMANTIC_COVERAGE_AUDIT_PASS",
+  "production_model_changed": false,
+  "model_training_started": false
+}
