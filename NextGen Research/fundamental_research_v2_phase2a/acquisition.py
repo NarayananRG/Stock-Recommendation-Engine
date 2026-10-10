@@ -68,19 +68,64 @@ def _pick(row: dict, *keys: str):
 
 
 def map_nse_row(row: dict) -> dict:
-    """Map documented/current NSE API field variants to the Phase 2A contract."""
+    """Map the observed NSE Integrated Filing API fields to the Phase 2A contract.
+
+    Live inspection on 2026-10-01 observed: seq_Id, symbol, smName, qe_Date,
+    consolidated, type_Sub, xbrl, xbrlFileSize, ixbrl, broadcast_Date,
+    creation_Date, revised_Date and revision_Remark. Older/generic aliases are
+    retained only as compatibility fallbacks.
+    """
+    broadcast = _pick(
+        row,
+        "broadcast_Date",
+        "broadcastDate",
+        "broadCastDate",
+        "broadcast_dttm",
+        "broadcastDateTime",
+        "BROADCAST DATE/TIME",
+    )
+    creation = _pick(row, "creation_Date", "creationDate", "creation_ts")
     return {
         "Symbol": _pick(row, "symbol", "Symbol"),
-        "Company Name": _pick(row, "companyName", "company_Name", "Company Name"),
+        "Company Name": _pick(row, "smName", "companyName", "company_Name", "Company Name"),
         "Quarter End Date": _pick(row, "qe_Date", "quarterEndDate", "Quarter End Date"),
         "Type of Submission": _pick(row, "type_Sub", "typeOfSubmission", "Type of Submission"),
         "Audited / Unaudited": _pick(row, "audited", "Audited / Unaudited"),
-        "CONSOLIDATED / Standalone": _pick(row, "consolidated", "Consolidated / Standalone", "CONSOLIDATED / Standalone"),
-        "BROADCAST DATE/TIME": _pick(row, "broadcastDate", "broadcast_dttm", "broadcastDateTime", "BROADCAST DATE/TIME"),
-        "Revised DATE/TIME": _pick(row, "revisedDate", "revised_dttm", "revisedDateTime", "Revised DATE/TIME"),
-        "Revision Remarks": _pick(row, "revisionRemarks", "remarks", "Revision Remarks"),
-        "IND AS/ NON IND AS": _pick(row, "accountingStandard", "indAs", "IND AS/ NON IND AS"),
+        "CONSOLIDATED / Standalone": _pick(
+            row,
+            "consolidated",
+            "Consolidated / Standalone",
+            "CONSOLIDATED / Standalone",
+        ),
+        # broadcast_Date is the primary official table timestamp. creation_Date
+        # is retained only as a fallback when NSE omits broadcast_Date.
+        "BROADCAST DATE/TIME": broadcast or creation,
+        "Creation DATE/TIME": creation,
+        "Revised DATE/TIME": _pick(
+            row,
+            "revised_Date",
+            "revisedDate",
+            "revised_dttm",
+            "revisedDateTime",
+            "Revised DATE/TIME",
+        ),
+        "Revision Remarks": _pick(
+            row,
+            "revision_Remark",
+            "revisionRemarks",
+            "remarks",
+            "Revision Remarks",
+        ),
+        "IND AS/ NON IND AS": _pick(
+            row,
+            "accountingStandard",
+            "indAs",
+            "ind_As",
+            "IND AS/ NON IND AS",
+        ),
+        "seq_id": _pick(row, "seq_Id", "seqId", "seqNumber"),
         "xbrl": _pick(row, "xbrl", "XBRL"),
+        "ixbrl": _pick(row, "ixbrl", "iXBRL"),
         "details": _pick(row, "details", "fileName", "Details"),
     }
 
@@ -93,7 +138,10 @@ def normalize_response(payload: object, *, source_url: str = NSE_INTEGRATED_API)
         mapped = map_nse_row(raw)
         try:
             event = build_filing_event(mapped, source_url=source_url, source_sha256=source_sha, source_exchange="NSE")
+            event["provider_seq_id"] = mapped.get("seq_id")
+            event["creation_ts"] = mapped.get("Creation DATE/TIME")
             event["xbrl_url"] = mapped.get("xbrl")
+            event["ixbrl_url"] = mapped.get("ixbrl")
             event["details_url"] = mapped.get("details")
             events.append(event)
         except Exception as exc:
