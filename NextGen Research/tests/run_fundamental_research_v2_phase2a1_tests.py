@@ -7,6 +7,7 @@ REPO = Path(__file__).resolve().parents[2]
 ROOT = REPO / "NextGen Research"
 sys.path.insert(0, str(ROOT))
 
+from fundamental_research_v2_phase2a.core import effective_availability_ts, rebind_event_availability  # noqa: E402
 from fundamental_research_v2_phase2a.validation import validate_pit_events  # noqa: E402
 
 from fundamental_research_v2_phase2a.acquisition import (  # noqa: E402
@@ -70,6 +71,22 @@ case('NORMALIZE','target quarter normalized',lambda: require(N['events'][0]['qua
 case('NORMALIZE','publication timestamp preserved',lambda: require(N['events'][0]['publication_ts'].startswith('2026-07-18T16:01:12')))
 case('NORMALIZE','creation timestamp normalized',lambda: require(N['events'][0]['creation_ts'].startswith('2026-07-18T16:01:13')))
 case('NORMALIZE','availability uses dissemination timestamp',lambda: require(N['events'][0]['availability_ts']==N['events'][0]['creation_ts']))
+
+creation_before_broadcast=dict(sample_row)
+creation_before_broadcast['broadcast_Date']='22-Apr-2025 20:04:55'
+creation_before_broadcast['creation_Date']='22-Apr-2025 19:45:19'
+creation_before_broadcast['qe_Date']='31-MAR-2025'
+CB=normalize_response({'data':[creation_before_broadcast]})
+case('NORMALIZE','availability uses later broadcast when creation is earlier',lambda: require(
+    CB['events'][0]['availability_ts']==CB['events'][0]['broadcast_ts']
+))
+case('VALIDATE','creation-before-broadcast is warning not failure',lambda: require(
+    validate_pit_events(CB['events'], required_symbols=['HDFCBANK'], require_all_target_quarters=False)['status']=='PASS'
+))
+case('VALIDATE','creation-before-broadcast warning preserved',lambda: require(
+    any(x['code']=='ORIGINAL_TIMESTAMP_ORDER_DISAGREEMENT'
+        for x in validate_pit_events(CB['events'], required_symbols=['HDFCBANK'], require_all_target_quarters=False)['warnings'])
+))
 case('NORMALIZE','provider seq survives',lambda: require(N['events'][0]['provider_seq_id']=='12345'))
 case('FILTER','target retained',lambda: require(len(target_quarter_filter(N['events']))==1))
 
@@ -99,6 +116,16 @@ case('VALIDATE','original plus later revision passes',lambda: require(
     validate_pit_events(PAIR, required_symbols=['HDFCBANK'], require_all_target_quarters=False)['status']=='PASS'
 ))
 
+weird_revision=dict(sample_row)
+weird_revision['type_Sub']='Revision'
+weird_revision['broadcast_Date']=None
+weird_revision['revised_Date']='18-Jul-2026 15:55:00'
+weird_revision['creation_Date']='18-Jul-2026 16:01:20'
+WR=normalize_response({'data':[weird_revision]})
+case('VALIDATE','revision raw revised time may precede original if availability is later',lambda: require(
+    validate_pit_events(N['events']+WR['events'], required_symbols=['HDFCBANK'], require_all_target_quarters=False)['status']=='PASS'
+))
+
 late_old = dict(N['events'][0])
 late_old['event_id'] = 'late-old-quarter'
 late_old['quarter_end'] = '2025-03-31'
@@ -123,6 +150,17 @@ LATE=validate_pit_events(
 case('VALIDATE','late older-quarter filing is warning not failure',lambda: require(LATE['status']=='PASS'))
 case('VALIDATE','late older-quarter filing warning preserved',lambda: require(
     any(x['code']=='LATE_OR_OUT_OF_ORDER_ORIGINAL_FILING' for x in LATE['warnings'])
+))
+
+stale=dict(CB['events'][0])
+stale['availability_ts']=stale['creation_ts']
+old_id=stale['event_id']
+rebound=rebind_event_availability(stale)
+case('REBIND','cached availability repaired conservatively',lambda: require(
+    rebound['availability_ts']==effective_availability_ts(rebound)==rebound['broadcast_ts']
+))
+case('REBIND','event identity changes when derived availability changes',lambda: require(
+    rebound['event_id']!=old_id
 ))
 
 bad_revision=dict(sample_row)
