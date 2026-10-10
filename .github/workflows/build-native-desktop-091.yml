@@ -95,6 +95,33 @@ jobs:
         run: |
           New-Item -ItemType Directory -Force -Path "native-desktop-0.9.1\resources" | Out-Null
           Compress-Archive -Path "$env:SRE_ENGINE_ROOT\*" -DestinationPath "native-desktop-0.9.1\resources\SRE091_ENGINE_SOURCE.zip" -Force
+          $iconDir = "native-desktop-0.9.1\src-tauri\icons"
+          New-Item -ItemType Directory -Force -Path $iconDir | Out-Null
+          @'
+import struct, zlib, binascii
+from pathlib import Path
+w = h = 64
+pixels = bytearray()
+for y in range(h):
+    pixels.append(0)
+    for x in range(w):
+        if 8 <= x <= 55 and 8 <= y <= 55:
+            r,g,b,a = (16,29,52,255)
+        else:
+            r,g,b,a = (9,16,30,255)
+        if (x,y) in {(14,45),(25,34),(34,39),(45,24),(54,16)}:
+            r,g,b,a = (54,211,153,255)
+        pixels.extend((r,g,b,a))
+def chunk(kind, data):
+    return struct.pack(">I", len(data)) + kind + data + struct.pack(">I", binascii.crc32(kind + data) & 0xffffffff)
+png = b"\x89PNG\r\n\x1a\n"
+png += chunk(b"IHDR", struct.pack(">IIBBBBB", w,h,8,6,0,0,0))
+png += chunk(b"IDAT", zlib.compress(bytes(pixels), 9))
+png += chunk(b"IEND", b"")
+header = struct.pack("<HHH", 0,1,1)
+entry = struct.pack("<BBBBHHII", w,h,0,0,1,32,len(png),22)
+Path(r"native-desktop-0.9.1\src-tauri\icons\icon.ico").write_bytes(header + entry + png)
+'@ | python -
           $p = "native-desktop-0.9.1\src-tauri\tauri.conf.json"
           $c = Get-Content $p -Raw | ConvertFrom-Json
           $c.bundle.targets = @("nsis")
