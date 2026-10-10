@@ -126,7 +126,9 @@ def _compact(row: dict) -> dict:
 
 
 def resolve_feature(document: dict, *, feature: str) -> dict:
-    domain = classify_domain(document.get("source_url"))
+    domain = classify_domain(
+        document.get("domain_source_url") or document.get("source_url")
+    )
     rules = DOMAIN_RULES.get(domain, {})
     priority = rules.get(feature)
     if not priority:
