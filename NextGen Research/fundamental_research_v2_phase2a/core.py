@@ -152,6 +152,10 @@ def build_filing_event(row: dict, *, source_url: str, source_sha256: str, source
         _first(row, "Revised DATE/TIME", "Revised Date/Time", "revised_ts"),
         "revised_ts",
     )
+    creation_ts = _parse_ts(
+        _first(row, "Creation DATE/TIME", "Creation Date/Time", "creation_ts"),
+        "creation_ts",
+    )
     if submission == "ORIGINAL":
         if broadcast_ts is None:
             raise ValueError("ORIGINAL_BROADCAST_TIMESTAMP_REQUIRED")
@@ -160,6 +164,11 @@ def build_filing_event(row: dict, *, source_url: str, source_sha256: str, source
         if revised_ts is None:
             raise ValueError("REVISION_TIMESTAMP_REQUIRED")
         publication_ts = revised_ts
+
+    # NSE creation_Date is the exchange dissemination/creation time and is
+    # normally a few seconds after broadcast_Date/revised_Date. For PIT
+    # availability, prefer that later public-facing timestamp when present.
+    availability_ts = creation_ts or publication_ts
 
     if datetime.fromisoformat(publication_ts).date() < date.fromisoformat(quarter_end):
         raise ValueError("PUBLICATION_PRECEDES_QUARTER_END")
@@ -175,7 +184,9 @@ def build_filing_event(row: dict, *, source_url: str, source_sha256: str, source
         "accounting_family": _accounting_family(_first(row, "IND AS/ NON IND AS", "Accounting Standard", "accounting_family")),
         "broadcast_ts": broadcast_ts,
         "revised_ts": revised_ts,
+        "creation_ts": creation_ts,
         "publication_ts": publication_ts,
+        "availability_ts": availability_ts,
         "revision_remarks": (_first(row, "Revision Remarks", "revision_remarks") or "").strip() or None,
         "source_exchange": exchange,
         "source_url": source_url,
@@ -184,7 +195,7 @@ def build_filing_event(row: dict, *, source_url: str, source_sha256: str, source
     }
     event["event_id"] = canonical_hash({k: event[k] for k in (
         "symbol", "quarter_end", "submission_type", "reporting_basis",
-        "publication_ts", "source_exchange", "source_sha256",
+        "publication_ts", "availability_ts", "source_exchange", "source_sha256",
     )})
     return event
 
@@ -229,15 +240,23 @@ def select_latest_available_filing(
             continue
         if basis and normalize_basis(item["reporting_basis"]) != basis:
             continue
-        if _dt(item["publication_ts"]) <= cutoff:
+        available_at = item.get("availability_ts") or item["publication_ts"]
+        if _dt(available_at) <= cutoff:
             eligible.append(item)
     if not eligible:
         return None
-    return max(eligible, key=lambda x: (x["quarter_end"], _dt(x["publication_ts"]), x.get("event_id", "")))
+    return max(
+        eligible,
+        key=lambda x: (
+            x["quarter_end"],
+            _dt(x.get("availability_ts") or x["publication_ts"]),
+            x.get("event_id", ""),
+        ),
+    )
 
 
 def first_decision_after_publication(event: dict, decision_timestamps: Sequence[str]) -> str | None:
-    publication = _dt(event["publication_ts"])
+    publication = _dt(event.get("availability_ts") or event["publication_ts"])
     later = sorted(_dt(x) for x in decision_timestamps if _dt(x) > publication)
     return later[0].isoformat() if later else None
 
