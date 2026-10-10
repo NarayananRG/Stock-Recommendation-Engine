@@ -18,9 +18,12 @@ Validation:
 - Source-only package without those Windows junctions naturally fails the single protected-surface existence assertion; this is environmental, not an app-code regression.
 
 ZIP SHA-256:
-`4c99dc4b1dfcbec022f436635dc8789c3e07018d57b4ef728caa8c61873f4fac`
+`1a4179dc4fa99b512ab35edcb34511c2c080439baab12334c161668e2e9b0fe5`
 
 Run EXTRACT_SOURCE.ps1 to reconstruct the exact source ZIP.
 
 
 Windows build fix (10-Oct-2026): updated stale 0.8.2 version assertions and hardened SQLite backup retention against transient WinError 32 file locks. Production scoring/ranking remains unchanged.
+
+
+Windows SQLite close fix V2 (10-Oct-2026): explicitly closes backup validation/source/destination SQLite connections before retention pruning; deterministic filename ordering avoids mtime ties. This fixes the persistent WinError 32 build-test failure without changing scoring/ranking/model logic.
