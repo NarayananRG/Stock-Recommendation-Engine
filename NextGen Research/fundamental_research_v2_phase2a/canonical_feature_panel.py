@@ -35,7 +35,7 @@ def numeric_or_none(value):
     if value in (None, ""):
         return None
     try:
-        return str(Decimal(str(value)).normalize())
+        return format(Decimal(str(value)), "f")
     except InvalidOperation:
         return None
 
