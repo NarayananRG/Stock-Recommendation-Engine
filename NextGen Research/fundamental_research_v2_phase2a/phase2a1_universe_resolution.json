@@ -1,0 +1,9 @@
+{
+  "artifact_type": "FUNDAMENTAL_RESEARCH_V2_PHASE2A1_UNIVERSE_RESOLUTION_V1",
+  "status": "SOURCE_RESULTS_PACKAGE_DOES_NOT_CONTAIN_FULL_SYMBOL_LIST",
+  "audited_symbol_count": 187,
+  "named_identity_issues": ["M&M", "MANDM", "IRCTC", "NESTLEIND", "PATANJALI"],
+  "policy": "DO_NOT_SUBSTITUTE_CURRENT_INDEX_MEMBERS_FOR_THE_AUDITED_UNIVERSE",
+  "safe_next_action": "Acquire target-quarter integrated filing metadata globally from official NSE and defer intersection until the original 187-symbol identity list is recovered from the upstream normalized dataset.",
+  "authority": "SHADOW_ONLY"
+}
