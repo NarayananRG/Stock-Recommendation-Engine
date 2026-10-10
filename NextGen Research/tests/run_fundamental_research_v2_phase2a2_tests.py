@@ -9,6 +9,7 @@ sys.path.insert(0, str(ROOT))
 
 from fundamental_research_v2_phase2a.xbrl_extraction import (  # noqa: E402
     latest_events_by_group,
+    parse_ixbrl_document,
     parse_xbrl_document,
     sha256_bytes,
 )
@@ -61,6 +62,42 @@ case('PARSE','revenue concept preserved',lambda: require(
 ))
 case('PARSE','context period preserved',lambda: require(P['contexts'][0]['end_date']=='2026-06-30'))
 case('PARSE','availability preserved',lambda: require(P['availability_ts']=='2026-07-20T10:00:02+05:30'))
+
+
+IXBRL=b'''<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+ xmlns:ix="http://www.xbrl.org/2013/inlineXBRL"
+ xmlns:xbrli="http://www.xbrl.org/2003/instance"
+ xmlns:iso4217="http://www.xbrl.org/2003/iso4217"
+ xmlns:in="https://example.test/indas">
+ <body>
+  <ix:resources>
+   <xbrli:context id="D2026">
+    <xbrli:entity><xbrli:identifier scheme="TEST">ABC</xbrli:identifier></xbrli:entity>
+    <xbrli:period><xbrli:startDate>2026-04-01</xbrli:startDate><xbrli:endDate>2026-06-30</xbrli:endDate></xbrli:period>
+   </xbrli:context>
+   <xbrli:unit id="INR"><xbrli:measure>iso4217:INR</xbrli:measure></xbrli:unit>
+  </ix:resources>
+  <div>
+   <ix:nonFraction name="in:RevenueFromOperations" contextRef="D2026" unitRef="INR" decimals="-6">123456000</ix:nonFraction>
+   <ix:nonFraction name="in:ProfitLossForPeriod" contextRef="D2026" unitRef="INR" decimals="-6">23456000</ix:nonFraction>
+  </div>
+ </body>
+</html>'''
+IX_EVENT=dict(EVENT)
+IX_EVENT['ixbrl_url']='https://nsearchives.nseindia.com/corporate/ixbrl/test.xhtml'
+IX=parse_ixbrl_document(IXBRL,source_url=IX_EVENT['ixbrl_url'],source_event=IX_EVENT)
+case('IXBRL','same event identity preserved',lambda: require(IX['source_event_id']=='evt1'))
+case('IXBRL','source representation tagged',lambda: require(IX['source_document_kind']=='IXBRL'))
+case('IXBRL','contexts parsed',lambda: require(IX['context_count']==1))
+case('IXBRL','units parsed',lambda: require(IX['unit_count']==1))
+case('IXBRL','inline numeric facts parsed',lambda: require(IX['numeric_fact_count']==2))
+case('IXBRL','inline revenue concept resolved',lambda: require(
+    any(x['concept_local_name']=='RevenueFromOperations' for x in IX['numeric_facts'])
+))
+case('IXBRL','inline concept namespace resolved',lambda: require(
+    any(x['concept_namespace']=='https://example.test/indas' for x in IX['numeric_facts'])
+))
 
 OLD=dict(EVENT)
 OLD['event_id']='old'
