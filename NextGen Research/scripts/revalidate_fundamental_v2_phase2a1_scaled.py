@@ -8,7 +8,7 @@ REPO = Path(__file__).resolve().parents[2]
 ROOT = REPO / "NextGen Research"
 sys.path.insert(0, str(ROOT))
 
-from fundamental_research_v2_phase2a.core import coverage_audit  # noqa: E402
+from fundamental_research_v2_phase2a.core import coverage_audit, rebind_event_availability  # noqa: E402
 from fundamental_research_v2_phase2a.validation import validate_pit_events  # noqa: E402
 
 UNIVERSE = ROOT / "fundamental_research_v2_phase2a" / "phase2a1_universe_resolution.json"
@@ -28,6 +28,11 @@ def main() -> int:
     events = json.loads(EVENTS.read_text(encoding="utf-8"))
     if not isinstance(events, list):
         raise RuntimeError("SCALED_EVENTS_NOT_LIST")
+
+    events = [rebind_event_availability(x) for x in events]
+    EVENTS.write_text(
+        json.dumps(events, indent=2, sort_keys=True), encoding="utf-8"
+    )
 
     validation = validate_pit_events(
         events,
@@ -57,6 +62,7 @@ def main() -> int:
     print(json.dumps({
         "artifact_type": "FUNDAMENTAL_RESEARCH_V2_PHASE2A1_SCALED_REVALIDATION_V1",
         "event_count": len(events),
+        "cached_events_rebound": True,
         "target_symbol_count": len(symbols),
         "validation_status": validation["status"],
         "failure_count": validation["failure_count"],
