@@ -163,3 +163,46 @@ def acquire_symbol(
         "target_events": target,
         "authority": AUTHORITY,
     }
+
+
+def acquire_marketwide(
+    *, fetch_json: Callable[[str, dict, dict], object],
+    page_size: int = 500,
+    max_pages: int = 100,
+) -> dict:
+    """Acquire market-wide Integrated Filing metadata before audited-universe intersection."""
+    if max_pages < 1:
+        raise ValueError("INVALID_MAX_PAGES")
+    pages, events, rejected = [], [], 0
+    for page in range(1, max_pages + 1):
+        params = build_query(page=page, size=page_size)
+        payload = fetch_json(
+            NSE_INTEGRATED_API,
+            params,
+            {"Referer": NSE_LANDING_URL, "Accept": "application/json,text/plain,*/*"},
+        )
+        normalized = normalize_response(payload)
+        pages.append({
+            "page": page,
+            "raw_payload_sha256": normalized["raw_payload_sha256"],
+            "raw_row_count": normalized["raw_row_count"],
+            "rejected_row_count": normalized["rejected_row_count"],
+        })
+        rejected += normalized["rejected_row_count"]
+        events.extend(normalized["events"])
+        if normalized["raw_row_count"] < page_size:
+            break
+    else:
+        raise ValueError("MAX_PAGE_LIMIT_REACHED")
+    target = target_quarter_filter(events)
+    return {
+        "artifact_type": "FUNDAMENTAL_PHASE2A1_MARKETWIDE_ACQUISITION_V1",
+        "page_count": len(pages),
+        "pages": pages,
+        "all_event_count": len(events),
+        "target_event_count": len(target),
+        "target_events": target,
+        "rejected_row_count": rejected,
+        "audited_universe_intersection_performed": False,
+        "authority": AUTHORITY,
+    }
