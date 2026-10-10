@@ -43,11 +43,14 @@ jobs:
           [IO.File]::WriteAllBytes($zip, [Convert]::FromBase64String($joined))
           $hash = (Get-FileHash $zip -Algorithm SHA256).Hash.ToLowerInvariant()
           if ($hash -ne "915425e7027fd6145298e3e467b678e6f5998a895d85c4c18a9cfec033df7edc") { throw "Canonical source hash mismatch: $hash" }
-          $engine = "$env:RUNNER_TEMP\engine-src"
-          New-Item -ItemType Directory -Force -Path $engine | Out-Null
-          Expand-Archive -LiteralPath $zip -DestinationPath $engine -Force
+          $extract = "$env:RUNNER_TEMP\engine-extract"
+          New-Item -ItemType Directory -Force -Path $extract | Out-Null
+          Expand-Archive -LiteralPath $zip -DestinationPath $extract -Force
+          $engine = Join-Path $extract "StockRecommendationEngine_0.8.5_ultra_ui_TEST_SOURCE"
+          if (!(Test-Path "$engine\requirements-v1.txt")) { throw "Canonical engine root missing" }
           Copy-Item "native-desktop-0.9.1\engine-overlay\*" $engine -Recurse -Force
           if (!(Test-Path "$engine\run_modern_ui.py")) { throw "Engine overlay failed" }
+          "SRE_ENGINE_ROOT=$engine" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -57,8 +60,8 @@ jobs:
       - name: Build bundled local engine
         shell: pwsh
         run: |
-          $engine = "$env:RUNNER_TEMP\engine-src"
-          python -m pip install --disable-pip-version-check -r "$engine\requirements-v1.txt" -r "$engine\requirements-modern-ui.txt" pyinstaller==6.16.0 matplotlib==3.10.8
+          $engine = "$env:SRE_ENGINE_ROOT"
+          python -m pip install --disable-pip-version-check -r "$engine\requirements-v1.txt" fastapi==0.128.2 uvicorn==0.48.0 pyinstaller==6.16.0 matplotlib==3.10.8
           Push-Location $engine
           pyinstaller --noconfirm --clean --onefile --noconsole --name sre_engine `
             --add-data "modern_ui\frontend;modern_ui\frontend" `
@@ -76,7 +79,7 @@ jobs:
         shell: pwsh
         run: |
           $engineExe = Resolve-Path "native-desktop-0.9.1\binaries\sre_engine.exe"
-          $repo = "$env:RUNNER_TEMP\engine-src"
+          $repo = "$env:SRE_ENGINE_ROOT"
           $data = "$env:RUNNER_TEMP\sre-appdata"
           $env:STOCK_MODERN_UI_PREVIEW = "1"
           $p = Start-Process -FilePath $engineExe -ArgumentList "--no-browser --host 127.0.0.1 --port 18765 --repo-root `"$repo`" --app-data-dir `"$data`"" -PassThru
@@ -103,7 +106,7 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path "native-desktop-0.9.1\resources" | Out-Null
-          Compress-Archive -Path "$env:RUNNER_TEMP\engine-src" -DestinationPath "native-desktop-0.9.1\resources\SRE091_ENGINE_SOURCE.zip" -Force
+          Compress-Archive -Path "$env:SRE_ENGINE_ROOT\*" -DestinationPath "native-desktop-0.9.1\resources\SRE091_ENGINE_SOURCE.zip" -Force
 
       - name: Restrict output to one NSIS installer
         shell: pwsh
