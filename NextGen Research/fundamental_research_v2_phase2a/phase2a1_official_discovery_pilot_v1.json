@@ -1,0 +1,171 @@
+{
+  "artifact_type": "FUNDAMENTAL_RESEARCH_V2_PHASE2A1_OFFICIAL_DISCOVERY_PILOT_V1",
+  "status": "OFFICIAL_FILING_DISCOVERY_CONFIRMED_PIT_TIMESTAMPS_PENDING",
+  "pilot_symbols": [
+    "M&M",
+    "IRCTC",
+    "NESTLEIND",
+    "PATANJALI"
+  ],
+  "target_quarters": [
+    "2025-03-31",
+    "2025-06-30",
+    "2025-09-30",
+    "2025-12-31",
+    "2026-03-31",
+    "2026-06-30"
+  ],
+  "purpose": "Prove official current-filing discoverability and basis continuity before scaled PIT acquisition. Search/index discovery is not used as historical availability time.",
+  "records": [
+    {
+      "symbol": "M&M",
+      "quarter_end": "2025-03-31",
+      "status": "NSE_XBRL_DIRECT",
+      "filings": [
+        {
+          "basis": "CONSOLIDATED",
+          "audited": true,
+          "url": "https://nsearchives.nseindia.com/corporate/ixbrl/INTEGRATED_FILING_INDAS_89282_05052025144840_iXBRL_WEB.html"
+        },
+        {
+          "basis": "STANDALONE",
+          "audited": true,
+          "url": "https://nsearchives.nseindia.com/corporate/ixbrl/INTEGRATED_FILING_INDAS_89281_05052025144751_iXBRL_WEB.html"
+        }
+      ],
+      "board_approval_date": "2025-05-05"
+    },
+    {
+      "symbol": "M&M",
+      "quarter_end": "2025-06-30",
+      "status": "NSE_XBRL_DIRECT",
+      "filings": [
+        {
+          "basis": "STANDALONE",
+          "audited": false,
+          "url": "https://nsearchives.nseindia.com/corporate/ixbrl/INTEGRATED_FILING_INDAS_107576_30072025215254_iXBRL_WEB.html"
+        },
+        {
+          "basis": "CONSOLIDATED",
+          "audited": false,
+          "url": "https://nsearchives.nseindia.com/corporate/ixbrl/INTEGRATED_FILING_INDAS_107577_30072025215744_iXBRL_WEB.html"
+        }
+      ],
+      "board_approval_date": "2025-07-30"
+    },
+    {
+      "symbol": "IRCTC",
+      "quarter_end": "2025-03-31",
+      "status": "NSE_XBRL_DIRECT",
+      "filings": [
+        {
+          "basis": "STANDALONE",
+          "audited": true,
+          "url": "https://nsearchives.nseindia.com/corporate/ixbrl/INTEGRATED_FILING_INDAS_95252_28052025212632_iXBRL_WEB.html"
+        },
+        {
+          "basis": "CONSOLIDATED",
+          "audited": true,
+          "url": "https://nsearchives.nseindia.com/corporate/ixbrl/INTEGRATED_FILING_INDAS_95257_28052025212833_iXBRL_WEB.html"
+        }
+      ],
+      "board_approval_date": "2025-05-28"
+    },
+    {
+      "symbol": "IRCTC",
+      "quarter_end": "2025-06-30",
+      "status": "NSE_XBRL_DIRECT",
+      "filings": [
+        {
+          "basis": "STANDALONE",
+          "audited": false,
+          "url": "https://nsearchives.nseindia.com/corporate/ixbrl/INTEGRATED_FILING_INDAS_111196_13082025193321_iXBRL_WEB.html"
+        },
+        {
+          "basis": "CONSOLIDATED",
+          "audited": false,
+          "url": "https://nsearchives.nseindia.com/corporate/ixbrl/INTEGRATED_FILING_INDAS_111198_13082025193741_iXBRL_WEB.html"
+        }
+      ],
+      "board_approval_date": "2025-08-13"
+    },
+    {
+      "symbol": "NESTLEIND",
+      "quarter_end": "2025-03-31",
+      "status": "NSE_XBRL_DIRECT",
+      "filings": [
+        {
+          "basis": "STANDALONE",
+          "audited": true,
+          "url": "https://nsearchives.nseindia.com/corporate/ixbrl/INTEGRATED_FILING_INDAS_86607_24042025185040_iXBRL_WEB.html"
+        }
+      ],
+      "board_approval_date": "2025-04-24",
+      "note": "Consolidated counterpart not required to infer existence; basis selection remains explicit."
+    },
+    {
+      "symbol": "NESTLEIND",
+      "quarter_end": "2025-06-30",
+      "status": "NSE_XBRL_DIRECT",
+      "filings": [
+        {
+          "basis": "STANDALONE",
+          "audited": false,
+          "url": "https://nsearchives.nseindia.com/corporate/ixbrl/INTEGRATED_FILING_INDAS_105328_24072025184107_iXBRL_WEB.html"
+        },
+        {
+          "basis": "CONSOLIDATED",
+          "audited": false,
+          "url": "https://nsearchives.nseindia.com/corporate/ixbrl/INTEGRATED_FILING_INDAS_105329_24072025184238_iXBRL_WEB.html"
+        }
+      ],
+      "board_approval_date": "2025-07-24"
+    },
+    {
+      "symbol": "PATANJALI",
+      "quarter_end": "2025-03-31",
+      "status": "NSE_XBRL_DIRECT",
+      "filings": [
+        {
+          "basis": "STANDALONE",
+          "audited": true,
+          "url": "https://nsearchives.nseindia.com/corporate/ixbrl/INTEGRATED_FILING_INDAS_91199_15052025204418_iXBRL_WEB.html"
+        },
+        {
+          "basis": "CONSOLIDATED",
+          "audited": true,
+          "url": "https://nsearchives.nseindia.com/corporate/ixbrl/INTEGRATED_FILING_INDAS_91200_15052025204449_iXBRL_WEB.html"
+        }
+      ],
+      "board_approval_date": "2025-05-15"
+    }
+  ],
+  "company_ir_continuity_evidence": {
+    "symbol": "PATANJALI",
+    "url": "https://www.patanjalifoods.com/quarterly-report/",
+    "listed_target_quarters": [
+      "2025-03-31",
+      "2025-06-30",
+      "2025-09-30",
+      "2025-12-31",
+      "2026-03-31",
+      "2026-06-30"
+    ],
+    "use": "EXISTENCE_AND_FALLBACK_DISCOVERY_ONLY",
+    "pit_timestamp_authority": false
+  },
+  "unresolved": {
+    "exact_broadcast_timestamp": "REQUIRED_FROM_OFFICIAL_EXCHANGE_FEED",
+    "exact_revision_timestamp": "REQUIRED_FROM_OFFICIAL_EXCHANGE_FEED",
+    "remaining_direct_archive_discovery": "NON_BLOCKING_FOR_PILOT; SEARCH_INDEX_VISIBILITY_IS_NOT_COVERAGE",
+    "scaled_186_symbol_run": "PENDING_NETWORKED_COLLECTOR"
+  },
+  "hard_rules": [
+    "Do not infer publication time from XBRL filename timestamp.",
+    "Do not substitute board approval date for exchange broadcast time.",
+    "Do not interpret search-engine absence as missing filing.",
+    "Do not use company IR publication date as PIT exchange availability when exchange timestamp is available.",
+    "No model training or promotion from this discovery artifact."
+  ],
+  "authority": "SHADOW_ONLY"
+}
