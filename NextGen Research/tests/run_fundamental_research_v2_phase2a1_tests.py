@@ -34,10 +34,13 @@ def case(cat,name,fn):
     RESULTS.append({'category':cat,'test':name,'status':s,'detail':d})
 
 sample_row = {
-    'symbol':'HDFCBANK','companyName':'HDFC Bank Limited','qe_Date':'30-JUN-2026',
+    'seq_Id':'12345',
+    'symbol':'HDFCBANK','smName':'HDFC Bank Limited','qe_Date':'30-JUN-2026',
     'type_Sub':'Original','audited':'Un-Audited','consolidated':'Consolidated',
-    'broadcastDate':'18-Jul-2026 16:01:12','revisedDate':'-','revisionRemarks':'-',
-    'xbrl':'https://nsearchives.nseindia.com/corporate/xbrl/test.xml'
+    'broadcast_Date':'18-Jul-2026 16:01:12','creation_Date':'18-Jul-2026 16:01:13',
+    'revised_Date':'-','revision_Remark':'-',
+    'xbrl':'https://nsearchives.nseindia.com/corporate/xbrl/test.xml',
+    'ixbrl':'https://nsearchives.nseindia.com/corporate/ixbrl/test.html'
 }
 sample_payload={'data':[sample_row]}
 
@@ -52,11 +55,16 @@ case('PAYLOAD','rows extracted',lambda: require(len(extract_rows(sample_payload)
 case('PAYLOAD','non-dict rejected',lambda: raises(ValueError,lambda:extract_rows([]),'PAYLOAD'))
 case('MAP','qe field mapped',lambda: require(map_nse_row(sample_row)['Quarter End Date']=='30-JUN-2026'))
 case('MAP','xbrl retained',lambda: require(map_nse_row(sample_row)['xbrl'].endswith('.xml')))
+case('MAP','live broadcast field mapped',lambda: require(map_nse_row(sample_row)['BROADCAST DATE/TIME']=='18-Jul-2026 16:01:12'))
+case('MAP','live revision field mapped',lambda: require(map_nse_row(sample_row)['Revision Remarks']=='-'))
+case('MAP','provider seq retained',lambda: require(map_nse_row(sample_row)['seq_id']=='12345'))
+case('MAP','ixbrl retained',lambda: require(map_nse_row(sample_row)['ixbrl'].endswith('.html')))
 N=normalize_response(sample_payload)
 case('NORMALIZE','row normalizes',lambda: require(N['normalized_event_count']==1))
 case('NORMALIZE','source payload hashed',lambda: require(len(N['raw_payload_sha256'])==64))
 case('NORMALIZE','target quarter normalized',lambda: require(N['events'][0]['quarter_end']=='2026-06-30'))
 case('NORMALIZE','publication timestamp preserved',lambda: require(N['events'][0]['publication_ts'].startswith('2026-07-18T16:01:12')))
+case('NORMALIZE','provider seq survives',lambda: require(N['events'][0]['provider_seq_id']=='12345'))
 case('FILTER','target retained',lambda: require(len(target_quarter_filter(N['events']))==1))
 
 calls=[]
