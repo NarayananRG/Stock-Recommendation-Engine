@@ -1,0 +1,49 @@
+{
+  "artifact_type": "FUNDAMENTAL_RESEARCH_V2_PHASE2A_CONTRACT_V1",
+  "phase": "FUNDAMENTAL_RESEARCH_V2_PHASE2A_OFFICIAL_PIT_RECOVERY_AND_EVENT_DECAY_FOUNDATION",
+  "authority": "SHADOW_ONLY",
+  "production_app_changed": false,
+  "production_model_changed": false,
+  "model_training_allowed": false,
+  "promotion_allowed": false,
+  "source_priority": ["NSE", "BSE"],
+  "forbidden_fallbacks": ["YFINANCE_FOR_FUNDAMENTALS"],
+  "target_quarter_ends": [
+    "2025-03-31",
+    "2025-06-30",
+    "2025-09-30",
+    "2025-12-31",
+    "2026-03-31",
+    "2026-06-30"
+  ],
+  "baseline_findings": {
+    "phase1_decision": "PROMISING_LONG_HORIZON_REVENUE_SIGNAL_NOT_VALIDATED_FOR_PROMOTION",
+    "deep_audit_decision": "DO_NOT_PROMOTE_V2_YET",
+    "deep_audit_20_session_event_spread": 0.075892,
+    "deep_audit_20_session_bootstrap_95ci": [0.014018, 0.138241],
+    "deep_audit_warning": "Signal was driven by the 2024-03 filing cohort and disappeared in the 2024-12 filing cohort.",
+    "median_filing_age_days": {"20": 377.49, "63": 344.71, "126": 298.74}
+  },
+  "required_repairs": [
+    "canonicalize MANDM and M&M before feature generation",
+    "retain original and revision publication timestamps as separate PIT knowledge events",
+    "do not compute growth across standalone/consolidated basis switches without an explicit bridge",
+    "audit accounting-family switches before computing growth",
+    "audit parser breadth separately for ordinary Ind-AS, banks, NBFCs and insurers"
+  ],
+  "event_decay_buckets": [
+    "EVENT_DECISION_0",
+    "DECISIONS_1_5",
+    "DECISIONS_6_20",
+    "DECISIONS_21_63",
+    "DECISIONS_64_PLUS"
+  ],
+  "phase2a_exit_gate": "READY_FOR_EVENT_DECAY_RESEARCH",
+  "next_research_after_gate": [
+    "technical baseline",
+    "revenue deterioration veto challenger",
+    "pre-registered moderate Revenue-YoY band challenger",
+    "revenue momentum / acceleration event challenger",
+    "quality and deterioration risk-filter challenger"
+  ]
+}
