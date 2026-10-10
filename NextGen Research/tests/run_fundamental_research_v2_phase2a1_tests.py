@@ -7,7 +7,7 @@ REPO = Path(__file__).resolve().parents[2]
 ROOT = REPO / "NextGen Research"
 sys.path.insert(0, str(ROOT))
 
-from fundamental_research_v2_phase2a.core import effective_availability_ts, rebind_event_availability  # noqa: E402
+from fundamental_research_v2_phase2a.core import canonical_hash, effective_availability_ts, rebind_event_availability  # noqa: E402
 from fundamental_research_v2_phase2a.validation import validate_pit_events  # noqa: E402
 
 from fundamental_research_v2_phase2a.acquisition import (  # noqa: E402
@@ -154,6 +154,12 @@ case('VALIDATE','late older-quarter filing warning preserved',lambda: require(
 
 stale=dict(CB['events'][0])
 stale['availability_ts']=stale['creation_ts']
+stale['event_id']=canonical_hash({
+    k: stale.get(k) for k in (
+        'symbol','quarter_end','submission_type','reporting_basis',
+        'publication_ts','availability_ts','source_exchange','source_sha256'
+    )
+})
 old_id=stale['event_id']
 rebound=rebind_event_availability(stale)
 case('REBIND','cached availability repaired conservatively',lambda: require(
