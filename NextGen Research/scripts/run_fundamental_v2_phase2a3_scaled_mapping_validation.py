@@ -89,6 +89,10 @@ def main() -> int:
         if path.exists():
             cached=json.loads(path.read_text(encoding="utf-8"))
             if cached.get("source_event_id")==event.get("event_id"):
+                if not cached.get("retrieval_representation"):
+                    cached["retrieval_representation"]="XBRL_PRIMARY_CACHED"
+                if not cached.get("source_document_kind"):
+                    cached["source_document_kind"]="XBRL"
                 resolutions.append(cached)
                 if idx % 25 == 0 or idx == len(selected):
                     print(f"[{idx}/{len(selected)}] checkpoint resume; parsed={len(resolutions)} failures={len(retrieval_failures)} url_gaps={len(url_gaps)}")
@@ -121,6 +125,7 @@ def main() -> int:
                 document=parse_ixbrl_document(
                     ix_body,source_url=ixbrl_url,source_event=event
                 )
+                document["domain_source_url"] = url
                 recovered_from_ixbrl = True
 
             compact=compact_document_resolution(document,contract)
