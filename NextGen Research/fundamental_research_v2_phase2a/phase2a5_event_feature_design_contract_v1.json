@@ -1,0 +1,110 @@
+{
+  "artifact_type": "FUNDAMENTAL_RESEARCH_V2_PHASE2A5_EVENT_FEATURE_DESIGN_CONTRACT_V1",
+  "status": "STARTED",
+  "authority": "SHADOW_ONLY",
+  "objective": "Define PIT-safe, basis-separated fundamental event-feature comparison policies from measured Phase 2A.4 continuity before calculating any derived values.",
+  "source": "Phase 2A.4 canonical feature panel and continuity findings review",
+  "invariants": [
+    "Never compare CONSOLIDATED with STANDALONE.",
+    "A derived comparison becomes available only at the later/current row availability timestamp.",
+    "Never backdate a revised/latest filing value to an earlier filing timestamp.",
+    "Never fill archive gaps or missing canonical values with zero, stale carry-forward, older filing versions, or non-official sources.",
+    "Do not compare facts that are not mapped for the row domain.",
+    "Phase 2A.5 eligibility audit calculates comparison availability only; it does not calculate feature values."
+  ],
+  "feature_policies": {
+    "REVENUE": {
+      "class": "QUARTER_FLOW_HIGH_CONTINUITY",
+      "comparisons": [
+        "QOQ",
+        "YOY"
+      ],
+      "tier": "PRIMARY"
+    },
+    "PAT": {
+      "class": "QUARTER_FLOW_HIGH_CONTINUITY_DOMAIN_SCOPED",
+      "comparisons": [
+        "QOQ",
+        "YOY"
+      ],
+      "tier": "PRIMARY_WHERE_MAPPED"
+    },
+    "PBT": {
+      "class": "QUARTER_FLOW_HIGH_CONTINUITY_DOMAIN_SCOPED",
+      "comparisons": [
+        "QOQ",
+        "YOY"
+      ],
+      "tier": "SECONDARY_WHERE_MAPPED"
+    },
+    "TAX": {
+      "class": "QUARTER_FLOW_HIGH_CONTINUITY",
+      "comparisons": [
+        "QOQ",
+        "YOY"
+      ],
+      "tier": "SECONDARY"
+    },
+    "FINANCE_COST": {
+      "class": "QUARTER_FLOW_HIGH_CONTINUITY_DOMAIN_SCOPED",
+      "comparisons": [
+        "QOQ",
+        "YOY"
+      ],
+      "tier": "SECONDARY_WHERE_MAPPED"
+    },
+    "DEPRECIATION": {
+      "class": "QUARTER_FLOW_HIGH_CONTINUITY_DOMAIN_SCOPED",
+      "comparisons": [
+        "QOQ",
+        "YOY"
+      ],
+      "tier": "SECONDARY_WHERE_MAPPED"
+    },
+    "EPS": {
+      "class": "QUARTER_FLOW_HIGH_CONTINUITY_DOMAIN_SCOPED",
+      "comparisons": [
+        "QOQ",
+        "YOY"
+      ],
+      "tier": "PRIMARY_WHERE_MAPPED"
+    },
+    "OPERATING_CASH_FLOW": {
+      "class": "SPARSE_CUMULATIVE_FLOW",
+      "comparisons": [
+        "YOY_SAME_QUARTER_ONLY"
+      ],
+      "tier": "SECONDARY_SPARSE"
+    },
+    "CASH_AND_EQUIVALENTS": {
+      "class": "SPARSE_STOCK",
+      "comparisons": [
+        "YOY_SAME_QUARTER_ONLY"
+      ],
+      "tier": "SECONDARY_SPARSE"
+    },
+    "TOTAL_ASSETS": {
+      "class": "SPARSE_STOCK",
+      "comparisons": [
+        "YOY_SAME_QUARTER_ONLY"
+      ],
+      "tier": "SECONDARY_SPARSE"
+    },
+    "DEBT_EQUITY_RATIO": {
+      "class": "UNAVAILABLE_IN_FROZEN_MAPPING",
+      "comparisons": [],
+      "tier": "EXCLUDED"
+    }
+  },
+  "explicitly_deferred": [
+    "Percentage-change formulas and denominator clipping.",
+    "Sign-transition encodings for loss/profit crossings.",
+    "Cross-feature ratios such as PAT margin or tax rate.",
+    "Composite deterioration scores.",
+    "Event decay windows and market-return labels.",
+    "Any predictive model training or promotion."
+  ],
+  "exit_gate": "EVENT_FEATURE_ELIGIBILITY_AUDIT_PASS",
+  "production_model_changed": false,
+  "model_training_started": false
+}
