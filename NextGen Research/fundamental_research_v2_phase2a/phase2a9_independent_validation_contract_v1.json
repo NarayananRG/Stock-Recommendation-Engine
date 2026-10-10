@@ -1,0 +1,28 @@
+{
+  "artifact_type": "FUNDAMENTAL_RESEARCH_V2_PHASE2A9_INDEPENDENT_VALIDATION_CONTRACT_V1",
+  "status": "STARTED",
+  "authority": "SHADOW_ONLY",
+  "objective": "Independently validate the pre-defined deterioration semantics on later filing quarters and issue a hard Fundamental V2 research decision without training or promotion.",
+  "split": {
+    "DEVELOPMENT": "current_quarter_end <= 2025-12-31",
+    "OUT_OF_SAMPLE": "current_quarter_end >= 2026-03-31"
+  },
+  "primary_comparison": "PURE_DETERIORATION future stock returns versus PURE_IMPROVEMENT future stock returns.",
+  "horizon_eligibility": "At least 30 mature events in each primary cohort for the horizon.",
+  "directional_support_rule": "Both mean and median forward return of PURE_DETERIORATION must be below PURE_IMPROVEMENT.",
+  "final_decision_rules": [
+    "If official-price matched-event coverage is below 75%, DO_NOT_PROMOTE_INSUFFICIENT_OFFICIAL_PRICE_COVERAGE.",
+    "If no OOS horizon has >=30 mature observations in both cohorts, DO_NOT_PROMOTE_INSUFFICIENT_MATURE_OOS.",
+    "If at least two eligible OOS horizons all satisfy the directional support rule and development evidence is not directionally contradictory, classify VALIDATED_RISK_FILTER_CANDIDATE_SHADOW_ONLY.",
+    "If at least one eligible OOS horizon supports but the full validation rule is not met, classify PROMISING_RISK_FILTER_CANDIDATE_NOT_VALIDATED.",
+    "Otherwise classify RISK_FILTER_NOT_SUPPORTED_BY_INDEPENDENT_VALIDATION."
+  ],
+  "caveats": [
+    "This is a fixed descriptive validation, not statistical-significance proof.",
+    "No horizon, feature, or threshold is optimized after observing outcomes.",
+    "No production promotion is authorized by this research close."
+  ],
+  "production_model_changed": false,
+  "model_training_started": false,
+  "promotion_authorized": false
+}
