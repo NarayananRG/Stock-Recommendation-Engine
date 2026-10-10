@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import sys
+from decimal import Decimal
 from pathlib import Path
 
 REPO=Path(__file__).resolve().parents[2]
@@ -42,7 +43,7 @@ elig={
 }
 pat=summarize_group(events[:3])
 case('DIST','count preserved',lambda: require(pat['count']==3))
-case('DIST','median zero',lambda: require(pat['p50']=='0.0' or pat['p50']=='0'))
+case('DIST','median zero',lambda: require(Decimal(pat['p50'])==Decimal('0')))
 case('DIST','positive boundary counted',lambda: require(pat['positive_two_boundary_count']==1))
 case('DIST','negative boundary counted',lambda: require(pat['negative_two_boundary_count']==1))
 case('DIST','sign crossings counted',lambda: require(pat['sign_crossing_count']==2))
