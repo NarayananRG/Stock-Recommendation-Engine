@@ -18,6 +18,9 @@ Validation:
 - Source-only package without those Windows junctions naturally fails the single protected-surface existence assertion; this is environmental, not an app-code regression.
 
 ZIP SHA-256:
-`d6a0b48dc899e6e824a95bdaafe8d8e6664a4c50c88c58beb636274371a91524`
+`4c99dc4b1dfcbec022f436635dc8789c3e07018d57b4ef728caa8c61873f4fac`
 
 Run EXTRACT_SOURCE.ps1 to reconstruct the exact source ZIP.
+
+
+Windows build fix (10-Oct-2026): updated stale 0.8.2 version assertions and hardened SQLite backup retention against transient WinError 32 file locks. Production scoring/ranking remains unchanged.
