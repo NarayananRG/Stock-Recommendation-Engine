@@ -1,0 +1,32 @@
+{
+  "artifact_type": "FUNDAMENTAL_RESEARCH_V2_PHASE2A7_RISK_EVENT_BUILDER_CONTRACT_V1",
+  "status": "STARTED",
+  "authority": "SHADOW_ONLY",
+  "objective": "Aggregate Phase 2A.6 semantic candidates to filing-event profiles without weights, scores, thresholds, or trading actions.",
+  "event_grain": "symbol + reporting_basis + current_event_id + current_quarter_end + effective_availability_ts",
+  "profile_classes": [
+    "PURE_DETERIORATION",
+    "PURE_IMPROVEMENT",
+    "MIXED_DIRECTIONAL",
+    "NO_DIRECTIONAL_EVIDENCE"
+  ],
+  "primary_market_evaluation_rule": "Compare PURE_DETERIORATION versus PURE_IMPROVEMENT. Exclude MIXED_DIRECTIONAL from the primary effect estimate but retain it in audit outputs.",
+  "strong_transition_features": [
+    "PAT",
+    "PBT",
+    "EPS",
+    "OPERATING_CASH_FLOW"
+  ],
+  "strong_deterioration_transition": "POSITIVE_TO_NEGATIVE",
+  "strong_improvement_transition": "NEGATIVE_TO_POSITIVE",
+  "forbidden": [
+    "No weighted composite score.",
+    "No magnitude threshold optimization.",
+    "No portfolio veto or trading action.",
+    "No market-return labels in the builder.",
+    "No model fitting or production promotion."
+  ],
+  "production_model_changed": false,
+  "model_training_started": false,
+  "next_gate": "PHASE2A8_MARKET_OUTCOME_EVALUATION"
+}
