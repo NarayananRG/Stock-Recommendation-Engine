@@ -1,0 +1,38 @@
+{
+  "artifact_type": "FUNDAMENTAL_RESEARCH_V2_PHASE2A8_MARKET_OUTCOME_EVALUATION_CONTRACT_V1",
+  "status": "STARTED",
+  "authority": "SHADOW_ONLY",
+  "objective": "Evaluate Phase 2A.7 filing-event profiles against future stock returns at fixed 21, 63, and 126 trading-session horizons using only locally available official/NSE/BSE-tagged market history.",
+  "price_source_policy": [
+    "Accept only local structured price files whose path is explicitly tagged official, NSE, BSE, or exchange.",
+    "Reject any path or provider metadata containing yfinance or fallback-yfinance.",
+    "Do not access the network in this bundled run.",
+    "Record accepted and rejected files plus duplicate/conflict diagnostics."
+  ],
+  "return_policy": [
+    "Entry is the first available trading-session close strictly after the filing availability calendar date.",
+    "Forward N-session return uses entry close to close N trading sessions later.",
+    "If N later sessions are unavailable, mark that horizon immature instead of extrapolating.",
+    "Do not use same-day close even when a filing timestamp is earlier than market close; this is deliberately conservative."
+  ],
+  "horizons": [
+    21,
+    63,
+    126
+  ],
+  "primary_cohorts": [
+    "PURE_DETERIORATION",
+    "PURE_IMPROVEMENT"
+  ],
+  "mixed_policy": "Retain MIXED_DIRECTIONAL outcomes for audit but exclude them from the primary deterioration-versus-improvement effect.",
+  "forbidden": [
+    "No yfinance.",
+    "No non-official automatic fallback.",
+    "No optimized horizon selection.",
+    "No model fitting or threshold tuning.",
+    "No production trading action."
+  ],
+  "production_model_changed": false,
+  "model_training_started": false,
+  "next_gate": "PHASE2A9_INDEPENDENT_VALIDATION_AND_FINAL_DECISION"
+}
