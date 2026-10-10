@@ -1,61 +1,38 @@
-name: Fundamental V2 Phase 2A.1 Pilot
+name: Build 0.8.5 Ultra UI Source ZIP
 
 on:
   push:
     branches:
-      - fundamental-research-v2-phase2a-pit-recovery
+      - ui-0.8.5-ultra-redesign
     paths:
       - ".github/workflows/fundamental-v2-phase2a1-pilot.yml"
-      - "NextGen Research/fundamental_research_v2_phase2a/**"
-      - "NextGen Research/scripts/run_fundamental_v2_phase2a1_pilot.py"
-      - "NextGen Research/tests/run_fundamental_research_v2_phase2a1_tests.py"
-  pull_request:
-    branches:
-      - main
-    paths:
-      - ".github/workflows/fundamental-v2-phase2a1-pilot.yml"
-      - "NextGen Research/fundamental_research_v2_phase2a/**"
-      - "NextGen Research/scripts/run_fundamental_v2_phase2a1_pilot.py"
-      - "NextGen Research/tests/run_fundamental_research_v2_phase2a1_tests.py"
   workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  pilot:
+  package:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
-
+    timeout-minutes: 10
     steps:
-      - name: Checkout research branch
+      - name: Checkout UI branch
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install bounded runtime dependency
-        run: python -m pip install --disable-pip-version-check requests==2.32.5
-
-      - name: Run Phase 2A.1 contract tests
-        run: python "NextGen Research/tests/run_fundamental_research_v2_phase2a1_tests.py"
-
-      - name: Run official NSE four-symbol PIT pilot
-        id: pilot
+      - name: Reconstruct exact canonical source ZIP
+        shell: bash
         run: |
-          set +e
-          python "NextGen Research/scripts/run_fundamental_v2_phase2a1_pilot.py"
-          code=$?
-          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
-          exit "$code"
+          set -euo pipefail
+          dir="stock-engine-ultra-ui-0.8.5-source-with-windows-builder"
+          cat "$dir"/source.part.*.b64 | base64 --decode > StockRecommendationEngine_0.8.5_ultra_ui_TEST_SOURCE.zip
+          echo "915425e7027fd6145298e3e467b678e6f5998a895d85c4c18a9cfec033df7edc  StockRecommendationEngine_0.8.5_ultra_ui_TEST_SOURCE.zip" | sha256sum --check
+          unzip -t StockRecommendationEngine_0.8.5_ultra_ui_TEST_SOURCE.zip
 
-      - name: Upload pilot evidence
-        if: always()
+      - name: Upload exact source ZIP
         uses: actions/upload-artifact@v4
         with:
-          name: fundamental-v2-phase2a1-pilot
-          path: "NextGen Research/results/fundamental_v2_phase2a1_pilot"
-          if-no-files-found: warn
-          retention-days: 14
+          name: stock-recommendation-engine-0.8.5-ultra-ui-source
+          path: StockRecommendationEngine_0.8.5_ultra_ui_TEST_SOURCE.zip
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 7
