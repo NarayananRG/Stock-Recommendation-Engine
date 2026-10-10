@@ -17,7 +17,7 @@ from fundamental_research_v2_phase2a.scaled_mapping_validation import (  # noqa:
     latest_event_groups,
     summarize_resolutions,
 )
-from fundamental_research_v2_phase2a.xbrl_extraction import parse_xbrl_document  # noqa: E402
+from fundamental_research_v2_phase2a.xbrl_extraction import parse_ixbrl_document, parse_xbrl_document  # noqa: E402
 
 EVENTS=ROOT/"results"/"fundamental_v2_phase2a1_scaled"/"all_target_events.json"
 CONTRACT=ROOT/"fundamental_research_v2_phase2a"/"phase2a2_canonical_mapping_freeze_v1.json"
@@ -106,9 +106,31 @@ def main() -> int:
             continue
 
         try:
-            body=fetch_bytes(url)
-            document=parse_xbrl_document(body,source_url=url,source_event=event)
+            recovered_from_ixbrl = False
+            primary_error = None
+            try:
+                body=fetch_bytes(url)
+                document=parse_xbrl_document(body,source_url=url,source_event=event)
+            except requests.HTTPError as primary_exc:
+                status = getattr(primary_exc.response, "status_code", None)
+                ixbrl_url = event.get("ixbrl_url")
+                if status != 404 or not ixbrl_url:
+                    raise
+                primary_error = f"{type(primary_exc).__name__}: {primary_exc}"
+                ix_body=fetch_bytes(ixbrl_url)
+                document=parse_ixbrl_document(
+                    ix_body,source_url=ixbrl_url,source_event=event
+                )
+                recovered_from_ixbrl = True
+
             compact=compact_document_resolution(document,contract)
+            compact["retrieval_representation"] = (
+                "IXBRL_SAME_EVENT_404_RECOVERY"
+                if recovered_from_ixbrl else "XBRL_PRIMARY"
+            )
+            compact["primary_xbrl_url"] = url
+            compact["same_event_ixbrl_url"] = event.get("ixbrl_url")
+            compact["primary_retrieval_error"] = primary_error
             path.write_text(json.dumps(compact,indent=2,sort_keys=True),encoding="utf-8")
             resolutions.append(compact)
         except Exception as exc:
@@ -118,6 +140,7 @@ def main() -> int:
                 "reporting_basis":event.get("reporting_basis"),
                 "event_id":event.get("event_id"),
                 "xbrl_url":url,
+                "ixbrl_url":event.get("ixbrl_url"),
                 "error":f"{type(exc).__name__}: {exc}",
             })
 
