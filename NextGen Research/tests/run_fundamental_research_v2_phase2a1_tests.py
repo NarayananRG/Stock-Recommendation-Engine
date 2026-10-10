@@ -99,6 +99,32 @@ case('VALIDATE','original plus later revision passes',lambda: require(
     validate_pit_events(PAIR, required_symbols=['HDFCBANK'], require_all_target_quarters=False)['status']=='PASS'
 ))
 
+late_old = dict(N['events'][0])
+late_old['event_id'] = 'late-old-quarter'
+late_old['quarter_end'] = '2025-03-31'
+late_old['publication_ts'] = '2026-08-01T10:00:00+05:30'
+late_old['availability_ts'] = '2026-08-01T10:00:03+05:30'
+late_old['broadcast_ts'] = '2026-08-01T10:00:00+05:30'
+late_old['creation_ts'] = '2026-08-01T10:00:03+05:30'
+
+newer_q = dict(N['events'][0])
+newer_q['event_id'] = 'newer-quarter-earlier-filed'
+newer_q['quarter_end'] = '2025-06-30'
+newer_q['publication_ts'] = '2026-07-20T10:00:00+05:30'
+newer_q['availability_ts'] = '2026-07-20T10:00:03+05:30'
+newer_q['broadcast_ts'] = '2026-07-20T10:00:00+05:30'
+newer_q['creation_ts'] = '2026-07-20T10:00:03+05:30'
+
+LATE=validate_pit_events(
+    [late_old,newer_q],
+    required_symbols=['HDFCBANK'],
+    require_all_target_quarters=False
+)
+case('VALIDATE','late older-quarter filing is warning not failure',lambda: require(LATE['status']=='PASS'))
+case('VALIDATE','late older-quarter filing warning preserved',lambda: require(
+    any(x['code']=='LATE_OR_OUT_OF_ORDER_ORIGINAL_FILING' for x in LATE['warnings'])
+))
+
 bad_revision=dict(sample_row)
 bad_revision['type_Sub']='Revision'
 bad_revision['broadcast_Date']=None
