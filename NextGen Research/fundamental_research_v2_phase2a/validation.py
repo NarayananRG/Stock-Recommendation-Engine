@@ -52,14 +52,22 @@ def validate_pit_events(
                 failures.append({"code": "ORIGINAL_BROADCAST_MISSING", "event_id": row.get("event_id")})
             elif _dt(row["broadcast_ts"]) != publication:
                 failures.append({"code": "ORIGINAL_PUBLICATION_NOT_BROADCAST", "event_id": row.get("event_id")})
+            if row.get("creation_ts") and row.get("broadcast_ts"):
+                if _dt(row["creation_ts"]) < _dt(row["broadcast_ts"]):
+                    failures.append({"code": "ORIGINAL_CREATION_PRECEDES_BROADCAST", "event_id": row.get("event_id")})
         elif submission == "REVISION":
             if not row.get("revised_ts"):
                 failures.append({"code": "REVISION_TIMESTAMP_MISSING", "event_id": row.get("event_id")})
             elif _dt(row["revised_ts"]) != publication:
                 failures.append({"code": "REVISION_PUBLICATION_NOT_REVISED_TS", "event_id": row.get("event_id")})
-            if row.get("broadcast_ts") and row.get("revised_ts"):
-                if _dt(row["revised_ts"]) < _dt(row["broadcast_ts"]):
-                    failures.append({"code": "REVISION_PRECEDES_BROADCAST", "event_id": row.get("event_id")})
+            # Current NSE Integrated Filing rows use mutually exclusive
+            # exchange-received fields: Original -> broadcast_Date,
+            # Revision -> revised_Date. A revision row should therefore not
+            # require or compare broadcast_ts. creation_ts, when present, is
+            # the later dissemination/creation timestamp.
+            if row.get("creation_ts") and row.get("revised_ts"):
+                if _dt(row["creation_ts"]) < _dt(row["revised_ts"]):
+                    failures.append({"code": "REVISION_CREATION_PRECEDES_REVISED_TS", "event_id": row.get("event_id")})
         else:
             failures.append({"code": "UNSUPPORTED_SUBMISSION_TYPE", "event_id": row.get("event_id")})
 
