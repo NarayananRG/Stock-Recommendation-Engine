@@ -1,0 +1,68 @@
+{
+  "artifact_type": "FUNDAMENTAL_RESEARCH_V2_PHASE2A2_CANONICAL_MAPPING_CONTRACT_V1",
+  "status": "STARTED",
+  "authority": "SHADOW_ONLY",
+  "objective": "Audit candidate XBRL concepts and period contexts before creating canonical PIT fundamental features.",
+  "candidate_features": {
+    "REVENUE": [
+      "RevenueFromOperations",
+      "Income"
+    ],
+    "PAT": [
+      "ProfitLossForPeriod",
+      "ProfitLossForPeriodFromContinuingOperations"
+    ],
+    "PBT": [
+      "ProfitBeforeTax",
+      "ProfitBeforeExceptionalItemsAndTax"
+    ],
+    "TAX": [
+      "TaxExpense",
+      "CurrentTax",
+      "DeferredTax"
+    ],
+    "FINANCE_COST": [
+      "FinanceCosts"
+    ],
+    "DEPRECIATION": [
+      "DepreciationDepletionAndAmortisationExpense"
+    ],
+    "OPERATING_CASH_FLOW": [
+      "CashFlowsFromUsedInOperatingActivities",
+      "CashFlowsFromUsedInOperations"
+    ],
+    "CASH_AND_EQUIVALENTS": [
+      "CashAndCashEquivalentsCashFlowStatement"
+    ],
+    "TOTAL_ASSETS": [
+      "Assets"
+    ],
+    "DEBT_EQUITY_RATIO": [
+      "DebtEquityRatio"
+    ],
+    "EPS": [
+      "BasicEarningsLossPerShareFromContinuingAndDiscontinuedOperations",
+      "BasicEarningsLossPerShareFromContinuingOperations"
+    ]
+  },
+  "context_policy": [
+    "Do not select a numeric fact by concept name alone.",
+    "For duration facts, preserve start_date/end_date and classify duration_days before quarter/YTD/annual use.",
+    "For instant facts, require instant date aligned to the reporting period.",
+    "Do not mix dimensioned segment/member facts into company-level canonical totals.",
+    "Prefer contexts with no dimensions for company-level canonical features unless a feature explicitly targets a dimension.",
+    "Keep standalone and consolidated mappings separate.",
+    "Bank/NBFC mappings may differ from corporate mappings; no forced global alias.",
+    "If multiple candidate facts remain after deterministic filters, mark AMBIGUOUS instead of guessing."
+  ],
+  "outputs": [
+    "Candidate concept inventory by feature/domain",
+    "Context-duration distribution by concept",
+    "Dimensioned-vs-undimensioned fact counts",
+    "Quarter/YTD/annual candidate classification",
+    "Per-document canonical candidate table with ambiguity status",
+    "Cross-quarter continuity audit for 2026-03-31 and 2026-06-30"
+  ],
+  "production_model_changed": false,
+  "model_training_started": false
+}
