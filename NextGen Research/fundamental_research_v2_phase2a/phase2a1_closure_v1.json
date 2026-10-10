@@ -1,0 +1,40 @@
+{
+  "artifact_type": "FUNDAMENTAL_RESEARCH_V2_PHASE2A1_CLOSURE_V1",
+  "status": "CLOSED_PASS",
+  "authority": "SHADOW_ONLY",
+  "scope": "Official PIT filing metadata/timestamp recovery for the exact upstream 186-company research universe",
+  "evidence": {
+    "regression_tests": {
+      "passed": 48,
+      "failed": 0
+    },
+    "canonical_symbol_count": 186,
+    "target_quarters": [
+      "2025-03-31",
+      "2025-06-30",
+      "2025-09-30",
+      "2025-12-31",
+      "2026-03-31",
+      "2026-06-30"
+    ],
+    "recovered_event_count": 2365,
+    "hard_pit_failure_count": 0,
+    "pit_validation_status": "PASS",
+    "warning_count": 2,
+    "warning_codes": [
+      "LATE_OR_OUT_OF_ORDER_ORIGINAL_FILING",
+      "ORIGINAL_TIMESTAMP_ORDER_DISAGREEMENT"
+    ],
+    "cached_events_rebound": true
+  },
+  "pit_policy": {
+    "availability_rule": "Use the latest official timestamp present on the filing row among publication/broadcast/revised/creation timestamps.",
+    "revisions": "Preserve revisions as separate immutable events; order versions by effective availability, never by label alone.",
+    "timestamp_disagreements": "Preserve and audit as warnings unless effective availability creates an actual chronological impossibility.",
+    "no_lookahead": true
+  },
+  "production_model_changed": false,
+  "model_training_started": false,
+  "promotion_allowed": false,
+  "next_phase": "FUNDAMENTAL_RESEARCH_V2_PHASE2A2_XBRL_EXTRACTION_AND_FEATURE_BREADTH"
+}
