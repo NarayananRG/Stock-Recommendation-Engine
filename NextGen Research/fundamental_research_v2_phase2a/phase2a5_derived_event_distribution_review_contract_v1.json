@@ -1,0 +1,39 @@
+{
+  "artifact_type": "FUNDAMENTAL_RESEARCH_V2_PHASE2A5_DERIVED_EVENT_DISTRIBUTION_REVIEW_CONTRACT_V1",
+  "status": "STARTED",
+  "authority": "SHADOW_ONLY",
+  "objective": "Profile PIT-safe derived-event transform distributions and sign transitions before assigning any feature-specific deterioration or favorable semantics.",
+  "inputs": [
+    "Phase 2A.5 derived_events.jsonl",
+    "Phase 2A.5 refreshed eligibility_audit.json"
+  ],
+  "review_dimensions": [
+    "feature",
+    "comparison",
+    "reporting_basis",
+    "direction",
+    "sign_transition",
+    "symmetric_change distribution",
+    "PIT-order rejection distribution"
+  ],
+  "distribution_rules": [
+    "Summarize symmetric_change only for cross-company distribution comparisons because it is bounded and scale-independent.",
+    "Do not aggregate absolute_delta across companies into a common magnitude statistic because raw units/scales differ by feature and filer.",
+    "Report deterministic p01, p05, p25, p50, p75, p95, p99 quantiles.",
+    "Report exact +/-2 saturation counts separately because sign crossings and zero transitions can sit at the symmetric-change boundary.",
+    "Keep CONSOLIDATED and STANDALONE visible as separate breakdowns."
+  ],
+  "forbidden": [
+    "No bullish/bearish labels.",
+    "No deterioration or improvement labels.",
+    "No feature weights or composite scores.",
+    "No market-return labels.",
+    "No model training, fitting, threshold optimization, or production promotion."
+  ],
+  "expected_pre_pit_candidate_count": 17402,
+  "expected_pit_order_rejection_count": 149,
+  "expected_derived_event_count": 17253,
+  "exit_gate": "DERIVED_EVENT_DISTRIBUTION_REVIEW_COMPLETE",
+  "production_model_changed": false,
+  "model_training_started": false
+}
