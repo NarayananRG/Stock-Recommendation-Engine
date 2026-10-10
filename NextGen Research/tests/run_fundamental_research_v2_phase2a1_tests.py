@@ -7,6 +7,8 @@ REPO = Path(__file__).resolve().parents[2]
 ROOT = REPO / "NextGen Research"
 sys.path.insert(0, str(ROOT))
 
+from fundamental_research_v2_phase2a.validation import validate_pit_events  # noqa: E402
+
 from fundamental_research_v2_phase2a.acquisition import (  # noqa: E402
     NSE_INTEGRATED_API,
     acquire_marketwide,
@@ -68,6 +70,32 @@ case('NORMALIZE','target quarter normalized',lambda: require(N['events'][0]['qua
 case('NORMALIZE','publication timestamp preserved',lambda: require(N['events'][0]['publication_ts'].startswith('2026-07-18T16:01:12')))
 case('NORMALIZE','provider seq survives',lambda: require(N['events'][0]['provider_seq_id']=='12345'))
 case('FILTER','target retained',lambda: require(len(target_quarter_filter(N['events']))==1))
+
+case('VALIDATE','single original PIT event passes',lambda: require(
+    validate_pit_events(N['events'], required_symbols=['HDFCBANK'], require_all_target_quarters=False)['status']=='PASS'
+))
+
+revision_row=dict(sample_row)
+revision_row['type_Sub']='Revision'
+revision_row['revised_Date']='22-Jul-2026 10:15:00'
+revision_payload={'data':[revision_row]}
+R=normalize_response(revision_payload)
+case('VALIDATE','revision row normalizes',lambda: require(R['normalized_event_count']==1))
+case('VALIDATE','revision publication uses revised timestamp',lambda: require(
+    R['events'][0]['publication_ts'].startswith('2026-07-22T10:15:00')
+))
+PAIR=N['events']+R['events']
+case('VALIDATE','original plus later revision passes',lambda: require(
+    validate_pit_events(PAIR, required_symbols=['HDFCBANK'], require_all_target_quarters=False)['status']=='PASS'
+))
+
+bad_revision=dict(sample_row)
+bad_revision['type_Sub']='Revision'
+bad_revision['revised_Date']='17-Jul-2026 10:15:00'
+BR=normalize_response({'data':[bad_revision]})
+case('VALIDATE','revision before broadcast fails chronology',lambda: require(
+    validate_pit_events(N['events']+BR['events'], required_symbols=['HDFCBANK'], require_all_target_quarters=False)['status']=='FAIL'
+))
 
 calls=[]
 def fake_fetch(url,params,headers):
