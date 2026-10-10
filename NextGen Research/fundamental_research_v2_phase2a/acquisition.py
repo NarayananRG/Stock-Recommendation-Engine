@@ -98,9 +98,11 @@ def map_nse_row(row: dict) -> dict:
             "Consolidated / Standalone",
             "CONSOLIDATED / Standalone",
         ),
-        # broadcast_Date is the primary official table timestamp. creation_Date
-        # is retained only as a fallback when NSE omits broadcast_Date.
-        "BROADCAST DATE/TIME": broadcast or creation,
+        # NSE Integrated Filing semantics are submission-type specific:
+        # Original rows populate broadcast_Date; Revision rows populate
+        # revised_Date. creation_Date is a later exchange dissemination/
+        # creation timestamp and must never be relabeled as broadcast_Date.
+        "BROADCAST DATE/TIME": broadcast,
         "Creation DATE/TIME": creation,
         "Revised DATE/TIME": _pick(
             row,
