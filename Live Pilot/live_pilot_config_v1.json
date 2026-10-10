@@ -1,0 +1,43 @@
+{
+  "artifact_type": "LIVE_PILOT_V1_CONFIG",
+  "status": "FROZEN_FOR_PILOT_001",
+  "pilot_id": "LIVE_001",
+  "production_app_version": "0.8.0-leg8",
+  "capital_inr": 1000,
+  "holding_sessions": 21,
+  "max_new_positions": 1,
+  "fractional_shares_allowed": false,
+  "force_investment": false,
+  "no_trade_allowed": true,
+  "manual_ranking_override_allowed": false,
+  "broker_execution_automation": false,
+  "production_logic_change_allowed": false,
+  "fundamental_v2": {
+    "authority": "SHADOW_ONLY",
+    "may_change_production_action": false,
+    "may_change_rank": false,
+    "display_in_ui": true,
+    "persist_with_snapshot": true
+  },
+  "readiness_hard_gates": [
+    "official_price_data_ready",
+    "market_index_data_ready",
+    "sector_data_ready",
+    "data_freshness_ready",
+    "pit_integrity_ready",
+    "database_integrity_ready",
+    "backup_ready",
+    "duplicate_run_protection_ready",
+    "capital_sizing_ready",
+    "yfinance_used_false",
+    "production_version_match"
+  ],
+  "invariants": [
+    "A failed hard gate blocks LIVE_READY but does not alter production scoring.",
+    "No qualified affordable production BUY is a valid NO_TRADE outcome.",
+    "All decision snapshots are immutable after capture.",
+    "Execution data is recorded separately from recommendation data.",
+    "Same-input reproducibility must match action, symbol, rank, quantity, expected return, probability, risk, and reason codes.",
+    "Fundamental V2 may warn or explain only; it cannot promote, demote, rerank, veto, or authorize a trade for Pilot 001."
+  ]
+}
