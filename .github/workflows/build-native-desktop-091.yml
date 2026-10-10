@@ -14,11 +14,11 @@ permissions:
 jobs:
   windows:
     runs-on: windows-latest
-    timeout-minutes: 60
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
 
-      - name: Decode native desktop source
+      - name: Decode verified native desktop source
         shell: pwsh
         run: |
           $parts = Get-ChildItem ".ci\native091\source.part.*" | Sort-Object Name
@@ -30,6 +30,7 @@ jobs:
           $hash = (Get-FileHash $zip -Algorithm SHA256).Hash.ToLowerInvariant()
           if ($hash -ne "86dd430e933d044d08ae4637787eff52369b46b7ee1013e48af7851d9ea88fcc") { throw "Native source ZIP hash mismatch: $hash" }
           Expand-Archive -LiteralPath $zip -DestinationPath "." -Force
+          Copy-Item ".ci\native091\main_system_python.rs" "native-desktop-0.9.1\src-tauri\src\main.rs" -Force
           if (!(Test-Path "native-desktop-0.9.1\src-tauri\Cargo.toml")) { throw "Native source decode failed" }
 
       - name: Reconstruct canonical 0.8.5 engine source
@@ -57,63 +58,42 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Build bundled local engine
+      - name: Smoke test source backend
         shell: pwsh
         run: |
+          python -m pip install --disable-pip-version-check fastapi==0.128.2 uvicorn==0.48.0
           $engine = "$env:SRE_ENGINE_ROOT"
-          python -m pip install --disable-pip-version-check -r "$engine\requirements-v1.txt" fastapi==0.128.2 uvicorn==0.48.0 pyinstaller==6.16.0 matplotlib==3.10.8
-          Push-Location $engine
-          pyinstaller --noconfirm --clean --onefile --noconsole --name sre_engine `
-            --add-data "modern_ui\frontend;modern_ui\frontend" `
-            --hidden-import uvicorn.logging `
-            --hidden-import uvicorn.loops.auto `
-            --hidden-import uvicorn.protocols.http.auto `
-            --hidden-import uvicorn.protocols.websockets.auto `
-            --hidden-import uvicorn.lifespan.on `
-            run_modern_ui.py
-          Pop-Location
-          New-Item -ItemType Directory -Force -Path "native-desktop-0.9.1\binaries" | Out-Null
-          Copy-Item "$engine\dist\sre_engine.exe" "native-desktop-0.9.1\binaries\sre_engine.exe" -Force
-
-      - name: Smoke test bundled engine
-        shell: pwsh
-        run: |
-          $engineExe = Resolve-Path "native-desktop-0.9.1\binaries\sre_engine.exe"
-          $repo = "$env:SRE_ENGINE_ROOT"
           $data = "$env:RUNNER_TEMP\sre-appdata"
           $env:STOCK_MODERN_UI_PREVIEW = "1"
-          $p = Start-Process -FilePath $engineExe -ArgumentList "--no-browser --host 127.0.0.1 --port 18765 --repo-root `"$repo`" --app-data-dir `"$data`"" -PassThru
+          $p = Start-Process -FilePath python -ArgumentList "`"$engine\run_modern_ui.py`" --no-browser --host 127.0.0.1 --port 18765 --repo-root `"$engine`" --app-data-dir `"$data`"" -PassThru -NoNewWindow
           try {
             $ok = $false
-            for ($i=0; $i -lt 80; $i++) {
+            for ($i=0; $i -lt 40; $i++) {
               Start-Sleep -Milliseconds 500
-              if ($p.HasExited) { throw "Bundled engine exited early with code $($p.ExitCode)" }
+              if ($p.HasExited) { throw "Source backend exited early with code $($p.ExitCode)" }
               try {
                 $health = Invoke-RestMethod "http://127.0.0.1:18765/api/health" -TimeoutSec 2
                 if ($health.status -eq "ok") { $ok = $true; break }
               } catch {}
             }
-            if (!$ok) { throw "Bundled engine health check timed out" }
+            if (!$ok) { throw "Source backend health check timed out" }
             $stock = Invoke-RestMethod "http://127.0.0.1:18765/api/stocks/INFY?limit=1300" -TimeoutSec 10
             if ($stock.bars.Count -lt 200) { throw "Stock chart dataset smoke failed" }
             if ($health.app_version -ne "0.9.1-native-desktop") { throw "Wrong engine version: $($health.app_version)" }
-            Write-Host "ENGINE SMOKE PASS - $($stock.bars.Count) chart bars"
+            Write-Host "SOURCE BACKEND PASS - $($stock.bars.Count) chart bars"
           } finally {
             if (!$p.HasExited) { Stop-Process -Id $p.Id -Force }
           }
 
-      - name: Package engine source for local writable runtime
+      - name: Package local engine source
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path "native-desktop-0.9.1\resources" | Out-Null
           Compress-Archive -Path "$env:SRE_ENGINE_ROOT\*" -DestinationPath "native-desktop-0.9.1\resources\SRE091_ENGINE_SOURCE.zip" -Force
-
-      - name: Restrict output to one NSIS installer
-        shell: pwsh
-        run: |
           $p = "native-desktop-0.9.1\src-tauri\tauri.conf.json"
           $c = Get-Content $p -Raw | ConvertFrom-Json
           $c.bundle.targets = @("nsis")
+          $c.bundle.resources = @{"../resources/SRE091_ENGINE_SOURCE.zip"="resources/SRE091_ENGINE_SOURCE.zip"}
           $c | ConvertTo-Json -Depth 20 | Set-Content $p -Encoding UTF8
 
       - name: Setup Node
@@ -146,7 +126,7 @@ jobs:
           Write-Host "SIZE: $($setup.Length)"
           Get-FileHash $setup.FullName -Algorithm SHA256
 
-      - name: Upload one native installer
+      - name: Upload native installer
         uses: actions/upload-artifact@v4
         with:
           name: SRE-0.9.1-Native-Setup
