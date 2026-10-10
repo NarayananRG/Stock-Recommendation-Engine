@@ -1,0 +1,148 @@
+name: Build SRE 0.9.1 Native Desktop
+
+on:
+  push:
+    branches: [ui-0.9.1-native-desktop]
+    paths:
+      - ".ci/native-desktop-0.9.1-source.b64"
+      - ".github/workflows/build-native-desktop-091.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Decode native desktop source
+        shell: pwsh
+        run: |
+          $b64 = Get-Content ".ci/native-desktop-0.9.1-source.b64" -Raw
+          $zip = "$env:RUNNER_TEMP\native-desktop-0.9.1-source.zip"
+          [IO.File]::WriteAllBytes($zip, [Convert]::FromBase64String($b64))
+          Expand-Archive -LiteralPath $zip -DestinationPath "." -Force
+          if (!(Test-Path "native-desktop-0.9.1\src-tauri\Cargo.toml")) { throw "Native source decode failed" }
+
+      - name: Reconstruct canonical 0.8.5 engine source
+        shell: pwsh
+        run: |
+          $dir = "stock-engine-ultra-ui-0.8.5-source-with-windows-builder"
+          $parts = Get-ChildItem -Path $dir -Filter "source.part.*.b64" | Sort-Object Name
+          if (!$parts) { throw "0.8.5 canonical source parts missing" }
+          $joined = ($parts | ForEach-Object { Get-Content $_.FullName -Raw }) -join ""
+          $zip = "$env:RUNNER_TEMP\sre085.zip"
+          [IO.File]::WriteAllBytes($zip, [Convert]::FromBase64String($joined))
+          $hash = (Get-FileHash $zip -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($hash -ne "915425e7027fd6145298e3e467b678e6f5998a895d85c4c18a9cfec033df7edc") { throw "Canonical source hash mismatch: $hash" }
+          $engine = "$env:RUNNER_TEMP\engine-src"
+          New-Item -ItemType Directory -Force -Path $engine | Out-Null
+          Expand-Archive -LiteralPath $zip -DestinationPath $engine -Force
+          Copy-Item "native-desktop-0.9.1\engine-overlay\*" $engine -Recurse -Force
+          if (!(Test-Path "$engine\run_modern_ui.py")) { throw "Engine overlay failed" }
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build bundled local engine
+        shell: pwsh
+        run: |
+          $engine = "$env:RUNNER_TEMP\engine-src"
+          python -m pip install --disable-pip-version-check -r "$engine\requirements-v1.txt" -r "$engine\requirements-modern-ui.txt" pyinstaller==6.16.0 matplotlib==3.10.8
+          Push-Location $engine
+          pyinstaller --noconfirm --clean --onefile --noconsole --name sre_engine `
+            --add-data "modern_ui\frontend;modern_ui\frontend" `
+            --hidden-import uvicorn.logging `
+            --hidden-import uvicorn.loops.auto `
+            --hidden-import uvicorn.protocols.http.auto `
+            --hidden-import uvicorn.protocols.websockets.auto `
+            --hidden-import uvicorn.lifespan.on `
+            run_modern_ui.py
+          Pop-Location
+          New-Item -ItemType Directory -Force -Path "native-desktop-0.9.1\binaries" | Out-Null
+          Copy-Item "$engine\dist\sre_engine.exe" "native-desktop-0.9.1\binaries\sre_engine.exe" -Force
+
+      - name: Smoke test bundled engine
+        shell: pwsh
+        run: |
+          $engineExe = Resolve-Path "native-desktop-0.9.1\binaries\sre_engine.exe"
+          $repo = "$env:RUNNER_TEMP\engine-src"
+          $data = "$env:RUNNER_TEMP\sre-appdata"
+          $env:STOCK_MODERN_UI_PREVIEW = "1"
+          $p = Start-Process -FilePath $engineExe -ArgumentList "--no-browser --host 127.0.0.1 --port 18765 --repo-root `"$repo`" --app-data-dir `"$data`"" -PassThru
+          try {
+            $ok = $false
+            for ($i=0; $i -lt 80; $i++) {
+              Start-Sleep -Milliseconds 500
+              if ($p.HasExited) { throw "Bundled engine exited early with code $($p.ExitCode)" }
+              try {
+                $health = Invoke-RestMethod "http://127.0.0.1:18765/api/health" -TimeoutSec 2
+                if ($health.status -eq "ok") { $ok = $true; break }
+              } catch {}
+            }
+            if (!$ok) { throw "Bundled engine health check timed out" }
+            $stock = Invoke-RestMethod "http://127.0.0.1:18765/api/stocks/INFY?limit=1300" -TimeoutSec 10
+            if ($stock.bars.Count -lt 200) { throw "Stock chart dataset smoke failed" }
+            if ($health.app_version -ne "0.9.1-native-desktop") { throw "Wrong engine version: $($health.app_version)" }
+            Write-Host "ENGINE SMOKE PASS - $($stock.bars.Count) chart bars"
+          } finally {
+            if (!$p.HasExited) { Stop-Process -Id $p.Id -Force }
+          }
+
+      - name: Package engine source for local writable runtime
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path "native-desktop-0.9.1\resources" | Out-Null
+          Compress-Archive -Path "$env:RUNNER_TEMP\engine-src" -DestinationPath "native-desktop-0.9.1\resources\SRE091_ENGINE_SOURCE.zip" -Force
+
+      - name: Restrict output to one NSIS installer
+        shell: pwsh
+        run: |
+          $p = "native-desktop-0.9.1\src-tauri\tauri.conf.json"
+          $c = Get-Content $p -Raw | ConvertFrom-Json
+          $c.bundle.targets = @("nsis")
+          $c | ConvertTo-Json -Depth 20 | Set-Content $p -Encoding UTF8
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: native-desktop-0.9.1/src-tauri
+
+      - name: Install Tauri CLI
+        working-directory: native-desktop-0.9.1
+        run: npm install --no-audit --no-fund
+
+      - name: Build native Windows installer
+        working-directory: native-desktop-0.9.1
+        run: npm run tauri build
+
+      - name: Verify installer
+        shell: pwsh
+        run: |
+          $setup = Get-ChildItem "native-desktop-0.9.1\src-tauri\target\release\bundle\nsis\*.exe" | Select-Object -First 1
+          if (!$setup) { throw "Native Setup.exe missing" }
+          Write-Host "SETUP: $($setup.FullName)"
+          Write-Host "SIZE: $($setup.Length)"
+          Get-FileHash $setup.FullName -Algorithm SHA256
+
+      - name: Upload one native installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: SRE-0.9.1-Native-Setup
+          path: native-desktop-0.9.1/src-tauri/target/release/bundle/nsis/*.exe
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
