@@ -86,7 +86,7 @@ case('MARKETWIDE','one partial page stops',lambda: require(MW['page_count']==1))
 case('MARKETWIDE','intersection deliberately false',lambda: require(MW['audited_universe_intersection_performed'] is False))
 case('MARKETWIDE','query has no symbol',lambda: require('symbol' not in market_calls[0]))
 
-bad={'data':[dict(sample_row, broadcastDate='18-May-2026 16:01:12')]}
+bad={'data':[dict(sample_row, broadcast_Date='18-May-2026 16:01:12')]}
 case('FAIL_CLOSED','invalid chronology rejected row',lambda: require(normalize_response(bad)['rejected_row_count']==1))
 case('FAIL_CLOSED','no silent conversion of rejected row',lambda: require(normalize_response(bad)['normalized_event_count']==0))
 
