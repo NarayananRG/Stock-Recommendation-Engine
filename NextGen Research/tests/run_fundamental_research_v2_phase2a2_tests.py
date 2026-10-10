@@ -99,6 +99,35 @@ case('IXBRL','inline concept namespace resolved',lambda: require(
     any(x['concept_namespace']=='https://example.test/indas' for x in IX['numeric_facts'])
 ))
 
+
+MALFORMED_IXBRL=b'''<html xmlns:ix="http://www.xbrl.org/2013/inlineXBRL"
+ xmlns:xbrli="http://www.xbrl.org/2003/instance"
+ xmlns:iso4217="http://www.xbrl.org/2003/iso4217"
+ xmlns:in="https://example.test/indas">
+ <body><p>Company&nbsp;Name</p>
+  <ix:resources>
+   <xbrli:context id="D2026">
+    <xbrli:entity><xbrli:identifier scheme="TEST">ABC</xbrli:identifier></xbrli:entity>
+    <xbrli:period><xbrli:startDate>2026-04-01</xbrli:startDate><xbrli:endDate>2026-06-30</xbrli:endDate></xbrli:period>
+   </xbrli:context>
+   <xbrli:unit id="INR"><xbrli:measure>iso4217:INR</xbrli:measure></xbrli:unit>
+  </ix:resources>
+  <ix:nonFraction name="in:RevenueFromOperations" contextRef="D2026" unitRef="INR" decimals="-6">123,456,000</ix:nonFraction>
+ </body></html>'''
+MIX=parse_ixbrl_document(
+    MALFORMED_IXBRL,source_url=IX_EVENT['ixbrl_url'],source_event=IX_EVENT
+)
+case('IXBRL_HTML','malformed html uses tolerant parser',lambda: require(
+    MIX['ixbrl_parser_mode']=='HTML_TOLERANT'
+))
+case('IXBRL_HTML','tolerant parser preserves context',lambda: require(
+    MIX['context_count']==1 and MIX['contexts'][0]['end_date']=='2026-06-30'
+))
+case('IXBRL_HTML','tolerant parser extracts numeric fact',lambda: require(
+    MIX['numeric_fact_count']==1
+    and MIX['numeric_facts'][0]['concept_local_name']=='RevenueFromOperations'
+))
+
 OLD=dict(EVENT)
 OLD['event_id']='old'
 OLD['creation_ts']='2026-07-20T10:00:01+05:30'
