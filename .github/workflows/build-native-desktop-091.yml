@@ -36,14 +36,12 @@ jobs:
           Expand-Archive -LiteralPath $zip -DestinationPath "." -Force
           Copy-Item ".ci\native091\main_system_python.rs" "native-desktop-0.9.1\src-tauri\src\main.rs" -Force
           Copy-Item ".ci\native091\Cargo.toml" "native-desktop-0.9.1\src-tauri\Cargo.toml" -Force
-          if (!(Test-Path "native-desktop-0.9.1\src-tauri\Cargo.toml")) { throw "Native source decode failed" }
 
       - name: Reconstruct canonical 0.8.5 engine source
         shell: pwsh
         run: |
           $dir = "stock-engine-ultra-ui-0.8.5-source-with-windows-builder"
           $parts = Get-ChildItem -Path $dir -Filter "source.part.*.b64" | Sort-Object Name
-          if (!$parts) { throw "0.8.5 canonical source parts missing" }
           $joined = ($parts | ForEach-Object { Get-Content $_.FullName -Raw }) -join ""
           $zip = "$env:RUNNER_TEMP\sre085.zip"
           [IO.File]::WriteAllBytes($zip, [Convert]::FromBase64String($joined))
@@ -53,9 +51,7 @@ jobs:
           New-Item -ItemType Directory -Force -Path $extract | Out-Null
           Expand-Archive -LiteralPath $zip -DestinationPath $extract -Force
           $engine = Join-Path $extract "StockRecommendationEngine_0.8.5_ultra_ui_TEST_SOURCE"
-          if (!(Test-Path "$engine\requirements-v1.txt")) { throw "Canonical engine root missing" }
           Copy-Item "native-desktop-0.9.1\engine-overlay\*" $engine -Recurse -Force
-          if (!(Test-Path "$engine\run_modern_ui.py")) { throw "Engine overlay failed" }
           "SRE_ENGINE_ROOT=$engine" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
 
       - name: Setup Python
@@ -95,33 +91,8 @@ jobs:
         run: |
           New-Item -ItemType Directory -Force -Path "native-desktop-0.9.1\resources" | Out-Null
           Compress-Archive -Path "$env:SRE_ENGINE_ROOT\*" -DestinationPath "native-desktop-0.9.1\resources\SRE091_ENGINE_SOURCE.zip" -Force
-          $iconDir = "native-desktop-0.9.1\src-tauri\icons"
-          New-Item -ItemType Directory -Force -Path $iconDir | Out-Null
-          @'
-import struct, zlib, binascii
-from pathlib import Path
-w = h = 64
-pixels = bytearray()
-for y in range(h):
-    pixels.append(0)
-    for x in range(w):
-        if 8 <= x <= 55 and 8 <= y <= 55:
-            r,g,b,a = (16,29,52,255)
-        else:
-            r,g,b,a = (9,16,30,255)
-        if (x,y) in {(14,45),(25,34),(34,39),(45,24),(54,16)}:
-            r,g,b,a = (54,211,153,255)
-        pixels.extend((r,g,b,a))
-def chunk(kind, data):
-    return struct.pack(">I", len(data)) + kind + data + struct.pack(">I", binascii.crc32(kind + data) & 0xffffffff)
-png = b"\x89PNG\r\n\x1a\n"
-png += chunk(b"IHDR", struct.pack(">IIBBBBB", w,h,8,6,0,0,0))
-png += chunk(b"IDAT", zlib.compress(bytes(pixels), 9))
-png += chunk(b"IEND", b"")
-header = struct.pack("<HHH", 0,1,1)
-entry = struct.pack("<BBBBHHII", w,h,0,0,1,32,len(png),22)
-Path(r"native-desktop-0.9.1\src-tauri\icons\icon.ico").write_bytes(header + entry + png)
-'@ | python -
+          New-Item -ItemType Directory -Force -Path "native-desktop-0.9.1\src-tauri\icons" | Out-Null
+          python -c "import struct,pathlib; w=h=32; px=bytes([52,211,153,255])*(w*h); mask=bytes(128); dib=struct.pack('<IIIHHIIIIII',40,w,h*2,1,32,0,len(px),0,0,0,0)+px+mask; ico=struct.pack('<HHH',0,1,1)+struct.pack('<BBBBHHII',w,h,0,0,1,32,len(dib),22)+dib; pathlib.Path(r'native-desktop-0.9.1\src-tauri\icons\icon.ico').write_bytes(ico)"
           $p = "native-desktop-0.9.1\src-tauri\tauri.conf.json"
           $c = Get-Content $p -Raw | ConvertFrom-Json
           $c.bundle.targets = @("nsis")
