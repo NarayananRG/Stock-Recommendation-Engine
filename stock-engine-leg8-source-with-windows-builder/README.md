@@ -25,3 +25,4 @@ Inside the extracted source:
 - `RUN_LIVE_PILOT_SOURCE_TEST.cmd` launches the same app from source for fast testing.
 - `BUILD_LIVE_PILOT_TEST_APP.cmd` builds the Windows `StockRecommendationEngine.exe` test package.
 - Fundamental Research V2 stays `SHADOW_ONLY` and cannot change production rank/action.
+\n\nBuild-script hotfix (10-Oct-2026): corrected PowerShell booleans in `scripts/build_leg8_final.ps1` from `false` to `$false` for the final manifest fields.\n
