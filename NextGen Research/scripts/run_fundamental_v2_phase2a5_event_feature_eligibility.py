@@ -50,6 +50,8 @@ def main() -> int:
         "panel_row_count":audit["panel_row_count"],
         "history_count":audit["history_count"],
         "feature_policy_count":audit["feature_policy_count"],
+        "pre_pit_candidate_count":audit["pre_pit_candidate_count"],
+        "pit_order_rejection_count":audit["pit_order_rejection_count"],
         "eligible_event_count":audit["eligible_event_count"],
         "feature_eligibility":audit["feature_eligibility"],
         "derived_feature_values_created":False,
