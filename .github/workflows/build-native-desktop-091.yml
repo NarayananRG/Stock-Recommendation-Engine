@@ -35,6 +35,7 @@ jobs:
           if ($hash -ne "86dd430e933d044d08ae4637787eff52369b46b7ee1013e48af7851d9ea88fcc") { throw "Native source ZIP hash mismatch: $hash" }
           Expand-Archive -LiteralPath $zip -DestinationPath "." -Force
           Copy-Item ".ci\native091\main_system_python.rs" "native-desktop-0.9.1\src-tauri\src\main.rs" -Force
+          Copy-Item ".ci\native091\Cargo.toml" "native-desktop-0.9.1\src-tauri\Cargo.toml" -Force
           if (!(Test-Path "native-desktop-0.9.1\src-tauri\Cargo.toml")) { throw "Native source decode failed" }
 
       - name: Reconstruct canonical 0.8.5 engine source
