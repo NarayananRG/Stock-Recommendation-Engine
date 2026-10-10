@@ -42,8 +42,10 @@
     "Only Phase 2A.5 eligibility-approved comparisons may be transformed.",
     "Missing/archive-gap values remain ineligible."
   ],
-  "expected_eligible_event_count": 17402,
   "exit_gate": "DERIVED_EVENT_TRANSFORM_AUDIT_PASS",
   "production_model_changed": false,
-  "model_training_started": false
+  "model_training_started": false,
+  "expected_pre_pit_candidate_count": 17402,
+  "post_pit_eligible_event_count_rule": "Must equal refreshed Phase 2A.5 eligibility audit eligible_event_count after timestamp-order exclusions.",
+  "pit_order_inversion_policy": "Exclude any pair where the globally latest previous-quarter filing becomes available after the current-quarter filing; record the exclusion explicitly and do not weaken the transform guard."
 }
