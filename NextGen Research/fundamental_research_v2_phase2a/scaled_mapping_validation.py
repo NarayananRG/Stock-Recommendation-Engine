@@ -138,6 +138,7 @@ def compact_document_resolution(document: dict, mapping_contract: dict) -> dict:
 def summarize_resolutions(resolutions: Iterable[dict], *, expected_document_count: int, retrieval_failures: list[dict], url_gaps: list[dict]) -> dict:
     rows = list(resolutions)
     domain_docs = defaultdict(int)
+    retrieval_representation_counts = defaultdict(int)
     domain_feature_selected = defaultdict(int)
     domain_feature_missing = defaultdict(int)
     hard = []
@@ -145,6 +146,11 @@ def summarize_resolutions(resolutions: Iterable[dict], *, expected_document_coun
     for row in rows:
         domain = row.get("domain") or "UNKNOWN"
         domain_docs[domain] += 1
+        retrieval_representation_counts[
+            row.get("retrieval_representation")
+            or row.get("source_document_kind")
+            or "UNKNOWN"
+        ] += 1
         hard.extend(
             {
                 "symbol": row.get("symbol"),
@@ -191,6 +197,7 @@ def summarize_resolutions(resolutions: Iterable[dict], *, expected_document_coun
         "retrieval_failure_count": len(retrieval_failures),
         "semantic_hard_failure_count": len(hard),
         "domain_document_counts": dict(sorted(domain_docs.items())),
+        "retrieval_representation_counts": dict(sorted(retrieval_representation_counts.items())),
         "feature_coverage": coverage,
         "xbrl_url_gaps": url_gaps,
         "retrieval_failures": retrieval_failures,
