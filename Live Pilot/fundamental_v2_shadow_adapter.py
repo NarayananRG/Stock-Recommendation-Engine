@@ -65,7 +65,7 @@ def load_shadow_profile(
     candidates.sort(
         key=lambda row:(
             row.get("reporting_basis")==reporting_basis_preference,
-            _parse_ts(row.get("effective_availability_ts")) or datetime.min,
+            str(row.get("effective_availability_ts") or ""),
         ),
         reverse=True,
     )
