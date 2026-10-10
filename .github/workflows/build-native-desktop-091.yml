@@ -4,7 +4,7 @@ on:
   push:
     branches: [ui-0.9.1-native-desktop]
     paths:
-      - ".ci/native-desktop-0.9.1-source.b64"
+      - ".ci/native091/**"
       - ".github/workflows/build-native-desktop-091.yml"
   workflow_dispatch:
 
@@ -21,9 +21,14 @@ jobs:
       - name: Decode native desktop source
         shell: pwsh
         run: |
-          $b64 = Get-Content ".ci/native-desktop-0.9.1-source.b64" -Raw
+          $parts = Get-ChildItem ".ci\native091\source.part.*" | Sort-Object Name
+          if ($parts.Count -ne 8) { throw "Expected 8 native source chunks, found $($parts.Count)" }
+          $b64 = ($parts | ForEach-Object { Get-Content $_.FullName -Raw }) -join ""
+          if ($b64.Length -ne 39284) { throw "Native source base64 length mismatch: $($b64.Length)" }
           $zip = "$env:RUNNER_TEMP\native-desktop-0.9.1-source.zip"
           [IO.File]::WriteAllBytes($zip, [Convert]::FromBase64String($b64))
+          $hash = (Get-FileHash $zip -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($hash -ne "86dd430e933d044d08ae4637787eff52369b46b7ee1013e48af7851d9ea88fcc") { throw "Native source ZIP hash mismatch: $hash" }
           Expand-Archive -LiteralPath $zip -DestinationPath "." -Force
           if (!(Test-Path "native-desktop-0.9.1\src-tauri\Cargo.toml")) { throw "Native source decode failed" }
 
