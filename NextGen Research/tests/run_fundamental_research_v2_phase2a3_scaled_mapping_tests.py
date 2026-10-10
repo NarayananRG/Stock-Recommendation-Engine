@@ -52,6 +52,15 @@ R=compact_document_resolution(DOC,CONTRACT)
 case('RESOLVE','frozen concept selected',lambda: require(R['features']['REVENUE']['selected_concept']=='RevenueFromOperations'))
 case('RESOLVE','no hard failures',lambda: require(R['hard_failures']==[]))
 
+IXDOC=dict(DOC)
+IXDOC['source_url']='https://nsearchives.nseindia.com/corporate/ixbrl/opaque.xhtml'
+IXDOC['domain_source_url']='https://nsearchives.nseindia.com/corporate/xbrl/INTEGRATED_FILING_INDAS_x.xml'
+IXDOC['source_document_kind']='IXBRL'
+RIX=compact_document_resolution(IXDOC,CONTRACT)
+case('RESOLVE','iXBRL recovery keeps original domain identity',lambda: require(
+ RIX['domain']=='IND_AS_CORPORATE' and RIX['hard_failures']==[]
+))
+
 MISSING=dict(DOC)
 MISSING['numeric_facts']=[]
 RM=compact_document_resolution(MISSING,CONTRACT)
