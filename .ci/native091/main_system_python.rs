@@ -82,12 +82,29 @@ fn python_command() -> Result<Command, String> {
         probe.arg("--version").stdout(Stdio::null()).stderr(Stdio::null());
         #[cfg(target_os = "windows")]
         probe.creation_flags(CREATE_NO_WINDOW);
-        if probe.status().map(|s| s.success()).unwrap_or(false) {
-            let mut cmd = Command::new(candidate);
-            #[cfg(target_os = "windows")]
-            cmd.creation_flags(CREATE_NO_WINDOW);
-            return Ok(cmd);
+        if !probe.status().map(|s| s.success()).unwrap_or(false) {
+            continue;
         }
+
+        let mut modules = Command::new(candidate);
+        modules.args(["-c", "import fastapi, uvicorn"]).stdout(Stdio::null()).stderr(Stdio::null());
+        #[cfg(target_os = "windows")]
+        modules.creation_flags(CREATE_NO_WINDOW);
+        if !modules.status().map(|s| s.success()).unwrap_or(false) {
+            let mut pip = Command::new(candidate);
+            pip.args(["-m", "pip", "install", "--disable-pip-version-check", "fastapi==0.128.2", "uvicorn==0.48.0"])
+                .stdout(Stdio::null()).stderr(Stdio::null());
+            #[cfg(target_os = "windows")]
+            pip.creation_flags(CREATE_NO_WINDOW);
+            if !pip.status().map(|s| s.success()).unwrap_or(false) {
+                return Err("Python is installed, but the local UI runtime could not be installed. Check internet access and reopen the app.".into());
+            }
+        }
+
+        let mut cmd = Command::new(candidate);
+        #[cfg(target_os = "windows")]
+        cmd.creation_flags(CREATE_NO_WINDOW);
+        return Ok(cmd);
     }
     Err("Python was not found. Install Python 3.12+ and reopen the app.".into())
 }
