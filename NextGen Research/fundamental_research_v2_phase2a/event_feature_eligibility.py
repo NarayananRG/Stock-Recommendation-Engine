@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from collections import Counter, defaultdict
+from datetime import datetime
 from typing import Iterable
 
 TARGET_QUARTERS=(
@@ -41,6 +42,17 @@ def usable(row: dict | None, feature: str) -> bool:
     )
 
 
+def _parse_ts(value: str) -> datetime:
+    text=str(value or "").strip()
+    if not text:
+        raise ValueError("AVAILABILITY_TIMESTAMP_REQUIRED")
+    return datetime.fromisoformat(text)
+
+
+def pit_order_valid(previous: dict, current: dict) -> bool:
+    return _parse_ts(current.get("availability_ts")) >= _parse_ts(previous.get("availability_ts"))
+
+
 def eligibility_audit(rows: Iterable[dict]) -> dict:
     items=list(rows)
     by_history=defaultdict(list)
@@ -50,6 +62,8 @@ def eligibility_audit(rows: Iterable[dict]) -> dict:
     by_feature=[]
     by_feature_basis=[]
     eligible_events=[]
+    pit_order_rejections=[]
+    pre_pit_candidate_count=0
 
     for feature,policy in FEATURE_POLICIES.items():
         feature_counts=Counter()
@@ -74,6 +88,22 @@ def eligibility_audit(rows: Iterable[dict]) -> dict:
                     previous=qmap.get(previous_q)
                     current=qmap.get(current_q)
                     if usable(previous,feature) and usable(current,feature):
+                        pre_pit_candidate_count+=1
+                        if not pit_order_valid(previous,current):
+                            pit_order_rejections.append({
+                                "reason":"PIT_PREVIOUS_FILING_AVAILABLE_AFTER_CURRENT_EVENT",
+                                "symbol":symbol,
+                                "reporting_basis":basis,
+                                "feature":feature,
+                                "comparison":"QOQ",
+                                "previous_quarter_end":previous_q,
+                                "current_quarter_end":current_q,
+                                "previous_event_id":previous.get("event_id"),
+                                "current_event_id":current.get("event_id"),
+                                "previous_availability_ts":previous.get("availability_ts"),
+                                "current_availability_ts":current.get("availability_ts"),
+                            })
+                            continue
                         feature_counts["QOQ"]+=1
                         basis_counts[basis]["QOQ"]+=1
                         eligible_events.append({
@@ -85,6 +115,7 @@ def eligibility_audit(rows: Iterable[dict]) -> dict:
                             "current_quarter_end":current_q,
                             "previous_event_id":previous.get("event_id"),
                             "current_event_id":current.get("event_id"),
+                            "previous_availability_ts":previous.get("availability_ts"),
                             "effective_availability_ts":current.get("availability_ts"),
                         })
 
@@ -101,6 +132,22 @@ def eligibility_audit(rows: Iterable[dict]) -> dict:
                     previous=qmap.get(previous_q)
                     current=qmap.get(current_q)
                     if usable(previous,feature) and usable(current,feature):
+                        pre_pit_candidate_count+=1
+                        if not pit_order_valid(previous,current):
+                            pit_order_rejections.append({
+                                "reason":"PIT_PREVIOUS_FILING_AVAILABLE_AFTER_CURRENT_EVENT",
+                                "symbol":symbol,
+                                "reporting_basis":basis,
+                                "feature":feature,
+                                "comparison":comparison,
+                                "previous_quarter_end":previous_q,
+                                "current_quarter_end":current_q,
+                                "previous_event_id":previous.get("event_id"),
+                                "current_event_id":current.get("event_id"),
+                                "previous_availability_ts":previous.get("availability_ts"),
+                                "current_availability_ts":current.get("availability_ts"),
+                            })
+                            continue
                         feature_counts["YOY"]+=1
                         basis_counts[basis]["YOY"]+=1
                         eligible_events.append({
@@ -112,6 +159,7 @@ def eligibility_audit(rows: Iterable[dict]) -> dict:
                             "current_quarter_end":current_q,
                             "previous_event_id":previous.get("event_id"),
                             "current_event_id":current.get("event_id"),
+                            "previous_availability_ts":previous.get("availability_ts"),
                             "effective_availability_ts":current.get("availability_ts"),
                         })
 
@@ -142,6 +190,9 @@ def eligibility_audit(rows: Iterable[dict]) -> dict:
         "feature_policy_count":len(FEATURE_POLICIES),
         "feature_eligibility":by_feature,
         "feature_basis_eligibility":by_feature_basis,
+        "pre_pit_candidate_count":pre_pit_candidate_count,
+        "pit_order_rejection_count":len(pit_order_rejections),
+        "pit_order_rejections":pit_order_rejections,
         "eligible_event_count":len(eligible_events),
         "eligible_events":eligible_events,
         "derived_feature_values_created":False,
