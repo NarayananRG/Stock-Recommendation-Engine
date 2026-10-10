@@ -131,6 +131,39 @@ def _accounting_family(value: str | None) -> str | None:
     return text or None
 
 
+def effective_availability_ts(event: dict) -> str:
+    """Return the conservative PIT availability timestamp for one filing event.
+
+    NSE Integrated Filing rows can contain received/revised and creation times
+    whose ordering is not stable across all records. To avoid look-ahead, use
+    the latest official timestamp present on the row.
+    """
+    candidates = []
+    for key in ("publication_ts", "broadcast_ts", "revised_ts", "creation_ts"):
+        value = event.get(key)
+        if value:
+            candidates.append(_dt(str(value)))
+    if not candidates:
+        fallback = event.get("availability_ts")
+        if fallback:
+            return _dt(str(fallback)).isoformat()
+        raise ValueError("EVENT_AVAILABILITY_TIMESTAMP_REQUIRED")
+    return max(candidates).isoformat()
+
+
+def rebind_event_availability(event: dict) -> dict:
+    """Recompute derived availability/event identity from immutable source fields."""
+    item = dict(event)
+    item["availability_ts"] = effective_availability_ts(item)
+    item["event_id"] = canonical_hash({
+        k: item.get(k) for k in (
+            "symbol", "quarter_end", "submission_type", "reporting_basis",
+            "publication_ts", "availability_ts", "source_exchange", "source_sha256",
+        )
+    })
+    return item
+
+
 def build_filing_event(row: dict, *, source_url: str, source_sha256: str, source_exchange: str = "NSE") -> dict:
     """Normalize one exchange filing row into an immutable PIT knowledge event."""
     require_official_fundamental_url(source_url)
@@ -165,10 +198,14 @@ def build_filing_event(row: dict, *, source_url: str, source_sha256: str, source
             raise ValueError("REVISION_TIMESTAMP_REQUIRED")
         publication_ts = revised_ts
 
-    # NSE creation_Date is the exchange dissemination/creation time and is
-    # normally a few seconds after broadcast_Date/revised_Date. For PIT
-    # availability, prefer that later public-facing timestamp when present.
-    availability_ts = creation_ts or publication_ts
+    # NSE timestamp ordering is not globally stable. Some rows have
+    # creation_Date after the received/revised timestamp, while other valid
+    # originals have creation_Date before broadcast_Date. PIT must therefore
+    # use the latest official timestamp carried by the row.
+    availability_ts = max(
+        datetime.fromisoformat(publication_ts),
+        datetime.fromisoformat(creation_ts) if creation_ts else datetime.fromisoformat(publication_ts),
+    ).isoformat()
 
     if datetime.fromisoformat(publication_ts).date() < date.fromisoformat(quarter_end):
         raise ValueError("PUBLICATION_PRECEDES_QUARTER_END")
@@ -240,7 +277,7 @@ def select_latest_available_filing(
             continue
         if basis and normalize_basis(item["reporting_basis"]) != basis:
             continue
-        available_at = item.get("availability_ts") or item["publication_ts"]
+        available_at = effective_availability_ts(item)
         if _dt(available_at) <= cutoff:
             eligible.append(item)
     if not eligible:
@@ -249,14 +286,14 @@ def select_latest_available_filing(
         eligible,
         key=lambda x: (
             x["quarter_end"],
-            _dt(x.get("availability_ts") or x["publication_ts"]),
+            _dt(effective_availability_ts(x)),
             x.get("event_id", ""),
         ),
     )
 
 
 def first_decision_after_publication(event: dict, decision_timestamps: Sequence[str]) -> str | None:
-    publication = _dt(event.get("availability_ts") or event["publication_ts"])
+    publication = _dt(effective_availability_ts(event))
     later = sorted(_dt(x) for x in decision_timestamps if _dt(x) > publication)
     return later[0].isoformat() if later else None
 
