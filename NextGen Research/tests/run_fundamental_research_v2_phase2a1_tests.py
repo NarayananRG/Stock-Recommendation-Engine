@@ -68,6 +68,8 @@ case('NORMALIZE','row normalizes',lambda: require(N['normalized_event_count']==1
 case('NORMALIZE','source payload hashed',lambda: require(len(N['raw_payload_sha256'])==64))
 case('NORMALIZE','target quarter normalized',lambda: require(N['events'][0]['quarter_end']=='2026-06-30'))
 case('NORMALIZE','publication timestamp preserved',lambda: require(N['events'][0]['publication_ts'].startswith('2026-07-18T16:01:12')))
+case('NORMALIZE','creation timestamp normalized',lambda: require(N['events'][0]['creation_ts'].startswith('2026-07-18T16:01:13')))
+case('NORMALIZE','availability uses dissemination timestamp',lambda: require(N['events'][0]['availability_ts']==N['events'][0]['creation_ts']))
 case('NORMALIZE','provider seq survives',lambda: require(N['events'][0]['provider_seq_id']=='12345'))
 case('FILTER','target retained',lambda: require(len(target_quarter_filter(N['events']))==1))
 
@@ -77,12 +79,20 @@ case('VALIDATE','single original PIT event passes',lambda: require(
 
 revision_row=dict(sample_row)
 revision_row['type_Sub']='Revision'
+revision_row['broadcast_Date']=None
 revision_row['revised_Date']='22-Jul-2026 10:15:00'
+revision_row['creation_Date']='22-Jul-2026 10:15:03'
 revision_payload={'data':[revision_row]}
 R=normalize_response(revision_payload)
 case('VALIDATE','revision row normalizes',lambda: require(R['normalized_event_count']==1))
 case('VALIDATE','revision publication uses revised timestamp',lambda: require(
     R['events'][0]['publication_ts'].startswith('2026-07-22T10:15:00')
+))
+case('VALIDATE','revision broadcast remains null',lambda: require(
+    R['events'][0]['broadcast_ts'] is None
+))
+case('VALIDATE','revision availability uses creation',lambda: require(
+    R['events'][0]['availability_ts'].startswith('2026-07-22T10:15:03')
 ))
 PAIR=N['events']+R['events']
 case('VALIDATE','original plus later revision passes',lambda: require(
@@ -91,7 +101,9 @@ case('VALIDATE','original plus later revision passes',lambda: require(
 
 bad_revision=dict(sample_row)
 bad_revision['type_Sub']='Revision'
+bad_revision['broadcast_Date']=None
 bad_revision['revised_Date']='17-Jul-2026 10:15:00'
+bad_revision['creation_Date']='17-Jul-2026 10:15:03'
 BR=normalize_response({'data':[bad_revision]})
 case('VALIDATE','revision before broadcast fails chronology',lambda: require(
     validate_pit_events(N['events']+BR['events'], required_symbols=['HDFCBANK'], require_all_target_quarters=False)['status']=='FAIL'
