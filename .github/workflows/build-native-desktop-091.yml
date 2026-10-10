@@ -11,6 +11,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: sre-native-091
+  cancel-in-progress: true
+
 jobs:
   windows:
     runs-on: windows-latest
