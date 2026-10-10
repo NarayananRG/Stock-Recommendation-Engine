@@ -35,12 +35,26 @@ def main() -> int:
 
     elig=json.loads(ELIG.read_text(encoding="utf-8"))
     eligible_events=elig.get("eligible_events") or []
-    if len(eligible_events)!=17402:
-        raise RuntimeError(f"PHASE2A5_ELIGIBLE_EVENT_COUNT_MISMATCH:{len(eligible_events)}")
+    expected_eligible=int(elig.get("eligible_event_count") or 0)
+    pre_pit_candidates=int(elig.get("pre_pit_candidate_count") or 0)
+    pit_rejections=int(elig.get("pit_order_rejection_count") or 0)
+    if pre_pit_candidates!=17402:
+        raise RuntimeError(f"PHASE2A5_PRE_PIT_CANDIDATE_COUNT_MISMATCH:{pre_pit_candidates}")
+    if expected_eligible != pre_pit_candidates - pit_rejections:
+        raise RuntimeError(
+            "PHASE2A5_PIT_ELIGIBILITY_ARITHMETIC_MISMATCH:"
+            f"{pre_pit_candidates}:{pit_rejections}:{expected_eligible}"
+        )
+    if len(eligible_events)!=expected_eligible:
+        raise RuntimeError(
+            f"PHASE2A5_ELIGIBLE_EVENT_LIST_COUNT_MISMATCH:{len(eligible_events)}:{expected_eligible}"
+        )
 
     events=transform_all(eligible_events,rows)
-    if len(events)!=17402:
-        raise RuntimeError(f"PHASE2A5_TRANSFORM_EVENT_COUNT_MISMATCH:{len(events)}")
+    if len(events)!=expected_eligible:
+        raise RuntimeError(
+            f"PHASE2A5_TRANSFORM_EVENT_COUNT_MISMATCH:{len(events)}:{expected_eligible}"
+        )
 
     with (OUT/"derived_events.jsonl").open("w",encoding="utf-8") as handle:
         for event in events:
@@ -55,6 +69,8 @@ def main() -> int:
         "artifact_type":"FUNDAMENTAL_RESEARCH_V2_PHASE2A5_DERIVED_EVENT_TRANSFORM_SUMMARY_V1",
         "authority":"SHADOW_ONLY",
         "status":"DERIVED_EVENT_TRANSFORM_AUDIT_PASS",
+        "pre_pit_candidate_count":pre_pit_candidates,
+        "pit_order_rejection_count":pit_rejections,
         "derived_event_count":len(events),
         "feature_counts":dict(sorted(by_feature.items())),
         "comparison_counts":dict(sorted(by_comparison.items())),
