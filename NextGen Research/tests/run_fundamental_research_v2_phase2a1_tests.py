@@ -9,6 +9,7 @@ sys.path.insert(0, str(ROOT))
 
 from fundamental_research_v2_phase2a.acquisition import (  # noqa: E402
     NSE_INTEGRATED_API,
+    acquire_marketwide,
     acquire_symbol,
     build_query,
     extract_rows,
@@ -45,7 +46,8 @@ sample_row = {
 sample_payload={'data':[sample_row]}
 
 case('QUERY','endpoint locked',lambda: require(NSE_INTEGRATED_API.endswith('/api/integrated-filing-results')))
-case('QUERY','symbol alias in query',lambda: require(build_query(symbol='MANDM')['symbol']=='M&M'))\ncase('QUERY','marketwide query omits symbol',lambda: require('symbol' not in build_query()))
+case('QUERY','symbol alias in query',lambda: require(build_query(symbol='MANDM')['symbol']=='M&M'))
+case('QUERY','marketwide query omits symbol',lambda: require('symbol' not in build_query()))
 case('QUERY','filing type locked',lambda: require(build_query(symbol='ABC')['type']=='Integrated Filing- Financials'))
 case('QUERY','invalid page rejected',lambda: raises(ValueError,lambda:build_query(symbol='ABC',page=0),'PAGINATION'))
 case('QUERY','one date bound rejected',lambda: raises(ValueError,lambda:build_query(symbol='ABC',from_date=__import__('datetime').date(2025,1,1)),'BOTH_DATE'))
@@ -81,7 +83,7 @@ market_calls=[]
 def market_fetch(url,params,headers):
     market_calls.append(params)
     return sample_payload
-MW=acquire_marketwide(fetch_json=market_fetch,page_size=500)
+MW=acquire_marketwide(fetch_json=market_fetch,page_size=50)
 case('MARKETWIDE','one partial page stops',lambda: require(MW['page_count']==1))
 case('MARKETWIDE','intersection deliberately false',lambda: require(MW['audited_universe_intersection_performed'] is False))
 case('MARKETWIDE','query has no symbol',lambda: require('symbol' not in market_calls[0]))
