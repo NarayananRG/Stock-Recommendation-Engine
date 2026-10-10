@@ -1,0 +1,49 @@
+{
+  "artifact_type": "FUNDAMENTAL_RESEARCH_V2_PHASE2A5_DERIVED_EVENT_FEATURE_TRANSFORM_CONTRACT_V1",
+  "status": "STARTED",
+  "authority": "SHADOW_ONLY",
+  "objective": "Transform eligible canonical fundamental comparisons into PIT-safe, sign-safe descriptive deltas without labels, scoring, or model training.",
+  "transforms": {
+    "ABSOLUTE_DELTA": {
+      "formula": "current_value - previous_value"
+    },
+    "SYMMETRIC_CHANGE": {
+      "formula": "2 * (current_value - previous_value) / (abs(current_value) + abs(previous_value))",
+      "zero_denominator_rule": "If both values are exactly zero, emit 0.",
+      "range": "[-2, 2]"
+    },
+    "DIRECTION": {
+      "values": [
+        "INCREASE",
+        "DECREASE",
+        "UNCHANGED"
+      ]
+    },
+    "SIGN_TRANSITION": {
+      "signs": [
+        "NEGATIVE",
+        "ZERO",
+        "POSITIVE"
+      ]
+    }
+  },
+  "forbidden_in_v1": [
+    "Traditional percent change across zero/sign changes.",
+    "Arbitrary epsilon or denominator clipping.",
+    "Winsorization or outlier clipping.",
+    "Bullish/bearish or deterioration labels.",
+    "Cross-feature ratios or composite scores.",
+    "Market labels, event-decay targets, model fitting or promotion."
+  ],
+  "pit_rules": [
+    "Never mix CONSOLIDATED and STANDALONE.",
+    "Effective availability is the current filing availability timestamp.",
+    "Current availability must not precede previous availability.",
+    "Only Phase 2A.5 eligibility-approved comparisons may be transformed.",
+    "Missing/archive-gap values remain ineligible."
+  ],
+  "expected_eligible_event_count": 17402,
+  "exit_gate": "DERIVED_EVENT_TRANSFORM_AUDIT_PASS",
+  "production_model_changed": false,
+  "model_training_started": false
+}
