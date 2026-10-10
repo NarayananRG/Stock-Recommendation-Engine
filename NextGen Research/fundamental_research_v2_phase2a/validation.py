@@ -134,12 +134,19 @@ def validate_pit_events(
                     sequence.append((quarter, _dt(earliest["publication_ts"])))
             for prev, cur in zip(sequence, sequence[1:]):
                 if cur[1] <= prev[1]:
-                    failures.append({
-                        "code": "ORIGINAL_QUARTER_CHRONOLOGY_NON_MONOTONIC",
+                    warnings.append({
+                        "code": "LATE_OR_OUT_OF_ORDER_ORIGINAL_FILING",
                         "symbol": symbol,
                         "basis": basis,
                         "prior_quarter": prev[0],
                         "current_quarter": cur[0],
+                        "prior_publication_ts": prev[1].isoformat(),
+                        "current_publication_ts": cur[1].isoformat(),
+                        "interpretation": (
+                            "Not a PIT failure. NSE may receive an older reporting "
+                            "period after a newer one. Availability remains governed "
+                            "strictly by each event's own availability_ts."
+                        ),
                     })
 
     by_symbol = {}
