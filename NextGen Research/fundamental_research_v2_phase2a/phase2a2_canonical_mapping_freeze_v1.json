@@ -1,0 +1,90 @@
+{
+  "artifact_type": "FUNDAMENTAL_RESEARCH_V2_PHASE2A2_CANONICAL_MAPPING_FREEZE_V1",
+  "status": "FROZEN_FOR_SCALED_RESEARCH_VALIDATION",
+  "authority": "SHADOW_ONLY",
+  "scope": "Research-only canonical XBRL mapping contract derived from the 24-document official NSE pilot; not production authority.",
+  "evidence": {
+    "pilot_document_count": 24,
+    "period_semantic_tests": {
+      "passed": 12,
+      "failed": 0
+    },
+    "deterministic_selection_count": 184,
+    "missing_expected_period_count": 80,
+    "blocked_domain_feature_count": 0,
+    "unresolved_example_count": 0,
+    "freeze_candidate_count": 25
+  },
+  "period_policy": {
+    "quarter_features": [
+      "REVENUE",
+      "PAT",
+      "PBT",
+      "TAX",
+      "FINANCE_COST",
+      "DEPRECIATION",
+      "EPS"
+    ],
+    "instant_features": [
+      "CASH_AND_EQUIVALENTS",
+      "TOTAL_ASSETS",
+      "DEBT_EQUITY_RATIO"
+    ],
+    "cumulative_features": [
+      "OPERATING_CASH_FLOW"
+    ],
+    "cumulative_bucket_by_quarter_end_month": {
+      "12": "NINE_MONTH_LIKE",
+      "03": "ANNUAL_LIKE",
+      "06": "QUARTER_LIKE",
+      "09": "HALF_YEAR_LIKE"
+    },
+    "require_end_aligned_to_quarter": true,
+    "require_undimensioned_company_level_context": true,
+    "keep_reporting_basis_separate": true
+  },
+  "domain_mappings": {
+    "IND_AS_CORPORATE": {
+      "REVENUE": "RevenueFromOperations",
+      "PAT": "ProfitLossForPeriod",
+      "PBT": "ProfitBeforeTax",
+      "TAX": "TaxExpense",
+      "FINANCE_COST": "FinanceCosts",
+      "DEPRECIATION": "DepreciationDepletionAndAmortisationExpense",
+      "OPERATING_CASH_FLOW": "CashFlowsFromUsedInOperatingActivities",
+      "CASH_AND_EQUIVALENTS": "CashAndCashEquivalentsCashFlowStatement",
+      "TOTAL_ASSETS": "Assets",
+      "EPS": "BasicEarningsLossPerShareFromContinuingAndDiscontinuedOperations"
+    },
+    "BANK": {
+      "REVENUE": "Income",
+      "TAX": "TaxExpense",
+      "OPERATING_CASH_FLOW": "CashFlowsFromUsedInOperatingActivities",
+      "CASH_AND_EQUIVALENTS": "CashAndCashEquivalentsCashFlowStatement",
+      "TOTAL_ASSETS": "Assets"
+    },
+    "NBFC": {
+      "REVENUE": "Income",
+      "PAT": "ProfitLossForPeriod",
+      "PBT": "ProfitBeforeTax",
+      "TAX": "TaxExpense",
+      "FINANCE_COST": "FinanceCosts",
+      "DEPRECIATION": "DepreciationDepletionAndAmortisationExpense",
+      "OPERATING_CASH_FLOW": "CashFlowsFromUsedInOperatingActivities",
+      "CASH_AND_EQUIVALENTS": "CashAndCashEquivalentsCashFlowStatement",
+      "TOTAL_ASSETS": "Assets",
+      "EPS": "BasicEarningsLossPerShareFromContinuingAndDiscontinuedOperations"
+    }
+  },
+  "safeguards": [
+    "Missing expected-period facts remain missing; never zero-fill or substitute another period.",
+    "Standalone and consolidated facts remain separate.",
+    "Dimensioned segment/member facts are not used for company-level canonical totals.",
+    "Unobserved domain/feature combinations are not silently mapped.",
+    "A preferred concept that becomes internally ambiguous in scaled validation must fail closed.",
+    "This freeze authorizes scaled research validation only; it does not authorize model training or production promotion."
+  ],
+  "production_model_changed": false,
+  "model_training_started": false,
+  "next_gate": "PHASE2A3_SCALED_186_COMPANY_XBRL_MAPPING_VALIDATION"
+}
