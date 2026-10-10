@@ -120,6 +120,7 @@ def compact_document_resolution(document: dict, mapping_contract: dict) -> dict:
         "availability_ts": document.get("availability_ts"),
         "source_url": document.get("source_url"),
         "source_content_sha256": document.get("source_content_sha256"),
+        "source_document_kind": document.get("source_document_kind"),
         "domain": domain,
         "all_fact_count": document.get("all_fact_count"),
         "numeric_fact_count": document.get("numeric_fact_count"),
