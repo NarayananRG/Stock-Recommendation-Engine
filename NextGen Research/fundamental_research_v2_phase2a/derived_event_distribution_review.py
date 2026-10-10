@@ -25,7 +25,11 @@ def _decimal(value) -> Decimal:
 
 
 def _text(value: Decimal | None) -> str | None:
-    return None if value is None else format(value,"f")
+    if value is None:
+        return None
+    if value == 0:
+        return "0"
+    return format(value.normalize(),"f")
 
 
 def _quantile(values: list[Decimal], q: Decimal) -> Decimal | None:
