@@ -1,0 +1,37 @@
+{
+  "artifact_type": "FUNDAMENTAL_RESEARCH_V2_PHASE2A3_SCALED_XBRL_VALIDATION_CONTRACT_V1",
+  "status": "STARTED",
+  "authority": "SHADOW_ONLY",
+  "objective": "Validate the frozen Phase 2A.2 period/domain mapping contract across the exact 186-company, six-quarter PIT-qualified official NSE universe before any event-decay or predictive research.",
+  "source_inputs": [
+    "Phase 2A.1 all_target_events.json (2,365 PIT-qualified official filing events)",
+    "Phase 2A.2 canonical mapping freeze V1"
+  ],
+  "target_quarters": [
+    "2025-03-31",
+    "2025-06-30",
+    "2025-09-30",
+    "2025-12-31",
+    "2026-03-31",
+    "2026-06-30"
+  ],
+  "execution": [
+    "Select latest PIT-qualified filing event per symbol/quarter/reporting-basis.",
+    "Use only official nsearchives.nseindia.com XBRL URLs.",
+    "Parse in memory and persist compact canonical-resolution evidence rather than the full fact inventory.",
+    "Checkpoint every document and resume without redownloading successful documents.",
+    "Preserve content SHA256, event id, provider sequence, source URL, availability, domain, concept, context, unit and normalized value for selected facts.",
+    "Record retrieval/parser failures and every unresolved preferred-concept ambiguity."
+  ],
+  "hard_gates": [
+    "No non-official fundamental source.",
+    "No yfinance fundamentals.",
+    "No model training.",
+    "No production model or production app authority changes.",
+    "No automatic mapping expansion beyond the frozen contract.",
+    "Any scaled semantic ambiguity is a hard mapping-validation failure."
+  ],
+  "exit_gate": "SCALED_MAPPING_VALIDATION_PASS_OR_QUANTIFIED_GAPS",
+  "production_model_changed": false,
+  "model_training_started": false
+}
