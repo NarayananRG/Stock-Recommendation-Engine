@@ -1,0 +1,40 @@
+{
+  "artifact_type": "FUNDAMENTAL_RESEARCH_V2_PHASE2A4_CANONICAL_FEATURE_PANEL_CONTRACT_V1",
+  "status": "STARTED",
+  "authority": "SHADOW_ONLY",
+  "objective": "Build a basis-separated PIT canonical fundamental feature panel from the Phase 2A.3 validated compact documents and audit cross-quarter continuity without introducing derived growth signals yet.",
+  "inputs": [
+    "Phase 2A.3 closure V1",
+    "Phase 2A.3 by_document compact canonical resolutions",
+    "Phase 2A.1 all_target_events.json",
+    "Phase 2A.2 canonical mapping freeze V1"
+  ],
+  "row_grain": "symbol + quarter_end + reporting_basis + latest PIT-qualified filing event",
+  "rules": [
+    "Keep CONSOLIDATED and STANDALONE as separate histories.",
+    "Include all 2,181 expected latest-event groups, including the 10 terminal official archive gaps.",
+    "Do not zero-fill missing features.",
+    "Preserve canonical feature status, selected concept and normalized numeric value.",
+    "Preserve source event id, availability timestamp and source representation provenance.",
+    "Do not calculate QoQ/YoY growth, ratios, scores, labels or prediction features in Phase 2A.4.",
+    "Continuity audit is descriptive: report observed quarter presence/gaps without inventing a regulatory cadence rule.",
+    "Any semantic hard failure in an existing compact document is a hard Phase 2A.4 failure."
+  ],
+  "outputs": [
+    "canonical_feature_panel.csv",
+    "canonical_feature_panel.jsonl",
+    "feature_continuity_audit.json",
+    "summary.json"
+  ],
+  "hard_gates": [
+    "Phase 2A.3 must be closed PASS_WITH_QUANTIFIED_OFFICIAL_ARCHIVE_GAPS.",
+    "Expected panel row count must equal 2,181.",
+    "Terminal archive gap row count must equal 10.",
+    "Semantic hard failure count must equal 0.",
+    "No network access.",
+    "No model training.",
+    "No production authority change."
+  ],
+  "production_model_changed": false,
+  "model_training_started": false
+}
