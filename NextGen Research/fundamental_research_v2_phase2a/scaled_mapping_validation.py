@@ -38,7 +38,9 @@ def frozen_features_for_domain(mapping_contract: dict, domain: str) -> dict[str,
 
 
 def compact_document_resolution(document: dict, mapping_contract: dict) -> dict:
-    domain = classify_domain(document.get("source_url"))
+    domain = classify_domain(
+        document.get("domain_source_url") or document.get("source_url")
+    )
     frozen = frozen_features_for_domain(mapping_contract, domain)
 
     features = {}
