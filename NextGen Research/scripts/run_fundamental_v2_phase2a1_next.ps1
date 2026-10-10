@@ -3,12 +3,17 @@ $ErrorActionPreference = "Stop"
 $repo = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 $python = "python"
 $tests = Join-Path $repo "NextGen Research\tests\run_fundamental_research_v2_phase2a1_tests.py"
+$pilot = Join-Path $repo "NextGen Research\scripts\run_fundamental_v2_phase2a1_pilot.py"
 $validate = Join-Path $repo "NextGen Research\scripts\validate_fundamental_v2_phase2a1_pilot.py"
 $scale = Join-Path $repo "NextGen Research\scripts\run_fundamental_v2_phase2a1_scaled.py"
 
 Write-Host "Phase 2A.1 - validate pilot PIT chronology"
 & $python $tests
 if ($LASTEXITCODE -ne 0) { throw "Phase 2A.1 tests failed." }
+
+Write-Host "Refreshing four-company official NSE pilot with corrected timestamp semantics."
+& $python $pilot
+if ($LASTEXITCODE -ne 0) { throw "Pilot refresh failed. Scale-up blocked." }
 
 & $python $validate
 if ($LASTEXITCODE -ne 0) { throw "Pilot PIT validation failed. Scale-up blocked." }
