@@ -18,7 +18,7 @@ NSE_INTEGRATED_API = "https://www.nseindia.com/api/integrated-filing-results"
 DEFAULT_PAGE_SIZE = 50
 
 
-def build_query(*, symbol: str, page: int = 1, size: int = DEFAULT_PAGE_SIZE,
+def build_query(*, symbol: str | None = None, page: int = 1, size: int = DEFAULT_PAGE_SIZE,
                 from_date: date | None = None, to_date: date | None = None) -> dict:
     if page < 1 or size < 1 or size > 500:
         raise ValueError("INVALID_PAGINATION")
@@ -26,12 +26,13 @@ def build_query(*, symbol: str, page: int = 1, size: int = DEFAULT_PAGE_SIZE,
         raise ValueError("BOTH_DATE_BOUNDS_REQUIRED")
     payload = {
         "index": "equities",
-        "symbol": normalize_symbol(symbol),
         "period_ended": "all",
         "type": "Integrated Filing- Financials",
         "page": page,
         "size": size,
     }
+    if symbol is not None:
+        payload["symbol"] = normalize_symbol(symbol)
     if from_date is not None and to_date is not None:
         if to_date < from_date:
             raise ValueError("INVALID_DATE_RANGE")
@@ -215,7 +216,7 @@ def acquire_symbol(
 
 def acquire_marketwide(
     *, fetch_json: Callable[[str, dict, dict], object],
-    page_size: int = 500,
+    page_size: int = DEFAULT_PAGE_SIZE,
     max_pages: int = 100,
 ) -> dict:
     """Acquire market-wide Integrated Filing metadata before audited-universe intersection."""
