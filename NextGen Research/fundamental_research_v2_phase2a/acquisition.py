@@ -142,7 +142,6 @@ def normalize_response(payload: object, *, source_url: str = NSE_INTEGRATED_API)
         try:
             event = build_filing_event(mapped, source_url=source_url, source_sha256=source_sha, source_exchange="NSE")
             event["provider_seq_id"] = mapped.get("seq_id")
-            event["creation_ts"] = mapped.get("Creation DATE/TIME")
             event["xbrl_url"] = mapped.get("xbrl")
             event["ixbrl_url"] = mapped.get("ixbrl")
             event["details_url"] = mapped.get("details")
