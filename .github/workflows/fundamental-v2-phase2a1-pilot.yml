@@ -9,6 +9,14 @@ on:
       - "NextGen Research/fundamental_research_v2_phase2a/**"
       - "NextGen Research/scripts/run_fundamental_v2_phase2a1_pilot.py"
       - "NextGen Research/tests/run_fundamental_research_v2_phase2a1_tests.py"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/fundamental-v2-phase2a1-pilot.yml"
+      - "NextGen Research/fundamental_research_v2_phase2a/**"
+      - "NextGen Research/scripts/run_fundamental_v2_phase2a1_pilot.py"
+      - "NextGen Research/tests/run_fundamental_research_v2_phase2a1_tests.py"
   workflow_dispatch:
 
 permissions:
