@@ -1,0 +1,51 @@
+{
+  "artifact_type": "FUNDAMENTAL_RESEARCH_V2_PHASE2A2_XBRL_PILOT_CLOSURE_V1",
+  "status": "PILOT_XBRL_PARSE_AND_BREADTH_PROFILE_PASS",
+  "authority": "SHADOW_ONLY",
+  "evidence": {
+    "selected_document_count": 24,
+    "successful_document_count": 24,
+    "failed_document_count": 0,
+    "total_numeric_fact_count": 31818,
+    "unique_concept_count": 313,
+    "domain_profile": {
+      "BANK": {
+        "documents": 4,
+        "numeric_facts": 1872,
+        "unique_concept_count": 143
+      },
+      "NBFC": {
+        "documents": 4,
+        "numeric_facts": 2516,
+        "unique_concept_count": 209
+      },
+      "IND_AS_CORPORATE": {
+        "documents": 16,
+        "numeric_facts": 27430,
+        "unique_concept_count": 218
+      }
+    }
+  },
+  "observed_high_coverage_concepts": [
+    "Income",
+    "OtherIncome",
+    "TaxExpense",
+    "RevenueFromOperations",
+    "ProfitBeforeTax",
+    "ProfitLossForPeriod",
+    "FinanceCosts",
+    "DepreciationDepletionAndAmortisationExpense",
+    "CashFlowsFromUsedInOperatingActivities",
+    "Assets",
+    "DebtEquityRatio"
+  ],
+  "interpretation": [
+    "Generic parser is viable across corporate, bank and NBFC official NSE XBRL documents.",
+    "Concept names are sufficiently rich for candidate mapping, but domain-specific and context-specific selection is required.",
+    "March documents contain much richer annual/full-statement context sets than June quarterly documents.",
+    "Canonical mappings must be proven from context/date/unit evidence rather than concept name alone."
+  ],
+  "production_model_changed": false,
+  "model_training_started": false,
+  "next_gate": "PHASE2A2_CANONICAL_FEATURE_MAPPING_AND_CONTEXT_AUDIT"
+}
