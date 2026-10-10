@@ -17,10 +17,11 @@ def case(cat,name,fn):
     except Exception as exc: s,d='FAIL',f'{type(exc).__name__}: {exc}'
     RESULTS.append({'category':cat,'test':name,'status':s,'detail':d})
 
-def row(q,revenue=None,ocf=None,basis='CONSOLIDATED',archive=False):
+def row(q,revenue=None,ocf=None,basis='CONSOLIDATED',archive=False,availability=None):
     base={
       'symbol':'ABC','quarter_end':q,'reporting_basis':basis,'archive_gap':archive,
-      'event_id':'E'+q,'availability_ts':q+'T12:00:00+05:30',
+      'event_id':'E'+q,
+      'availability_ts':availability or (q+'T12:00:00+05:30'),
     }
     for feature,value in [('REVENUE',revenue),('OPERATING_CASH_FLOW',ocf)]:
         base[f'{feature}__status']=(
@@ -53,6 +54,22 @@ case('POLICY','ocf same-quarter yoy only',lambda: require(ocf['yoy_eligible_coun
 case('POLICY','debt equity excluded',lambda: require(der['excluded'] is True))
 case('PIT','effective timestamp comes from current event',lambda: require(
  all(x['effective_availability_ts']==x['current_quarter_end']+'T12:00:00+05:30' for x in audit['eligible_events'])
+))
+case('PIT','normal history has zero timestamp inversions',lambda: require(
+ audit['pit_order_rejection_count']==0
+))
+
+inverted=[
+ row('2025-03-31','100',None,availability='2025-08-01T12:00:00+05:30'),
+ row('2025-06-30','110',None,availability='2025-07-15T12:00:00+05:30'),
+]
+inv_audit=eligibility_audit(inverted)
+inv_rev=next(x for x in inv_audit['feature_eligibility'] if x['feature']=='REVENUE')
+case('PIT','pit inversion excluded upstream',lambda: require(
+ inv_audit['pit_order_rejection_count']==1 and inv_rev['qoq_eligible_count']==0
+))
+case('PIT','pre-pit candidate retained for auditability',lambda: require(
+ inv_audit['pre_pit_candidate_count']==1
 ))
 case('SAFETY','no derived values created',lambda: require(audit['derived_feature_values_created'] is False))
 
