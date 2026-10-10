@@ -5,7 +5,7 @@ from collections import defaultdict
 from datetime import datetime
 from typing import Iterable, Sequence
 
-from .core import TARGET_QUARTER_ENDS, normalize_symbol
+from .core import TARGET_QUARTER_ENDS, effective_availability_ts, normalize_symbol
 
 
 def _dt(value: str) -> datetime:
@@ -54,7 +54,13 @@ def validate_pit_events(
                 failures.append({"code": "ORIGINAL_PUBLICATION_NOT_BROADCAST", "event_id": row.get("event_id")})
             if row.get("creation_ts") and row.get("broadcast_ts"):
                 if _dt(row["creation_ts"]) < _dt(row["broadcast_ts"]):
-                    failures.append({"code": "ORIGINAL_CREATION_PRECEDES_BROADCAST", "event_id": row.get("event_id")})
+                    warnings.append({
+                        "code": "ORIGINAL_TIMESTAMP_ORDER_DISAGREEMENT",
+                        "event_id": row.get("event_id"),
+                        "broadcast_ts": row.get("broadcast_ts"),
+                        "creation_ts": row.get("creation_ts"),
+                        "availability_ts": effective_availability_ts(row),
+                    })
         elif submission == "REVISION":
             if not row.get("revised_ts"):
                 failures.append({"code": "REVISION_TIMESTAMP_MISSING", "event_id": row.get("event_id")})
@@ -67,7 +73,13 @@ def validate_pit_events(
             # the later dissemination/creation timestamp.
             if row.get("creation_ts") and row.get("revised_ts"):
                 if _dt(row["creation_ts"]) < _dt(row["revised_ts"]):
-                    failures.append({"code": "REVISION_CREATION_PRECEDES_REVISED_TS", "event_id": row.get("event_id")})
+                    warnings.append({
+                        "code": "REVISION_TIMESTAMP_ORDER_DISAGREEMENT",
+                        "event_id": row.get("event_id"),
+                        "revised_ts": row.get("revised_ts"),
+                        "creation_ts": row.get("creation_ts"),
+                        "availability_ts": effective_availability_ts(row),
+                    })
         else:
             failures.append({"code": "UNSUPPORTED_SUBMISSION_TYPE", "event_id": row.get("event_id")})
 
@@ -90,11 +102,11 @@ def validate_pit_events(
     for (symbol, quarter, basis), xs in grouped.items():
         originals = sorted(
             (x for x in xs if x.get("submission_type") == "ORIGINAL"),
-            key=lambda x: _dt(x["publication_ts"]),
+            key=lambda x: _dt(effective_availability_ts(x)),
         )
         revisions = sorted(
             (x for x in xs if x.get("submission_type") == "REVISION"),
-            key=lambda x: _dt(x["publication_ts"]),
+            key=lambda x: _dt(effective_availability_ts(x)),
         )
         revision_count += len(revisions)
         if revisions and not originals:
@@ -106,11 +118,11 @@ def validate_pit_events(
             })
             continue
         if originals and revisions:
-            first_original = _dt(originals[0]["publication_ts"])
+            first_original = _dt(effective_availability_ts(originals[0]))
             for revision in revisions:
-                if _dt(revision["publication_ts"]) <= first_original:
+                if _dt(effective_availability_ts(revision)) <= first_original:
                     failures.append({
-                        "code": "REVISION_NOT_AFTER_ORIGINAL",
+                        "code": "REVISION_AVAILABLE_NOT_AFTER_ORIGINAL",
                         "symbol": symbol,
                         "quarter_end": quarter,
                         "basis": basis,
@@ -130,8 +142,8 @@ def validate_pit_events(
                     if x.get("submission_type") == "ORIGINAL"
                 ]
                 if originals:
-                    earliest = min(originals, key=lambda x: _dt(x["publication_ts"]))
-                    sequence.append((quarter, _dt(earliest["publication_ts"])))
+                    earliest = min(originals, key=lambda x: _dt(effective_availability_ts(x)))
+                    sequence.append((quarter, _dt(effective_availability_ts(earliest))))
             for prev, cur in zip(sequence, sequence[1:]):
                 if cur[1] <= prev[1]:
                     warnings.append({
