@@ -16,7 +16,7 @@ from fundamental_research_v2_phase2a.acquisition import (  # noqa: E402
     NSE_LANDING_URL,
     acquire_symbol,
 )
-from fundamental_research_v2_phase2a.core import TARGET_QUARTER_ENDS, coverage_audit  # noqa: E402
+from fundamental_research_v2_phase2a.core import TARGET_QUARTER_ENDS, coverage_audit, rebind_event_availability  # noqa: E402
 from fundamental_research_v2_phase2a.validation import validate_pit_events  # noqa: E402
 
 UNIVERSE_PATH = ROOT / "fundamental_research_v2_phase2a" / "phase2a1_universe_resolution.json"
@@ -130,7 +130,11 @@ def main() -> int:
             print(f"[{index:03d}/{len(symbols)}] {symbol}: FAIL {failure['error']}")
         write_checkpoint(symbols, completed, failures)
 
-    all_events = [event for result in results for event in result.get("target_events", [])]
+    all_events = [
+        rebind_event_availability(event)
+        for result in results
+        for event in result.get("target_events", [])
+    ]
     (OUT / "all_target_events.json").write_text(
         json.dumps(all_events, indent=2, sort_keys=True), encoding="utf-8"
     )
