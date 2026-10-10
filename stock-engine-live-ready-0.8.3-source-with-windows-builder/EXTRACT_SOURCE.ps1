@@ -8,7 +8,7 @@ $out = Join-Path $Here "extracted"
 (Get-Content $parts.FullName -Raw) | Set-Content -NoNewline -Encoding ASCII $joined
 [IO.File]::WriteAllBytes($zip, [Convert]::FromBase64String((Get-Content $joined -Raw)))
 $actual = (Get-FileHash -Algorithm SHA256 $zip).Hash.ToLowerInvariant()
-$expected = "d6a0b48dc899e6e824a95bdaafe8d8e6664a4c50c88c58beb636274371a91524"
+$expected = "4c99dc4b1dfcbec022f436635dc8789c3e07018d57b4ef728caa8c61873f4fac"
 if ($actual -ne $expected) { throw "Source ZIP hash mismatch: $actual" }
 if (Test-Path $out) { Remove-Item -Recurse -Force $out }
 Expand-Archive -Path $zip -DestinationPath $out
