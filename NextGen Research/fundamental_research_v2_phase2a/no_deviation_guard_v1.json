@@ -1,0 +1,42 @@
+{
+  "artifact_type": "FUNDAMENTAL_RESEARCH_V2_NO_DEVIATION_GUARD_V1",
+  "tracker_source": "Stock_Recommendation_App_Roadmap_TRACKER_09Oct2026_LEG6_CLOSED.xlsx",
+  "original_roadmap_legs": 8,
+  "authoritative_delivery_state": {
+    "leg4": "CLOSED",
+    "leg5": "CLOSED",
+    "leg5_result": "NO_INCREMENTAL_EDGE",
+    "leg6": "CLOSED",
+    "leg7": "NEXT_OFFICIAL_DELIVERY_LEG",
+    "leg8": "NOT_STARTED"
+  },
+  "fundamental_v2_role": "PARALLEL_SHADOW_RESEARCH_ONLY",
+  "must_not": [
+    "reopen Leg 4",
+    "reopen or relabel closed Leg 5",
+    "change the frozen Leg 5 production engine",
+    "change the frozen Leg 6 allocator",
+    "delay or replace Leg 7 or Leg 8",
+    "claim predictive uplift from the old Leg 5 result",
+    "promote a Fundamental V2 signal without a new PIT and OOS gate",
+    "use silent yfinance fundamental fallback",
+    "substitute current index members for the historical audited universe"
+  ],
+  "allowed": [
+    "recover fresher official PIT filing history",
+    "repair identity, revision, basis and accounting-family semantics",
+    "run event-decay and risk-filter research in SHADOW_ONLY mode",
+    "compare a new version against the frozen technical/combined control on identical rows",
+    "propose a future explicit new model version only after independent OOS evidence"
+  ],
+  "promotion_gate": {
+    "requires_new_version": true,
+    "requires_pit_correctness": true,
+    "requires_chronological_oos": true,
+    "requires_same_row_control_comparison": true,
+    "requires_multi_cohort_stability": true,
+    "requires_no_material_return_or_risk_degradation": true,
+    "automatic_production_authority": false
+  },
+  "authority": "SHADOW_ONLY"
+}
