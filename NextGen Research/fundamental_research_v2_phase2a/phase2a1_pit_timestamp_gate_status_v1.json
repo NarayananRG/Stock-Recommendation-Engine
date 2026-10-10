@@ -1,0 +1,37 @@
+{
+  "artifact_type": "FUNDAMENTAL_RESEARCH_V2_PHASE2A1_PIT_TIMESTAMP_GATE_STATUS_V1",
+  "status": "BLOCKED_ON_NETWORKED_OFFICIAL_FEED_EXECUTION",
+  "completed": [
+    "original roadmap no-deviation guard locked",
+    "exact upstream universe recovered: 187 raw / 186 canonical",
+    "NSE integrated-feed field mapping aligned to live 2026 schema",
+    "four-symbol official filing discovery pilot recorded",
+    "Python networked collector committed",
+    "Windows one-command runner committed",
+    "GitHub Actions pilot workflow committed"
+  ],
+  "verified_constraints": {
+    "chat_web_direct_api": "BLOCKED",
+    "container_dns_to_nse": "BLOCKED",
+    "api_created_push_workflow": "DID_NOT_TRIGGER",
+    "new_pr_workflow_on_nondefault_branch": "CANNOT_TRIGGER_BEFORE_BASE_WORKFLOW_EXISTS",
+    "p1g_integrated_metadata_cache_in_available_library": "NOT_PRESENT",
+    "current_v2_inputs_latest_fresh_normalized_fundamentals": "2024-12-31"
+  },
+  "do_not_do": [
+    "do not infer broadcast timestamp from XBRL filename",
+    "do not use board approval date as exchange availability timestamp",
+    "do not merge research workflow into main merely to gain network execution",
+    "do not start model training without exact PIT timestamps",
+    "do not use yfinance for fundamentals"
+  ],
+  "next_executable_action": {
+    "environment": "local Windows repo with normal internet access",
+    "command": "powershell -ExecutionPolicy Bypass -File \"NextGen Research/scripts/run_fundamental_v2_phase2a1_pilot.ps1\"",
+    "expected_output": "NextGen Research/results/fundamental_v2_phase2a1_pilot/pilot_summary.json and pilot_events.json",
+    "gate_after_success": "validate exact broadcast/revision chronology for four pilot symbols, then scale collector to 186 canonical companies"
+  },
+  "authority": "SHADOW_ONLY",
+  "production_model_changed": false,
+  "model_training_started": false
+}
