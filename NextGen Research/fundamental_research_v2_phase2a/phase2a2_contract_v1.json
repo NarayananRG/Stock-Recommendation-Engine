@@ -1,0 +1,52 @@
+{
+  "artifact_type": "FUNDAMENTAL_RESEARCH_V2_PHASE2A2_CONTRACT_V1",
+  "status": "STARTED",
+  "authority": "SHADOW_ONLY",
+  "parent_phase": "FUNDAMENTAL_RESEARCH_V2_PHASE2A1_CLOSURE_V1",
+  "objective": "Recover official XBRL facts from PIT-qualified NSE filing versions, quantify feature breadth/continuity, and only then define fundamental feature mappings.",
+  "invariants": [
+    "Do not reopen Original Roadmap Legs 4, 5, or 6.",
+    "Do not delay or replace Original Roadmap Legs 7 or 8.",
+    "Do not train or promote any model in Phase 2A.2.",
+    "Use only official NSE/BSE filing documents for fundamental facts.",
+    "Do not use yfinance fundamentals.",
+    "Preserve filing version, reporting basis, quarter, context, unit, namespace, source URL, source SHA, and PIT availability.",
+    "Never bridge standalone and consolidated facts unless an explicit continuity rule is later approved.",
+    "Never silently map unknown XBRL concepts to canonical financial features.",
+    "Profile observed concepts first; canonical feature mapping is a later evidence-driven step."
+  ],
+  "pilot": {
+    "symbols": [
+      "HCLTECH",
+      "HDFCBANK",
+      "360ONE",
+      "IRCTC",
+      "M&M",
+      "RELIANCE"
+    ],
+    "quarters": [
+      "2026-03-31",
+      "2026-06-30"
+    ],
+    "selection": "Latest PIT-available filing version per symbol/quarter/reporting-basis, while retaining source lineage to earlier versions.",
+    "expected_domains": [
+      "IND_AS_CORPORATE",
+      "BANK",
+      "NBFC",
+      "SERVICE_TRANSPORT",
+      "AUTO",
+      "DIVERSIFIED"
+    ]
+  },
+  "required_outputs": [
+    "Per-document parser evidence with content SHA256",
+    "Numeric fact inventory with concept namespace/local name/context/unit/decimals/scale",
+    "Context and unit inventory",
+    "Concept coverage matrix by symbol/basis/quarter",
+    "Parse/retrieval failure manifest",
+    "Candidate mapping evidence only after observed concept profiling"
+  ],
+  "exit_gate": "PILOT_XBRL_PARSE_AND_BREADTH_PROFILE_PASS",
+  "production_model_changed": false,
+  "model_training_started": false
+}
