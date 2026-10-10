@@ -1,0 +1,15 @@
+$ErrorActionPreference = "Stop"
+$Here = Split-Path -Parent $MyInvocation.MyCommand.Path
+$parts = Get-ChildItem -Path $Here -Filter "source.part.*.b64" | Sort-Object Name
+if (-not $parts) { throw "No source archive parts found." }
+$joined = Join-Path $Here "StockRecommendationEngine_0.8.5_ultra_ui_TEST_SOURCE.zip.b64"
+$zip = Join-Path $Here "StockRecommendationEngine_0.8.5_ultra_ui_TEST_SOURCE.zip"
+$out = Join-Path $Here "extracted"
+(Get-Content $parts.FullName -Raw) | Set-Content -NoNewline -Encoding ASCII $joined
+[IO.File]::WriteAllBytes($zip, [Convert]::FromBase64String((Get-Content $joined -Raw)))
+$actual = (Get-FileHash -Algorithm SHA256 $zip).Hash.ToLowerInvariant()
+$expected = "915425e7027fd6145298e3e467b678e6f5998a895d85c4c18a9cfec033df7edc"
+if ($actual -ne $expected) { throw "Source ZIP hash mismatch: $actual" }
+if (Test-Path $out) { Remove-Item -Recurse -Force $out }
+Expand-Archive -Path $zip -DestinationPath $out
+Write-Host "0.8.5 ultra-ui source extracted and verified: $out" -ForegroundColor Green
