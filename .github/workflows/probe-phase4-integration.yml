@@ -765,19 +765,23 @@ jobs:
         run: |
           @'
           from pathlib import Path
-          import os
+          import os, sys
+          sys.stdout.reconfigure(encoding="utf-8", errors="backslashreplace")
           root=Path(os.environ["SRE_ENGINE_ROOT"])
-          for rel in ["modern_ui/api.py","modern_ui/frontend/app.js","modern_ui/frontend/index.html","stock_app/historical.py","stock_app/allocation.py"]:
-              p=root/rel
-              text=p.read_text(encoding="utf-8")
-              print("\n===== "+rel+" =====")
-              needles=["/api/stocks","/api/opportunities","/api/capital-plan","def stock","def latest_prediction_rows","def capital_plan","def opportunities","class ModernAppContext","renderStock","stockIntelligence","technical","APP_VERSION"]
-              lines=text.splitlines()
-              for needle in needles:
-                  hits=[i for i,x in enumerate(lines) if needle in x]
-                  for i in hits[:4]:
-                      lo=max(0,i-8); hi=min(len(lines),i+35)
-                      print("\n---",needle,"line",i+1,"---")
-                      for n in range(lo,hi):
-                          print(f"{n+1:04d}: {lines[n]}")
+
+          def emit(rel, start, end):
+              lines=(root/rel).read_text(encoding="utf-8").splitlines()
+              print("\n===== "+rel+f" {start}:{end} =====")
+              for i in range(max(0,start-1), min(len(lines),end)):
+                  safe=lines[i].encode("unicode_escape").decode("ascii")
+                  print(f"{i+1:04d}: {safe}")
+
+          emit("modern_ui/api.py", 730, 855)
+          lines=(root/"modern_ui/frontend/app.js").read_text(encoding="utf-8").splitlines()
+          rs=next(i for i,x in enumerate(lines) if "function renderStock" in x)
+          emit("modern_ui/frontend/app.js", rs+1, min(len(lines),rs+115))
+          html=(root/"modern_ui/frontend/index.html").read_text(encoding="utf-8").splitlines()
+          hits=[i for i,x in enumerate(html) if "stock" in x.lower() and ("id=" in x or "chart" in x.lower())]
+          if hits:
+              emit("modern_ui/frontend/index.html", max(1,min(hits)-20), min(len(html),max(hits)+80))
           '@ | python -
