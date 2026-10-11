@@ -36,7 +36,7 @@ jobs:
           if ($hash -ne "86dd430e933d044d08ae4637787eff52369b46b7ee1013e48af7851d9ea88fcc") { throw "Native shell hash mismatch: $hash" }
           Expand-Archive -LiteralPath $zip -DestinationPath "." -Force
 
-          Copy-Item ".ci\native099\main_dynamic_port_python.rs" "native-desktop-0.9.1\src-tauri\src\main.rs" -Force
+          Copy-Item ".ci\native100\main_dynamic_port_python.rs" "native-desktop-0.9.1\src-tauri\src\main.rs" -Force
           Copy-Item ".ci\native091\Cargo.toml" "native-desktop-0.9.1\src-tauri\Cargo.toml" -Force
 
           $main = "native-desktop-0.9.1\src-tauri\src\main.rs"
@@ -249,7 +249,7 @@ jobs:
           $alloc = Get-Content "$env:SRE_ENGINE_ROOT\stock_app\allocation.py" -Raw
           $hist = Get-Content "$env:SRE_ENGINE_ROOT\stock_app\historical.py" -Raw
           $html = Get-Content "$env:SRE_ENGINE_ROOT\modern_ui\frontend\index.html" -Raw
-          if ($api -notmatch '0.9.10-phase3-foundation') { throw "0.9.9 backend identity missing" }
+          if ($api -notmatch '0.9.9-allocation-executability-v2') { throw "0.9.9 backend identity missing" }
           if ($alloc -notmatch 'SINGLE_ELIGIBLE_FULL_CAPITAL') { throw "Single-stock exception missing" }
           if ($alloc -notmatch 'single_eligible_stock_exception') { throw "Phase 2 policy metadata missing" }
           if ($hist -notmatch 'INDEX_') { throw "Market-index exclusion missing" }
