@@ -76,7 +76,7 @@ def _history_symbol(path: Path) -> str | None:
     if name.startswith("INDEX_"):
         return None
     stem = path.stem.upper()
-    if stem.endswith(".NS") or raw.endswith(".BO"):
+    if stem.endswith(".NS") or stem.endswith(".BO"):
         stem = stem[:-3]
     if stem.startswith("INDEX_") or stem in {"NSEI", "NIFTY", "NIFTY50", "NIFTY_50"}:
         return None
@@ -94,7 +94,7 @@ class OfficialUniverseCatalog:
                     "data/official/nifty200",
                     "data/official/nse/nifty200",
                     "data/external_authoritative/nifty_constituents",
-                    "NextGen Research/data/external_authoritative/ncfty_constituents",
+                    "NextGen Research/data/external_authoritative/nifty_constituents",
                 ],
             )
         )
