@@ -305,7 +305,7 @@ jobs:
           root = Path(os.environ["SRE0911_OFFICIAL_ROOT"])
           const = root / "data" / "official" / "nifty200"
           master = root / "data" / "official" / "nse" / "security_master"
-          cache = root / "data" / "normalized" / "nse_official" / "equity_bhavcopy"
+          cache = root / "data" / "normalized" / "nse_official" / "equity_bhavcopy" / "expanded_universe_2026_10_08"
 
           symbols = [f"STK{i:03d}" for i in range(1, 201)]
 
@@ -356,7 +356,7 @@ jobs:
           from stock_app.official_universe import OfficialUniverseCatalog
 
           root = Path(os.environ["SRE0911_OFFICIAL_ROOT"])
-          cache = root / "data" / "normalized" / "nse_official" / "equity_bhavcopy"
+          cache = root / "data" / "normalized" / "nse_official" / "equity_bhavcopy" / "expanded_universe_2026_10_08"
           files = sorted(cache.glob("*.csv"))
 
           status = OfficialUniverseCatalog.inspect(root, files)
