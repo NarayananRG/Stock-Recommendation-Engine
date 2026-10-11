@@ -2,7 +2,7 @@ name: Build SRE 0.9.7 Legacy Data Autodiscovery
 
 on:
   push:
-    branches: [ui-0.9.7-installed-app-verified]
+    branches: [ui-0.9.7-legacy-data-autodiscovery]
     paths:
       - ".ci/native097/**"
       - ".github/workflows/build-native-desktop-096.yml"
