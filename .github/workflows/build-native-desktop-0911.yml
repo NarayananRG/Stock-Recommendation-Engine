@@ -295,7 +295,7 @@ jobs:
           $fixture = "$env:RUNNER_TEMP\sre0911-official-universe"
           $const = Join-Path $fixture "data\official\nifty200"
           $master = Join-Path $fixture "data\official\nse\security_master"
-          $cache = Join-Path $fixture "data\normalized\nse_official\equity_bhavcopy"
+          $cache = Join-Path $fixture "data\normalized\nse_official\equity_bhavcopy\expanded_universe_2026_10_08"
           New-Item -ItemType Directory -Force -Path $const,$master,$cache | Out-Null
           $env:SRE0911_OFFICIAL_ROOT = $fixture
           @'
