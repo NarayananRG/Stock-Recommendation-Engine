@@ -1,0 +1,143 @@
+name: Phase 5 Fast Official Fundamental Bundle
+
+on:
+  push:
+    branches: [ui-0.11.0-phase5-fundamental-v3]
+    paths:
+      - ".github/workflows/phase5-fast-official-fundamentals.yml"
+      - "NextGen Research/scripts/run_fundamental_v2_phase2a3_scaled_mapping_validation_parallel.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sre-phase5-fast-fundamentals
+  cancel-in-progress: true
+
+jobs:
+  build-fast-bundle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check requests pandas
+
+      - name: Acquire official NSE filing metadata
+        run: |
+          python "NextGen Research/scripts/run_fundamental_v2_phase2a1_pilot.py"
+          python "NextGen Research/scripts/validate_fundamental_v2_phase2a1_pilot.py"
+          python "NextGen Research/scripts/run_fundamental_v2_phase2a1_scaled.py"
+
+      - name: Parallel official XBRL mapping
+        run: python "NextGen Research/scripts/run_fundamental_v2_phase2a3_scaled_mapping_validation_parallel.py"
+
+      - name: Close mapping with quantified archive gaps
+        run: |
+          python "NextGen Research/scripts/diagnose_fundamental_v2_phase2a3_ixbrl_structure.py"
+          python "NextGen Research/scripts/close_fundamental_v2_phase2a3.ps1.py"
+
+      - name: Build canonical PIT panel
+        run: |
+          python "NextGen Research/scripts/run_fundamental_v2_phase2a4_feature_panel.py"
+          python "NextGen Research/scripts/run_fundamental_v2_phase2a4_continuity_review.py"
+
+      - name: Build PIT event and risk evidence
+        run: |
+          python "NextGen Research/scripts/run_fundamental_v2_phase2a5_event_feature_eligibility.py"
+          python "NextGen Research/scripts/run_fundamental_v2_phase2a5_derived_event_transforms.py"
+          python "NextGen Research/scripts/run_fundamental_v2_phase2a6_semantic_interpretation.py"
+          python "NextGen Research/scripts/run_fundamental_v2_phase2a7_risk_event_builder.py"
+
+      - name: Validate compact production bundle
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import csv,json,hashlib
+          r=Path("NextGen Research/results")
+          panel=r/"fundamental_v2_phase2a4_feature_panel"/"canonical_feature_panel.csv"
+          events=r/"fundamental_v2_phase2a5_derived_event_transforms"/"derived_events.jsonl"
+          risks=r/"fundamental_v2_phase2a7_risk_events"/"risk_event_profiles.jsonl"
+          closure=r/"fundamental_v2_phase2a3_scaled_mapping_validation"/"phase2a3_closure_v1.json"
+          rows=list(csv.DictReader(panel.open(encoding="utf-8")))
+          e=sum(1 for x in events.open(encoding="utf-8") if x.strip())
+          q=sum(1 for x in risks.open(encoding="utf-8") if x.strip())
+          c=json.loads(closure.read_text(encoding="utf-8"))
+          assert len(rows)==2181,len(rows)
+          assert e==17253,e
+          assert q>0,q
+          assert c["phase2a3_closed"] is True,c
+          assert c["semantic_hard_failure_count"]==0,c
+          assert c["status"]=="PASS_WITH_QUANTIFIED_OFFICIAL_ARCHIVE_GAPS",c
+          print(json.dumps({
+            "panel_rows":len(rows),
+            "derived_events":e,
+            "risk_profiles":q,
+            "parsed_document_coverage":c["parsed_document_coverage"],
+            "semantic_hard_failures":0,
+            "source":"OFFICIAL_NSE_XBRL",
+            "yfinance_used":False,
+            "authority":"SHADOW_ONLY"
+          },indent=2))
+          PY
+
+      - name: Package compact Fundamental V3 data
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,shutil,zipfile,hashlib
+          src=Path("NextGen Research/results")
+          stage=Path("phase5_bundle/NextGen Research/results")
+          wanted=[
+            "fundamental_v2_phase2a1_scaled/scaled_pit_validation.json",
+            "fundamental_v2_phase2a1_scaled/scaled_coverage_audit.json",
+            "fundamental_v2_phase2a3_scaled_mapping_validation/phase2a3_closure_v1.json",
+            "fundamental_v2_phase2a4_feature_panel/canonical_feature_panel.csv",
+            "fundamental_v2_phase2a4_feature_panel/summary.json",
+            "fundamental_v2_phase2a5_derived_event_transforms/derived_events.jsonl",
+            "fundamental_v2_phase2a5_derived_event_transforms/summary.json",
+            "fundamental_v2_phase2a6_semantic_interpretation/summary.json",
+            "fundamental_v2_phase2a7_risk_events/risk_event_profiles.jsonl",
+            "fundamental_v2_phase2a7_risk_events/summary.json",
+          ]
+          files=[]
+          for rel in wanted:
+            a=src/rel
+            assert a.exists(),rel
+            b=stage/rel
+            b.parent.mkdir(parents=True,exist_ok=True)
+            shutil.copy2(a,b)
+            files.append({
+              "path":rel,
+              "bytes":a.stat().st_size,
+              "sha256":hashlib.sha256(a.read_bytes()).hexdigest()
+            })
+          manifest={
+            "artifact_type":"SRE_PHASE5_REAL_FUNDAMENTAL_BUNDLE_V1",
+            "source":"OFFICIAL_NSE_INTEGRATED_FILING_XBRL",
+            "authority":"SHADOW_ONLY",
+            "yfinance_used":False,
+            "synthetic_data":False,
+            "files":files
+          }
+          m=stage.parent/"phase5_real_fundamental_manifest.json"
+          m.write_text(json.dumps(manifest,indent=2),encoding="utf-8")
+          out=Path("SRE_Phase5_Real_Official_Fundamentals.zip")
+          with zipfile.ZipFile(out,"w",zipfile.ZIP_DEFLATED,compresslevel=9) as z:
+            for p in Path("phase5_bundle").rglob("*"):
+              if p.is_file(): z.write(p,p.relative_to("phase5_bundle"))
+          print(out,out.stat().st_size,hashlib.sha256(out.read_bytes()).hexdigest())
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SRE-Phase5-Real-Official-Fundamentals-FAST
+          path: SRE_Phase5_Real_Official_Fundamentals.zip
+          if-no-files-found: error
+          retention-days: 14
