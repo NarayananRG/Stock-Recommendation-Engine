@@ -272,13 +272,13 @@ js = root / "modern_ui" / "frontend" / "app.js"
 t = js.read_text(encoding="utf-8")
 fn_start = t.index("function dataSourceLabel(ds){")
 candidates = [
-    t.find("\nfunction ", fl_start + 1),
+    t.find("\nfunction ", fn_start + 1),
     t.find("\nasync function ", fn_start + 1),
 ]
-fn_end = min(pos for pos in candidates if pos > fn_start) if any(pos > fl_start for pos in candidates) else -1
+fn_end = min(pos for pos in candidates if pos > fn_start) if any(pos > fn_start for pos in candidates) else -1
 if fn_end < 0:
     raise RuntimeError("Phase 3B data-source label end marker missing")
-new_fn = """function dataSourceLabel(ds){const a=ds?.active||{},idx=+a.index_files||0,extra=idx?(' · '+idx+' market index'++idx===1?'':'es')):'';const gate=a.freshness_gate||'FAIL',fresh=a.freshness_status||'UNAVAILABLE',freshTag=' · freshness '+gate+'/'+fresh;const u=+a.official_universe_members||0,im=+a.identity_mapped||0,hc=+a.history_covered_members||0,ut=+a.official_universe_target||200,universeTag=u?(' · NIFTY 200 '+u+'/'+ut+' · ISIN '+im+'/'+u+' · history '+hc+'/'+u):'';if(ds?.mode==='REAL_OFFICIAL_DATA')return 'Official NSE OHLCV · '+(a.stock_files||0)+' equities'+extra+' · '+(a.latest_session||'—')+freshTag+universeTag;if(ds?.mode==='REAL_FROZEN_HISTORY')return 'Frozen historical OHLCV · '+(a.stock_files||0)+' equities'+extra+' · '+(a.latest_session||'—')+freshTag+universeTag;return 'No real OHLCV repository connected · freshness FAIL/UNAVAILABLE'+universeTag;}"""
+new_fn = """function dataSourceLabel(ds){const a=ds?.active||{},idx=+a.index_files||0,extra=idx?(' · '+idx+' market index'+(idx===1?'':'es')):'';const gate=a.freshness_gate||'FAIL',fresh=a.freshness_status||'UNAVAILABLE',freshTag=' · freshness '+gate+'/'+fresh;const u=+a.official_universe_members||0,im=+a.identity_mapped||0,hc=+a.history_covered_members||0,ut=+a.official_universe_target||200,universeTag=u?(' · NIFTY 200 '+u+'/'+ut+' · ISIN '+im+'/'+u+' · history '+hc+'/'+u):'';if(ds?.mode==='REAL_OFFICIAL_DATA')return 'Official NSE OHLCV · '+(a.stock_files||0)+' equities'+extra+' · '+(a.latest_session||'—')+freshTag+universeTag;if(ds?.mode==='REAL_FROZEN_HISTORY')return 'Frozen historical OHLCV · '+(a.stock_files||0)+' equities'+extra+' · '+(a.latest_session||'—')+freshTag+universeTag;return 'No real OHLCV repository connected · freshness FAIL/UNAVAILABLE'+universeTag;}"""
 t = t[:fn_start] + new_fn + t[fn_end:]
 js.write_text(t, encoding="utf-8")
 
