@@ -4,8 +4,8 @@ on:
   push:
     branches: [ui-0.9.5-port-isolation]
     paths:
-      - ".ci/native093/**"
-      - ".github/workflows/build-native-desktop-094.yml"
+      - ".ci/native095/**"
+      - ".github/workflows/build-native-desktop-095.yml"
   workflow_dispatch:
 
 permissions:
