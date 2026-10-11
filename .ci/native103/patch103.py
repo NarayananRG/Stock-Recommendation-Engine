@@ -150,8 +150,12 @@ s = repl(s,
             price = candidate.latest_close
             if price is None:
                 price, _ = self.history.latest_close(candidate.symbol)
-            position_budget = request.deployable_capital * effective_position_cap_fraction
-            if price is not None and price > 0 and int(position_budget // price) >= 1:
+            eligibility_budget = (
+                request.deployable_capital
+                if request.deployable_capital <= SMALL_CAPITAL_SINGLE_STOCK_MAX
+                else request.deployable_capital * effective_position_cap_fraction
+            )
+            if price is not None and price > 0 and int(eligibility_budget // price) >= 1:
                 viable_new_symbols.append(candidate.symbol)
 
         single_eligible_symbol = (
