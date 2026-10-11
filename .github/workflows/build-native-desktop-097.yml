@@ -118,13 +118,110 @@ jobs:
       - name: Apply 0.9.7 legacy data autodiscovery
         shell: pwsh
         run: |
-          $b64 = Get-Content ".ci\native097\patch097.py.b64" -Raw
-          $script = "$env:RUNNER_TEMP\patch097.py"
-          [IO.File]::WriteAllBytes($script, [Convert]::FromBase64String($b64))
-          python $script
-          $p = "$env:SRE_ENGINE_ROOT\modern_ui\api.py"
-          if ((Get-Content $p -Raw) -notmatch 'APP_VERSION = "0.9.7-legacy-data-autodiscovery"') { throw "0.9.7 backend patch failed" }
-          if ((Get-Content $p -Raw) -notmatch 'REAL_FROZEN_HISTORY') { throw "Legacy data mode patch missing" }
+          @'
+          from pathlib import Path
+          import os
+
+          root = Path(os.environ["SRE_ENGINE_ROOT"])
+          api = root / "modern_ui" / "api.py"
+          s = api.read_text(encoding="utf-8")
+          s = s.replace('APP_VERSION = "0.9.4-data-source-hotfix"', 'APP_VERSION = "0.9.7-legacy-data-autodiscovery"')
+
+          start = s.index("    @staticmethod\n    def _official_cache_roots")
+          end = s.index("    @staticmethod\n    def _normalize_data_repo_root", start)
+          original = s[start:end]
+          insert = original + '''    @staticmethod
+    def _legacy_frozen_cache_roots(root: Path) -> list[Path]:
+        candidates = [
+            root / "stage2_2_1" / "data" / "frozen",
+            root / "Stage 2.2.2 Final" / "stage2_2_1" / "data" / "frozen",
+        ]
+        return [p for p in candidates if p.exists() and any(p.glob("*.csv"))]
+
+    @classmethod
+    def _market_cache_roots(cls, root: Path) -> tuple[list[Path], str, str]:
+        official = [p for p in cls._official_cache_roots(root) if p.exists() and any(p.glob("*.csv"))]
+        if official:
+            return official, "REAL_OFFICIAL_DATA", "OFFICIAL_NSE_OHLCV"
+        legacy = cls._legacy_frozen_cache_roots(root)
+        if legacy:
+            return legacy, "REAL_FROZEN_HISTORY", "LEGACY_FROZEN_OHLCV"
+        return [], "NO_REAL_DATA_CONNECTED", "NONE"
+
+'''
+          s = s[:start] + insert + s[end:]
+
+          old = '''        for idx in range(max(0, len(parts) - 3)):
+            if parts[idx:idx + 4] == ["data", "normalized", "nse_official", "equity_bhavcopy"]:
+                return Path(*root.parts[:idx]).resolve()
+        return root
+'''
+          new = '''        for idx in range(max(0, len(parts) - 3)):
+            if parts[idx:idx + 4] == ["data", "normalized", "nse_official", "equity_bhavcopy"]:
+                return Path(*root.parts[:idx]).resolve()
+        for idx in range(max(0, len(parts) - 2)):
+            if parts[idx:idx + 3] == ["stage2_2_1", "data", "frozen"]:
+                return Path(*root.parts[:idx]).resolve()
+        return root
+'''
+          if old not in s:
+              raise RuntimeError("normalize path contract missing")
+          s = s.replace(old, new, 1)
+
+          if '        roots = self._official_cache_roots(root)\n        files: list[Path] = []' not in s:
+              raise RuntimeError("inspect roots contract missing")
+          s = s.replace(
+              '        roots = self._official_cache_roots(root)\n        files: list[Path] = []',
+              '        roots, data_mode, provenance = self._market_cache_roots(root)\n        files: list[Path] = []',
+              1,
+          )
+
+          marker = '            "cache_roots": [str(p) for p in roots if p.exists()],'
+          pos = s.index(marker)
+          line_end = pos + len(marker)
+          s = s[:line_end] + '\n            "data_mode": data_mode,\n            "provenance": provenance,' + s[line_end:]
+
+          if '        roots = self._official_cache_roots(root)' not in s:
+              raise RuntimeError("bind roots contract missing")
+          s = s.replace(
+              '        roots = self._official_cache_roots(root)',
+              '        roots, _, _ = self._market_cache_roots(root)',
+              1,
+          )
+
+          s = s.replace(
+              '"mode": "REAL_OFFICIAL_DATA" if current["ohlcv_ready"] else ("PREVIEW" if self.preview_mode else "NO_REAL_DATA_CONNECTED")',
+              '"mode": current.get("data_mode") if current["ohlcv_ready"] else ("PREVIEW" if self.preview_mode else "NO_REAL_DATA_CONNECTED")',
+              1,
+          )
+          s = s.replace(
+              'No official NSE OHLCV cache was found under that folder. Select the Stock-Recommendation-Engine repository that contains data/normalized/nse_official/equity_bhavcopy.',
+              'No usable OHLCV history was found under that repository. Expected either data/normalized/nse_official/equity_bhavcopy or stage2_2_1/data/frozen.',
+              1,
+          )
+          s = s.replace(
+              'Real official market data is not connected.',
+              'Real market history is not connected.',
+              1,
+          )
+          api.write_text(s, encoding="utf-8")
+
+          js = root / "modern_ui" / "frontend" / "app.js"
+          t = js.read_text(encoding="utf-8")
+          t = t.replace("d.mode==='REAL_OFFICIAL_DATA'", "String(d.mode||'').startsWith('REAL_')")
+          t = t.replace("ds.mode==='REAL_OFFICIAL_DATA'", "String(ds.mode||'').startsWith('REAL_')")
+          t = t.replace("official stock histories", "stock histories")
+          t = t.replace("Real official OHLCV repository is not connected", "Real OHLCV repository is not connected")
+          t = t.replace("Select the repository that contains data/normalized/nse_official/equity_bhavcopy", "Select your Stock-Recommendation-Engine repository; official NSE cache and stage2_2_1/data/frozen are supported")
+          t = t.replace("REAL DATA", "REAL REPOSITORY DATA")
+          js.write_text(t, encoding="utf-8")
+
+          assert 'APP_VERSION = "0.9.7-legacy-data-autodiscovery"' in api.read_text(encoding="utf-8")
+          assert "REAL_FROZEN_HISTORY" in api.read_text(encoding="utf-8")
+          assert "LEGACY_FROZEN_OHLCV" in api.read_text(encoding="utf-8")
+          assert "stage2_2_1" in api.read_text(encoding="utf-8")
+          print("0.9.7 legacy data autodiscovery applied")
+          '@ | python -
 
       - name: Fast repository scan regression
         shell: pwsh
