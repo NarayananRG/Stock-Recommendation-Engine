@@ -19,65 +19,38 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Probe documented NSE MCP response shape
+      - name: Probe documented NSE MCP schemas only
         shell: pwsh
         run: |
           @'
-          import json
+          import json, time
           from urllib.request import Request, urlopen
 
           endpoint="https://mcp.nseindia.in/bhavcopy/cm/mcp"
           def post(payload, session=None):
-              headers={
-                  "Content-Type":"application/json",
-                  "Accept":"application/json, text/event-stream",
-                  "User-Agent":"Stock-Recommendation-Engine official-data activation probe"
-              }
+              headers={"Content-Type":"application/json","Accept":"application/json, text/event-stream",
+                       "User-Agent":"Stock-Recommendation-Engine official-data activation probe"}
               if session: headers["Mcp-Session-Id"]=session
-              req=Request(endpoint,data=json.dumps(payload).encode(),headers=headers,method="POST")
-              with urlopen(req,timeout=30) as resp:
-                  raw=resp.read().decode()
-                  rh=dict(resp.headers.items())
-              if raw.startswith("event:"):
-                  data_line=next((x[5:] for x in raw.splitlines() if x.startswith("data:")),None)
-                  if data_line is None: raise RuntimeError("SSE data missing")
-                  raw=data_line
-              return json.loads(raw),rh
+              last=None
+              for attempt in range(3):
+                  try:
+                      req=Request(endpoint,data=json.dumps(payload).encode(),headers=headers,method="POST")
+                      with urlopen(req,timeout=30) as resp:
+                          raw=resp.read().decode(); rh=dict(resp.headers.items())
+                      if raw.startswith("event:"):
+                          raw=next(x[5:] for x in raw.splitlines() if x.startswith("data:"))
+                      return json.loads(raw),rh
+                  except Exception as exc:
+                      last=exc; time.sleep(1.5*(attempt+1))
+              raise last
 
           init,h=post({"jsonrpc":"2.0","id":1,"method":"initialize","params":{
               "protocolVersion":"2025-03-26","capabilities":{},
               "clientInfo":{"name":"sre-phase3c-probe","version":"1.0"}}})
           sid=h.get("mcp-session-id") or h.get("Mcp-Session-Id")
-          assert sid, "MCP session id missing"
-          print("SERVER",init.get("result",{}).get("serverInfo",{}))
+          assert sid
           tools,_=post({"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}},sid)
-          names=[x.get("name") for x in tools.get("result",{}).get("tools",[])]
-          print("TOOLS",names)
-          assert "get_stock_history" in names, names
-          tool_map={x.get("name"):x for x in tools.get("result",{}).get("tools",[])}
-          print("INDEX_SCHEMA",json.dumps(tool_map.get("get_index_history",{}).get("inputSchema",{})))
-          print("STOCK_SCHEMA",json.dumps(tool_map.get("get_stock_history",{}).get("inputSchema",{})))
-          from urllib.request import urlopen as _u
-          constituent_url="https://www.niftyindices.com/IndexConstituent/ind_nifty200list.csv"
-          with _u(constituent_url,timeout=30) as rr:
-              body=rr.read().decode("utf-8-sig")
-          rows=[x for x in body.splitlines() if x.strip()]
-          print("NIFTY200_HEADER",rows[0] if rows else "EMPTY")
-          print("NIFTY200_ROWS",max(0,len(rows)-1))
-          res,_=post({"jsonrpc":"2.0","id":3,"method":"tools/call","params":{
-              "name":"get_stock_history",
-              "arguments":{"symbol":"RELIANCE","months":1,"endDate":"2026-10-08"}
-          }},sid)
-          print("TOP_KEYS",list(res.keys()))
-          result=res.get("result",{})
-          print("RESULT_KEYS",list(result.keys()) if isinstance(result,dict) else type(result).__name__)
-          content=result.get("content",[]) if isinstance(result,dict) else []
-          print("CONTENT_TYPES",[x.get("type") for x in content if isinstance(x,dict)])
-          for idx,item in enumerate(content[:2]):
-              if isinstance(item,dict):
-                  val=item.get("text")
-                  if val:
-                      print("TEXT_SAMPLE",idx,val[:2500])
-                  else:
-                      print("ITEM_SAMPLE",idx,json.dumps(item)[:2500])
+          tm={x.get("name"):x for x in tools.get("result",{}).get("tools",[])}
+          for name in ["get_stock_history","get_index_history","get_index_snapshot","search_symbols"]:
+              print(name.upper()+"_SCHEMA",json.dumps(tm.get(name,{}).get("inputSchema",{}),sort_keys=True))
           '@ | python -
