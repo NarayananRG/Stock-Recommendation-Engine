@@ -309,7 +309,7 @@ jobs:
             if ($js -notmatch 'limit=5000') { throw "5000-session chart history contract missing" }
             if ($html -notmatch 'chartZoomIn' -or $html -notmatch 'chartZoomOut') { throw "Chart zoom buttons missing" }
             if ($html -notmatch 'drag to pan') { throw "Chart pan guidance missing" }
-            if ($js -notmatch 'REAL FROZEN DATA') { throw "Legacy data UI badge contract missing" }
+            if ($js -notmatch "startsWith\('REAL_'\)") { throw "Legacy real-data UI mode contract missing" }
 
             Write-Host "0.9.7 LEGACY BACKEND CONTRACT PASS"
             Write-Host "Budget: $($plan.capital_summary.deployable_capital)"
