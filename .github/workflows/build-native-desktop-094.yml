@@ -1,0 +1,433 @@
+name: Build SRE 0.9.4 Data Source Hotfix
+
+on:
+  push:
+    branches: [ui-0.9.3.1-data-source-hotfix]
+    paths:
+      - ".ci/native093/**"
+      - ".github/workflows/build-native-desktop-093.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sre-native-094
+  cancel-in-progress: true
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Decode verified native desktop shell
+        shell: pwsh
+        run: |
+          $parts = Get-ChildItem ".ci\native091\source.part.*" | Sort-Object Name
+          if ($parts.Count -ne 8) { throw "Expected 8 native shell chunks, found $($parts.Count)" }
+          $b64 = ($parts | ForEach-Object { Get-Content $_.FullName -Raw }) -join ""
+          if ($b64.Length -ne 39284) { throw "Native shell base64 length mismatch: $($b64.Length)" }
+          $zip = "$env:RUNNER_TEMP\native-desktop-shell.zip"
+          [IO.File]::WriteAllBytes($zip, [Convert]::FromBase64String($b64))
+          $hash = (Get-FileHash $zip -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($hash -ne "86dd430e933d044d08ae4637787eff52369b46b7ee1013e48af7851d9ea88fcc") { throw "Native shell hash mismatch: $hash" }
+          Expand-Archive -LiteralPath $zip -DestinationPath "." -Force
+
+          Copy-Item ".ci\native091\main_system_python.rs" "native-desktop-0.9.1\src-tauri\src\main.rs" -Force
+          Copy-Item ".ci\native091\Cargo.toml" "native-desktop-0.9.1\src-tauri\Cargo.toml" -Force
+
+          $main = "native-desktop-0.9.1\src-tauri\src\main.rs"
+          $m = Get-Content $main -Raw
+          $m = $m.Replace("0.9.1-native-desktop","0.9.4-data-source-hotfix")
+          $m = $m.Replace("engine-v091","engine-v094")
+          $m = $m.Replace(".sre091-ready",".sre094-ready")
+          $m = $m.Replace("SRE091_ENGINE_SOURCE.zip","SRE094_ENGINE_SOURCE.zip")
+          $m = $m.Replace("native-desktop-0.9.1.log","native-desktop-0.9.4.log")
+          $m = $m.Replace('.env("STOCK_MODERN_UI_PREVIEW", "1")','.env("STOCK_MODERN_UI_PREVIEW", "0")')
+          Set-Content $main $m -Encoding UTF8
+          if ((Get-Content $main -Raw) -notmatch 'STOCK_MODERN_UI_PREVIEW", "0') { throw "Native runtime preview-disable patch failed" }
+
+          $cargo = "native-desktop-0.9.1\src-tauri\Cargo.toml"
+          (Get-Content $cargo -Raw).Replace('version = "0.9.1"','version = "0.9.4"') | Set-Content $cargo -Encoding UTF8
+
+          $pkg = "native-desktop-0.9.1\package.json"
+          $j = Get-Content $pkg -Raw | ConvertFrom-Json
+          $j.version = "0.9.4"
+          $j | ConvertTo-Json -Depth 20 | Set-Content $pkg -Encoding UTF8
+
+      - name: Reconstruct canonical engine and apply 0.9.2 and 0.9.3 overlays
+        shell: pwsh
+        run: |
+          $dir = "stock-engine-ultra-ui-0.8.5-source-with-windows-builder"
+          $parts = Get-ChildItem -Path $dir -Filter "source.part.*.b64" | Sort-Object Name
+          if (!$parts) { throw "Canonical 0.8.5 source parts missing" }
+          $joined = ($parts | ForEach-Object { Get-Content $_.FullName -Raw }) -join ""
+          $zip = "$env:RUNNER_TEMP\sre085.zip"
+          [IO.File]::WriteAllBytes($zip, [Convert]::FromBase64String($joined))
+          $hash = (Get-FileHash $zip -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($hash -ne "915425e7027fd6145298e3e467b678e6f5998a895d85c4c18a9cfec033df7edc") { throw "Canonical source hash mismatch: $hash" }
+
+          $extract = "$env:RUNNER_TEMP\engine-extract"
+          New-Item -ItemType Directory -Force -Path $extract | Out-Null
+          Expand-Archive -LiteralPath $zip -DestinationPath $extract -Force
+          $engine = Join-Path $extract "StockRecommendationEngine_0.8.5_ultra_ui_TEST_SOURCE"
+          if (!(Test-Path "$engine\requirements-v1.txt")) { throw "Canonical engine root missing" }
+
+          $overlay092Paths = @(
+            ".ci\native092\overlay.part.00.b64",
+            ".ci\native092\overlay.part.01.b64",
+            ".ci\native092\overlay.part.02a.b64",
+            ".ci\native092\overlay.part.02b.b64",
+            ".ci\native092\overlay.part.03.b64",
+            ".ci\native092\overlay.part.04.b64",
+            ".ci\native092\overlay.part.05.b64",
+            ".ci\native092\overlay.part.06.b64"
+          )
+          $overlay092B64 = ($overlay092Paths | ForEach-Object { Get-Content $_ -Raw }) -join ""
+          if ($overlay092B64.Length -ne 42016) { throw "0.9.2 overlay base64 length mismatch: $($overlay092B64.Length)" }
+          $overlay092Zip = "$env:RUNNER_TEMP\sre092-overlay.zip"
+          [IO.File]::WriteAllBytes($overlay092Zip, [Convert]::FromBase64String($overlay092B64))
+          $overlay092Hash = (Get-FileHash $overlay092Zip -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($overlay092Hash -ne "ed91eb0ec54c562f2965a730174bbf422c4ae2ba6852f9e046305593cf96d1d8") { throw "0.9.2 overlay hash mismatch: $overlay092Hash" }
+          Expand-Archive -LiteralPath $overlay092Zip -DestinationPath $engine -Force
+
+          $overlay093Paths = 0..8 | ForEach-Object { ".ci\native093\overlay.part.{0:D2}.b64" -f $_ }
+          $overlay093B64 = ($overlay093Paths | ForEach-Object { Get-Content $_ -Raw }) -join ""
+          if ($overlay093B64.Length -ne 46088) { throw "0.9.3 overlay base64 length mismatch: $($overlay093B64.Length)" }
+          $overlay093Zip = "$env:RUNNER_TEMP\sre093-overlay.zip"
+          [IO.File]::WriteAllBytes($overlay093Zip, [Convert]::FromBase64String($overlay093B64))
+          $overlay093Hash = (Get-FileHash $overlay093Zip -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($overlay093Hash -ne "af2e954e71f906ab7331408cac11a78fc97446ca320c6bed7e71eab06b3421c8") { throw "0.9.3 overlay hash mismatch: $overlay093Hash" }
+          Expand-Archive -LiteralPath $overlay093Zip -DestinationPath $engine -Force
+
+          if (!(Test-Path "$engine\modern_ui\api.py")) { throw "0.9.3 engine overlay failed" }
+          "SRE_ENGINE_ROOT=$engine" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Apply 0.9.4 fast data-source hotfix
+        shell: pwsh
+        run: |
+          @'
+          from pathlib import Path
+          import os
+
+          root = Path(os.environ["SRE_ENGINE_ROOT"])
+          api = root / "modern_ui" / "api.py"
+          s = api.read_text(encoding="utf-8")
+          s = s.replace('APP_VERSION = "0.9.3-real-data-chart-zoom"', 'APP_VERSION = "0.9.4-data-source-hotfix"')
+
+          start = s.index("    def _inspect_data_repo(self, root: Path) -> dict[str, Any]:")
+          end = s.index("    def _candidate_data_repos(self) -> list[Path]:", start)
+          replacement = '''    @staticmethod
+    def _normalize_data_repo_root(raw_root: Path) -> Path:
+        root = raw_root.expanduser().resolve()
+        parts = [part.lower() for part in root.parts]
+        for idx in range(max(0, len(parts) - 3)):
+            if parts[idx:idx + 4] == ["data", "normalized", "nse_official", "equity_bhavcopy"]:
+                return Path(*root.parts[:idx]).resolve()
+        return root
+
+    @staticmethod
+    def _last_nonempty_line(path: Path, chunk_size: int = 4096) -> str | None:
+        try:
+            with path.open("rb") as handle:
+                handle.seek(0, os.SEEK_END)
+                pos = handle.tell()
+                if pos <= 0:
+                    return None
+                buf = b""
+                while pos > 0 and len(buf) < 65536:
+                    step = min(chunk_size, pos)
+                    pos -= step
+                    handle.seek(pos)
+                    buf = handle.read(step) + buf
+                    lines = [line.strip() for line in buf.splitlines() if line.strip()]
+                    if len(lines) >= 2 or pos == 0:
+                        if not lines:
+                            return None
+                        return lines[-1].decode("utf-8", errors="replace")
+        except OSError:
+            return None
+        return None
+
+    def _inspect_data_repo(self, root: Path) -> dict[str, Any]:
+        root = self._normalize_data_repo_root(root)
+        roots = self._official_cache_roots(root)
+        files: list[Path] = []
+        latest = None
+        for cache in roots:
+            if not cache.exists():
+                continue
+            try:
+                cache_files = list(cache.glob("*.csv"))
+            except OSError:
+                continue
+            files.extend(cache_files)
+            for path in cache_files:
+                line = self._last_nonempty_line(path)
+                if not line:
+                    continue
+                d = line.split(",", 1)[0].strip().strip('"')
+                if d and d.lower() not in {"date", "timestamp", "datetime"}:
+                    if not latest or d > latest:
+                        latest = d
+        full_engine_ready = (root / "run_official_v1_daily.py").exists() and (root / "Stage 4A.3").exists()
+        fundamental_ready = (root / "data" / "fundamentals").exists()
+        return {
+            "path": str(root),
+            "exists": root.exists(),
+            "ohlcv_ready": bool(files),
+            "stock_files": len({p.name for p in files}),
+            "latest_session": latest,
+            "full_engine_ready": full_engine_ready,
+            "fundamental_ready": fundamental_ready,
+            "cache_roots": [str(p) for p in roots if p.exists()],
+        }
+
+'''
+          s = s[:start] + replacement + s[end:]
+
+          start = s.index("    def data_source_status(self) -> dict[str, Any]:")
+          end = s.index("    def connect_data_repo(self, raw_path: str) -> dict[str, Any]:", start)
+          replacement = '''    def data_source_status(self) -> dict[str, Any]:
+        current = dict(self.real_data_status)
+        candidates = []
+        if not current["ohlcv_ready"]:
+            for root in self._candidate_data_repos():
+                try:
+                    status = self._inspect_data_repo(root)
+                except Exception:
+                    continue
+                if status["ohlcv_ready"] and status["path"] != current["path"]:
+                    candidates.append(status)
+                    if len(candidates) >= 3:
+                        break
+        return {
+            "mode": "REAL_OFFICIAL_DATA" if current["ohlcv_ready"] else ("PREVIEW" if self.preview_mode else "NO_REAL_DATA_CONNECTED"),
+            "active": current,
+            "code_root": str(self.code_root),
+            "saved_config": str(self.data_source_file),
+            "candidates": candidates,
+            "budget_uses_real_data": bool(current["ohlcv_ready"]),
+            "yfinance_automatic_fallback": False,
+        }
+
+'''
+          s = s[:start] + replacement + s[end:]
+          s = s.replace(
+              'root = Path(raw_path.strip().strip(\\'"\\')).expanduser().resolve()\\n        status = self._inspect_data_repo(root)',
+              'root = self._normalize_data_repo_root(Path(raw_path.strip().strip(\\'"\\')))\\n        status = self._inspect_data_repo(root)',
+              1,
+          )
+          s = s.replace(
+              'status = self._inspect_data_repo(self.data_repo_root)\\n        if not status["ohlcv_ready"]:',
+              'status = self.real_data_status\\n        if not status["ohlcv_ready"]:',
+              1,
+          )
+          api.write_text(s, encoding="utf-8")
+
+          js = root / "modern_ui" / "frontend" / "app.js"
+          t = js.read_text(encoding="utf-8")
+          start = t.index("async function loadDataSource()")
+          end = t.index("\\n\\nasync function loadSystem()", start)
+          replacement = """async function apiTimed(path,options={},timeoutMs=12000){const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),timeoutMs);try{return await api(path,{...options,signal:controller.signal})}catch(e){if(e?.name==='AbortError')throw new Error('Repository check timed out. The app stopped the scan instead of hanging.');throw e}finally{clearTimeout(timer)}}
+async function loadDataSource(){try{const d=await apiTimed('/api/data-source',{},10000);renderDataSource(d);return d}catch(e){if($('#dataSourceSummary'))$('#dataSourceSummary').textContent='Repository check stopped';if($('#dataSourceDetail'))$('#dataSourceDetail').textContent=e.message;throw e}}
+async function connectDataRepo(pathOverride=null){const input=$('#dataRepoPath');const path=(pathOverride||input?.value||'').trim();if(!path){toast('Enter the local Stock Recommendation Engine repository path');return;}busy(true,'Connecting real data','Verifying official NSE OHLCV cache and switching the native app to real-data mode…');try{const d=await apiTimed('/api/data-source',{method:'POST',body:{path}},15000);renderDataSource(d);state.symbols=[];renderDashboard(await api('/api/dashboard'));await loadSymbols('');toast('Real data connected · '+(d.active?.stock_files||0)+' stock histories');}catch(e){if($('#dataSourceSummary'))$('#dataSourceSummary').textContent='Connection failed';if($('#dataSourceDetail'))$('#dataSourceDetail').textContent=e.message;toast(e.message)}finally{busy(false)}}"""
+          t = t[:start] + replacement + t[end:]
+          js.write_text(t, encoding="utf-8")
+
+          assert 'APP_VERSION = "0.9.4-data-source-hotfix"' in api.read_text(encoding="utf-8")
+          assert "_last_nonempty_line" in api.read_text(encoding="utf-8")
+          assert "apiTimed" in js.read_text(encoding="utf-8")
+          print("0.9.4 hotfix patch applied")
+          '@ | python -
+
+      - name: Fast repository scan regression
+        shell: pwsh
+        run: |
+          python -m pip install --disable-pip-version-check fastapi==0.128.2 uvicorn==0.48.0
+          $large = "$env:RUNNER_TEMP\\large-real-repo"
+          $env:SRE094_LARGE_ROOT = $large
+          @'
+          from pathlib import Path
+          import os, sys, time
+
+          root = Path(os.environ["SRE094_LARGE_ROOT"])
+          cache = root / "data" / "normalized" / "nse_official" / "equity_bhavcopy" / "expanded_universe_2026_10_05"
+          cache.mkdir(parents=True, exist_ok=True)
+          row = "Date,Open,High,Low,Close,Volume\\n2026-10-08,100,101,99,100.5,10000\\n2026-10-09,100.5,103,100,102.5,12000\\n"
+          for i in range(1200):
+              (cache / f"STK{i:04d}.NS.csv").write_text(row, encoding="utf-8")
+          sys.path.insert(0, os.environ["SRE_ENGINE_ROOT"])
+          from modern_ui.api import ModernAppContext
+          ctx = ModernAppContext.__new__(ModernAppContext)
+          started = time.perf_counter()
+          status = ctx._inspect_data_repo(root)
+          elapsed = time.perf_counter() - started
+          assert status["stock_files"] == 1200, status
+          assert status["latest_session"] == "2026-10-09", status
+          assert elapsed < 3.0, elapsed
+          assert ctx._normalize_data_repo_root(cache) == root.resolve()
+          print(f"FAST DATA CHECK PASS: 1200 stocks in {elapsed:.3f}s")
+          '@ | python -
+
+      - name: Build deterministic official-data fixture
+        shell: pwsh
+        run: |
+          $fixture = "$env:RUNNER_TEMP\sre093-real-repo"
+          $cache = Join-Path $fixture "data\normalized\nse_official\equity_bhavcopy\expanded_universe_2026_10_05"
+          New-Item -ItemType Directory -Force -Path $cache | Out-Null
+          $env:SRE093_FIXTURE_ROOT = $fixture
+          @'
+          from pathlib import Path
+          import csv, datetime, math, os
+
+          root = Path(os.environ["SRE093_FIXTURE_ROOT"])
+          cache = root / "data" / "normalized" / "nse_official" / "equity_bhavcopy" / "expanded_universe_2026_10_05"
+          symbols = ["INFY", "TCS", "RELIANCE", "HDFCBANK", "SUNPHARMA", "LT"]
+          start = datetime.date(2023, 1, 2)
+
+          for si, symbol in enumerate(symbols):
+              d = start
+              price = 900.0 + si * 220.0
+              rows = []
+              i = 0
+              while len(rows) < 760:
+                  if d.weekday() < 5:
+                      seasonal = math.sin(i / 13 + si) * 0.012 + math.cos(i / 31 + si) * 0.007
+                      drift = 0.00035 + (si - 2) * 0.00003
+                      close = price * (1 + drift + seasonal * 0.08)
+                      op = price * (1 + math.sin(i / 7 + si) * 0.002)
+                      hi = max(op, close) * (1.006 + abs(math.sin(i / 9)) * 0.004)
+                      lo = min(op, close) * (1 - 0.006 - abs(math.cos(i / 11)) * 0.004)
+                      vol = 1_000_000 + si * 120_000 + (i % 37) * 9_000
+                      rows.append([d.isoformat(), f"{op:.2f}", f"{hi:.2f}", f"{lo:.2f}", f"{close:.2f}", str(vol)])
+                      price = close
+                      i += 1
+                  d += datetime.timedelta(days=1)
+              with (cache / f"{symbol}.NS.csv").open("w", newline="", encoding="utf-8") as handle:
+                  writer = csv.writer(handle)
+                  writer.writerow(["Date", "Open", "High", "Low", "Close", "Volume"])
+                  writer.writerows(rows)
+          '@ | python -
+          "SRE093_FIXTURE_ROOT=$fixture" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Smoke test real-data budget and chart contracts
+        shell: pwsh
+        run: |
+          python -m pip install --disable-pip-version-check fastapi==0.128.2 uvicorn==0.48.0
+          $engine = "$env:SRE_ENGINE_ROOT"
+          $data = "$env:RUNNER_TEMP\sre093-appdata"
+          $env:STOCK_MODERN_UI_PREVIEW = "0"
+          $env:STOCK_REAL_DATA_REPO_ROOT = "$env:SRE093_FIXTURE_ROOT"
+
+          $p = Start-Process -FilePath python -ArgumentList "`"$engine\run_modern_ui.py`" --no-browser --host 127.0.0.1 --port 18765 --repo-root `"$engine`" --app-data-dir `"$data`"" -PassThru -NoNewWindow
+          try {
+            $ok = $false
+            for ($i=0; $i -lt 60; $i++) {
+              Start-Sleep -Milliseconds 400
+              if ($p.HasExited) { throw "0.9.4 backend exited early with code $($p.ExitCode)" }
+              try {
+                $health = Invoke-RestMethod "http://127.0.0.1:18765/api/health" -TimeoutSec 2
+                if ($health.status -eq "ok") { $ok = $true; break }
+              } catch {}
+            }
+            if (!$ok) { throw "0.9.4 backend health check timed out" }
+            if ($health.app_version -ne "0.9.4-data-source-hotfix") { throw "Wrong app version: $($health.app_version)" }
+            if ($health.preview_mode) { throw "Preview mode must be disabled in 0.9.3" }
+            if ($health.data_source.mode -ne "REAL_OFFICIAL_DATA") { throw "Real data mode not active: $($health.data_source.mode)" }
+            if ([int]$health.data_source.active.stock_files -lt 6) { throw "Real data source did not expose expected stock files" }
+
+            $stock = Invoke-RestMethod "http://127.0.0.1:18765/api/stocks/INFY?limit=5000" -TimeoutSec 15
+            if ($stock.bars.Count -lt 700) { throw "Real stock chart dataset smoke failed: $($stock.bars.Count)" }
+
+            $runBody = @{capital=50000; horizon_sessions=20; target_return_percent=3} | ConvertTo-Json
+            $run = Invoke-RestMethod "http://127.0.0.1:18765/api/opportunities/run" -Method Post -ContentType "application/json" -Body $runBody -TimeoutSec 60
+            if ([int]$run.count -lt 1) { throw "Real-data opportunity run produced no candidates" }
+
+            $planBody = @{deployable_capital=50000; horizon_sessions=20; target_return_percent=3} | ConvertTo-Json
+            $plan = Invoke-RestMethod "http://127.0.0.1:18765/api/capital-plan" -Method Post -ContentType "application/json" -Body $planBody -TimeoutSec 60
+            if ([double]$plan.capital_summary.deployable_capital -ne 50000) { throw "Budget was not preserved in capital plan" }
+            if (!$plan.source_run.market_session) { throw "Capital plan has no real market session" }
+
+            $source = Invoke-RestMethod "http://127.0.0.1:18765/api/data-source" -TimeoutSec 10
+            if ($source.mode -ne "REAL_OFFICIAL_DATA") { throw "Data source endpoint not real" }
+            if (!$source.budget_uses_real_data) { throw "Budget is not marked as real-data driven" }
+
+            $js = (Invoke-WebRequest "http://127.0.0.1:18765/assets/app.js" -TimeoutSec 10).Content
+            $html = (Invoke-WebRequest "http://127.0.0.1:18765/" -TimeoutSec 10).Content
+            if ($js -notmatch 'minBars\s*=\s*8') { throw "8-candle minimum zoom contract missing" }
+            if ($js -notmatch 'limit=5000') { throw "5000-session chart history contract missing" }
+            if ($html -notmatch 'chartZoomIn' -or $html -notmatch 'chartZoomOut') { throw "Chart zoom buttons missing" }
+            if ($html -notmatch 'drag to pan') { throw "Chart pan guidance missing" }
+
+            Write-Host "0.9.4 DATA SOURCE HOTFIX PASS"
+            Write-Host "Budget: $($plan.capital_summary.deployable_capital)"
+            Write-Host "Market session: $($plan.source_run.market_session)"
+            Write-Host "Chart bars: $($stock.bars.Count)"
+            Write-Host "Candidates: $($run.count)"
+          } finally {
+            if (!$p.HasExited) { Stop-Process -Id $p.Id -Force }
+          }
+
+      - name: Package native application
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path "native-desktop-0.9.1\resources" | Out-Null
+          Compress-Archive -Path "$env:SRE_ENGINE_ROOT\*" -DestinationPath "native-desktop-0.9.1\resources\SRE094_ENGINE_SOURCE.zip" -Force
+
+          New-Item -ItemType Directory -Force -Path "native-desktop-0.9.1\src-tauri\icons" | Out-Null
+          python -c "import struct,pathlib; w=h=32; px=bytes([52,211,153,255])*(w*h); mask=bytes(128); dib=struct.pack('<IIIHHIIIIII',40,w,h*2,1,32,0,len(px),0,0,0,0)+px+mask; ico=struct.pack('<HHH',0,1,1)+struct.pack('<BBBBHHII',w,h,0,0,1,32,len(dib),22)+dib; pathlib.Path(r'native-desktop-0.9.1\src-tauri\icons\icon.ico').write_bytes(ico)"
+
+          $p = "native-desktop-0.9.1\src-tauri\tauri.conf.json"
+          $c = Get-Content $p -Raw | ConvertFrom-Json
+          $c.version = "0.9.4"
+          $c.productName = "Stock Recommendation Engine"
+          $c.bundle.targets = @("nsis")
+          $c.bundle.resources = @{"../resources/SRE094_ENGINE_SOURCE.zip"="resources/SRE094_ENGINE_SOURCE.zip"}
+          $c | ConvertTo-Json -Depth 20 | Set-Content $p -Encoding UTF8
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: native-desktop-0.9.1/src-tauri
+
+      - name: Install Tauri CLI
+        working-directory: native-desktop-0.9.1
+        run: npm install --no-audit --no-fund
+
+      - name: Build native Windows installer
+        working-directory: native-desktop-0.9.1
+        run: npm run tauri build
+
+      - name: Verify installer
+        shell: pwsh
+        run: |
+          $setup = Get-ChildItem "native-desktop-0.9.1\src-tauri\target\release\bundle\nsis\*.exe" | Select-Object -First 1
+          if (!$setup) { throw "0.9.4 native Setup.exe missing" }
+          Write-Host "SETUP: $($setup.FullName)"
+          Write-Host "SIZE: $($setup.Length)"
+          Get-FileHash $setup.FullName -Algorithm SHA256
+
+      - name: Upload 0.9.3 installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: SRE-0.9.4-Data-Source-Hotfix-Setup
+          path: native-desktop-0.9.1/src-tauri/target/release/bundle/nsis/*.exe
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
