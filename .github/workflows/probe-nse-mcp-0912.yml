@@ -54,6 +54,16 @@ jobs:
           names=[x.get("name") for x in tools.get("result",{}).get("tools",[])]
           print("TOOLS",names)
           assert "get_stock_history" in names, names
+          tool_map={x.get("name"):x for x in tools.get("result",{}).get("tools",[])}
+          print("INDEX_SCHEMA",json.dumps(tool_map.get("get_index_history",{}).get("inputSchema",{})))
+          print("STOCK_SCHEMA",json.dumps(tool_map.get("get_stock_history",{}).get("inputSchema",{})))
+          from urllib.request import urlopen as _u
+          constituent_url="https://www.niftyindices.com/IndexConstituent/ind_nifty200list.csv"
+          with _u(constituent_url,timeout=30) as rr:
+              body=rr.read().decode("utf-8-sig")
+          rows=[x for x in body.splitlines() if x.strip()]
+          print("NIFTY200_HEADER",rows[0] if rows else "EMPTY")
+          print("NIFTY200_ROWS",max(0,len(rows)-1))
           res,_=post({"jsonrpc":"2.0","id":3,"method":"tools/call","params":{
               "name":"get_stock_history",
               "arguments":{"symbol":"RELIANCE","months":1,"endDate":"2026-10-08"}
