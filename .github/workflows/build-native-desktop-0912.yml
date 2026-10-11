@@ -283,7 +283,7 @@ jobs:
           node --check "$env:SRE_ENGINE_ROOT\modern_ui\frontend\app.js"
           $api = Get-Content "$env:SRE_ENGINE_ROOT\modern_ui\api.py" -Raw
           $universe = Get-Content "$env:SRE_ENGINE_ROOT\stock_app\official_universe.py" -Raw
-          if ($api -notmatch '0.9.12-phase3c-universe-visibility') { throw "0.9.11 backend identity missing" }
+          if ($api -notmatch '0.9.11-phase3b-official-data') { throw "0.9.11 backend identity missing" }
           if ($universe -notmatch 'OfficialUniverseCatalog') { throw "Official universe catalog missing" }
           if ($universe -notmatch 'MIN_IDENTITY_COVERAGE = 0.98') { throw "Identity coverage gate missing" }
           if ($universe -notmatch 'MIN_HISTORY_COVERAGE = 0.95') { throw "History coverage gate missing" }
