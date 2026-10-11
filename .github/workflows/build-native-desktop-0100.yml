@@ -837,7 +837,7 @@ jobs:
               now=float(stock_i.iloc[end]["Close"]);future=float(stock_i.iloc[end+20]["Close"])
               wf.append((float(score),future/now-1.0))
           assert len(wf)>=6,wf
-          corr=pd.Series([x[0] for x in wf]).corr(pd.Series([x[1] for x in wf]),method="spearman")
+          corr=pd.Series([x[0] for x in wf]).rank().corr(pd.Series([x[1] for x in wf]).rank(),method="pearson")
           assert math.isfinite(float(corr)),corr
 
           allocation=(Path(os.environ["SRE_ENGINE_ROOT"])/"stock_app"/"allocation.py").read_text(encoding="utf-8")
