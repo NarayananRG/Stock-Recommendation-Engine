@@ -228,7 +228,7 @@ jobs:
           Copy-Item "$tmp\styles.css" "$env:SRE_ENGINE_ROOT\modern_ui\frontend\styles.css" -Force
           $api = Get-Content "$env:SRE_ENGINE_ROOT\modern_ui\api.py" -Raw
           $js = Get-Content "$env:SRE_ENGINE_ROOT\modern_ui\frontend\app.js" -Raw
-          if ($api -notmatch 'APP_VERSION = "0.9.9-allocation-executability-v2"') { throw "0.9.9 backend identity missing" }
+          if ($api -notmatch 'APP_VERSION = "0.9.8-correctness-state"') { throw "0.9.8 backend identity missing before Phase 2 patch" }
           if ($api -notmatch 'active_analysis_run.json') { throw "Persistent active-run contract missing" }
           if ($api -notmatch 'unused_cash_explanation') { throw "Unused-cash explanation contract missing" }
           if ($js -notmatch 'MEETS TARGET' -or $js -notmatch 'BELOW TARGET') { throw "Target-status UI contract missing" }
