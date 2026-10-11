@@ -73,9 +73,17 @@ jobs:
           $engine = Join-Path $extract "StockRecommendationEngine_0.8.5_ultra_ui_TEST_SOURCE"
           if (!(Test-Path "$engine\requirements-v1.txt")) { throw "Canonical engine root missing" }
 
-          $overlayParts = Get-ChildItem ".ci\native092\overlay.part.*.b64" | Sort-Object Name
-          if ($overlayParts.Count -ne 7) { throw "Expected 7 parity overlay chunks, found $($overlayParts.Count)" }
-          $overlayB64 = ($overlayParts | ForEach-Object { Get-Content $_.FullName -Raw }) -join ""
+          $overlayPaths = @(
+            ".ci\native092\overlay.part.00.b64",
+            ".ci\native092\overlay.part.01.b64",
+            ".ci\native092\overlay.part.02a.b64",
+            ".ci\native092\overlay.part.02b.b64",
+            ".ci\native092\overlay.part.03.b64",
+            ".ci\native092\overlay.part.04.b64",
+            ".ci\native092\overlay.part.05.b64",
+            ".ci\native092\overlay.part.06.b64"
+          )
+          $overlayB64 = ($overlayPaths | ForEach-Object { Get-Content $_ -Raw }) -join ""
           if ($overlayB64.Length -ne 42016) { throw "Parity overlay base64 length mismatch: $($overlayB64.Length)" }
           $overlayZip = "$env:RUNNER_TEMP\sre092-overlay.zip"
           [IO.File]::WriteAllBytes($overlayZip, [Convert]::FromBase64String($overlayB64))
