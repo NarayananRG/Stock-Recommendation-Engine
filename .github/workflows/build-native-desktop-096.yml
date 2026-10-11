@@ -196,7 +196,7 @@ jobs:
               } catch {}
             }
             if (!$ok) { throw "0.9.6 backend health check timed out" }
-            if ($health.app_version -ne "0.9.5-port-isolation") { throw "Wrong app version: $($health.app_version)" }
+            if ($health.app_version -ne "0.9.6-installed-app-verified") { throw "Wrong app version: $($health.app_version)" }
             if ($health.preview_mode) { throw "Preview mode must be disabled in 0.9.3" }
             if ($health.data_source.mode -ne "REAL_OFFICIAL_DATA") { throw "Real data mode not active: $($health.data_source.mode)" }
             if ([int]$health.data_source.active.stock_files -lt 6) { throw "Real data source did not expose expected stock files" }
