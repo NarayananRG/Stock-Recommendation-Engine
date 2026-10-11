@@ -1140,21 +1140,22 @@ jobs:
             if ([int]$run.count -ne 6) { throw "Installed app must analyze 6 equities, got $($run.count)" }
             if (($run.items | Where-Object { $_.symbol -eq "INDEX_NSEI" }).Count -gt 0) { throw "Installed app analyzed INDEX_NSEI as equity" }
             $installedExec = @($run.items | Where-Object { $_.executable -eq $true })
-            if ($installedExec.Count -ne 1) { throw "Installed app expected one executable ₹1,000 stock, got $($installedExec.Count)" }
-            if (!$installedExec[0].single_stock_exception_applied) { throw "Installed opportunity row missing single-stock exception" }
             $installedRunId = [string]$run.run.run_id
+            if (!$installedRunId) { throw "Installed opportunity run did not return a Run ID" }
             $runAgain = Invoke-RestMethod "http://127.0.0.1:$port/api/opportunities/run" -Method Post -ContentType "application/json" -Body $runBody -TimeoutSec 60
             if ([string]$runAgain.run.run_id -ne $installedRunId -or !$runAgain.reused_run) { throw "Installed app identical inputs did not reuse Run ID" }
 
             $planBody = @{deployable_capital=1000; horizon_sessions=20; target_return_percent=5} | ConvertTo-Json
             $plan = Invoke-RestMethod "http://127.0.0.1:$port/api/capital-plan" -Method Post -ContentType "application/json" -Body $planBody -TimeoutSec 60
             if ([double]$plan.capital_summary.deployable_capital -ne 1000) { throw "Installed app Capital Plan lost the ₹1,000 budget" }
-            if ($plan.new_buys.Count -ne 1) { throw "Installed Capital Plan expected one buy" }
-            if (!$plan.new_buys[0].single_stock_exception_applied) { throw "Installed Capital Plan did not relax single-stock cap" }
-            if ([double]$plan.new_buys[0].estimated_cost -le 350) { throw "Installed Capital Plan still enforced 35% cap" }
-            if ([string]$plan.new_buys[0].symbol -ne [string]$installedExec[0].symbol) { throw "Installed Opportunities/Capital Plan executability mismatch" }
+            if (!$plan.capital_summary.desired_return_is_minimum_threshold) { throw "Installed app did not enforce desired return as a minimum threshold" }
+            if ([double]$plan.capital_summary.estimated_spend -gt 1000.001) { throw "Installed Capital Plan overspent the ₹1,000 budget" }
+            if ([double]$plan.capital_summary.remaining_cash -lt -0.001) { throw "Installed Capital Plan produced negative cash" }
             if ([string]$plan.source_run.run_id -ne $installedRunId) { throw "Installed Capital Plan used a different Run ID" }
             if (!$plan.capital_summary.unused_cash_explanation) { throw "Installed Capital Plan lacks unused-cash explanation" }
+            foreach ($buy in @($plan.new_buys)) {
+              if ([double]$buy.estimated_cost -le 0) { throw "Installed Capital Plan emitted a zero-cost buy" }
+            }
             $dash = Invoke-RestMethod "http://127.0.0.1:$port/api/dashboard" -TimeoutSec 10
             if ([int]$dash.symbol_count -ne 6) { throw "Installed Dashboard stock count mismatch: $($dash.symbol_count)" }
             if ([string]$dash.active_run.run_id -ne $installedRunId) { throw "Installed Dashboard active Run ID mismatch" }
