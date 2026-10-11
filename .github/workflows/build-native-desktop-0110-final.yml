@@ -1075,30 +1075,46 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          $workflow = "phase5-fast-official-fundamentals.yml"
           $branch = "ui-0.11.0-phase5-fundamental-v3"
           $runId = $null
+          $artifactName = $null
+
           for ($attempt = 0; $attempt -lt 120; $attempt++) {
-            $json = gh run list --repo "$env:GITHUB_REPOSITORY" --workflow $workflow --branch $branch --limit 10 --json databaseId,status,conclusion,createdAt
-            if ($LASTEXITCODE -ne 0) { throw "Unable to query Phase 5 data workflow" }
-            $runs = @($json | ConvertFrom-Json | Sort-Object createdAt -Descending)
-            $success = $runs | Where-Object { $_.status -eq "completed" -and $_.conclusion -eq "success" } | Select-Object -First 1
+            $candidates = @()
+            foreach ($spec in @(
+              @{ workflow="phase5-fast-official-fundamentals.yml"; artifact="SRE-Phase5-Real-Official-Fundamentals-FAST" },
+              @{ workflow="phase5-real-official-fundamentals.yml"; artifact="SRE-Phase5-Real-Official-Fundamentals" }
+            )) {
+              $json = gh run list --repo "$env:GITHUB_REPOSITORY" --workflow $spec.workflow --branch $branch --limit 10 --json databaseId,status,conclusion,createdAt
+              if ($LASTEXITCODE -ne 0) { throw "Unable to query Phase 5 data workflow $($spec.workflow)" }
+              foreach ($r in @($json | ConvertFrom-Json)) {
+                $candidates += [pscustomobject]@{
+                  databaseId=$r.databaseId; status=$r.status; conclusion=$r.conclusion;
+                  createdAt=$r.createdAt; artifact=$spec.artifact; workflow=$spec.workflow
+                }
+              }
+            }
+
+            $success = $candidates |
+              Where-Object { $_.status -eq "completed" -and $_.conclusion -eq "success" } |
+              Sort-Object createdAt -Descending |
+              Select-Object -First 1
+
             if ($success) {
               $runId = [string]$success.databaseId
+              $artifactName = [string]$success.artifact
+              Write-Host "Using successful official-data run $runId from $($success.workflow)"
               break
             }
-            $latest = $runs | Select-Object -First 1
-            if ($latest -and $latest.status -eq "completed" -and $latest.conclusion -notin @("success","cancelled")) {
-              throw "Latest Phase 5 official-data run failed: id=$($latest.databaseId) conclusion=$($latest.conclusion)"
-            }
-            Write-Host "Waiting for official fundamental bundle... attempt $($attempt+1)/120"
+
+            Write-Host "Waiting for first successful official fundamental bundle... attempt $($attempt+1)/120"
             Start-Sleep -Seconds 10
           }
           if (!$runId) { throw "Timed out waiting for successful Phase 5 official fundamental bundle" }
 
           $dest = "$env:RUNNER_TEMP\phase5-real"
           New-Item -ItemType Directory -Force -Path $dest | Out-Null
-          gh run download $runId --repo "$env:GITHUB_REPOSITORY" --name "SRE-Phase5-Real-Official-Fundamentals-FAST" --dir $dest
+          gh run download $runId --repo "$env:GITHUB_REPOSITORY" --name $artifactName --dir $dest
           if ($LASTEXITCODE -ne 0) { throw "Unable to download Phase 5 official fundamental artifact" }
 
           $bundle = Join-Path $dest "SRE_Phase5_Real_Official_Fundamentals.zip"
