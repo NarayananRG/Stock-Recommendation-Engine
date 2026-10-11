@@ -1,0 +1,1233 @@
+name: Build SRE 0.10.0 Phase 4 Technical Intelligence V2
+
+on:
+  push:
+    branches: [ui-0.10.0-phase4-technical-v2]
+    paths:
+      - ".ci/native098/**"
+      - ".ci/native099/**"
+      - ".ci/native100/**"
+      - ".ci/native101/**"
+      - ".ci/native102/**"
+      - ".ci/native103/**"
+      - ".ci/native104/**"
+      - ".github/workflows/build-native-desktop-0100.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sre-native-0100
+  cancel-in-progress: true
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Decode verified native desktop shell
+        shell: pwsh
+        run: |
+          $parts = Get-ChildItem ".ci\native091\source.part.*" | Sort-Object Name
+          if ($parts.Count -ne 8) { throw "Expected 8 native shell chunks, found $($parts.Count)" }
+          $b64 = ($parts | ForEach-Object { Get-Content $_.FullName -Raw }) -join ""
+          if ($b64.Length -ne 39284) { throw "Native shell base64 length mismatch: $($b64.Length)" }
+          $zip = "$env:RUNNER_TEMP\native-desktop-shell.zip"
+          [IO.File]::WriteAllBytes($zip, [Convert]::FromBase64String($b64))
+          $hash = (Get-FileHash $zip -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($hash -ne "86dd430e933d044d08ae4637787eff52369b46b7ee1013e48af7851d9ea88fcc") { throw "Native shell hash mismatch: $hash" }
+          Expand-Archive -LiteralPath $zip -DestinationPath "." -Force
+
+          Copy-Item ".ci\native104\main_dynamic_port_python.rs" "native-desktop-0.9.1\src-tauri\src\main.rs" -Force
+          Copy-Item ".ci\native091\Cargo.toml" "native-desktop-0.9.1\src-tauri\Cargo.toml" -Force
+
+          $main = "native-desktop-0.9.1\src-tauri\src\main.rs"
+          $m = Get-Content $main -Raw
+          if ($m -notmatch 'choose_free_port') { throw "Dynamic-port launcher missing" }
+          if ($m -notmatch 'health_matches') { throw "Backend-version handshake missing" }
+          if ($m -match 'const PORT') { throw "Fixed desktop port must not exist in 0.9.9" }
+          if ($m -notmatch '0.10.0-phase4-technical-v2') { throw "Wrong native launcher version" }
+          if ($m -notmatch 'STOCK_MODERN_UI_PREVIEW", "0') { throw "Preview must remain disabled" }
+
+          $cargo = "native-desktop-0.9.1\src-tauri\Cargo.toml"
+          (Get-Content $cargo -Raw).Replace('version = "0.9.1"','version = "0.10.0"') | Set-Content $cargo -Encoding UTF8
+
+          $pkg = "native-desktop-0.9.1\package.json"
+          $j = Get-Content $pkg -Raw | ConvertFrom-Json
+          $j.version = "0.10.0"
+          $j | ConvertTo-Json -Depth 20 | Set-Content $pkg -Encoding UTF8
+
+      - name: Reconstruct canonical engine and apply 0.9.2 and 0.9.3 overlays
+        shell: pwsh
+        run: |
+          $dir = "stock-engine-ultra-ui-0.8.5-source-with-windows-builder"
+          $parts = Get-ChildItem -Path $dir -Filter "source.part.*.b64" | Sort-Object Name
+          if (!$parts) { throw "Canonical 0.8.5 source parts missing" }
+          $joined = ($parts | ForEach-Object { Get-Content $_.FullName -Raw }) -join ""
+          $zip = "$env:RUNNER_TEMP\sre085.zip"
+          [IO.File]::WriteAllBytes($zip, [Convert]::FromBase64String($joined))
+          $hash = (Get-FileHash $zip -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($hash -ne "915425e7027fd6145298e3e467b678e6f5998a895d85c4c18a9cfec033df7edc") { throw "Canonical source hash mismatch: $hash" }
+
+          $extract = "$env:RUNNER_TEMP\engine-extract"
+          New-Item -ItemType Directory -Force -Path $extract | Out-Null
+          Expand-Archive -LiteralPath $zip -DestinationPath $extract -Force
+          $engine = Join-Path $extract "StockRecommendationEngine_0.8.5_ultra_ui_TEST_SOURCE"
+          if (!(Test-Path "$engine\requirements-v1.txt")) { throw "Canonical engine root missing" }
+
+          $overlay092Paths = @(
+            ".ci\native092\overlay.part.00.b64",
+            ".ci\native092\overlay.part.01.b64",
+            ".ci\native092\overlay.part.02a.b64",
+            ".ci\native092\overlay.part.02b.b64",
+            ".ci\native092\overlay.part.03.b64",
+            ".ci\native092\overlay.part.04.b64",
+            ".ci\native092\overlay.part.05.b64",
+            ".ci\native092\overlay.part.06.b64"
+          )
+          $overlay092B64 = ($overlay092Paths | ForEach-Object { Get-Content $_ -Raw }) -join ""
+          if ($overlay092B64.Length -ne 42016) { throw "0.9.2 overlay base64 length mismatch: $($overlay092B64.Length)" }
+          $overlay092Zip = "$env:RUNNER_TEMP\sre092-overlay.zip"
+          [IO.File]::WriteAllBytes($overlay092Zip, [Convert]::FromBase64String($overlay092B64))
+          $overlay092Hash = (Get-FileHash $overlay092Zip -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($overlay092Hash -ne "ed91eb0ec54c562f2965a730174bbf422c4ae2ba6852f9e046305593cf96d1d8") { throw "0.9.2 overlay hash mismatch: $overlay092Hash" }
+          Expand-Archive -LiteralPath $overlay092Zip -DestinationPath $engine -Force
+
+          $overlay093Paths = 0..8 | ForEach-Object { ".ci\native093\overlay.part.{0:D2}.b64" -f $_ }
+          $overlay093B64 = ($overlay093Paths | ForEach-Object { Get-Content $_ -Raw }) -join ""
+          if ($overlay093B64.Length -ne 46088) { throw "0.9.3 overlay base64 length mismatch: $($overlay093B64.Length)" }
+          $overlay093Zip = "$env:RUNNER_TEMP\sre093-overlay.zip"
+          [IO.File]::WriteAllBytes($overlay093Zip, [Convert]::FromBase64String($overlay093B64))
+          $overlay093Hash = (Get-FileHash $overlay093Zip -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($overlay093Hash -ne "af2e954e71f906ab7331408cac11a78fc97446ca320c6bed7e71eab06b3421c8") { throw "0.9.3 overlay hash mismatch: $overlay093Hash" }
+          Expand-Archive -LiteralPath $overlay093Zip -DestinationPath $engine -Force
+
+          if (!(Test-Path "$engine\modern_ui\api.py")) { throw "0.9.3 engine overlay failed" }
+          "SRE_ENGINE_ROOT=$engine" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Apply 0.9.4 fast data-source hotfix
+        shell: pwsh
+        run: |
+          $b64 = 'ZnJvbSBwYXRobGliIGltcG9ydCBQYXRoCmltcG9ydCBvcwoKcm9vdCA9IFBhdGgob3MuZW52aXJvblsnU1JFX0VOR0lORV9ST09UJ10pCmFwaSA9IHJvb3QgLyAnbW9kZXJuX3VpJyAvICdhcGkucHknCnMgPSBhcGkucmVhZF90ZXh0KGVuY29kaW5nPSd1dGYtOCcpCnMgPSBzLnJlcGxhY2UoJ0FQUF9WRVJTSU9OID0gIjAuOS4zLXJlYWwtZGF0YS1jaGFydC16b29tIicsICdBUFBfVkVSU0lPTiA9ICIwLjkuNC1kYXRhLXNvdXJjZS1ob3RmaXgiJykKCnN0YXJ0ID0gcy5pbmRleCgnICAgIGRlZiBfaW5zcGVjdF9kYXRhX3JlcG8oc2VsZiwgcm9vdDogUGF0aCkgLT4gZGljdFtzdHIsIEFueV06JykKZW5kID0gcy5pbmRleCgnICAgIGRlZiBfY2FuZGlkYXRlX2RhdGFfcmVwb3Moc2VsZikgLT4gbGlzdFtQYXRoXTonLCBzdGFydCkKcmVwbGFjZW1lbnQgPSAnJycgICAgQHN0YXRpY21ldGhvZAogICAgZGVmIF9ub3JtYWxpemVfZGF0YV9yZXBvX3Jvb3QocmF3X3Jvb3Q6IFBhdGgpIC0+IFBhdGg6CiAgICAgICAgcm9vdCA9IHJhd19yb290LmV4cGFuZHVzZXIoKS5yZXNvbHZlKCkKICAgICAgICBwYXJ0cyA9IFtwYXJ0Lmxvd2VyKCkgZm9yIHBhcnQgaW4gcm9vdC5wYXJ0c10KICAgICAgICBmb3IgaWR4IGluIHJhbmdlKG1heCgwLCBsZW4ocGFydHMpIC0gMykpOgogICAgICAgICAgICBpZiBwYXJ0c1tpZHg6aWR4ICsgNF0gPT0gWyJkYXRhIiwgIm5vcm1hbGl6ZWQiLCAibnNlX29mZmljaWFsIiwgImVxdWl0eV9iaGF2Y29weSJdOgogICAgICAgICAgICAgICAgcmV0dXJuIFBhdGgoKnJvb3QucGFydHNbOmlkeF0pLnJlc29sdmUoKQogICAgICAgIHJldHVybiByb290CgogICAgQHN0YXRpY21ldGhvZAogICAgZGVmIF9sYXN0X25vbmVtcHR5X2xpbmUocGF0aDogUGF0aCwgY2h1bmtfc2l6ZTogaW50ID0gNDA5NikgLT4gc3RyIHwgTm9uZToKICAgICAgICB0cnk6CiAgICAgICAgICAgIHdpdGggcGF0aC5vcGVuKCJyYiIpIGFzIGhhbmRsZToKICAgICAgICAgICAgICAgIGhhbmRsZS5zZWVrKDAsIG9zLlNFRUtfRU5EKQogICAgICAgICAgICAgICAgcG9zID0gaGFuZGxlLnRlbGwoKQogICAgICAgICAgICAgICAgaWYgcG9zIDw9IDA6CiAgICAgICAgICAgICAgICAgICAgcmV0dXJuIE5vbmUKICAgICAgICAgICAgICAgIGJ1ZiA9IGIiIgogICAgICAgICAgICAgICAgd2hpbGUgcG9zID4gMCBhbmQgbGVuKGJ1ZikgPCA2NTUzNjoKICAgICAgICAgICAgICAgICAgICBzdGVwID0gbWluKGNodW5rX3NpemUsIHBvcykKICAgICAgICAgICAgICAgICAgICBwb3MgLT0gc3RlcAogICAgICAgICAgICAgICAgICAgIGhhbmRsZS5zZWVrKHBvcykKICAgICAgICAgICAgICAgICAgICBidWYgPSBoYW5kbGUucmVhZChzdGVwKSArIGJ1ZgogICAgICAgICAgICAgICAgICAgIGxpbmVzID0gW2xpbmUuc3RyaXAoKSBmb3IgbGluZSBpbiBidWYuc3BsaXRsaW5lcygpIGlmIGxpbmUuc3RyaXAoKV0KICAgICAgICAgICAgICAgICAgICBpZiBsZW4obGluZXMpID49IDIgb3IgcG9zID09IDA6CiAgICAgICAgICAgICAgICAgICAgICAgIGlmIG5vdCBsaW5lczoKICAgICAgICAgICAgICAgICAgICAgICAgICAgIHJldHVybiBOb25lCiAgICAgICAgICAgICAgICAgICAgICAgIHJldHVybiBsaW5lc1stMV0uZGVjb2RlKCJ1dGYtOCIsIGVycm9ycz0icmVwbGFjZSIpCiAgICAgICAgZXhjZXB0IE9TRXJyb3I6CiAgICAgICAgICAgIHJldHVybiBOb25lCiAgICAgICAgcmV0dXJuIE5vbmUKCiAgICBkZWYgX2luc3BlY3RfZGF0YV9yZXBvKHNlbGYsIHJvb3Q6IFBhdGgpIC0+IGRpY3Rbc3RyLCBBbnldOgogICAgICAgIHJvb3QgPSBzZWxmLl9ub3JtYWxpemVfZGF0YV9yZXBvX3Jvb3Qocm9vdCkKICAgICAgICByb290cyA9IHNlbGYuX29mZmljaWFsX2NhY2hlX3Jvb3RzKHJvb3QpCiAgICAgICAgZmlsZXM6IGxpc3RbUGF0aF0gPSBbXQogICAgICAgIGxhdGVzdCA9IE5vbmUKICAgICAgICBmb3IgY2FjaGUgaW4gcm9vdHM6CiAgICAgICAgICAgIGlmIG5vdCBjYWNoZS5leGlzdHMoKToKICAgICAgICAgICAgICAgIGNvbnRpbnVlCiAgICAgICAgICAgIHRyeToKICAgICAgICAgICAgICAgIGNhY2hlX2ZpbGVzID0gbGlzdChjYWNoZS5nbG9iKCIqLmNzdiIpKQogICAgICAgICAgICBleGNlcHQgT1NFcnJvcjoKICAgICAgICAgICAgICAgIGNvbnRpbnVlCiAgICAgICAgICAgIGZpbGVzLmV4dGVuZChjYWNoZV9maWxlcykKICAgICAgICAgICAgZm9yIHBhdGggaW4gY2FjaGVfZmlsZXM6CiAgICAgICAgICAgICAgICBsaW5lID0gc2VsZi5fbGFzdF9ub25lbXB0eV9saW5lKHBhdGgpCiAgICAgICAgICAgICAgICBpZiBub3QgbGluZToKICAgICAgICAgICAgICAgICAgICBjb250aW51ZQogICAgICAgICAgICAgICAgZCA9IGxpbmUuc3BsaXQoIiwiLCAxKVswXS5zdHJpcCgpLnN0cmlwKCciJykKICAgICAgICAgICAgICAgIGlmIGQgYW5kIGQubG93ZXIoKSBub3QgaW4geyJkYXRlIiwgInRpbWVzdGFtcCIsICJkYXRldGltZSJ9OgogICAgICAgICAgICAgICAgICAgIGlmIG5vdCBsYXRlc3Qgb3IgZCA+IGxhdGVzdDoKICAgICAgICAgICAgICAgICAgICAgICAgbGF0ZXN0ID0gZAogICAgICAgIGZ1bGxfZW5naW5lX3JlYWR5ID0gKHJvb3QgLyAicnVuX29mZmljaWFsX3YxX2RhaWx5LnB5IikuZXhpc3RzKCkgYW5kIChyb290IC8gIlN0YWdlIDRBLjMiKS5leGlzdHMoKQogICAgICAgIGZ1bmRhbWVudGFsX3JlYWR5ID0gKHJvb3QgLyAiZGF0YSIgLyAiZnVuZGFtZW50YWxzIikuZXhpc3RzKCkKICAgICAgICByZXR1cm4gewogICAgICAgICAgICAicGF0aCI6IHN0cihyb290KSwKICAgICAgICAgICAgImV4aXN0cyI6IHJvb3QuZXhpc3RzKCksCiAgICAgICAgICAgICJvaGxjdl9yZWFkeSI6IGJvb2woZmlsZXMpLAogICAgICAgICAgICAic3RvY2tfZmlsZXMiOiBsZW4oe3AubmFtZSBmb3IgcCBpbiBmaWxlc30pLAogICAgICAgICAgICAibGF0ZXN0X3Nlc3Npb24iOiBsYXRlc3QsCiAgICAgICAgICAgICJmdWxsX2VuZ2luZV9yZWFkeSI6IGZ1bGxfZW5naW5lX3JlYWR5LAogICAgICAgICAgICAiZnVuZGFtZW50YWxfcmVhZHkiOiBmdW5kYW1lbnRhbF9yZWFkeSwKICAgICAgICAgICAgImNhY2hlX3Jvb3RzIjogW3N0cihwKSBmb3IgcCBpbiByb290cyBpZiBwLmV4aXN0cygpXSwKICAgICAgICB9CgonJycKcyA9IHNbOnN0YXJ0XSArIHJlcGxhY2VtZW50ICsgc1tlbmQ6XQoKc3RhcnQgPSBzLmluZGV4KCcgICAgZGVmIGRhdGFfc291cmNlX3N0YXR1cyhzZWxmKSAtPiBkaWN0W3N0ciwgQW55XTonKQplbmQgPSBzLmluZGV4KCcgICAgZGVmIGNvbm5lY3RfZGF0YV9yZXBvKHNlbGYsIHJhd19wYXRoOiBzdHIpIC0+IGRpY3Rbc3RyLCBBbnldOicsIHN0YXJ0KQpyZXBsYWNlbWVudCA9ICcnJyAgICBkZWYgZGF0YV9zb3VyY2Vfc3RhdHVzKHNlbGYpIC0+IGRpY3Rbc3RyLCBBbnldOgogICAgICAgIGN1cnJlbnQgPSBkaWN0KHNlbGYucmVhbF9kYXRhX3N0YXR1cykKICAgICAgICBjYW5kaWRhdGVzID0gW10KICAgICAgICBpZiBub3QgY3VycmVudFsib2hsY3ZfcmVhZHkiXToKICAgICAgICAgICAgZm9yIHJvb3QgaW4gc2VsZi5fY2FuZGlkYXRlX2RhdGFfcmVwb3MoKToKICAgICAgICAgICAgICAgIHRyeToKICAgICAgICAgICAgICAgICAgICBzdGF0dXMgPSBzZWxmLl9pbnNwZWN0X2RhdGFfcmVwbyhyb290KQogICAgICAgICAgICAgICAgZXhjZXB0IEV4Y2VwdGlvbjoKICAgICAgICAgICAgICAgICAgICBjb250aW51ZQogICAgICAgICAgICAgICAgaWYgc3RhdHVzWyJvaGxjdl9yZWFkeSJdIGFuZCBzdGF0dXNbInBhdGgiXSAhPSBjdXJyZW50WyJwYXRoIl06CiAgICAgICAgICAgICAgICAgICAgY2FuZGlkYXRlcy5hcHBlbmQoc3RhdHVzKQogICAgICAgICAgICAgICAgICAgIGlmIGxlbihjYW5kaWRhdGVzKSA+PSAzOgogICAgICAgICAgICAgICAgICAgICAgICBicmVhawogICAgICAgIHJldHVybiB7CiAgICAgICAgICAgICJtb2RlIjogIlJFQUxfT0ZGSUNJQUxfREFUQSIgaWYgY3VycmVudFsib2hsY3ZfcmVhZHkiXSBlbHNlICgiUFJFVklFVyIgaWYgc2VsZi5wcmV2aWV3X21vZGUgZWxzZSAiTk9fUkVBTF9EQVRBX0NPTk5FQ1RFRCIpLAogICAgICAgICAgICAiYWN0aXZlIjogY3VycmVudCwKICAgICAgICAgICAgImNvZGVfcm9vdCI6IHN0cihzZWxmLmNvZGVfcm9vdCksCiAgICAgICAgICAgICJzYXZlZF9jb25maWciOiBzdHIoc2VsZi5kYXRhX3NvdXJjZV9maWxlKSwKICAgICAgICAgICAgImNhbmRpZGF0ZXMiOiBjYW5kaWRhdGVzLAogICAgICAgICAgICAiYnVkZ2V0X3VzZXNfcmVhbF9kYXRhIjogYm9vbChjdXJyZW50WyJvaGxjdl9yZWFkeSJdKSwKICAgICAgICAgICAgInlmaW5hbmNlX2F1dG9tYXRpY19mYWxsYmFjayI6IEZhbHNlLAogICAgICAgIH0KCicnJwpzID0gc1s6c3RhcnRdICsgcmVwbGFjZW1lbnQgKyBzW2VuZDpdCnMgPSBzLnJlcGxhY2UoCiAgICAncm9vdCA9IFBhdGgocmF3X3BhdGguc3RyaXAoKS5zdHJpcChcJyJcJykpLmV4cGFuZHVzZXIoKS5yZXNvbHZlKClcbiAgICAgICAgc3RhdHVzID0gc2VsZi5faW5zcGVjdF9kYXRhX3JlcG8ocm9vdCknLAogICAgJ3Jvb3QgPSBzZWxmLl9ub3JtYWxpemVfZGF0YV9yZXBvX3Jvb3QoUGF0aChyYXdfcGF0aC5zdHJpcCgpLnN0cmlwKFwnIlwnKSkpXG4gICAgICAgIHN0YXR1cyA9IHNlbGYuX2luc3BlY3RfZGF0YV9yZXBvKHJvb3QpJywKICAgIDEsCikKcyA9IHMucmVwbGFjZSgKICAgICdzdGF0dXMgPSBzZWxmLl9pbnNwZWN0X2RhdGFfcmVwbyhzZWxmLmRhdGFfcmVwb19yb290KVxuICAgICAgICBpZiBub3Qgc3RhdHVzWyJvaGxjdl9yZWFkeSJdOicsCiAgICAnc3RhdHVzID0gc2VsZi5yZWFsX2RhdGFfc3RhdHVzXG4gICAgICAgIGlmIG5vdCBzdGF0dXNbIm9obGN2X3JlYWR5Il06JywKICAgIDEsCikKYXBpLndyaXRlX3RleHQocywgZW5jb2Rpbmc9J3V0Zi04JykKCmpzID0gcm9vdCAvICdtb2Rlcm5fdWknIC8gJ2Zyb250ZW5kJyAvICdhcHAuanMnCnQgPSBqcy5yZWFkX3RleHQoZW5jb2Rpbmc9J3V0Zi04JykKc3RhcnQgPSB0LmluZGV4KCdhc3luYyBmdW5jdGlvbiBsb2FkRGF0YVNvdXJjZSgpJykKZW5kID0gdC5pbmRleCgnXG5cbmFzeW5jIGZ1bmN0aW9uIGxvYWRTeXN0ZW0oKScsIHN0YXJ0KQpyZXBsYWNlbWVudCA9ICIiImFzeW5jIGZ1bmN0aW9uIGFwaVRpbWVkKHBhdGgsb3B0aW9ucz17fSx0aW1lb3V0TXM9MTIwMDApe2NvbnN0IGNvbnRyb2xsZXI9bmV3IEFib3J0Q29udHJvbGxlcigpO2NvbnN0IHRpbWVyPXNldFRpbWVvdXQoKCk9PmNvbnRyb2xsZXIuYWJvcnQoKSx0aW1lb3V0TXMpO3RyeXtyZXR1cm4gYXdhaXQgYXBpKHBhdGgsey4uLm9wdGlvbnMsc2lnbmFsOmNvbnRyb2xsZXIuc2lnbmFsfSl9Y2F0Y2goZSl7aWYoZT8ubmFtZT09PSdBYm9ydEVycm9yJyl0aHJvdyBuZXcgRXJyb3IoJ1JlcG9zaXRvcnkgY2hlY2sgdGltZWQgb3V0LiBUaGUgYXBwIHN0b3BwZWQgdGhlIHNjYW4gaW5zdGVhZCBvZiBoYW5naW5nLicpO3Rocm93IGV9ZmluYWxseXtjbGVhclRpbWVvdXQodGltZXIpfX0KYXN5bmMgZnVuY3Rpb24gbG9hZERhdGFTb3VyY2UoKXt0cnl7Y29uc3QgZD1hd2FpdCBhcGlUaW1lZCgnL2FwaS9kYXRhLXNvdXJjZScse30sMTAwMDApO3JlbmRlckRhdGFTb3VyY2UoZCk7cmV0dXJuIGR9Y2F0Y2goZSl7aWYoJCgnI2RhdGFTb3VyY2VTdW1tYXJ5JykpJCgnI2RhdGFTb3VyY2VTdW1tYXJ5JykudGV4dENvbnRlbnQ9J1JlcG9zaXRvcnkgY2hlY2sgc3RvcHBlZCc7aWYoJCgnI2RhdGFTb3VyY2VEZXRhaWwnKSkkKCcjZGF0YVNvdXJjZURldGFpbCcpLnRleHRDb250ZW50PWUubWVzc2FnZTt0aHJvdyBlfX0KYXN5bmMgZnVuY3Rpb24gY29ubmVjdERhdGFSZXBvKHBhdGhPdmVycmlkZT1udWxsKXtjb25zdCBpbnB1dD0kKCcjZGF0YVJlcG9QYXRoJyk7Y29uc3QgcGF0aD0ocGF0aE92ZXJyaWRlfHxpbnB1dD8udmFsdWV8fCcnKS50cmltKCk7aWYoIXBhdGgpe3RvYXN0KCdFbnRlciB0aGUgbG9jYWwgU3RvY2sgUmVjb21tZW5kYXRpb24gRW5naW5lIHJlcG9zaXRvcnkgcGF0aCcpO3JldHVybjt9YnVzeSh0cnVlLCdDb25uZWN0aW5nIHJlYWwgZGF0YScsJ1ZlcmlmeWluZyBvZmZpY2lhbCBOU0UgT0hMQ1YgY2FjaGUgYW5kIHN3aXRjaGluZyB0aGUgbmF0aXZlIGFwcCB0byByZWFsLWRhdGEgbW9kZeKApicpO3RyeXtjb25zdCBkPWF3YWl0IGFwaVRpbWVkKCcvYXBpL2RhdGEtc291cmNlJyx7bWV0aG9kOidQT1NUJyxib2R5OntwYXRofX0sMTUwMDApO3JlbmRlckRhdGFTb3VyY2UoZCk7c3RhdGUuc3ltYm9scz1bXTtyZW5kZXJEYXNoYm9hcmQoYXdhaXQgYXBpKCcvYXBpL2Rhc2hib2FyZCcpKTthd2FpdCBsb2FkU3ltYm9scygnJyk7dG9hc3QoJ1JlYWwgZGF0YSBjb25uZWN0ZWQgwrcgJysoZC5hY3RpdmU/LnN0b2NrX2ZpbGVzfHwwKSsnIHN0b2NrIGhpc3RvcmllcycpO31jYXRjaChlKXtpZigkKCcjZGF0YVNvdXJjZVN1bW1hcnknKSkkKCcjZGF0YVNvdXJjZVN1bW1hcnknKS50ZXh0Q29udGVudD0nQ29ubmVjdGlvbiBmYWlsZWQnO2lmKCQoJyNkYXRhU291cmNlRGV0YWlsJykpJCgnI2RhdGFTb3VyY2VEZXRhaWwnKS50ZXh0Q29udGVudD1lLm1lc3NhZ2U7dG9hc3QoZS5tZXNzYWdlKX1maW5hbGx5e2J1c3koZmFsc2UpfX0iIiIKdCA9IHRbOnN0YXJ0XSArIHJlcGxhY2VtZW50ICsgdFtlbmQ6XQpqcy53cml0ZV90ZXh0KHQsIGVuY29kaW5nPSd1dGYtOCcpCgphc3NlcnQgJ0FQUF9WRVJTSU9OID0gIjAuOS40LWRhdGEtc291cmNlLWhvdGZpeCInIGluIGFwaS5yZWFkX3RleHQoZW5jb2Rpbmc9J3V0Zi04JykKYXNzZXJ0ICdfbGFzdF9ub25lbXB0eV9saW5lJyBpbiBhcGkucmVhZF90ZXh0KGVuY29kaW5nPSd1dGYtOCcpCmFzc2VydCAnYXBpVGltZWQnIGluIGpzLnJlYWRfdGV4dChlbmNvZGluZz0ndXRmLTgnKQpwcmludCgnMC45LjQgaG90Zml4IHBhdGNoIGFwcGxpZWQnKQo='
+          $script = "$env:RUNNER_TEMP\\patch094.py"
+          [IO.File]::WriteAllBytes($script, [Convert]::FromBase64String($b64))
+          python $script
+
+      - name: Apply 0.9.7 legacy data autodiscovery
+        shell: pwsh
+        run: |
+          @'
+          from pathlib import Path
+          import os
+          
+          root = Path(os.environ["SRE_ENGINE_ROOT"])
+          api = root / "modern_ui" / "api.py"
+          s = api.read_text(encoding="utf-8")
+          s = s.replace('APP_VERSION = "0.9.4-data-source-hotfix"', 'APP_VERSION = "0.9.7-legacy-data-autodiscovery"')
+          
+          anchor = '    @staticmethod\n    def _normalize_data_repo_root'
+          pos = s.index(anchor)
+          helpers = '''    @staticmethod
+              def _legacy_frozen_cache_roots(root: Path) -> list[Path]:
+                  candidates = [
+                      root / "stage2_2_1" / "data" / "frozen",
+                      root / "Stage 2.2.2 Final" / "stage2_2_1" / "data" / "frozen",
+                  ]
+                  return [p for p in candidates if p.exists() and any(p.glob("*.csv"))]
+          
+              @classmethod
+              def _market_cache_roots(cls, root: Path) -> tuple[list[Path], str, str]:
+                  official = [p for p in cls._official_cache_roots(root) if p.exists() and any(p.glob("*.csv"))]
+                  if official:
+                      return official, "REAL_OFFICIAL_DATA", "OFFICIAL_NSE_OHLCV"
+                  legacy = cls._legacy_frozen_cache_roots(root)
+                  if legacy:
+                      return legacy, "REAL_FROZEN_HISTORY", "LEGACY_FROZEN_OHLCV"
+                  return [], "NO_REAL_DATA_CONNECTED", "NONE"
+          
+          '''
+          s = s[:pos] + helpers + s[pos:]
+          
+          old = '''        for idx in range(max(0, len(parts) - 3)):
+                      if parts[idx:idx + 4] == ["data", "normalized", "nse_official", "equity_bhavcopy"]:
+                          return Path(*root.parts[:idx]).resolve()
+                  return root
+          '''
+          new = '''        for idx in range(max(0, len(parts) - 3)):
+                      if parts[idx:idx + 4] == ["data", "normalized", "nse_official", "equity_bhavcopy"]:
+                          return Path(*root.parts[:idx]).resolve()
+                  for idx in range(max(0, len(parts) - 2)):
+                      if parts[idx:idx + 3] == ["stage2_2_1", "data", "frozen"]:
+                          return Path(*root.parts[:idx]).resolve()
+                  return root
+          '''
+          if old not in s:
+              raise RuntimeError("normalize contract missing")
+          s = s.replace(old, new, 1)
+          
+          old = '        roots = self._official_cache_roots(root)\n        files: list[Path] = []'
+          if old not in s:
+              raise RuntimeError("inspect roots contract missing")
+          s = s.replace(old, '        roots, data_mode, provenance = self._market_cache_roots(root)\n        files: list[Path] = []', 1)
+          
+          marker = '            "cache_roots": [str(p) for p in roots if p.exists()],'
+          pos = s.index(marker)
+          s = s[:pos + len(marker)] + '\n            "data_mode": data_mode,\n            "provenance": provenance,' + s[pos + len(marker):]
+          
+          old = '        roots = self._official_cache_roots(root)'
+          if old not in s:
+              raise RuntimeError("bind roots contract missing")
+          s = s.replace(old, '        roots, _, _ = self._market_cache_roots(root)', 1)
+          
+          old = '"mode": "REAL_OFFICIAL_DATA" if current["ohlcv_ready"] else ("PREVIEW" if self.preview_mode else "NO_REAL_DATA_CONNECTED")'
+          if old not in s:
+              raise RuntimeError("mode contract missing")
+          s = s.replace(old, '"mode": current.get("data_mode") if current["ohlcv_ready"] else ("PREVIEW" if self.preview_mode else "NO_REAL_DATA_CONNECTED")', 1)
+          
+          s = s.replace(
+              'No official NSE OHLCV cache was found under that folder. Select the Stock-Recommendation-Engine repository that contains data/normalized/nse_official/equity_bhavcopy.',
+              'No usable OHLCV history was found under that repository. Expected either data/normalized/nse_official/equity_bhavcopy or stage2_2_1/data/frozen.',
+              1,
+          )
+          s = s.replace('Real official market data is not connected.', 'Real market history is not connected.', 1)
+          api.write_text(s, encoding="utf-8")
+          
+          js = root / "modern_ui" / "frontend" / "app.js"
+          t = js.read_text(encoding="utf-8")
+          t = t.replace("d.mode==='REAL_OFFICIAL_DATA'", "String(d.mode||'').startsWith('REAL_')")
+          t = t.replace("ds.mode==='REAL_OFFICIAL_DATA'", "String(ds.mode||'').startsWith('REAL_')")
+          t = t.replace("official stock histories", "stock histories")
+          t = t.replace("Real official OHLCV repository is not connected", "Real OHLCV repository is not connected")
+          t = t.replace("Select the repository that contains data/normalized/nse_official/equity_bhavcopy", "Select your Stock-Recommendation-Engine repository; official NSE cache and stage2_2_1/data/frozen are supported")
+          js.write_text(t, encoding="utf-8")
+          
+          assert 'APP_VERSION = "0.9.7-legacy-data-autodiscovery"' in api.read_text(encoding="utf-8")
+          assert "REAL_FROZEN_HISTORY" in api.read_text(encoding="utf-8")
+          assert "LEGACY_FROZEN_OHLCV" in api.read_text(encoding="utf-8")
+          print("0.9.7 legacy data autodiscovery applied")
+          '@ | python -
+
+      - name: Apply tested 0.9.8 correctness-state overlay
+        shell: pwsh
+        run: |
+          $b64 = Get-Content ".ci\native098\overlay.b64" -Raw
+          if ($b64.Length -ne 50728) { throw "0.9.8 overlay base64 length mismatch: $($b64.Length)" }
+          $zip = "$env:RUNNER_TEMP\sre098-overlay.zip"
+          [IO.File]::WriteAllBytes($zip, [Convert]::FromBase64String($b64))
+          $hash = (Get-FileHash $zip -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($hash -ne "845b34e3e06d2101241bf36c2b99a7c934f4f25ca0cbfb2baa3e53cf969f2fe3") { throw "0.9.8 overlay hash mismatch: $hash" }
+          $tmp = "$env:RUNNER_TEMP\sre098-overlay"
+          if (Test-Path $tmp) { Remove-Item $tmp -Recurse -Force }
+          Expand-Archive -LiteralPath $zip -DestinationPath $tmp -Force
+          Copy-Item "$tmp\api.py" "$env:SRE_ENGINE_ROOT\modern_ui\api.py" -Force
+          Copy-Item "$tmp\app.js" "$env:SRE_ENGINE_ROOT\modern_ui\frontend\app.js" -Force
+          Copy-Item "$tmp\index.html" "$env:SRE_ENGINE_ROOT\modern_ui\frontend\index.html" -Force
+          Copy-Item "$tmp\styles.css" "$env:SRE_ENGINE_ROOT\modern_ui\frontend\styles.css" -Force
+          $api = Get-Content "$env:SRE_ENGINE_ROOT\modern_ui\api.py" -Raw
+          $js = Get-Content "$env:SRE_ENGINE_ROOT\modern_ui\frontend\app.js" -Raw
+          if ($api -notmatch 'APP_VERSION = "0.9.8-correctness-state"') { throw "0.9.8 backend identity missing before Phase 2 patch" }
+          if ($api -notmatch 'active_analysis_run.json') { throw "Persistent active-run contract missing" }
+          if ($api -notmatch 'unused_cash_explanation') { throw "Unused-cash explanation contract missing" }
+          if ($js -notmatch 'MEETS TARGET' -or $js -notmatch 'BELOW TARGET') { throw "Target-status UI contract missing" }
+          if ($js -notmatch 'activeRunShort') { throw "Active Run ID UI contract missing" }
+          node --check "$env:SRE_ENGINE_ROOT\modern_ui\frontend\app.js"
+          python -m py_compile "$env:SRE_ENGINE_ROOT\modern_ui\api.py"
+          Write-Host "0.9.8 EXACT OVERLAY PASS"
+
+      - name: Apply Phase 2 baseline allocation and executability V2
+        shell: pwsh
+        run: |
+          python ".ci\native099\patch099.py"
+          python -m py_compile "$env:SRE_ENGINE_ROOT\stock_app\allocation.py"
+          python -m py_compile "$env:SRE_ENGINE_ROOT\stock_app\historical.py"
+          python -m py_compile "$env:SRE_ENGINE_ROOT\modern_ui\api.py"
+          node --check "$env:SRE_ENGINE_ROOT\modern_ui\frontend\app.js"
+          $api = Get-Content "$env:SRE_ENGINE_ROOT\modern_ui\api.py" -Raw
+          $alloc = Get-Content "$env:SRE_ENGINE_ROOT\stock_app\allocation.py" -Raw
+          $hist = Get-Content "$env:SRE_ENGINE_ROOT\stock_app\historical.py" -Raw
+          $html = Get-Content "$env:SRE_ENGINE_ROOT\modern_ui\frontend\index.html" -Raw
+          if ($api -notmatch '0.9.9-allocation-executability-v2') { throw "0.9.9 backend identity missing" }
+          if ($alloc -notmatch 'SINGLE_ELIGIBLE_FULL_CAPITAL') { throw "Single-stock exception missing" }
+          if ($alloc -notmatch 'single_eligible_stock_exception') { throw "Phase 2 policy metadata missing" }
+          if ($hist -notmatch 'INDEX_') { throw "Market-index exclusion missing" }
+          if ($html -notmatch 'Cash affordable' -or $html -notmatch 'Executable') { throw "Opportunity executability filters missing" }
+          Write-Host "0.9.9 PHASE-2 PATCH PASS"
+
+      - name: Apply Phase 3 freshness and provenance foundation
+        shell: pwsh
+        run: |
+          python ".ci\\native100\\patch100.py"
+          python -m py_compile "$env:SRE_ENGINE_ROOT\\modern_ui\\api.py"
+          node --check "$env:SRE_ENGINE_ROOT\\modern_ui\\frontend\\app.js"
+          $api = Get-Content "$env:SRE_ENGINE_ROOT\\modern_ui\\api.py" -Raw
+          $js = Get-Content "$env:SRE_ENGINE_ROOT\\modern_ui\\frontend\\app.js" -Raw
+          if ($api -notmatch '0.9.10-phase3-foundation') { throw "0.9.10 backend identity missing" }
+          if ($api -notmatch '_phase3_freshness_contract') { throw "Phase 3 freshness gate missing" }
+          if ($api -notmatch 'analysis_data_current') { throw "Phase 3 analysis-current flag missing" }
+          if ($js -notmatch 'freshness_gate') { throw "Phase 3 freshness UI label missing" }
+          if (!(Test-Path "$env:SRE_ENGINE_ROOT\\phase3\\data_foundation_policy_v1.json")) { throw "Phase 3 policy file missing" }
+          Write-Host "0.9.10 PHASE-3 FOUNDATION PATCH PASS"
+
+      - name: Apply Phase 3B official universe and identity foundation
+        shell: pwsh
+        run: |
+          python ".ci\native101\patch101.py"
+          python -m py_compile "$env:SRE_ENGINE_ROOT\stock_app\official_universe.py"
+          python -m py_compile "$env:SRE_ENGINE_ROOT\modern_ui\api.py"
+          node --check "$env:SRE_ENGINE_ROOT\modern_ui\frontend\app.js"
+          $api = Get-Content "$env:SRE_ENGINE_ROOT\modern_ui\api.py" -Raw
+          $universe = Get-Content "$env:SRE_ENGINE_ROOT\stock_app\official_universe.py" -Raw
+          if ($api -notmatch '0.9.11-phase3b-official-data') { throw "0.9.11 backend identity missing" }
+          if ($universe -notmatch 'OfficialUniverseCatalog') { throw "Official universe catalog missing" }
+          if ($universe -notmatch 'MIN_IDENTITY_COVERAGE = 0.98') { throw "Identity coverage gate missing" }
+          if ($universe -notmatch 'MIN_HISTORY_COVERAGE = 0.95') { throw "History coverage gate missing" }
+          if (!(Test-Path "$env:SRE_ENGINE_ROOT\phase3\official_market_data_contract_v1.json")) { throw "Phase 3B contract missing" }
+          Write-Host "0.9.11 PHASE-3B OFFICIAL DATA PATCH PASS"
+
+      - name: Apply 0.9.12 universe visibility hotfix
+        shell: pwsh
+        run: |
+          python ".ci\native102\patch102.py"
+          python -m py_compile "$env:SRE_ENGINE_ROOT\modern_ui\api.py"
+          node --check "$env:SRE_ENGINE_ROOT\modern_ui\frontend\app.js"
+          $api = Get-Content "$env:SRE_ENGINE_ROOT\modern_ui\api.py" -Raw
+          $js = Get-Content "$env:SRE_ENGINE_ROOT\modern_ui\frontend\app.js" -Raw
+          $html = Get-Content "$env:SRE_ENGINE_ROOT\modern_ui\frontend\index.html" -Raw
+          if ($api -notmatch '0.9.12-phase3c-universe-visibility') { throw "0.9.12 backend identity missing" }
+          if ($js -notmatch 'history loaded') { throw "Loaded-history visibility text missing" }
+          if ($html -notmatch '<small>universe</small>') { throw "Universe orb label missing" }
+          Write-Host "0.9.12 UNIVERSE VISIBILITY HOTFIX PASS"
+
+      - name: 0.9.12 dashboard visibility regression
+        shell: pwsh
+        run: |
+          python -m pip install --disable-pip-version-check fastapi==0.128.2 uvicorn==0.48.0
+          $engine = "$env:SRE_ENGINE_ROOT"
+          $data = "$env:RUNNER_TEMP\sre0912-appdata"
+          $env:STOCK_MODERN_UI_PREVIEW = "0"
+          $p = Start-Process -FilePath python -ArgumentList "`"$engine\run_modern_ui.py`" --no-browser --host 127.0.0.1 --port 18768 --repo-root `"$engine`" --app-data-dir `"$data`"" -PassThru -NoNewWindow
+          try {
+            $ok = $false
+            for ($i=0; $i -lt 60; $i++) {
+              Start-Sleep -Milliseconds 400
+              if ($p.HasExited) { throw "0.9.12 backend exited during dashboard visibility regression" }
+              try {
+                $health = Invoke-RestMethod "http://127.0.0.1:18768/api/health" -TimeoutSec 2
+                if ($health.status -eq "ok") { $ok = $true; break }
+              } catch {}
+            }
+            if (!$ok) { throw "0.9.12 health timed out" }
+            if ($health.app_version -ne "0.9.12-phase3c-universe-visibility") { throw "Wrong app version: $($health.app_version)" }
+            Write-Host "0.9.12 DASHBOARD VISIBILITY REGRESSION PASS"
+          } finally {
+            if (!$p.HasExited) { Stop-Process -Id $p.Id -Force }
+          }
+
+      - name: Build deterministic NIFTY 200 identity fixture
+        shell: pwsh
+        run: |
+          $fixture = "$env:RUNNER_TEMP\sre0911-official-universe"
+          $const = Join-Path $fixture "data\official\nifty200"
+          $master = Join-Path $fixture "data\official\nse\security_master"
+          $cache = Join-Path $fixture "data\normalized\nse_official\equity_bhavcopy\expanded_universe_2026_10_08"
+          New-Item -ItemType Directory -Force -Path $const,$master,$cache | Out-Null
+          $env:SRE0911_OFFICIAL_ROOT = $fixture
+          @'
+          from pathlib import Path
+          import csv, os
+
+          root = Path(os.environ["SRE0911_OFFICIAL_ROOT"])
+          const = root / "data" / "official" / "nifty200"
+          master = root / "data" / "official" / "nse" / "security_master"
+          cache = root / "data" / "normalized" / "nse_official" / "equity_bhavcopy" / "expanded_universe_2026_10_08"
+
+          symbols = [f"STK{i:03d}" for i in range(1, 201)]
+
+          with (const / "ind_nifty200list_20261008.csv").open("w", newline="", encoding="utf-8") as h:
+              w = csv.writer(h)
+              w.writerow(["Company Name","Industry","Symbol","Series","ISIN Code"])
+              for i, symbol in enumerate(symbols, 1):
+                  w.writerow([f"Company {i}", f"Sector {(i-1)%12+1}", symbol, "EQ", f"INE{i:03d}A01{i:03d}"])
+
+          with (master / "EQUITY_L_20261008.csv").open("w", newline="", encoding="utf-8") as h:
+              w = csv.writer(h)
+              w.writerow(["SYMBOL","NAME OF COMPANY","SERIES","ISIN NUMBER"])
+              for i, symbol in enumerate(symbols, 1):
+                  w.writerow([symbol, f"Company {i}", "EQ", f"INE{i:03d}A01{i:03d}"])
+
+          rows = [
+              ["2026-10-06","100","102","99","101","1000000"],
+              ["2026-10-07","101","103","100","102","1100000"],
+              ["2026-10-08","102","104","101","103","1200000"],
+          ]
+          for i, symbol in enumerate(symbols, 1):
+              with (cache / f"{symbol}.NS.csv").open("w", newline="", encoding="utf-8") as h:
+                  w = csv.writer(h)
+                  w.writerow(["Date","Open","High","Low","Close","Volume"])
+                  bump = i / 100.0
+                  for row in rows:
+                      out = row.copy()
+                      out[1] = f"{float(out[1])+bump:.2f}"
+                      out[2] = f"{float(out[2])+bump:.2f}"
+                      out[3] = f"{float(out[3])+bump:.2f}"
+                      out[4] = f"{float(out[4])+bump:.2f}"
+                      w.writerow(out)
+
+          with (cache / "INDEX_NSEI.csv").open("w", newline="", encoding="utf-8") as h:
+              w = csv.writer(h)
+              w.writerow(["Date","Open","High","Low","Close","Volume"])
+              w.writerow(["2026-10-08","25000","25200","24900","25100","0"])
+          '@ | python -
+          "SRE0911_OFFICIAL_ROOT=$fixture" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Phase 3B NIFTY 200 universe regression
+        shell: pwsh
+        run: |
+          @'
+          import os, sys
+          from pathlib import Path
+          sys.path.insert(0, os.environ["SRE_ENGINE_ROOT"])
+          from stock_app.official_universe import OfficialUniverseCatalog
+
+          root = Path(os.environ["SRE0911_OFFICIAL_ROOT"])
+          cache = root / "data" / "normalized" / "nse_official" / "equity_bhavcopy" / "expanded_universe_2026_10_08"
+          files = sorted(cache.glob("*.csv"))
+
+          status = OfficialUniverseCatalog.inspect(root, files)
+          assert status["official_universe_status"] == "OFFICIAL_NIFTY200_READY", status
+          assert status["official_universe_members"] == 200, status
+          assert status["identity_mapped"] == 200, status
+          assert status["identity_coverage"] == 1.0, status
+          assert status["history_covered_members"] == 200, status
+          assert status["history_coverage"] == 1.0, status
+          assert status["analysis_universe_ready"] is True, status
+          assert len(OfficialUniverseCatalog.symbols(root, files)) == 200
+
+          degraded = OfficialUniverseCatalog.inspect(root, [p for p in files if not p.name.startswith("INDEX_")][:189])
+          assert degraded["universe_ready"] is True, degraded
+          assert degraded["analysis_universe_ready"] is False, degraded
+          assert degraded["official_universe_status"] == "OFFICIAL_NIFTY200_HISTORY_GAP", degraded
+          assert degraded["history_covered_members"] == 189, degraded
+          print("PHASE3B NIFTY200 IDENTITY/HISTORY REGRESSION PASS")
+          '@ | python -
+
+      - name: Phase 3B data-source API regression
+        shell: pwsh
+        run: |
+          python -m pip install --disable-pip-version-check fastapi==0.128.2 uvicorn==0.48.0
+          $engine = "$env:SRE_ENGINE_ROOT"
+          $data = "$env:RUNNER_TEMP\sre0911-appdata"
+          $env:STOCK_MODERN_UI_PREVIEW = "0"
+          $env:STOCK_REAL_DATA_REPO_ROOT = "$env:SRE0911_OFFICIAL_ROOT"
+          $p = Start-Process -FilePath python -ArgumentList "`"$engine\run_modern_ui.py`" --no-browser --host 127.0.0.1 --port 18767 --repo-root `"$engine`" --app-data-dir `"$data`"" -PassThru -NoNewWindow
+          try {
+            $ok = $false
+            for ($i=0; $i -lt 60; $i++) {
+              Start-Sleep -Milliseconds 400
+              if ($p.HasExited) { throw "0.9.11 backend exited during official-universe API regression" }
+              try {
+                $health = Invoke-RestMethod "http://127.0.0.1:18767/api/health" -TimeoutSec 2
+                if ($health.status -eq "ok") { $ok = $true; break }
+              } catch {}
+            }
+            if (!$ok) { throw "0.9.11 official-universe API health timed out" }
+            if ($health.app_version -ne "0.9.12-phase3c-universe-visibility") { throw "Wrong app version: $($health.app_version)" }
+            $source = Invoke-RestMethod "http://127.0.0.1:18767/api/data-source" -TimeoutSec 15
+            if ($source.mode -ne "REAL_OFFICIAL_DATA") { throw "Official fixture mode mismatch: $($source.mode)" }
+            if ([int]$source.active.stock_files -ne 200) { throw "Expected 200 official equity histories: $($source.active.stock_files)" }
+            if ([int]$source.active.official_universe_members -ne 200) { throw "NIFTY 200 membership count mismatch" }
+            if ([double]$source.active.identity_coverage -ne 1.0) { throw "Identity coverage mismatch" }
+            if ([double]$source.active.history_coverage -ne 1.0) { throw "History coverage mismatch" }
+            if (!$source.active.analysis_universe_ready) { throw "Official universe must be analysis-ready" }
+            if ($source.active.authority -ne "DATA_FOUNDATION_ONLY_NO_SCORE_CHANGE") { throw "Phase 3B authority changed unexpectedly" }
+            Write-Host "PHASE3B DATA-SOURCE API REGRESSION PASS"
+          } finally {
+            if (!$p.HasExited) { Stop-Process -Id $p.Id -Force }
+          }
+
+      - name: Phase 3 freshness policy regression
+        shell: pwsh
+        run: |
+          python -m pip install --disable-pip-version-check fastapi==0.128.2
+          @'
+          import datetime as dt
+          import os, sys
+          sys.path.insert(0, os.environ["SRE_ENGINE_ROOT"])
+          from modern_ui.api import ModernAppContext
+
+          today = dt.date.today()
+          recent = today
+          if recent.weekday() >= 5:
+              recent -= dt.timedelta(days=recent.weekday() - 4)
+          current = ModernAppContext._phase3_freshness_contract(recent.isoformat(), "REAL_OFFICIAL_DATA")
+          assert current["freshness_gate"] == "PASS", current
+          assert current["analysis_data_current"] is True, current
+
+          stale_date = today - dt.timedelta(days=30)
+          stale = ModernAppContext._phase3_freshness_contract(stale_date.isoformat(), "REAL_OFFICIAL_DATA")
+          assert stale["freshness_gate"] == "FAIL", stale
+          assert stale["analysis_data_current"] is False, stale
+
+          frozen = ModernAppContext._phase3_freshness_contract(recent.isoformat(), "REAL_FROZEN_HISTORY")
+          assert frozen["freshness_gate"] == "WARN", frozen
+          assert frozen["freshness_status"] == "STALE_FROZEN", frozen
+          assert frozen["analysis_data_current"] is False, frozen
+          print("PHASE3 FRESHNESS POLICY REGRESSION PASS")
+          '@ | python -
+
+      - name: Direct allocator policy regression
+        shell: pwsh
+        run: |
+          @'
+          import os, sys
+          from pathlib import Path
+          sys.path.insert(0, os.environ["SRE_ENGINE_ROOT"])
+          from stock_app.allocation import PortfolioAllocator, AllocationRequest, AllocationInput
+          a = PortfolioAllocator(Path(os.environ["SRE_ENGINE_ROOT"]), portfolio=None)
+          one = [
+              AllocationInput(1, "ONE", 466.30, "STRONG BUY CANDIDATE", "HIGH", "TEST"),
+              AllocationInput(2, "WATCH", 500.00, "WATCH - TECHNICAL ONLY", "LOW", "TEST"),
+          ]
+          r = a.allocate(AllocationRequest(1000, 20, 0.05), one, [])
+          assert len(r["new_buys"]) == 1, r
+          b = r["new_buys"][0]
+          assert b["shares"] == 2 and abs(b["estimated_cost"] - 932.60) < 0.01, b
+          assert b["single_stock_exception_applied"] is True, b
+          assert r["capital_summary"]["single_eligible_symbol"] == "ONE", r["capital_summary"]
+          multi = [
+              AllocationInput(1, "AAA", 466.30, "STRONG BUY CANDIDATE", "HIGH", "A"),
+              AllocationInput(2, "BBB", 300.00, "BUY CANDIDATE", "HIGH", "B"),
+          ]
+          r2 = a.allocate(AllocationRequest(1000, 20, 0.05), multi, [])
+          assert r2["capital_summary"]["single_eligible_symbol"] is None, r2["capital_summary"]
+          rows = {x["symbol"]: x for x in r2["rows"]}
+          assert rows["AAA"]["shares"] == 0, rows["AAA"]
+          assert rows["BBB"]["shares"] == 1 and rows["BBB"]["single_stock_exception_applied"] is False, rows["BBB"]
+          print("PHASE2 DIRECT ALLOCATOR REGRESSION PASS")
+          '@ | python -
+
+      - name: Fast repository scan regression
+        shell: pwsh
+        run: |
+          python -m pip install --disable-pip-version-check fastapi==0.128.2 uvicorn==0.48.0
+          $env:SRE094_LARGE_ROOT = "$env:RUNNER_TEMP\\large-real-repo"
+          $b64 = 'ZnJvbSBwYXRobGliIGltcG9ydCBQYXRoCmltcG9ydCBvcywgc3lzLCB0aW1lCnJvb3QgPSBQYXRoKG9zLmVudmlyb25bJ1NSRTA5NF9MQVJHRV9ST09UJ10pCmNhY2hlID0gcm9vdCAvICdkYXRhJyAvICdub3JtYWxpemVkJyAvICduc2Vfb2ZmaWNpYWwnIC8gJ2VxdWl0eV9iaGF2Y29weScgLyAnZXhwYW5kZWRfdW5pdmVyc2VfMjAyNl8xMF8wNScKY2FjaGUubWtkaXIocGFyZW50cz1UcnVlLCBleGlzdF9vaz1UcnVlKQpyb3cgPSAnRGF0ZSxPcGVuLEhpZ2gsTG93LENsb3NlLFZvbHVtZVxuMjAyNi0xMC0wOCwxMDAsMTAxLDk5LDEwMC41LDEwMDAwXG4yMDI2LTEwLTA5LDEwMC41LDEwMywxMDAsMTAyLjUsMTIwMDBcbicKZm9yIGkgaW4gcmFuZ2UoMTIwMCk6CiAgICAoY2FjaGUgLyBmJ1NUS3tpOjA0ZH0uTlMuY3N2Jykud3JpdGVfdGV4dChyb3csIGVuY29kaW5nPSd1dGYtOCcpCnN5cy5wYXRoLmluc2VydCgwLCBvcy5lbnZpcm9uWydTUkVfRU5HSU5FX1JPT1QnXSkKZnJvbSBtb2Rlcm5fdWkuYXBpIGltcG9ydCBNb2Rlcm5BcHBDb250ZXh0CmN0eCA9IE1vZGVybkFwcENvbnRleHQuX19uZXdfXyhNb2Rlcm5BcHBDb250ZXh0KQpzdGFydGVkID0gdGltZS5wZXJmX2NvdW50ZXIoKQpzdGF0dXMgPSBjdHguX2luc3BlY3RfZGF0YV9yZXBvKHJvb3QpCmVsYXBzZWQgPSB0aW1lLnBlcmZfY291bnRlcigpIC0gc3RhcnRlZAphc3NlcnQgc3RhdHVzWydzdG9ja19maWxlcyddID09IDEyMDAsIHN0YXR1cwphc3NlcnQgc3RhdHVzWydsYXRlc3Rfc2Vzc2lvbiddID09ICcyMDI2LTEwLTA5Jywgc3RhdHVzCmFzc2VydCBlbGFwc2VkIDwgMy4wLCBlbGFwc2VkCmFzc2VydCBjdHguX25vcm1hbGl6ZV9kYXRhX3JlcG9fcm9vdChjYWNoZSkgPT0gcm9vdC5yZXNvbHZlKCkKcHJpbnQoZidGQVNUIERBVEEgQ0hFQ0sgUEFTUzogMTIwMCBzdG9ja3MgaW4ge2VsYXBzZWQ6LjNmfXMnKQo='
+          $script = "$env:RUNNER_TEMP\\reg094.py"
+          [IO.File]::WriteAllBytes($script, [Convert]::FromBase64String($b64))
+          python $script
+
+      - name: Build deterministic legacy frozen-data fixture
+        shell: pwsh
+        run: |
+          $fixture = "$env:RUNNER_TEMP\sre099-legacy-repo"
+          $cache = Join-Path $fixture "stage2_2_1\data\frozen"
+          New-Item -ItemType Directory -Force -Path $cache | Out-Null
+          $env:SRE099_FIXTURE_ROOT = $fixture
+          @'
+          from pathlib import Path
+          import csv, datetime, math, os
+
+          root = Path(os.environ["SRE099_FIXTURE_ROOT"])
+          cache = root / "stage2_2_1" / "data" / "frozen"
+          symbols = ["INFY", "TCS", "RELIANCE", "HDFCBANK", "SUNPHARMA", "LT"]
+          start = datetime.date(2023, 1, 2)
+
+          for si, symbol in enumerate(symbols):
+              d = start
+              price = 350.0 + si * 120.0
+              rows = []
+              i = 0
+              while len(rows) < 760:
+                  if d.weekday() < 5:
+                      seasonal = math.sin(i / 13 + si) * 0.012 + math.cos(i / 31 + si) * 0.007
+                      drift = 0.00035 + (si - 2) * 0.00003
+                      close = price * (1 + drift + seasonal * 0.08)
+                      op = price * (1 + math.sin(i / 7 + si) * 0.002)
+                      hi = max(op, close) * (1.006 + abs(math.sin(i / 9)) * 0.004)
+                      lo = min(op, close) * (1 - 0.006 - abs(math.cos(i / 11)) * 0.004)
+                      vol = 1_000_000 + si * 120_000 + (i % 37) * 9_000
+                      rows.append([d.isoformat(), f"{op:.2f}", f"{hi:.2f}", f"{lo:.2f}", f"{close:.2f}", str(vol)])
+                      price = close
+                      i += 1
+                  d += datetime.timedelta(days=1)
+              with (cache / f"{symbol}.NS.csv").open("w", newline="", encoding="utf-8") as handle:
+                  writer = csv.writer(handle)
+                  writer.writerow(["Date", "Open", "High", "Low", "Close", "Volume"])
+                  writer.writerows(rows)
+          '@ | python -
+          Copy-Item (Join-Path $cache "INFY.NS.csv") (Join-Path $cache "INDEX_NSEI.csv") -Force
+          "SRE099_FIXTURE_ROOT=$fixture" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Smoke test legacy-data recommendations, budget and chart contracts
+        shell: pwsh
+        run: |
+          python -m pip install --disable-pip-version-check fastapi==0.128.2 uvicorn==0.48.0
+          $engine = "$env:SRE_ENGINE_ROOT"
+          $data = "$env:RUNNER_TEMP\sre099-appdata"
+          $env:STOCK_MODERN_UI_PREVIEW = "0"
+          $env:STOCK_REAL_DATA_REPO_ROOT = "$env:SRE099_FIXTURE_ROOT"
+
+          $p = Start-Process -FilePath python -ArgumentList "`"$engine\run_modern_ui.py`" --no-browser --host 127.0.0.1 --port 18765 --repo-root `"$engine`" --app-data-dir `"$data`"" -PassThru -NoNewWindow
+          try {
+            $ok = $false
+            for ($i=0; $i -lt 60; $i++) {
+              Start-Sleep -Milliseconds 400
+              if ($p.HasExited) { throw "0.9.9 backend exited early with code $($p.ExitCode)" }
+              try {
+                $health = Invoke-RestMethod "http://127.0.0.1:18765/api/health" -TimeoutSec 2
+                if ($health.status -eq "ok") { $ok = $true; break }
+              } catch {}
+            }
+            if (!$ok) { throw "0.9.9 backend health check timed out" }
+            if ($health.app_version -ne "0.9.12-phase3c-universe-visibility") { throw "Wrong app version: $($health.app_version)" }
+            if ($health.preview_mode) { throw "Preview mode must be disabled in 0.9.3" }
+            if ($health.data_source.mode -ne "REAL_FROZEN_HISTORY") { throw "Legacy real data mode not active: $($health.data_source.mode)" }
+            if ([int]$health.data_source.active.stock_files -ne 6) { throw "Equity history count mismatch: $($health.data_source.active.stock_files)" }
+            if ([int]$health.data_source.active.index_files -ne 1) { throw "Market index count mismatch: $($health.data_source.active.index_files)" }
+            if ([int]$health.symbols -ne 6) { throw "Searchable equity symbol count must exclude INDEX_NSEI: $($health.symbols)" }
+
+            $stock = Invoke-RestMethod "http://127.0.0.1:18765/api/stocks/INFY?limit=5000" -TimeoutSec 15
+            if ($stock.bars.Count -lt 700) { throw "Legacy stock chart dataset smoke failed: $($stock.bars.Count)" }
+
+            $runBody = @{capital=1000; horizon_sessions=20; target_return_percent=5} | ConvertTo-Json
+            $run = Invoke-RestMethod "http://127.0.0.1:18765/api/opportunities/run" -Method Post -ContentType "application/json" -Body $runBody -TimeoutSec 60
+            if ([int]$run.count -ne 6) { throw "Opportunity engine must analyze 6 equities and exclude INDEX_NSEI, got $($run.count)" }
+            if (($run.items | Where-Object { $_.symbol -eq "INDEX_NSEI" }).Count -gt 0) { throw "Market index leaked into equity recommendations" }
+            $exec = @($run.items | Where-Object { $_.executable -eq $true })
+            if ($exec.Count -ne 1) { throw "Expected exactly one executable small-cap stock, got $($exec.Count)" }
+            if (!$exec[0].single_stock_exception_applied) { throw "Opportunity row did not expose single-stock exception" }
+            if ([int]$exec[0].executable_qty -lt 1) { throw "Executable quantity missing" }
+            $runId = [string]$run.run.run_id
+            if (!$runId) { throw "Opportunity run did not expose a Run ID" }
+            $run2 = Invoke-RestMethod "http://127.0.0.1:18765/api/opportunities/run" -Method Post -ContentType "application/json" -Body $runBody -TimeoutSec 60
+            if ([string]$run2.run.run_id -ne $runId) { throw "Identical inputs created a different Run ID" }
+            if (!$run2.reused_run) { throw "Identical inputs were not marked as reused" }
+            if (($run2.items | Where-Object { $_.target_status -notin @("MEETS TARGET","BELOW TARGET","NO TARGET") }).Count -gt 0) { throw "Invalid target status in Opportunities" }
+            $runId | Set-Content "$env:RUNNER_TEMP\phase2-active-run.txt" -Encoding ASCII
+
+            $planBody = @{deployable_capital=1000; horizon_sessions=20; target_return_percent=5} | ConvertTo-Json
+            $plan = Invoke-RestMethod "http://127.0.0.1:18765/api/capital-plan" -Method Post -ContentType "application/json" -Body $planBody -TimeoutSec 60
+            if ([double]$plan.capital_summary.deployable_capital -ne 1000) { throw "Budget was not preserved in capital plan" }
+            if ($plan.new_buys.Count -ne 1) { throw "Capital Plan must contain exactly one executable buy for ₹1,000 fixture" }
+            if (!$plan.new_buys[0].single_stock_exception_applied) { throw "Capital Plan did not apply single-stock exception" }
+            if ([double]$plan.new_buys[0].estimated_cost -le 350) { throw "35% cap was not relaxed; spend stayed at/below ₹350" }
+            if ([double]$plan.new_buys[0].estimated_cost -gt 1000) { throw "Capital Plan overspent ₹1,000" }
+            if ([string]$plan.new_buys[0].symbol -ne [string]$exec[0].symbol) { throw "Opportunities Executable and Capital Plan disagree" }
+            if (!$plan.source_run.market_session) { throw "Capital plan has no real market session" }
+            if ([string]$plan.source_run.run_id -ne $runId) { throw "Capital Plan did not consume the same active Run ID" }
+            if (!$plan.capital_summary.unused_cash_explanation) { throw "Capital Plan did not explain unused cash" }
+            $dash = Invoke-RestMethod "http://127.0.0.1:18765/api/dashboard" -TimeoutSec 10
+            if ([int]$dash.symbol_count -ne 6) { throw "Dashboard stock count must equal connected history count, got $($dash.symbol_count)" }
+            if ([string]$dash.active_run.run_id -ne $runId) { throw "Dashboard is not bound to the active Run ID" }
+            $stockActive = Invoke-RestMethod "http://127.0.0.1:18765/api/stocks/INFY?limit=5000" -TimeoutSec 15
+            if ([string]$stockActive.active_run.run_id -ne $runId) { throw "Stock Intelligence is not bound to the active Run ID" }
+            if ($stockActive.history.source_mode -ne "REAL_FROZEN_HISTORY") { throw "Stock history provenance mode missing" }
+            if (!$stockActive.history.first_session -or !$stockActive.history.last_session) { throw "Stock history date range missing" }
+
+            $source = Invoke-RestMethod "http://127.0.0.1:18765/api/data-source" -TimeoutSec 10
+            if ($source.mode -ne "REAL_FROZEN_HISTORY") { throw "Legacy data source endpoint not active" }
+            if (!$source.budget_uses_real_data) { throw "Budget is not marked as real-data driven" }
+            if ($source.active.provenance -ne "LEGACY_FROZEN_OHLCV") { throw "Legacy provenance missing: $($source.active.provenance)" }
+            if ($source.active.freshness_gate -ne "WARN") { throw "Frozen history must carry WARN freshness gate: $($source.active.freshness_gate)" }
+            if ($source.active.freshness_status -ne "STALE_FROZEN") { throw "Frozen history freshness status mismatch: $($source.active.freshness_status)" }
+            if ($source.active.analysis_data_current) { throw "Frozen history must never be marked current market data" }
+
+            $js = (Invoke-WebRequest "http://127.0.0.1:18765/assets/app.js" -TimeoutSec 10).Content
+            $html = (Invoke-WebRequest "http://127.0.0.1:18765/" -TimeoutSec 10).Content
+            if ($js -notmatch 'minBars\s*=\s*8') { throw "8-candle minimum zoom contract missing" }
+            if ($js -notmatch 'limit=5000') { throw "5000-session chart history contract missing" }
+            if ($html -notmatch 'chartZoomIn' -or $html -notmatch 'chartZoomOut') { throw "Chart zoom buttons missing" }
+            if ($html -notmatch 'drag to pan') { throw "Chart pan guidance missing" }
+            if ($js -notmatch "startsWith\('REAL_'\)") { throw "Legacy real-data UI mode contract missing" }
+            if ($js -notmatch 'MEETS TARGET' -or $js -notmatch 'BELOW TARGET') { throw "Target check labels missing" }
+            if ($js -notmatch 'activeRunShort') { throw "Active Run ID rendering missing" }
+            if ($js -notmatch 'capitalCashExplanation') { throw "Unused capital explanation UI missing" }
+            if ($js -notmatch 'cash-affordable' -or $js -notmatch 'executable_qty') { throw "Opportunity execution UI contract missing" }
+            if ($js -notmatch 'REAL FROZEN DATA') { throw "Frozen-data label missing" }
+
+            Write-Host "0.9.9 PHASE-2 BACKEND CONTRACT PASS"
+            Write-Host "Budget: $($plan.capital_summary.deployable_capital)"
+            Write-Host "Market session: $($plan.source_run.market_session)"
+            Write-Host "Chart bars: $($stock.bars.Count)"
+            Write-Host "Candidates: $($run.count)"
+          } finally {
+            if (!$p.HasExited) { Stop-Process -Id $p.Id -Force }
+          }
+
+      - name: Verify backend restart preserves active Run ID
+        shell: pwsh
+        run: |
+          $engine = "$env:SRE_ENGINE_ROOT"
+          $data = "$env:RUNNER_TEMP\sre099-appdata"
+          $expected = (Get-Content "$env:RUNNER_TEMP\phase2-active-run.txt" -Raw).Trim()
+          if (!$expected) { throw "Expected active Run ID file missing" }
+          $env:STOCK_MODERN_UI_PREVIEW = "0"
+          $env:STOCK_REAL_DATA_REPO_ROOT = "$env:SRE099_FIXTURE_ROOT"
+          $p = Start-Process -FilePath python -ArgumentList "`"$engine\run_modern_ui.py`" --no-browser --host 127.0.0.1 --port 18766 --repo-root `"$engine`" --app-data-dir `"$data`"" -PassThru -NoNewWindow
+          try {
+            $ok = $false
+            for ($i=0; $i -lt 60; $i++) {
+              Start-Sleep -Milliseconds 400
+              if ($p.HasExited) { throw "Restarted 0.9.9 backend exited early" }
+              try {
+                $health = Invoke-RestMethod "http://127.0.0.1:18766/api/health" -TimeoutSec 2
+                if ($health.status -eq "ok") { $ok = $true; break }
+              } catch {}
+            }
+            if (!$ok) { throw "Restarted 0.9.9 backend timed out" }
+            $dash = Invoke-RestMethod "http://127.0.0.1:18766/api/dashboard" -TimeoutSec 10
+            if ([string]$dash.active_run.run_id -ne $expected) { throw "Active Run ID changed after backend restart" }
+            $opps = Invoke-RestMethod "http://127.0.0.1:18766/api/opportunities" -TimeoutSec 10
+            if ([string]$opps.run.run_id -ne $expected) { throw "Opportunities lost persisted Run ID after restart" }
+            Write-Host "0.9.9 RESTART PERSISTENCE PASS: $expected"
+          } finally {
+            if (!$p.HasExited) { Stop-Process -Id $p.Id -Force }
+          }
+
+      - name: Apply 0.9.13 Capital Plan V3
+        shell: pwsh
+        run: |
+          python ".ci\native103\patch103.py"
+          python -m py_compile "$env:SRE_ENGINE_ROOT\stock_app\allocation.py"
+          python -m py_compile "$env:SRE_ENGINE_ROOT\modern_ui\api.py"
+          $api = Get-Content "$env:SRE_ENGINE_ROOT\modern_ui\api.py" -Raw
+          $alloc = Get-Content "$env:SRE_ENGINE_ROOT\stock_app\allocation.py" -Raw
+          if ($api -notmatch '0.9.13-capital-plan-v3') { throw "0.9.13 backend identity missing" }
+          if ($alloc -notmatch 'LEG6_PORTFOLIO_ALLOCATION_POLICY_V3_TARGET_DIVERSIFIED') { throw "V3 allocator policy missing" }
+          if ($alloc -notmatch 'DIVERSIFIED_TARGET_HOLDINGS = 5') { throw "Five-stock target missing" }
+          if ($alloc -notmatch 'DIVERSIFIED_MAX_POSITION_CAPITAL_FRACTION = 0.20') { throw "20% large-cap position limit missing" }
+          if ($alloc -notmatch 'BELOW_DESIRED_RETURN') { throw "Desired-return floor missing" }
+          Write-Host "0.9.13 CAPITAL PLAN V3 PATCH PASS"
+
+      - name: Capital Plan V3 policy regression
+        shell: pwsh
+        run: |
+          @'
+          import os, sys
+          from pathlib import Path
+          sys.path.insert(0, os.environ["SRE_ENGINE_ROOT"])
+          from stock_app.allocation import PortfolioAllocator, AllocationRequest, AllocationInput
+
+          a = PortfolioAllocator(Path(os.environ["SRE_ENGINE_ROOT"]), portfolio=None)
+
+          small = [
+              AllocationInput(1, "SMALL", 466.30, "STRONG BUY CANDIDATE", "HIGH", "A", 0.08),
+          ]
+          rs = a.allocate(AllocationRequest(1000, 20, 0.05), small, [])
+          assert len(rs["new_buys"]) == 1, rs
+          assert rs["new_buys"][0]["single_stock_exception_applied"] is True, rs
+          assert rs["new_buys"][0]["estimated_cost"] > 350, rs
+
+          large = [
+              AllocationInput(1, "AAA", 1000.0, "STRONG BUY CANDIDATE", "HIGH", "A", 0.10),
+              AllocationInput(2, "BBB", 1000.0, "BUY CANDIDATE", "HIGH", "B", 0.09),
+              AllocationInput(3, "CCC", 1000.0, "BUY CANDIDATE", "HIGH", "C", 0.08),
+              AllocationInput(4, "DDD", 1000.0, "BUY CANDIDATE", "HIGH", "D", 0.07),
+              AllocationInput(5, "EEE", 1000.0, "BUY CANDIDATE", "HIGH", "E", 0.06),
+              AllocationInput(6, "LOW", 1000.0, "BUY CANDIDATE", "HIGH", "F", 0.04),
+          ]
+          rl = a.allocate(AllocationRequest(100000, 20, 0.05), large, [])
+          assert len(rl["new_buys"]) == 5, rl
+          assert all(x["estimated_cost"] <= 20000.01 for x in rl["new_buys"]), rl
+          assert rl["capital_summary"]["diversification_target_holdings"] == 5, rl
+          assert rl["capital_summary"]["diversification_target_met"] is True, rl
+          assert rl["capital_summary"]["desired_return_is_minimum_threshold"] is True, rl
+          assert rl["capital_summary"]["target_qualified_affordable_count"] == 5, rl
+          low = next(x for x in rl["rows"] if x["symbol"] == "LOW")
+          assert low["action"] == "EXCLUDED" and low["reason_code"] == "BELOW_DESIRED_RETURN", low
+
+          one_large = [
+              AllocationInput(1, "ONLY", 1000.0, "STRONG BUY CANDIDATE", "HIGH", "A", 0.10),
+          ]
+          ro = a.allocate(AllocationRequest(100000, 20, 0.05), one_large, [])
+          assert len(ro["new_buys"]) == 1, ro
+          assert ro["new_buys"][0]["single_stock_exception_applied"] is False, ro
+          assert ro["new_buys"][0]["estimated_cost"] <= 20000.01, ro
+          assert ro["capital_summary"]["diversification_shortfall"] == 4, ro
+
+          strict = a.allocate(AllocationRequest(100000, 20, 0.095), large, [])
+          assert len(strict["new_buys"]) == 1, strict
+          assert strict["new_buys"][0]["symbol"] == "AAA", strict
+          assert strict["new_buys"][0]["estimated_cost"] <= 20000.01, strict
+
+          print("CAPITAL PLAN V3 REGRESSION PASS")
+          '@ | python -
+
+      - name: Apply Phase 4 Technical Intelligence V2
+        shell: pwsh
+        run: |
+          python ".ci\native104\patch104.py"
+          python ".ci\native104\patch104_integration.py"
+          python -m py_compile "$env:SRE_ENGINE_ROOT\stock_app\technical_v2.py"
+          python -m py_compile "$env:SRE_ENGINE_ROOT\modern_ui\api.py"
+          node --check "$env:SRE_ENGINE_ROOT\modern_ui\frontend\app.js"
+          $api = Get-Content "$env:SRE_ENGINE_ROOT\modern_ui\api.py" -Raw
+          $tech = Get-Content "$env:SRE_ENGINE_ROOT\stock_app\technical_v2.py" -Raw
+          $html = Get-Content "$env:SRE_ENGINE_ROOT\modern_ui\frontend\index.html" -Raw
+          $js = Get-Content "$env:SRE_ENGINE_ROOT\modern_ui\frontend\app.js" -Raw
+          if ($api -notmatch '0.10.0-phase4-technical-v2') { throw "Phase 4 backend identity missing" }
+          if ($tech -notmatch 'SRE_TECHNICAL_INTELLIGENCE_V2') { throw "Technical V2 schema missing" }
+          if ($tech -notmatch 'AUTHORITY = "SHADOW_ONLY"') { throw "Technical V2 must remain shadow-only" }
+          if ($tech -notmatch 'MACDHist' -or $tech -notmatch 'StochK14' -or $tech -notmatch 'BBBandwidthPct') { throw "Momentum/volatility feature set incomplete" }
+          if ($tech -notmatch 'CMF20' -or $tech -notmatch 'OBV' -or $tech -notmatch 'ADLine') { throw "Volume-flow feature set incomplete" }
+          if ($tech -notmatch 'BullishEngulfing' -or $tech -notmatch 'Retest20') { throw "Candlestick/structure feature set incomplete" }
+          if ($html -notmatch 'technicalV2Panel' -or $js -notmatch 'renderTechnicalV2') { throw "Technical V2 Stock Intelligence UI missing" }
+          if (!(Test-Path "$env:SRE_ENGINE_ROOT\phase4\technical_intelligence_v2_policy.json")) { throw "Phase 4 policy artifact missing" }
+          Write-Host "PHASE 4 TECHNICAL INTELLIGENCE V2 PATCH PASS"
+
+      - name: Phase 4 indicator, analogue and PIT regression
+        shell: pwsh
+        run: |
+          python -m pip install --disable-pip-version-check pandas numpy
+          @'
+          import math, os, sys
+          from pathlib import Path
+          import numpy as np
+          import pandas as pd
+          sys.path.insert(0, os.environ["SRE_ENGINE_ROOT"])
+          from stock_app.technical_v2 import analyze, point_in_time_prefix_audit
+
+          n=900
+          dates=pd.bdate_range("2023-01-02",periods=n)
+          i=np.arange(n,dtype=float)
+          close=700.0*np.exp(0.00055*i+0.035*np.sin(i/23.0)+0.012*np.cos(i/9.0))
+          op=close*(1.0+0.002*np.sin(i/5.0))
+          hi=np.maximum(op,close)*(1.006+0.003*np.abs(np.sin(i/7.0)))
+          lo=np.minimum(op,close)*(1.0-0.006-0.003*np.abs(np.cos(i/11.0)))
+          vol=1_200_000+(i%37)*11000+90000*np.sin(i/17.0)
+          stock=pd.DataFrame({"Date":dates,"Open":op,"High":hi,"Low":lo,"Close":close,"Volume":vol})
+
+          bclose=18000.0*np.exp(0.00035*i+0.018*np.sin(i/31.0))
+          bop=bclose*(1.0+0.001*np.sin(i/6.0))
+          bench=pd.DataFrame({"Date":dates,"Open":bop,"High":np.maximum(bop,bclose)*1.004,"Low":np.minimum(bop,bclose)*0.996,"Close":bclose,"Volume":0})
+
+          result=analyze(stock,bench,horizon_sessions=20)
+          assert result["schema"]=="SRE_TECHNICAL_INTELLIGENCE_V2",result
+          assert result["authority"]=="SHADOW_ONLY",result
+          assert result["shadow_challenger"]["promotion_allowed"] is False,result
+          assert result["technical_score"] is not None and 0<=result["technical_score"]<=100,result
+          assert result["evidence_coverage"]>=0.80,result
+          assert result["trend"]["ema20"] is not None and result["trend"]["ema200"] is not None,result["trend"]
+          assert result["momentum"]["macd_hist"] is not None and result["momentum"]["adx14"] is not None,result["momentum"]
+          assert result["momentum"]["stoch_k14"] is not None and result["momentum"]["roc20_pct"] is not None,result["momentum"]
+          assert result["volatility"]["bb_bandwidth_pct"] is not None and result["volatility"]["atr_pct"] is not None,result["volatility"]
+          assert result["volume_flow"]["cmf20"] is not None and result["volume_flow"]["obv"] is not None,result["volume_flow"]
+          assert result["structure"]["support20"] is not None and result["structure"]["resistance20"] is not None,result["structure"]
+          assert result["multi_timeframe"]["weekly_rsi14"] is not None,result["multi_timeframe"]
+          assert result["relative_strength"]["rs20_vs_nifty"] is not None,result["relative_strength"]
+          assert result["historical_analogues"]["sample_size"]>=10,result["historical_analogues"]
+
+          pit=point_in_time_prefix_audit(stock,bench,checkpoints=5)
+          assert pit["status"]=="PASS",pit
+
+          wf=[]
+          stock_i=stock.set_index("Date")
+          for end in range(360,n-20,80):
+              snap=analyze(stock.iloc[:end+1].copy(),bench.iloc[:end+1].copy(),horizon_sessions=20)
+              score=snap.get("technical_score")
+              if score is None: continue
+              now=float(stock_i.iloc[end]["Close"]);future=float(stock_i.iloc[end+20]["Close"])
+              wf.append((float(score),future/now-1.0))
+          assert len(wf)>=6,wf
+          corr=pd.Series([x[0] for x in wf]).corr(pd.Series([x[1] for x in wf]),method="spearman")
+          assert math.isfinite(float(corr)),corr
+
+          allocation=(Path(os.environ["SRE_ENGINE_ROOT"])/"stock_app"/"allocation.py").read_text(encoding="utf-8")
+          assert "technical_v2" not in allocation.lower(),"Phase 4 shadow data leaked into allocation authority"
+          print("PHASE4 TECHNICAL/PIT/WALK-FORWARD REGRESSION PASS")
+          print("Shadow checkpoints:",len(wf),"Spearman:",round(float(corr),4))
+          '@ | python -
+
+      - name: Phase 4 live API and Stock Intelligence regression
+        shell: pwsh
+        run: |
+          python -m pip install --disable-pip-version-check fastapi==0.128.2 uvicorn==0.48.0 pandas numpy
+          $engine = "$env:SRE_ENGINE_ROOT"
+          $data = "$env:RUNNER_TEMP\sre0100-appdata"
+          $env:STOCK_MODERN_UI_PREVIEW = "0"
+          $env:STOCK_REAL_DATA_REPO_ROOT = "$env:SRE099_FIXTURE_ROOT"
+          $args = @("$engine\run_modern_ui.py","--no-browser","--host","127.0.0.1","--port","18770","--repo-root",$engine,"--app-data-dir",$data)
+          $p = Start-Process -FilePath python -ArgumentList $args -PassThru -NoNewWindow
+          try {
+            $ok=$false
+            for($i=0;$i -lt 80;$i++){
+              Start-Sleep -Milliseconds 400
+              if($p.HasExited){throw "Phase 4 backend exited early"}
+              try{$health=Invoke-RestMethod "http://127.0.0.1:18770/api/health" -TimeoutSec 2;if($health.status -eq "ok"){$ok=$true;break}}catch{}
+            }
+            if(!$ok){throw "Phase 4 backend health timed out"}
+            if($health.app_version -ne "0.10.0-phase4-technical-v2"){throw "Wrong Phase 4 app version: $($health.app_version)"}
+            $stock=Invoke-RestMethod "http://127.0.0.1:18770/api/stocks/INFY?limit=5000" -TimeoutSec 30
+            $tech=$stock.technical_v2
+            if($tech.schema -ne "SRE_TECHNICAL_INTELLIGENCE_V2"){throw "Stock endpoint missing Technical V2 schema"}
+            if($tech.authority -ne "SHADOW_ONLY"){throw "Technical V2 authority is not shadow-only"}
+            if($null -eq $tech.technical_score){throw "Technical V2 score missing"}
+            if($null -eq $tech.momentum.macd_hist -or $null -eq $tech.volatility.bb_bandwidth_pct -or $null -eq $tech.volume_flow.cmf20){throw "Technical V2 indicator evidence incomplete"}
+            if($null -eq $tech.multi_timeframe.weekly_rsi14){throw "Weekly confirmation missing"}
+            $direct=Invoke-RestMethod "http://127.0.0.1:18770/api/stocks/INFY/technical-v2" -TimeoutSec 30
+            if($direct.schema -ne "SRE_TECHNICAL_INTELLIGENCE_V2" -or $direct.authority -ne "SHADOW_ONLY"){throw "Dedicated technical endpoint failed"}
+            $html=(Invoke-WebRequest "http://127.0.0.1:18770/" -TimeoutSec 10).Content
+            $js=(Invoke-WebRequest "http://127.0.0.1:18770/assets/app.js" -TimeoutSec 10).Content
+            if($html -notmatch 'technicalV2Panel'){throw "Technical V2 panel missing from UI"}
+            if($js -notmatch 'renderTechnicalV2'){throw "Technical V2 renderer missing"}
+            if($html -notmatch 'SHADOW ONLY'){throw "Shadow-authority disclosure missing"}
+            Write-Host "PHASE4 LIVE API/UI REGRESSION PASS"
+          } finally {
+            if(!$p.HasExited){Stop-Process -Id $p.Id -Force}
+          }
+
+      - name: Package native application
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path "native-desktop-0.9.1\resources" | Out-Null
+          Compress-Archive -Path "$env:SRE_ENGINE_ROOT\*" -DestinationPath "native-desktop-0.9.1\resources\SRE0100_ENGINE_SOURCE.zip" -Force
+
+          New-Item -ItemType Directory -Force -Path "native-desktop-0.9.1\src-tauri\icons" | Out-Null
+          python -c "import struct,pathlib; w=h=32; px=bytes([52,211,153,255])*(w*h); mask=bytes(128); dib=struct.pack('<IIIHHIIIIII',40,w,h*2,1,32,0,len(px),0,0,0,0)+px+mask; ico=struct.pack('<HHH',0,1,1)+struct.pack('<BBBBHHII',w,h,0,0,1,32,len(dib),22)+dib; pathlib.Path(r'native-desktop-0.9.1\src-tauri\icons\icon.ico').write_bytes(ico)"
+
+          $p = "native-desktop-0.9.1\src-tauri\tauri.conf.json"
+          $c = Get-Content $p -Raw | ConvertFrom-Json
+          $c.version = "0.10.0"
+          $c.productName = "Stock Recommendation Engine"
+          $c | Add-Member -NotePropertyName identifier -NotePropertyValue "com.narayananrg.stockrecommendationengine" -Force
+          $c.bundle | Add-Member -NotePropertyName publisher -NotePropertyValue "NarayananRG" -Force
+          $c.bundle | Add-Member -NotePropertyName shortDescription -NotePropertyValue "Local stock research and recommendation workspace" -Force
+          $c.bundle | Add-Member -NotePropertyName longDescription -NotePropertyValue "Stock Recommendation Engine desktop workspace with explicit data provenance and freshness controls." -Force
+          $c.bundle | Add-Member -NotePropertyName copyright -NotePropertyValue "Copyright 2026 NarayananRG" -Force
+          if (!$c.bundle.windows) { $c.bundle | Add-Member -NotePropertyName windows -NotePropertyValue ([pscustomobject]@{}) -Force }
+          if (!$c.bundle.windows.nsis) { $c.bundle.windows | Add-Member -NotePropertyName nsis -NotePropertyValue ([pscustomobject]@{}) -Force }
+          $c.bundle.windows.nsis | Add-Member -NotePropertyName installMode -NotePropertyValue "currentUser" -Force
+          $c.bundle.targets = @("nsis")
+          $c.bundle.resources = @{"../resources/SRE0100_ENGINE_SOURCE.zip"="resources/SRE0100_ENGINE_SOURCE.zip"}
+          $c | ConvertTo-Json -Depth 20 | Set-Content $p -Encoding UTF8
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: native-desktop-0.9.1/src-tauri
+
+      - name: Install Tauri CLI
+        working-directory: native-desktop-0.9.1
+        run: npm install --no-audit --no-fund
+
+      - name: Build native Windows installer
+        working-directory: native-desktop-0.9.1
+        run: npm run tauri build
+
+      - name: Authenticode sign installer when certificate is configured
+        shell: pwsh
+        env:
+          WINDOWS_CERTIFICATE_PFX_BASE64: ${{ secrets.WINDOWS_CERTIFICATE_PFX_BASE64 }}
+          WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
+        run: |
+          $setup = Get-ChildItem "native-desktop-0.9.1\\src-tauri\\target\\release\\bundle\\nsis\\*.exe" | Select-Object -First 1
+          if (!$setup) { throw "Generated installer missing before signing" }
+          $reportDir = $setup.Directory.FullName
+          if ([string]::IsNullOrWhiteSpace($env:WINDOWS_CERTIFICATE_PFX_BASE64)) {
+            "AUTHENTICODE_SIGNING=NOT_CONFIGURED" | Set-Content (Join-Path $reportDir "signing-status.txt") -Encoding UTF8
+            Write-Host "Trusted Windows certificate is not configured; build remains unsigned."
+          } else {
+            $pfx = Join-Path $env:RUNNER_TEMP "sre-signing.pfx"
+            [IO.File]::WriteAllBytes($pfx, [Convert]::FromBase64String($env:WINDOWS_CERTIFICATE_PFX_BASE64))
+            $signtool = Get-ChildItem "${env:ProgramFiles(x86)}\\Windows Kits\\10\\bin\\*\\x64\\signtool.exe" -ErrorAction SilentlyContinue |
+              Sort-Object FullName -Descending | Select-Object -First 1
+            if (!$signtool) { throw "signtool.exe not found" }
+            & $signtool.FullName sign /fd SHA256 /td SHA256 /tr "http://timestamp.digicert.com" /f $pfx /p $env:WINDOWS_CERTIFICATE_PASSWORD $setup.FullName
+            if ($LASTEXITCODE -ne 0) { throw "Authenticode signing failed: $LASTEXITCODE" }
+            & $signtool.FullName verify /pa /v $setup.FullName
+            if ($LASTEXITCODE -ne 0) { throw "Authenticode verification failed: $LASTEXITCODE" }
+            "AUTHENTICODE_SIGNING=SIGNED_AND_VERIFIED" | Set-Content (Join-Path $reportDir "signing-status.txt") -Encoding UTF8
+            Remove-Item $pfx -Force -ErrorAction SilentlyContinue
+          }
+
+      - name: Windows Defender scan and release security report
+        shell: pwsh
+        run: |
+          $setup = Get-ChildItem "native-desktop-0.9.1\\src-tauri\\target\\release\\bundle\\nsis\\*.exe" | Select-Object -First 1
+          if (!$setup) { throw "Generated installer missing before security scan" }
+          $dir = $setup.Directory.FullName
+          $hash = (Get-FileHash $setup.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+          "$hash  $($setup.Name)" | Set-Content (Join-Path $dir "installer.sha256") -Encoding ASCII
+
+          $mp = $null
+          $platform = Join-Path $env:ProgramData "Microsoft\\Windows Defender\\Platform"
+          if (Test-Path $platform) {
+            $mp = Get-ChildItem $platform -Recurse -Filter "MpCmdRun.exe" -ErrorAction SilentlyContinue |
+              Sort-Object FullName -Descending | Select-Object -First 1
+          }
+          if (!$mp) {
+            $legacy = Join-Path $env:ProgramFiles "Windows Defender\\MpCmdRun.exe"
+            if (Test-Path $legacy) { $mp = Get-Item $legacy }
+          }
+
+          $defenderStatus = "NOT_AVAILABLE_ON_RUNNER"
+          if ($mp) {
+            & $mp.FullName -Scan -ScanType 3 -File $setup.FullName -DisableRemediation
+            $code = $LASTEXITCODE
+            if ($code -ne 0) { throw "Windows Defender scan failed or detected a threat. Exit code: $code" }
+            $defenderStatus = "PASS"
+          }
+
+          $sig = Get-AuthenticodeSignature $setup.FullName
+          $fv = [Diagnostics.FileVersionInfo]::GetVersionInfo($setup.FullName)
+          $signing = if (Test-Path (Join-Path $dir "signing-status.txt")) { (Get-Content (Join-Path $dir "signing-status.txt") -Raw).Trim() } else { "AUTHENTICODE_SIGNING=UNKNOWN" }
+          @(
+            "SRE_RELEASE_SECURITY_REPORT_V1",
+            "VERSION=0.10.0-phase4-technical-v2",
+            "SHA256=$hash",
+            "DEFENDER_SCAN=$defenderStatus",
+            "SIGNATURE_STATUS=$($sig.Status)",
+            "SIGNER_SUBJECT=$($sig.SignerCertificate.Subject)",
+            $signing,
+            "PRODUCT_NAME=$($fv.ProductName)",
+            "FILE_VERSION=$($fv.FileVersion)",
+            "INSTALL_MODE=currentUser",
+            "ADMIN_REQUIRED=false-by-policy"
+          ) | Set-Content (Join-Path $dir "release-security-report.txt") -Encoding UTF8
+
+          Write-Host "SHA256: $hash"
+          Write-Host "Defender: $defenderStatus"
+          Write-Host "Signature: $($sig.Status)"
+
+      - name: Verify installer
+        shell: pwsh
+        run: |
+          $setup = Get-ChildItem "native-desktop-0.9.1\src-tauri\target\release\bundle\nsis\*.exe" | Select-Object -First 1
+          if (!$setup) { throw "0.9.13 native Setup.exe missing" }
+          Write-Host "SETUP: $($setup.FullName)"
+          Write-Host "SIZE: $($setup.Length)"
+          Get-FileHash $setup.FullName -Algorithm SHA256
+
+      - name: Install and launch generated Setup.exe
+        shell: pwsh
+        run: |
+          $setup = Get-ChildItem "native-desktop-0.9.1\src-tauri\target\release\bundle\nsis\*.exe" | Select-Object -First 1
+          if (!$setup) { throw "Generated installer missing before installed-app test" }
+
+          $installDir = "$env:RUNNER_TEMP\SRE0100Installed"
+          if (Test-Path $installDir) { Remove-Item $installDir -Recurse -Force }
+          New-Item -ItemType Directory -Force -Path $installDir | Out-Null
+
+          Write-Host "Silent installing: $($setup.FullName)"
+          $installer = Start-Process -FilePath $setup.FullName -ArgumentList @("/S", "/D=$installDir") -PassThru -Wait
+          if ($installer.ExitCode -ne 0) { throw "Silent installer failed: $($installer.ExitCode)" }
+
+          $uninstallRoots = @(
+            "HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*",
+            "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*",
+            "HKLM:\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*"
+          )
+          $entry = Get-ItemProperty $uninstallRoots -ErrorAction SilentlyContinue |
+            Where-Object { $_.DisplayName -eq "Stock Recommendation Engine" } |
+            Select-Object -First 1
+
+          $candidateDirs = @($installDir)
+          if ($entry) {
+            Write-Host "Registry install entry found:"
+            $entry | Select-Object DisplayName,DisplayVersion,InstallLocation,UninstallString | Format-List
+            if ($entry.InstallLocation) { $candidateDirs += $entry.InstallLocation }
+            if ($entry.UninstallString) {
+              $un = [Environment]::ExpandEnvironmentVariables($entry.UninstallString.Trim('"'))
+              if (Test-Path $un) { $candidateDirs += (Split-Path $un -Parent) }
+            }
+          }
+
+          $appExe = $null
+          foreach ($dir in ($candidateDirs | Where-Object { $_ } | Select-Object -Unique)) {
+            if (!(Test-Path $dir)) { continue }
+            Write-Host "Inspecting install directory: $dir"
+            Get-ChildItem $dir -Recurse -Filter "*.exe" -ErrorAction SilentlyContinue |
+              ForEach-Object { Write-Host "  EXE: $($_.FullName)" }
+            $appExe = Get-ChildItem $dir -Recurse -Filter "*.exe" -ErrorAction SilentlyContinue |
+              Where-Object {
+                $_.Name -notmatch "uninstall|unins|setup|updater" -and
+                ($_.Name -match "stock|recommendation|engine|sre" -or $_.Length -gt 1000000)
+              } |
+              Sort-Object Length -Descending |
+              Select-Object -First 1
+            if ($appExe) { break }
+          }
+
+          if (!$appExe) {
+            $recent = Get-ChildItem "$env:LOCALAPPDATA" -Recurse -Filter "*.exe" -ErrorAction SilentlyContinue |
+              Where-Object { $_.LastWriteTime -gt (Get-Date).AddMinutes(-10) -and $_.Name -notmatch "uninstall|unins|setup|updater" } |
+              Sort-Object Length -Descending
+            $recent | Select-Object -First 20 | ForEach-Object { Write-Host "Recent EXE: $($_.FullName)" }
+            $appExe = $recent | Where-Object { $_.Name -match "stock|recommendation|engine|sre" } | Select-Object -First 1
+          }
+
+          if (!$appExe) { throw "Installed desktop EXE was not found after Setup.exe completed" }
+          Write-Host "Installed EXE: $($appExe.FullName)"
+
+          $appData = Join-Path $env:LOCALAPPDATA "StockRecommendationEngine"
+          $ready = Join-Path $appData "runtime-ready.txt"
+          $portFile = Join-Path $appData "runtime-port.txt"
+          $logFile = Join-Path $appData "native-desktop-0.10.0.log"
+          Remove-Item $ready,$portFile -Force -ErrorAction SilentlyContinue
+
+          $env:STOCK_REAL_DATA_REPO_ROOT = "$env:SRE099_FIXTURE_ROOT"
+          $desktop = Start-Process -FilePath $appExe.FullName -PassThru
+          try {
+            $alive = $false
+            for ($i=0; $i -lt 120; $i++) {
+              Start-Sleep -Milliseconds 500
+              $desktop.Refresh()
+              if ($desktop.HasExited) {
+                if (Test-Path $logFile) {
+                  Write-Host "---- startup log ----"
+                  Get-Content $logFile -Tail 200
+                }
+                throw "Installed desktop app exited during startup with code $($desktop.ExitCode)"
+              }
+              if (Test-Path $ready) { $alive = $true; break }
+            }
+            if (!$alive) {
+              if (Test-Path $logFile) {
+                Write-Host "---- startup log ----"
+                Get-Content $logFile -Tail 200
+              }
+              throw "Installed desktop app never reached runtime-ready state"
+            }
+
+            $readyLines = Get-Content $ready
+            if ($readyLines[0] -ne "0.10.0-phase4-technical-v2") {
+              throw "Installed desktop runtime version mismatch: $($readyLines[0])"
+            }
+            $port = [int]$readyLines[1]
+            if ($port -le 0) { throw "Installed desktop runtime port invalid" }
+            Write-Host "Installed app dynamic port: $port"
+
+            $health = Invoke-RestMethod "http://127.0.0.1:$port/api/health" -TimeoutSec 10
+            if ($health.status -ne "ok") { throw "Installed app health status is not ok" }
+            if ($health.app_version -ne "0.10.0-phase4-technical-v2") {
+              throw "Installed app backend version mismatch: $($health.app_version)"
+            }
+
+            $source = Invoke-RestMethod "http://127.0.0.1:$port/api/data-source" -TimeoutSec 10
+            if ($source.mode -ne "REAL_FROZEN_HISTORY") {
+              throw "Installed app did not connect to real fixture data: $($source.mode)"
+            }
+            if ([int]$source.active.stock_files -ne 6) { throw "Installed app equity count mismatch: $($source.active.stock_files)" }
+            if ([int]$source.active.index_files -ne 1) { throw "Installed app index count mismatch: $($source.active.index_files)" }
+            if ($source.active.provenance -ne "LEGACY_FROZEN_OHLCV") {
+              throw "Installed app legacy provenance mismatch: $($source.active.provenance)"
+            }
+
+            $body = @{path="$env:SRE099_FIXTURE_ROOT"} | ConvertTo-Json
+            $connected = Invoke-RestMethod "http://127.0.0.1:$port/api/data-source" -Method Post -ContentType "application/json" -Body $body -TimeoutSec 15
+            if ($connected.mode -ne "REAL_FROZEN_HISTORY") {
+              throw "Installed app POST /api/data-source failed"
+            }
+
+            $runBody = @{capital=1000; horizon_sessions=20; target_return_percent=5} | ConvertTo-Json
+            $run = Invoke-RestMethod "http://127.0.0.1:$port/api/opportunities/run" -Method Post -ContentType "application/json" -Body $runBody -TimeoutSec 60
+            if ([int]$run.count -ne 6) { throw "Installed app must analyze 6 equities, got $($run.count)" }
+            if (($run.items | Where-Object { $_.symbol -eq "INDEX_NSEI" }).Count -gt 0) { throw "Installed app analyzed INDEX_NSEI as equity" }
+            $installedExec = @($run.items | Where-Object { $_.executable -eq $true })
+            if ($installedExec.Count -ne 1) { throw "Installed app expected one executable ₹1,000 stock, got $($installedExec.Count)" }
+            if (!$installedExec[0].single_stock_exception_applied) { throw "Installed opportunity row missing single-stock exception" }
+            $installedRunId = [string]$run.run.run_id
+            $runAgain = Invoke-RestMethod "http://127.0.0.1:$port/api/opportunities/run" -Method Post -ContentType "application/json" -Body $runBody -TimeoutSec 60
+            if ([string]$runAgain.run.run_id -ne $installedRunId -or !$runAgain.reused_run) { throw "Installed app identical inputs did not reuse Run ID" }
+
+            $planBody = @{deployable_capital=1000; horizon_sessions=20; target_return_percent=5} | ConvertTo-Json
+            $plan = Invoke-RestMethod "http://127.0.0.1:$port/api/capital-plan" -Method Post -ContentType "application/json" -Body $planBody -TimeoutSec 60
+            if ([double]$plan.capital_summary.deployable_capital -ne 1000) { throw "Installed app Capital Plan lost the ₹1,000 budget" }
+            if ($plan.new_buys.Count -ne 1) { throw "Installed Capital Plan expected one buy" }
+            if (!$plan.new_buys[0].single_stock_exception_applied) { throw "Installed Capital Plan did not relax single-stock cap" }
+            if ([double]$plan.new_buys[0].estimated_cost -le 350) { throw "Installed Capital Plan still enforced 35% cap" }
+            if ([string]$plan.new_buys[0].symbol -ne [string]$installedExec[0].symbol) { throw "Installed Opportunities/Capital Plan executability mismatch" }
+            if ([string]$plan.source_run.run_id -ne $installedRunId) { throw "Installed Capital Plan used a different Run ID" }
+            if (!$plan.capital_summary.unused_cash_explanation) { throw "Installed Capital Plan lacks unused-cash explanation" }
+            $dash = Invoke-RestMethod "http://127.0.0.1:$port/api/dashboard" -TimeoutSec 10
+            if ([int]$dash.symbol_count -ne 6) { throw "Installed Dashboard stock count mismatch: $($dash.symbol_count)" }
+            if ([string]$dash.active_run.run_id -ne $installedRunId) { throw "Installed Dashboard active Run ID mismatch" }
+            $stockPhase = Invoke-RestMethod "http://127.0.0.1:$port/api/stocks/INFY?limit=5000" -TimeoutSec 30
+            if ([string]$stockPhase.active_run.run_id -ne $installedRunId) { throw "Installed Stock Intelligence active Run ID mismatch" }
+            if ($stockPhase.technical_v2.schema -ne "SRE_TECHNICAL_INTELLIGENCE_V2") { throw "Installed app Technical V2 schema missing" }
+            if ($stockPhase.technical_v2.authority -ne "SHADOW_ONLY") { throw "Installed app Technical V2 authority changed" }
+            if ($null -eq $stockPhase.technical_v2.technical_score) { throw "Installed app Technical V2 score missing" }
+            $installedRunId | Set-Content "$env:RUNNER_TEMP\installed-phase2-run.txt" -Encoding ASCII
+
+            $root = Invoke-WebRequest "http://127.0.0.1:$port/" -TimeoutSec 10
+            if ($root.StatusCode -ne 200) { throw "Installed app UI root did not return HTTP 200" }
+            if ($root.Content -notmatch "Stock Recommendation Engine") {
+              throw "Installed app UI root is not the expected workspace"
+            }
+
+            Write-Host "INSTALLED APP END-TO-END PASS"
+            Write-Host "Version: $($health.app_version)"
+            Write-Host "Mode: $($source.mode)"
+            Write-Host "Stocks: $($source.active.stock_files)"
+            Write-Host "Port: $port"
+          }
+          finally {
+            if (!$desktop.HasExited) {
+              Start-Process -FilePath "taskkill.exe" -ArgumentList @("/PID",$desktop.Id,"/T","/F") -Wait -NoNewWindow | Out-Null
+            }
+          }
+
+      - name: Reopen installed app and verify persistent Run ID
+        shell: pwsh
+        run: |
+          $appExe = Get-ChildItem "$env:RUNNER_TEMP\SRE0100Installed" -Recurse -Filter "*.exe" -ErrorAction SilentlyContinue |
+            Where-Object { $_.Name -notmatch "uninstall|unins|setup|updater" } |
+            Sort-Object Length -Descending | Select-Object -First 1
+          if (!$appExe) { throw "Installed 0.10.0 desktop EXE missing for restart test" }
+          $expected = (Get-Content "$env:RUNNER_TEMP\installed-phase2-run.txt" -Raw).Trim()
+          $appData = Join-Path $env:LOCALAPPDATA "StockRecommendationEngine"
+          $ready = Join-Path $appData "runtime-ready.txt"
+          $portFile = Join-Path $appData "runtime-port.txt"
+          Remove-Item $ready,$portFile -Force -ErrorAction SilentlyContinue
+          $env:STOCK_REAL_DATA_REPO_ROOT = "$env:SRE099_FIXTURE_ROOT"
+          $desktop = Start-Process -FilePath $appExe.FullName -PassThru
+          try {
+            $alive=$false
+            for($i=0;$i -lt 120;$i++){
+              Start-Sleep -Milliseconds 500
+              $desktop.Refresh()
+              if($desktop.HasExited){throw "Reopened installed app exited early"}
+              if(Test-Path $ready){$alive=$true;break}
+            }
+            if(!$alive){throw "Reopened installed app never reached runtime-ready"}
+            $readyLines=Get-Content $ready
+            if($readyLines[0] -ne "0.10.0-phase4-technical-v2"){throw "Reopened runtime version mismatch: $($readyLines[0])"}
+            $port=[int]$readyLines[1]
+            $dash=Invoke-RestMethod "http://127.0.0.1:$port/api/dashboard" -TimeoutSec 10
+            if([string]$dash.active_run.run_id -ne $expected){throw "Installed app changed active Run ID after close/reopen"}
+            $opps=Invoke-RestMethod "http://127.0.0.1:$port/api/opportunities" -TimeoutSec 10
+            if([string]$opps.run.run_id -ne $expected){throw "Opportunities changed Run ID after close/reopen"}
+            Write-Host "INSTALLED APP RESTART STATE PASS: $expected"
+          } finally {
+            if(!$desktop.HasExited){Start-Process -FilePath "taskkill.exe" -ArgumentList @("/PID",$desktop.Id,"/T","/F") -Wait -NoNewWindow | Out-Null}
+          }
+
+      - name: Upload 0.10.0 Phase 4 installer and security report
+        uses: actions/upload-artifact@v4
+        with:
+          name: SRE-0.10.0-Phase4-Technical-V2-Setup
+          path: |
+            native-desktop-0.9.1/src-tauri/target/release/bundle/nsis/*.exe
+            native-desktop-0.9.1/src-tauri/target/release/bundle/nsis/installer.sha256
+            native-desktop-0.9.1/src-tauri/target/release/bundle/nsis/release-security-report.txt
+            native-desktop-0.9.1/src-tauri/target/release/bundle/nsis/signing-status.txt
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
+# Phase 4 combined build: Capital Plan V3 + Technical Intelligence V2 (shadow-only technical authority).
