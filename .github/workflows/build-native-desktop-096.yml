@@ -294,12 +294,50 @@ jobs:
           $installer = Start-Process -FilePath $setup.FullName -ArgumentList @("/S", "/D=$installDir") -PassThru -Wait
           if ($installer.ExitCode -ne 0) { throw "Silent installer failed: $($installer.ExitCode)" }
 
-          $appExe = Get-ChildItem $installDir -Recurse -Filter "Stock Recommendation Engine.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
-          if (!$appExe) {
-            $appExe = Get-ChildItem "$env:LOCALAPPDATA" -Recurse -Filter "Stock Recommendation Engine.exe" -ErrorAction SilentlyContinue |
-              Where-Object { $_.LastWriteTime -gt (Get-Date).AddMinutes(-10) } |
-              Select-Object -First 1
+          $uninstallRoots = @(
+            "HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*",
+            "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*",
+            "HKLM:\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*"
+          )
+          $entry = Get-ItemProperty $uninstallRoots -ErrorAction SilentlyContinue |
+            Where-Object { $_.DisplayName -eq "Stock Recommendation Engine" } |
+            Select-Object -First 1
+
+          $candidateDirs = @($installDir)
+          if ($entry) {
+            Write-Host "Registry install entry found:"
+            $entry | Select-Object DisplayName,DisplayVersion,InstallLocation,UninstallString | Format-List
+            if ($entry.InstallLocation) { $candidateDirs += $entry.InstallLocation }
+            if ($entry.UninstallString) {
+              $un = [Environment]::ExpandEnvironmentVariables($entry.UninstallString.Trim('"'))
+              if (Test-Path $un) { $candidateDirs += (Split-Path $un -Parent) }
+            }
           }
+
+          $appExe = $null
+          foreach ($dir in ($candidateDirs | Where-Object { $_ } | Select-Object -Unique)) {
+            if (!(Test-Path $dir)) { continue }
+            Write-Host "Inspecting install directory: $dir"
+            Get-ChildItem $dir -Recurse -Filter "*.exe" -ErrorAction SilentlyContinue |
+              ForEach-Object { Write-Host "  EXE: $($_.FullName)" }
+            $appExe = Get-ChildItem $dir -Recurse -Filter "*.exe" -ErrorAction SilentlyContinue |
+              Where-Object {
+                $_.Name -notmatch "uninstall|unins|setup|updater" -and
+                ($_.Name -match "stock|recommendation|engine|sre" -or $_.Length -gt 1000000)
+              } |
+              Sort-Object Length -Descending |
+              Select-Object -First 1
+            if ($appExe) { break }
+          }
+
+          if (!$appExe) {
+            $recent = Get-ChildItem "$env:LOCALAPPDATA" -Recurse -Filter "*.exe" -ErrorAction SilentlyContinue |
+              Where-Object { $_.LastWriteTime -gt (Get-Date).AddMinutes(-10) -and $_.Name -notmatch "uninstall|unins|setup|updater" } |
+              Sort-Object Length -Descending
+            $recent | Select-Object -First 20 | ForEach-Object { Write-Host "Recent EXE: $($_.FullName)" }
+            $appExe = $recent | Where-Object { $_.Name -match "stock|recommendation|engine|sre" } | Select-Object -First 1
+          }
+
           if (!$appExe) { throw "Installed desktop EXE was not found after Setup.exe completed" }
           Write-Host "Installed EXE: $($appExe.FullName)"
 
