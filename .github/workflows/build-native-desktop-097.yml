@@ -43,7 +43,7 @@ jobs:
           if ($m -notmatch 'choose_free_port') { throw "Dynamic-port launcher missing" }
           if ($m -notmatch 'health_matches') { throw "Backend-version handshake missing" }
           if ($m -match 'const PORT') { throw "Fixed desktop port must not exist in 0.9.7" }
-          if ($m -notmatch '0.9.7-installed-app-verified') { throw "Wrong native launcher version" }
+          if ($m -notmatch '0.9.7-legacy-data-autodiscovery') { throw "Wrong native launcher version" }
           if ($m -notmatch 'STOCK_MODERN_UI_PREVIEW", "0') { throw "Preview must remain disabled" }
 
           $cargo = "native-desktop-0.9.1\src-tauri\Cargo.toml"
@@ -198,7 +198,7 @@ jobs:
               } catch {}
             }
             if (!$ok) { throw "0.9.7 backend health check timed out" }
-            if ($health.app_version -ne "0.9.7-installed-app-verified") { throw "Wrong app version: $($health.app_version)" }
+            if ($health.app_version -ne "0.9.7-legacy-data-autodiscovery") { throw "Wrong app version: $($health.app_version)" }
             if ($health.preview_mode) { throw "Preview mode must be disabled in 0.9.3" }
             if ($health.data_source.mode -ne "REAL_FROZEN_HISTORY") { throw "Legacy real data mode not active: $($health.data_source.mode)" }
             if ([int]$health.data_source.active.stock_files -lt 6) { throw "Real data source did not expose expected stock files" }
@@ -376,7 +376,7 @@ jobs:
             }
 
             $readyLines = Get-Content $ready
-            if ($readyLines[0] -ne "0.9.7-installed-app-verified") {
+            if ($readyLines[0] -ne "0.9.7-legacy-data-autodiscovery") {
               throw "Installed desktop runtime version mismatch: $($readyLines[0])"
             }
             $port = [int]$readyLines[1]
@@ -385,7 +385,7 @@ jobs:
 
             $health = Invoke-RestMethod "http://127.0.0.1:$port/api/health" -TimeoutSec 10
             if ($health.status -ne "ok") { throw "Installed app health status is not ok" }
-            if ($health.app_version -ne "0.9.7-installed-app-verified") {
+            if ($health.app_version -ne "0.9.7-legacy-data-autodiscovery") {
               throw "Installed app backend version mismatch: $($health.app_version)"
             }
 
@@ -435,7 +435,7 @@ jobs:
       - name: Upload 0.9.7 installer
         uses: actions/upload-artifact@v4
         with:
-          name: SRE-0.9.7-Installed-App-Verified-Setup
+          name: SRE-0.9.7-Legacy-Data-Autodiscovery-Setup
           path: native-desktop-0.9.1/src-tauri/target/release/bundle/nsis/*.exe
           if-no-files-found: error
           compression-level: 0
