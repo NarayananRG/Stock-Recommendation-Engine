@@ -113,169 +113,20 @@ jobs:
       - name: Apply 0.9.4 fast data-source hotfix
         shell: pwsh
         run: |
-          @'
-          from pathlib import Path
-          import os
-
-          root = Path(os.environ["SRE_ENGINE_ROOT"])
-          api = root / "modern_ui" / "api.py"
-          s = api.read_text(encoding="utf-8")
-          s = s.replace('APP_VERSION = "0.9.3-real-data-chart-zoom"', 'APP_VERSION = "0.9.4-data-source-hotfix"')
-
-          start = s.index("    def _inspect_data_repo(self, root: Path) -> dict[str, Any]:")
-          end = s.index("    def _candidate_data_repos(self) -> list[Path]:", start)
-          replacement = '''    @staticmethod
-    def _normalize_data_repo_root(raw_root: Path) -> Path:
-        root = raw_root.expanduser().resolve()
-        parts = [part.lower() for part in root.parts]
-        for idx in range(max(0, len(parts) - 3)):
-            if parts[idx:idx + 4] == ["data", "normalized", "nse_official", "equity_bhavcopy"]:
-                return Path(*root.parts[:idx]).resolve()
-        return root
-
-    @staticmethod
-    def _last_nonempty_line(path: Path, chunk_size: int = 4096) -> str | None:
-        try:
-            with path.open("rb") as handle:
-                handle.seek(0, os.SEEK_END)
-                pos = handle.tell()
-                if pos <= 0:
-                    return None
-                buf = b""
-                while pos > 0 and len(buf) < 65536:
-                    step = min(chunk_size, pos)
-                    pos -= step
-                    handle.seek(pos)
-                    buf = handle.read(step) + buf
-                    lines = [line.strip() for line in buf.splitlines() if line.strip()]
-                    if len(lines) >= 2 or pos == 0:
-                        if not lines:
-                            return None
-                        return lines[-1].decode("utf-8", errors="replace")
-        except OSError:
-            return None
-        return None
-
-    def _inspect_data_repo(self, root: Path) -> dict[str, Any]:
-        root = self._normalize_data_repo_root(root)
-        roots = self._official_cache_roots(root)
-        files: list[Path] = []
-        latest = None
-        for cache in roots:
-            if not cache.exists():
-                continue
-            try:
-                cache_files = list(cache.glob("*.csv"))
-            except OSError:
-                continue
-            files.extend(cache_files)
-            for path in cache_files:
-                line = self._last_nonempty_line(path)
-                if not line:
-                    continue
-                d = line.split(",", 1)[0].strip().strip('"')
-                if d and d.lower() not in {"date", "timestamp", "datetime"}:
-                    if not latest or d > latest:
-                        latest = d
-        full_engine_ready = (root / "run_official_v1_daily.py").exists() and (root / "Stage 4A.3").exists()
-        fundamental_ready = (root / "data" / "fundamentals").exists()
-        return {
-            "path": str(root),
-            "exists": root.exists(),
-            "ohlcv_ready": bool(files),
-            "stock_files": len({p.name for p in files}),
-            "latest_session": latest,
-            "full_engine_ready": full_engine_ready,
-            "fundamental_ready": fundamental_ready,
-            "cache_roots": [str(p) for p in roots if p.exists()],
-        }
-
-'''
-          s = s[:start] + replacement + s[end:]
-
-          start = s.index("    def data_source_status(self) -> dict[str, Any]:")
-          end = s.index("    def connect_data_repo(self, raw_path: str) -> dict[str, Any]:", start)
-          replacement = '''    def data_source_status(self) -> dict[str, Any]:
-        current = dict(self.real_data_status)
-        candidates = []
-        if not current["ohlcv_ready"]:
-            for root in self._candidate_data_repos():
-                try:
-                    status = self._inspect_data_repo(root)
-                except Exception:
-                    continue
-                if status["ohlcv_ready"] and status["path"] != current["path"]:
-                    candidates.append(status)
-                    if len(candidates) >= 3:
-                        break
-        return {
-            "mode": "REAL_OFFICIAL_DATA" if current["ohlcv_ready"] else ("PREVIEW" if self.preview_mode else "NO_REAL_DATA_CONNECTED"),
-            "active": current,
-            "code_root": str(self.code_root),
-            "saved_config": str(self.data_source_file),
-            "candidates": candidates,
-            "budget_uses_real_data": bool(current["ohlcv_ready"]),
-            "yfinance_automatic_fallback": False,
-        }
-
-'''
-          s = s[:start] + replacement + s[end:]
-          s = s.replace(
-              'root = Path(raw_path.strip().strip(\\'"\\')).expanduser().resolve()\\n        status = self._inspect_data_repo(root)',
-              'root = self._normalize_data_repo_root(Path(raw_path.strip().strip(\\'"\\')))\\n        status = self._inspect_data_repo(root)',
-              1,
-          )
-          s = s.replace(
-              'status = self._inspect_data_repo(self.data_repo_root)\\n        if not status["ohlcv_ready"]:',
-              'status = self.real_data_status\\n        if not status["ohlcv_ready"]:',
-              1,
-          )
-          api.write_text(s, encoding="utf-8")
-
-          js = root / "modern_ui" / "frontend" / "app.js"
-          t = js.read_text(encoding="utf-8")
-          start = t.index("async function loadDataSource()")
-          end = t.index("\\n\\nasync function loadSystem()", start)
-          replacement = """async function apiTimed(path,options={},timeoutMs=12000){const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),timeoutMs);try{return await api(path,{...options,signal:controller.signal})}catch(e){if(e?.name==='AbortError')throw new Error('Repository check timed out. The app stopped the scan instead of hanging.');throw e}finally{clearTimeout(timer)}}
-async function loadDataSource(){try{const d=await apiTimed('/api/data-source',{},10000);renderDataSource(d);return d}catch(e){if($('#dataSourceSummary'))$('#dataSourceSummary').textContent='Repository check stopped';if($('#dataSourceDetail'))$('#dataSourceDetail').textContent=e.message;throw e}}
-async function connectDataRepo(pathOverride=null){const input=$('#dataRepoPath');const path=(pathOverride||input?.value||'').trim();if(!path){toast('Enter the local Stock Recommendation Engine repository path');return;}busy(true,'Connecting real data','Verifying official NSE OHLCV cache and switching the native app to real-data mode…');try{const d=await apiTimed('/api/data-source',{method:'POST',body:{path}},15000);renderDataSource(d);state.symbols=[];renderDashboard(await api('/api/dashboard'));await loadSymbols('');toast('Real data connected · '+(d.active?.stock_files||0)+' stock histories');}catch(e){if($('#dataSourceSummary'))$('#dataSourceSummary').textContent='Connection failed';if($('#dataSourceDetail'))$('#dataSourceDetail').textContent=e.message;toast(e.message)}finally{busy(false)}}"""
-          t = t[:start] + replacement + t[end:]
-          js.write_text(t, encoding="utf-8")
-
-          assert 'APP_VERSION = "0.9.4-data-source-hotfix"' in api.read_text(encoding="utf-8")
-          assert "_last_nonempty_line" in api.read_text(encoding="utf-8")
-          assert "apiTimed" in js.read_text(encoding="utf-8")
-          print("0.9.4 hotfix patch applied")
-          '@ | python -
+          $b64 = 'ZnJvbSBwYXRobGliIGltcG9ydCBQYXRoCmltcG9ydCBvcwoKcm9vdCA9IFBhdGgob3MuZW52aXJvblsnU1JFX0VOR0lORV9ST09UJ10pCmFwaSA9IHJvb3QgLyAnbW9kZXJuX3VpJyAvICdhcGkucHknCnMgPSBhcGkucmVhZF90ZXh0KGVuY29kaW5nPSd1dGYtOCcpCnMgPSBzLnJlcGxhY2UoJ0FQUF9WRVJTSU9OID0gIjAuOS4zLXJlYWwtZGF0YS1jaGFydC16b29tIicsICdBUFBfVkVSU0lPTiA9ICIwLjkuNC1kYXRhLXNvdXJjZS1ob3RmaXgiJykKCnN0YXJ0ID0gcy5pbmRleCgnICAgIGRlZiBfaW5zcGVjdF9kYXRhX3JlcG8oc2VsZiwgcm9vdDogUGF0aCkgLT4gZGljdFtzdHIsIEFueV06JykKZW5kID0gcy5pbmRleCgnICAgIGRlZiBfY2FuZGlkYXRlX2RhdGFfcmVwb3Moc2VsZikgLT4gbGlzdFtQYXRoXTonLCBzdGFydCkKcmVwbGFjZW1lbnQgPSAnJycgICAgQHN0YXRpY21ldGhvZAogICAgZGVmIF9ub3JtYWxpemVfZGF0YV9yZXBvX3Jvb3QocmF3X3Jvb3Q6IFBhdGgpIC0+IFBhdGg6CiAgICAgICAgcm9vdCA9IHJhd19yb290LmV4cGFuZHVzZXIoKS5yZXNvbHZlKCkKICAgICAgICBwYXJ0cyA9IFtwYXJ0Lmxvd2VyKCkgZm9yIHBhcnQgaW4gcm9vdC5wYXJ0c10KICAgICAgICBmb3IgaWR4IGluIHJhbmdlKG1heCgwLCBsZW4ocGFydHMpIC0gMykpOgogICAgICAgICAgICBpZiBwYXJ0c1tpZHg6aWR4ICsgNF0gPT0gWyJkYXRhIiwgIm5vcm1hbGl6ZWQiLCAibnNlX29mZmljaWFsIiwgImVxdWl0eV9iaGF2Y29weSJdOgogICAgICAgICAgICAgICAgcmV0dXJuIFBhdGgoKnJvb3QucGFydHNbOmlkeF0pLnJlc29sdmUoKQogICAgICAgIHJldHVybiByb290CgogICAgQHN0YXRpY21ldGhvZAogICAgZGVmIF9sYXN0X25vbmVtcHR5X2xpbmUocGF0aDogUGF0aCwgY2h1bmtfc2l6ZTogaW50ID0gNDA5NikgLT4gc3RyIHwgTm9uZToKICAgICAgICB0cnk6CiAgICAgICAgICAgIHdpdGggcGF0aC5vcGVuKCJyYiIpIGFzIGhhbmRsZToKICAgICAgICAgICAgICAgIGhhbmRsZS5zZWVrKDAsIG9zLlNFRUtfRU5EKQogICAgICAgICAgICAgICAgcG9zID0gaGFuZGxlLnRlbGwoKQogICAgICAgICAgICAgICAgaWYgcG9zIDw9IDA6CiAgICAgICAgICAgICAgICAgICAgcmV0dXJuIE5vbmUKICAgICAgICAgICAgICAgIGJ1ZiA9IGIiIgogICAgICAgICAgICAgICAgd2hpbGUgcG9zID4gMCBhbmQgbGVuKGJ1ZikgPCA2NTUzNjoKICAgICAgICAgICAgICAgICAgICBzdGVwID0gbWluKGNodW5rX3NpemUsIHBvcykKICAgICAgICAgICAgICAgICAgICBwb3MgLT0gc3RlcAogICAgICAgICAgICAgICAgICAgIGhhbmRsZS5zZWVrKHBvcykKICAgICAgICAgICAgICAgICAgICBidWYgPSBoYW5kbGUucmVhZChzdGVwKSArIGJ1ZgogICAgICAgICAgICAgICAgICAgIGxpbmVzID0gW2xpbmUuc3RyaXAoKSBmb3IgbGluZSBpbiBidWYuc3BsaXRsaW5lcygpIGlmIGxpbmUuc3RyaXAoKV0KICAgICAgICAgICAgICAgICAgICBpZiBsZW4obGluZXMpID49IDIgb3IgcG9zID09IDA6CiAgICAgICAgICAgICAgICAgICAgICAgIGlmIG5vdCBsaW5lczoKICAgICAgICAgICAgICAgICAgICAgICAgICAgIHJldHVybiBOb25lCiAgICAgICAgICAgICAgICAgICAgICAgIHJldHVybiBsaW5lc1stMV0uZGVjb2RlKCJ1dGYtOCIsIGVycm9ycz0icmVwbGFjZSIpCiAgICAgICAgZXhjZXB0IE9TRXJyb3I6CiAgICAgICAgICAgIHJldHVybiBOb25lCiAgICAgICAgcmV0dXJuIE5vbmUKCiAgICBkZWYgX2luc3BlY3RfZGF0YV9yZXBvKHNlbGYsIHJvb3Q6IFBhdGgpIC0+IGRpY3Rbc3RyLCBBbnldOgogICAgICAgIHJvb3QgPSBzZWxmLl9ub3JtYWxpemVfZGF0YV9yZXBvX3Jvb3Qocm9vdCkKICAgICAgICByb290cyA9IHNlbGYuX29mZmljaWFsX2NhY2hlX3Jvb3RzKHJvb3QpCiAgICAgICAgZmlsZXM6IGxpc3RbUGF0aF0gPSBbXQogICAgICAgIGxhdGVzdCA9IE5vbmUKICAgICAgICBmb3IgY2FjaGUgaW4gcm9vdHM6CiAgICAgICAgICAgIGlmIG5vdCBjYWNoZS5leGlzdHMoKToKICAgICAgICAgICAgICAgIGNvbnRpbnVlCiAgICAgICAgICAgIHRyeToKICAgICAgICAgICAgICAgIGNhY2hlX2ZpbGVzID0gbGlzdChjYWNoZS5nbG9iKCIqLmNzdiIpKQogICAgICAgICAgICBleGNlcHQgT1NFcnJvcjoKICAgICAgICAgICAgICAgIGNvbnRpbnVlCiAgICAgICAgICAgIGZpbGVzLmV4dGVuZChjYWNoZV9maWxlcykKICAgICAgICAgICAgZm9yIHBhdGggaW4gY2FjaGVfZmlsZXM6CiAgICAgICAgICAgICAgICBsaW5lID0gc2VsZi5fbGFzdF9ub25lbXB0eV9saW5lKHBhdGgpCiAgICAgICAgICAgICAgICBpZiBub3QgbGluZToKICAgICAgICAgICAgICAgICAgICBjb250aW51ZQogICAgICAgICAgICAgICAgZCA9IGxpbmUuc3BsaXQoIiwiLCAxKVswXS5zdHJpcCgpLnN0cmlwKCciJykKICAgICAgICAgICAgICAgIGlmIGQgYW5kIGQubG93ZXIoKSBub3QgaW4geyJkYXRlIiwgInRpbWVzdGFtcCIsICJkYXRldGltZSJ9OgogICAgICAgICAgICAgICAgICAgIGlmIG5vdCBsYXRlc3Qgb3IgZCA+IGxhdGVzdDoKICAgICAgICAgICAgICAgICAgICAgICAgbGF0ZXN0ID0gZAogICAgICAgIGZ1bGxfZW5naW5lX3JlYWR5ID0gKHJvb3QgLyAicnVuX29mZmljaWFsX3YxX2RhaWx5LnB5IikuZXhpc3RzKCkgYW5kIChyb290IC8gIlN0YWdlIDRBLjMiKS5leGlzdHMoKQogICAgICAgIGZ1bmRhbWVudGFsX3JlYWR5ID0gKHJvb3QgLyAiZGF0YSIgLyAiZnVuZGFtZW50YWxzIikuZXhpc3RzKCkKICAgICAgICByZXR1cm4gewogICAgICAgICAgICAicGF0aCI6IHN0cihyb290KSwKICAgICAgICAgICAgImV4aXN0cyI6IHJvb3QuZXhpc3RzKCksCiAgICAgICAgICAgICJvaGxjdl9yZWFkeSI6IGJvb2woZmlsZXMpLAogICAgICAgICAgICAic3RvY2tfZmlsZXMiOiBsZW4oe3AubmFtZSBmb3IgcCBpbiBmaWxlc30pLAogICAgICAgICAgICAibGF0ZXN0X3Nlc3Npb24iOiBsYXRlc3QsCiAgICAgICAgICAgICJmdWxsX2VuZ2luZV9yZWFkeSI6IGZ1bGxfZW5naW5lX3JlYWR5LAogICAgICAgICAgICAiZnVuZGFtZW50YWxfcmVhZHkiOiBmdW5kYW1lbnRhbF9yZWFkeSwKICAgICAgICAgICAgImNhY2hlX3Jvb3RzIjogW3N0cihwKSBmb3IgcCBpbiByb290cyBpZiBwLmV4aXN0cygpXSwKICAgICAgICB9CgonJycKcyA9IHNbOnN0YXJ0XSArIHJlcGxhY2VtZW50ICsgc1tlbmQ6XQoKc3RhcnQgPSBzLmluZGV4KCcgICAgZGVmIGRhdGFfc291cmNlX3N0YXR1cyhzZWxmKSAtPiBkaWN0W3N0ciwgQW55XTonKQplbmQgPSBzLmluZGV4KCcgICAgZGVmIGNvbm5lY3RfZGF0YV9yZXBvKHNlbGYsIHJhd19wYXRoOiBzdHIpIC0+IGRpY3Rbc3RyLCBBbnldOicsIHN0YXJ0KQpyZXBsYWNlbWVudCA9ICcnJyAgICBkZWYgZGF0YV9zb3VyY2Vfc3RhdHVzKHNlbGYpIC0+IGRpY3Rbc3RyLCBBbnldOgogICAgICAgIGN1cnJlbnQgPSBkaWN0KHNlbGYucmVhbF9kYXRhX3N0YXR1cykKICAgICAgICBjYW5kaWRhdGVzID0gW10KICAgICAgICBpZiBub3QgY3VycmVudFsib2hsY3ZfcmVhZHkiXToKICAgICAgICAgICAgZm9yIHJvb3QgaW4gc2VsZi5fY2FuZGlkYXRlX2RhdGFfcmVwb3MoKToKICAgICAgICAgICAgICAgIHRyeToKICAgICAgICAgICAgICAgICAgICBzdGF0dXMgPSBzZWxmLl9pbnNwZWN0X2RhdGFfcmVwbyhyb290KQogICAgICAgICAgICAgICAgZXhjZXB0IEV4Y2VwdGlvbjoKICAgICAgICAgICAgICAgICAgICBjb250aW51ZQogICAgICAgICAgICAgICAgaWYgc3RhdHVzWyJvaGxjdl9yZWFkeSJdIGFuZCBzdGF0dXNbInBhdGgiXSAhPSBjdXJyZW50WyJwYXRoIl06CiAgICAgICAgICAgICAgICAgICAgY2FuZGlkYXRlcy5hcHBlbmQoc3RhdHVzKQogICAgICAgICAgICAgICAgICAgIGlmIGxlbihjYW5kaWRhdGVzKSA+PSAzOgogICAgICAgICAgICAgICAgICAgICAgICBicmVhawogICAgICAgIHJldHVybiB7CiAgICAgICAgICAgICJtb2RlIjogIlJFQUxfT0ZGSUNJQUxfREFUQSIgaWYgY3VycmVudFsib2hsY3ZfcmVhZHkiXSBlbHNlICgiUFJFVklFVyIgaWYgc2VsZi5wcmV2aWV3X21vZGUgZWxzZSAiTk9fUkVBTF9EQVRBX0NPTk5FQ1RFRCIpLAogICAgICAgICAgICAiYWN0aXZlIjogY3VycmVudCwKICAgICAgICAgICAgImNvZGVfcm9vdCI6IHN0cihzZWxmLmNvZGVfcm9vdCksCiAgICAgICAgICAgICJzYXZlZF9jb25maWciOiBzdHIoc2VsZi5kYXRhX3NvdXJjZV9maWxlKSwKICAgICAgICAgICAgImNhbmRpZGF0ZXMiOiBjYW5kaWRhdGVzLAogICAgICAgICAgICAiYnVkZ2V0X3VzZXNfcmVhbF9kYXRhIjogYm9vbChjdXJyZW50WyJvaGxjdl9yZWFkeSJdKSwKICAgICAgICAgICAgInlmaW5hbmNlX2F1dG9tYXRpY19mYWxsYmFjayI6IEZhbHNlLAogICAgICAgIH0KCicnJwpzID0gc1s6c3RhcnRdICsgcmVwbGFjZW1lbnQgKyBzW2VuZDpdCnMgPSBzLnJlcGxhY2UoCiAgICAncm9vdCA9IFBhdGgocmF3X3BhdGguc3RyaXAoKS5zdHJpcChcJyJcJykpLmV4cGFuZHVzZXIoKS5yZXNvbHZlKClcbiAgICAgICAgc3RhdHVzID0gc2VsZi5faW5zcGVjdF9kYXRhX3JlcG8ocm9vdCknLAogICAgJ3Jvb3QgPSBzZWxmLl9ub3JtYWxpemVfZGF0YV9yZXBvX3Jvb3QoUGF0aChyYXdfcGF0aC5zdHJpcCgpLnN0cmlwKFwnIlwnKSkpXG4gICAgICAgIHN0YXR1cyA9IHNlbGYuX2luc3BlY3RfZGF0YV9yZXBvKHJvb3QpJywKICAgIDEsCikKcyA9IHMucmVwbGFjZSgKICAgICdzdGF0dXMgPSBzZWxmLl9pbnNwZWN0X2RhdGFfcmVwbyhzZWxmLmRhdGFfcmVwb19yb290KVxuICAgICAgICBpZiBub3Qgc3RhdHVzWyJvaGxjdl9yZWFkeSJdOicsCiAgICAnc3RhdHVzID0gc2VsZi5yZWFsX2RhdGFfc3RhdHVzXG4gICAgICAgIGlmIG5vdCBzdGF0dXNbIm9obGN2X3JlYWR5Il06JywKICAgIDEsCikKYXBpLndyaXRlX3RleHQocywgZW5jb2Rpbmc9J3V0Zi04JykKCmpzID0gcm9vdCAvICdtb2Rlcm5fdWknIC8gJ2Zyb250ZW5kJyAvICdhcHAuanMnCnQgPSBqcy5yZWFkX3RleHQoZW5jb2Rpbmc9J3V0Zi04JykKc3RhcnQgPSB0LmluZGV4KCdhc3luYyBmdW5jdGlvbiBsb2FkRGF0YVNvdXJjZSgpJykKZW5kID0gdC5pbmRleCgnXG5cbmFzeW5jIGZ1bmN0aW9uIGxvYWRTeXN0ZW0oKScsIHN0YXJ0KQpyZXBsYWNlbWVudCA9ICIiImFzeW5jIGZ1bmN0aW9uIGFwaVRpbWVkKHBhdGgsb3B0aW9ucz17fSx0aW1lb3V0TXM9MTIwMDApe2NvbnN0IGNvbnRyb2xsZXI9bmV3IEFib3J0Q29udHJvbGxlcigpO2NvbnN0IHRpbWVyPXNldFRpbWVvdXQoKCk9PmNvbnRyb2xsZXIuYWJvcnQoKSx0aW1lb3V0TXMpO3RyeXtyZXR1cm4gYXdhaXQgYXBpKHBhdGgsey4uLm9wdGlvbnMsc2lnbmFsOmNvbnRyb2xsZXIuc2lnbmFsfSl9Y2F0Y2goZSl7aWYoZT8ubmFtZT09PSdBYm9ydEVycm9yJyl0aHJvdyBuZXcgRXJyb3IoJ1JlcG9zaXRvcnkgY2hlY2sgdGltZWQgb3V0LiBUaGUgYXBwIHN0b3BwZWQgdGhlIHNjYW4gaW5zdGVhZCBvZiBoYW5naW5nLicpO3Rocm93IGV9ZmluYWxseXtjbGVhclRpbWVvdXQodGltZXIpfX0KYXN5bmMgZnVuY3Rpb24gbG9hZERhdGFTb3VyY2UoKXt0cnl7Y29uc3QgZD1hd2FpdCBhcGlUaW1lZCgnL2FwaS9kYXRhLXNvdXJjZScse30sMTAwMDApO3JlbmRlckRhdGFTb3VyY2UoZCk7cmV0dXJuIGR9Y2F0Y2goZSl7aWYoJCgnI2RhdGFTb3VyY2VTdW1tYXJ5JykpJCgnI2RhdGFTb3VyY2VTdW1tYXJ5JykudGV4dENvbnRlbnQ9J1JlcG9zaXRvcnkgY2hlY2sgc3RvcHBlZCc7aWYoJCgnI2RhdGFTb3VyY2VEZXRhaWwnKSkkKCcjZGF0YVNvdXJjZURldGFpbCcpLnRleHRDb250ZW50PWUubWVzc2FnZTt0aHJvdyBlfX0KYXN5bmMgZnVuY3Rpb24gY29ubmVjdERhdGFSZXBvKHBhdGhPdmVycmlkZT1udWxsKXtjb25zdCBpbnB1dD0kKCcjZGF0YVJlcG9QYXRoJyk7Y29uc3QgcGF0aD0ocGF0aE92ZXJyaWRlfHxpbnB1dD8udmFsdWV8fCcnKS50cmltKCk7aWYoIXBhdGgpe3RvYXN0KCdFbnRlciB0aGUgbG9jYWwgU3RvY2sgUmVjb21tZW5kYXRpb24gRW5naW5lIHJlcG9zaXRvcnkgcGF0aCcpO3JldHVybjt9YnVzeSh0cnVlLCdDb25uZWN0aW5nIHJlYWwgZGF0YScsJ1ZlcmlmeWluZyBvZmZpY2lhbCBOU0UgT0hMQ1YgY2FjaGUgYW5kIHN3aXRjaGluZyB0aGUgbmF0aXZlIGFwcCB0byByZWFsLWRhdGEgbW9kZeKApicpO3RyeXtjb25zdCBkPWF3YWl0IGFwaVRpbWVkKCcvYXBpL2RhdGEtc291cmNlJyx7bWV0aG9kOidQT1NUJyxib2R5OntwYXRofX0sMTUwMDApO3JlbmRlckRhdGFTb3VyY2UoZCk7c3RhdGUuc3ltYm9scz1bXTtyZW5kZXJEYXNoYm9hcmQoYXdhaXQgYXBpKCcvYXBpL2Rhc2hib2FyZCcpKTthd2FpdCBsb2FkU3ltYm9scygnJyk7dG9hc3QoJ1JlYWwgZGF0YSBjb25uZWN0ZWQgwrcgJysoZC5hY3RpdmU/LnN0b2NrX2ZpbGVzfHwwKSsnIHN0b2NrIGhpc3RvcmllcycpO31jYXRjaChlKXtpZigkKCcjZGF0YVNvdXJjZVN1bW1hcnknKSkkKCcjZGF0YVNvdXJjZVN1bW1hcnknKS50ZXh0Q29udGVudD0nQ29ubmVjdGlvbiBmYWlsZWQnO2lmKCQoJyNkYXRhU291cmNlRGV0YWlsJykpJCgnI2RhdGFTb3VyY2VEZXRhaWwnKS50ZXh0Q29udGVudD1lLm1lc3NhZ2U7dG9hc3QoZS5tZXNzYWdlKX1maW5hbGx5e2J1c3koZmFsc2UpfX0iIiIKdCA9IHRbOnN0YXJ0XSArIHJlcGxhY2VtZW50ICsgdFtlbmQ6XQpqcy53cml0ZV90ZXh0KHQsIGVuY29kaW5nPSd1dGYtOCcpCgphc3NlcnQgJ0FQUF9WRVJTSU9OID0gIjAuOS40LWRhdGEtc291cmNlLWhvdGZpeCInIGluIGFwaS5yZWFkX3RleHQoZW5jb2Rpbmc9J3V0Zi04JykKYXNzZXJ0ICdfbGFzdF9ub25lbXB0eV9saW5lJyBpbiBhcGkucmVhZF90ZXh0KGVuY29kaW5nPSd1dGYtOCcpCmFzc2VydCAnYXBpVGltZWQnIGluIGpzLnJlYWRfdGV4dChlbmNvZGluZz0ndXRmLTgnKQpwcmludCgnMC45LjQgaG90Zml4IHBhdGNoIGFwcGxpZWQnKQo='
+          $script = "$env:RUNNER_TEMP\\patch094.py"
+          [IO.File]::WriteAllBytes($script, [Convert]::FromBase64String($b64))
+          python $script
 
       - name: Fast repository scan regression
         shell: pwsh
         run: |
           python -m pip install --disable-pip-version-check fastapi==0.128.2 uvicorn==0.48.0
-          $large = "$env:RUNNER_TEMP\\large-real-repo"
-          $env:SRE094_LARGE_ROOT = $large
-          @'
-          from pathlib import Path
-          import os, sys, time
-
-          root = Path(os.environ["SRE094_LARGE_ROOT"])
-          cache = root / "data" / "normalized" / "nse_official" / "equity_bhavcopy" / "expanded_universe_2026_10_05"
-          cache.mkdir(parents=True, exist_ok=True)
-          row = "Date,Open,High,Low,Close,Volume\\n2026-10-08,100,101,99,100.5,10000\\n2026-10-09,100.5,103,100,102.5,12000\\n"
-          for i in range(1200):
-              (cache / f"STK{i:04d}.NS.csv").write_text(row, encoding="utf-8")
-          sys.path.insert(0, os.environ["SRE_ENGINE_ROOT"])
-          from modern_ui.api import ModernAppContext
-          ctx = ModernAppContext.__new__(ModernAppContext)
-          started = time.perf_counter()
-          status = ctx._inspect_data_repo(root)
-          elapsed = time.perf_counter() - started
-          assert status["stock_files"] == 1200, status
-          assert status["latest_session"] == "2026-10-09", status
-          assert elapsed < 3.0, elapsed
-          assert ctx._normalize_data_repo_root(cache) == root.resolve()
-          print(f"FAST DATA CHECK PASS: 1200 stocks in {elapsed:.3f}s")
-          '@ | python -
+          $env:SRE094_LARGE_ROOT = "$env:RUNNER_TEMP\\large-real-repo"
+          $b64 = 'ZnJvbSBwYXRobGliIGltcG9ydCBQYXRoCmltcG9ydCBvcywgc3lzLCB0aW1lCnJvb3QgPSBQYXRoKG9zLmVudmlyb25bJ1NSRTA5NF9MQVJHRV9ST09UJ10pCmNhY2hlID0gcm9vdCAvICdkYXRhJyAvICdub3JtYWxpemVkJyAvICduc2Vfb2ZmaWNpYWwnIC8gJ2VxdWl0eV9iaGF2Y29weScgLyAnZXhwYW5kZWRfdW5pdmVyc2VfMjAyNl8xMF8wNScKY2FjaGUubWtkaXIocGFyZW50cz1UcnVlLCBleGlzdF9vaz1UcnVlKQpyb3cgPSAnRGF0ZSxPcGVuLEhpZ2gsTG93LENsb3NlLFZvbHVtZVxuMjAyNi0xMC0wOCwxMDAsMTAxLDk5LDEwMC41LDEwMDAwXG4yMDI2LTEwLTA5LDEwMC41LDEwMywxMDAsMTAyLjUsMTIwMDBcbicKZm9yIGkgaW4gcmFuZ2UoMTIwMCk6CiAgICAoY2FjaGUgLyBmJ1NUS3tpOjA0ZH0uTlMuY3N2Jykud3JpdGVfdGV4dChyb3csIGVuY29kaW5nPSd1dGYtOCcpCnN5cy5wYXRoLmluc2VydCgwLCBvcy5lbnZpcm9uWydTUkVfRU5HSU5FX1JPT1QnXSkKZnJvbSBtb2Rlcm5fdWkuYXBpIGltcG9ydCBNb2Rlcm5BcHBDb250ZXh0CmN0eCA9IE1vZGVybkFwcENvbnRleHQuX19uZXdfXyhNb2Rlcm5BcHBDb250ZXh0KQpzdGFydGVkID0gdGltZS5wZXJmX2NvdW50ZXIoKQpzdGF0dXMgPSBjdHguX2luc3BlY3RfZGF0YV9yZXBvKHJvb3QpCmVsYXBzZWQgPSB0aW1lLnBlcmZfY291bnRlcigpIC0gc3RhcnRlZAphc3NlcnQgc3RhdHVzWydzdG9ja19maWxlcyddID09IDEyMDAsIHN0YXR1cwphc3NlcnQgc3RhdHVzWydsYXRlc3Rfc2Vzc2lvbiddID09ICcyMDI2LTEwLTA5Jywgc3RhdHVzCmFzc2VydCBlbGFwc2VkIDwgMy4wLCBlbGFwc2VkCmFzc2VydCBjdHguX25vcm1hbGl6ZV9kYXRhX3JlcG9fcm9vdChjYWNoZSkgPT0gcm9vdC5yZXNvbHZlKCkKcHJpbnQoZidGQVNUIERBVEEgQ0hFQ0sgUEFTUzogMTIwMCBzdG9ja3MgaW4ge2VsYXBzZWQ6LjNmfXMnKQo='
+          $script = "$env:RUNNER_TEMP\\reg094.py"
+          [IO.File]::WriteAllBytes($script, [Convert]::FromBase64String($b64))
+          python $script
 
       - name: Build deterministic official-data fixture
         shell: pwsh
