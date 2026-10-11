@@ -114,9 +114,10 @@ def discover_sources(root: Path) -> dict[str, Path | None]:
         risk_candidates.append(
             research / "fundamental_v2_phase2a7_risk_events" / "risk_event_profiles.jsonl"
         )
-        validation_candidates.append(
-            research / "fundamental_v2_phase2a9_independent_validation" / "final_decision.json"
-        )
+        validation_candidates.extend([
+            research / "fundamental_v2_phase2a9_final_validation" / "fundamental_v2_final_decision.json",
+            research / "fundamental_v2_phase2a9_independent_validation" / "final_decision.json",
+        ])
 
     def newest(paths: Iterable[Path]) -> Path | None:
         existing = [p for p in paths if p.exists() and p.is_file()]
@@ -158,7 +159,16 @@ def _usable_feature(row: dict[str, Any], feature: str) -> float | None:
 
 
 def _cutoff(decision_timestamp: Any) -> datetime:
-    return _dt(decision_timestamp) or datetime.now(timezone.utc)
+    raw = str(decision_timestamp or "").strip()
+    parsed = _dt(decision_timestamp)
+    if parsed is None:
+        return datetime.now(timezone.utc)
+    # Active analysis sessions are stored as YYYY-MM-DD. Treat that as market-session
+    # end-of-day so filings timestamped earlier on that same session are eligible,
+    # while future sessions remain strictly excluded.
+    if len(raw) == 10 and raw[4:5] == "-" and raw[7:8] == "-":
+        return parsed.replace(hour=23, minute=59, second=59, microsecond=999999)
+    return parsed
 
 
 def _pit_rows(
