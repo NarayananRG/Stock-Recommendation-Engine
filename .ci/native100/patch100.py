@@ -91,9 +91,16 @@ api.write_text(s, encoding="utf-8")
 # Surface freshness directly in the existing data-source label.
 js = root / "modern_ui" / "frontend" / "app.js"
 t = js.read_text(encoding="utf-8")
-old = "function dataSourceLabel(ds){const a=ds?.active||{},idx=+a.index_files||0,extra=idx?\` · \${idx} market index\${idx===1?'':'es'}\`:'';if(ds?.mode==='REAL_OFFICIAL_DATA')return \`Official NSE OHLCV · \${a.stock_files||0} equities\${extra} · \${a.latest_session||'—'}\`;if(ds?.mode==='REAL_FROZEN_HISTORY')return \`Frozen historical OHLCV · \${a.stock_files||0} equities\${extra} · \${a.latest_session||'—'}\`;return 'No real OHLCV repository connected';}"
-new = "function dataSourceLabel(ds){const a=ds?.active||{},idx=+a.index_files||0,extra=idx?\` · \${idx} market index\${idx===1?'':'es'}\`:'';const gate=a.freshness_gate||'FAIL',fresh=a.freshness_status||'UNAVAILABLE',freshTag=\` · freshness \${gate}/\${fresh}\`;if(ds?.mode==='REAL_OFFICIAL_DATA')return \`Official NSE OHLCV · \${a.stock_files||0} equities\${extra} · \${a.latest_session||'—'}\${freshTag}\`;if(ds?.mode==='REAL_FROZEN_HISTORY')return \`Frozen historical OHLCV · \${a.stock_files||0} equities\${extra} · \${a.latest_session||'—'}\${freshTag}\`;return 'No real OHLCV repository connected · freshness FAIL/UNAVAILABLE';}"
-t = repl(t, old, new, "Phase 3 data-source label")
+fn_start = t.index("function dataSourceLabel(ds){")
+candidates = [
+    t.find("\nfunction ", fn_start + 1),
+    t.find("\nasync function ", fn_start + 1),
+]
+fn_end = min(pos for pos in candidates if pos > fn_start) if any(pos > fn_start for pos in candidates) else -1
+if fn_end < 0:
+    raise RuntimeError("Phase 3 data-source label end marker missing")
+new_fn = """function dataSourceLabel(ds){const a=ds?.active||{},idx=+a.index_files||0,extra=idx?` · ${idx} market index${idx===1?'':'es'}`:'';const gate=a.freshness_gate||'FAIL',fresh=a.freshness_status||'UNAVAILABLE',freshTag=` · freshness ${gate}/${fresh}`;if(ds?.mode==='REAL_OFFICIAL_DATA')return `Official NSE OHLCV · ${a.stock_files||0} equities${extra} · ${a.latest_session||'—'}${freshTag}`;if(ds?.mode==='REAL_FROZEN_HISTORY')return `Frozen historical OHLCV · ${a.stock_files||0} equities${extra} · ${a.latest_session||'—'}${freshTag}`;return 'No real OHLCV repository connected · freshness FAIL/UNAVAILABLE';}"""
+t = t[:fn_start] + new_fn + t[fn_end:]
 js.write_text(t, encoding="utf-8")
 
 # Machine-readable Phase 3 policy shipped with the engine.
