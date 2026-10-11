@@ -73,7 +73,15 @@ jobs:
           $engine = Join-Path $extract "StockRecommendationEngine_0.8.5_ultra_ui_TEST_SOURCE"
           if (!(Test-Path "$engine\requirements-v1.txt")) { throw "Canonical engine root missing" }
 
-          Expand-Archive -LiteralPath ".ci\native092\engine-overlay.zip" -DestinationPath $engine -Force
+          $overlayParts = Get-ChildItem ".ci\native092\overlay.part.*.b64" | Sort-Object Name
+          if ($overlayParts.Count -ne 7) { throw "Expected 7 parity overlay chunks, found $($overlayParts.Count)" }
+          $overlayB64 = ($overlayParts | ForEach-Object { Get-Content $_.FullName -Raw }) -join ""
+          if ($overlayB64.Length -ne 42016) { throw "Parity overlay base64 length mismatch: $($overlayB64.Length)" }
+          $overlayZip = "$env:RUNNER_TEMP\sre092-overlay.zip"
+          [IO.File]::WriteAllBytes($overlayZip, [Convert]::FromBase64String($overlayB64))
+          $overlayHash = (Get-FileHash $overlayZip -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($overlayHash -ne "ed91eb0ec54c562f2965a730174bbf422c4ae2ba6852f9e046305593cf96d1d8") { throw "Parity overlay hash mismatch: $overlayHash" }
+          Expand-Archive -LiteralPath $overlayZip -DestinationPath $engine -Force
           if (!(Test-Path "$engine\modern_ui\api.py")) { throw "0.9.2 engine overlay failed" }
           "SRE_ENGINE_ROOT=$engine" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
 
