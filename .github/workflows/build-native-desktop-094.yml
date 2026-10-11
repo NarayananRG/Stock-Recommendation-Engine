@@ -5,7 +5,7 @@ on:
     branches: [ui-0.9.3.1-data-source-hotfix]
     paths:
       - ".ci/native093/**"
-      - ".github/workflows/build-native-desktop-093.yml"
+      - ".github/workflows/build-native-desktop-094.yml"
   workflow_dispatch:
 
 permissions:
