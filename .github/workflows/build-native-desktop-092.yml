@@ -12,7 +12,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: sre-native-092
+  group: sre-native-092-v2
   cancel-in-progress: true
 
 jobs:
