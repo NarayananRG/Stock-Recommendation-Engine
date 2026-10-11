@@ -48,7 +48,7 @@ jobs:
           if ($m -notmatch 'choose_free_port') { throw "Dynamic-port launcher missing" }
           if ($m -notmatch 'health_matches') { throw "Backend-version handshake missing" }
           if ($m -match 'const PORT') { throw "Fixed desktop port must not exist in 0.9.9" }
-          if ($m -notmatch '0.9.12-phase3c-universe-visibility') { throw "Wrong native launcher version" }
+          if ($m -notmatch '0.9.13-capital-plan-v3') { throw "Wrong native launcher version" }
           if ($m -notmatch 'STOCK_MODERN_UI_PREVIEW", "0') { throw "Preview must remain disabled" }
 
           $cargo = "native-desktop-0.9.1\src-tauri\Cargo.toml"
