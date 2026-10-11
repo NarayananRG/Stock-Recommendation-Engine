@@ -5,7 +5,8 @@ on:
     branches: [ui-0.9.10-phase3-foundation]
     paths:
       - ".ci/native098/**"
-      - ".ci/native099/**"\n      - ".ci/native100/**"
+      - ".ci/native099/**"
+      - ".ci/native100/**"
       - ".github/workflows/build-native-desktop-0910.yml"
   workflow_dispatch:
 
