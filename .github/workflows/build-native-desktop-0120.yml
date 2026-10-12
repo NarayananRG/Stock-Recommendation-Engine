@@ -1,4 +1,4 @@
-name: Build SRE 0.12.4 Phase 7 Session Freshness Windows Hardening
+name: Build SRE 0.12.5 Phase 7 Official Daily Refresh Hotfix
 
 on:
   push:
@@ -18,6 +18,8 @@ on:
       - ".ci/native109/**"
       - ".ci/native110/**"
       - ".ci/native111/**"
+      - ".ci/native112/**"
+      - "Stage 6/tests/run_phase7_official_daily_refresh_tests.py"
       - ".github/workflows/build-native-desktop-0120.yml"
   workflow_dispatch:
 
@@ -57,15 +59,15 @@ jobs:
           if ($m -notmatch 'choose_free_port') { throw "Dynamic-port launcher missing" }
           if ($m -notmatch 'health_matches') { throw "Backend-version handshake missing" }
           if ($m -match 'const PORT') { throw "Fixed desktop port must not exist in 0.9.9" }
-          if ($m -notmatch '0.12.4-phase7-session-freshness-windows-hardening') { throw "Wrong native launcher version" }
+          if ($m -notmatch '0.12.5-phase7-official-daily-refresh-hotfix') { throw "Wrong native launcher version" }
           if ($m -notmatch 'STOCK_MODERN_UI_PREVIEW", "0') { throw "Preview must remain disabled" }
 
           $cargo = "native-desktop-0.9.1\src-tauri\Cargo.toml"
-          (Get-Content $cargo -Raw).Replace('version = "0.9.1"','version = "0.12.4"') | Set-Content $cargo -Encoding UTF8
+          (Get-Content $cargo -Raw).Replace('version = "0.9.1"','version = "0.12.5"') | Set-Content $cargo -Encoding UTF8
 
           $pkg = "native-desktop-0.9.1\package.json"
           $j = Get-Content $pkg -Raw | ConvertFrom-Json
-          $j.version = "0.12.4"
+          $j.version = "0.12.5"
           $j | ConvertTo-Json -Depth 20 | Set-Content $pkg -Encoding UTF8
 
       - name: Reconstruct canonical engine and apply 0.9.2 and 0.9.3 overlays
@@ -1219,6 +1221,7 @@ jobs:
           python ".ci\native109\patch109_first_launch_state.py"
           python ".ci\native110\patch110_daily_flow_ui.py"
           python ".ci\native111\patch111_session_freshness_windows.py"
+          python ".ci\native112\patch112_official_daily_refresh.py"
           python -m py_compile "$env:SRE_ENGINE_ROOT\stock_app\combined_prediction_v2.py"
           python -m py_compile "$env:SRE_ENGINE_ROOT\modern_ui\api.py"
           node --check "$env:SRE_ENGINE_ROOT\modern_ui\frontend\app.js"
@@ -1226,7 +1229,7 @@ jobs:
           $js = Get-Content "$env:SRE_ENGINE_ROOT\modern_ui\frontend\app.js" -Raw
           $html = Get-Content "$env:SRE_ENGINE_ROOT\modern_ui\frontend\index.html" -Raw
           $combined = Get-Content "$env:SRE_ENGINE_ROOT\stock_app\combined_prediction_v2.py" -Raw
-          if ($api -notmatch '0.12.4-phase7-session-freshness-windows-hardening') { throw "Phase 6 backend identity missing" }
+          if ($api -notmatch '0.12.5-phase7-official-daily-refresh-hotfix') { throw "Phase 6 backend identity missing" }
           if ($combined -notmatch 'SRE_COMBINED_PREDICTION_V2') { throw "Combined V2 schema missing" }
           if ($combined -notmatch 'AUTHORITY = "SHADOW_ONLY"') { throw "Combined V2 authority changed" }
           if ($combined -notmatch 'target_used_in_score') { throw "Combined V2 target-independence marker missing" }
@@ -1251,6 +1254,11 @@ jobs:
         shell: pwsh
         run: |
           python "Stage 6\tests\run_phase7_session_freshness_windows_hardening_tests.py"
+
+      - name: Phase 7 official daily refresh regression
+        shell: pwsh
+        run: |
+          python "Stage 6\tests\run_phase7_official_daily_refresh_tests.py"
 
       - name: Combined V2 target-independence and authority regression
         shell: pwsh
@@ -1319,7 +1327,7 @@ jobs:
               try{$health=Invoke-RestMethod "http://127.0.0.1:18774/api/health" -TimeoutSec 2;if($health.status -eq "ok"){$ok=$true;break}}catch{}
             }
             if(!$ok){throw "Phase 6 fresh backend health timed out"}
-            if($health.app_version -ne "0.12.4-phase7-session-freshness-windows-hardening"){throw "Wrong Phase 6 version"}
+            if($health.app_version -ne "0.12.5-phase7-official-daily-refresh-hotfix"){throw "Wrong Phase 6 version"}
 
             $source=Invoke-RestMethod "http://127.0.0.1:18774/api/data-source" -TimeoutSec 20
             if($source.mode -ne "REAL_OFFICIAL_DATA"){throw "Official market bundle not active: $($source.mode)"}
@@ -1361,7 +1369,7 @@ jobs:
 
           $p = "native-desktop-0.9.1\src-tauri\tauri.conf.json"
           $c = Get-Content $p -Raw | ConvertFrom-Json
-          $c.version = "0.12.4"
+          $c.version = "0.12.5"
           $c.productName = "Stock Recommendation Engine"
           $c | Add-Member -NotePropertyName identifier -NotePropertyValue "com.narayananrg.stockrecommendationengine" -Force
           $c.bundle | Add-Member -NotePropertyName publisher -NotePropertyValue "NarayananRG" -Force
@@ -1466,7 +1474,7 @@ jobs:
           $signing = if (Test-Path (Join-Path $dir "signing-status.txt")) { (Get-Content (Join-Path $dir "signing-status.txt") -Raw).Trim() } else { "AUTHENTICODE_SIGNING=UNKNOWN" }
           @(
             "SRE_RELEASE_SECURITY_REPORT_V1",
-            "VERSION=0.12.4-phase7-session-freshness-windows-hardening",
+            "VERSION=0.12.5-phase7-official-daily-refresh-hotfix",
             "SHA256=$hash",
             "DEFENDER_SCAN=$defenderStatus",
             "SIGNATURE_STATUS=$($sig.Status)",
@@ -1555,7 +1563,7 @@ jobs:
           $appData = Join-Path $env:LOCALAPPDATA "StockRecommendationEngine"
           $ready = Join-Path $appData "runtime-ready.txt"
           $portFile = Join-Path $appData "runtime-port.txt"
-          $logFile = Join-Path $appData "native-desktop-0.12.4.log"
+          $logFile = Join-Path $appData "native-desktop-0.12.5.log"
           New-Item -ItemType Directory -Force -Path $appData | Out-Null
           @{
             run_id = "20261012T092526Z-2"
@@ -1596,7 +1604,7 @@ jobs:
             }
 
             $readyLines = Get-Content $ready
-            if ($readyLines[0] -ne "0.12.4-phase7-session-freshness-windows-hardening") {
+            if ($readyLines[0] -ne "0.12.5-phase7-official-daily-refresh-hotfix") {
               throw "Installed desktop runtime version mismatch: $($readyLines[0])"
             }
             $port = [int]$readyLines[1]
@@ -1605,7 +1613,7 @@ jobs:
 
             $health = Invoke-RestMethod "http://127.0.0.1:$port/api/health" -TimeoutSec 10
             if ($health.status -ne "ok") { throw "Installed app health status is not ok" }
-            if ($health.app_version -ne "0.12.4-phase7-session-freshness-windows-hardening") {
+            if ($health.app_version -ne "0.12.5-phase7-official-daily-refresh-hotfix") {
               throw "Installed app backend version mismatch: $($health.app_version)"
             }
 
@@ -1621,7 +1629,7 @@ jobs:
               }
             }
             $stateMarker = Get-Content (Join-Path $appData "current_ui_state_version.json") -Raw | ConvertFrom-Json
-            if ($stateMarker.app_version -ne "0.12.4-phase7-session-freshness-windows-hardening") { throw "Current UI state version marker was not upgraded" }
+            if ($stateMarker.app_version -ne "0.12.5-phase7-official-daily-refresh-hotfix") { throw "Current UI state version marker was not upgraded" }
 
             $source = Invoke-RestMethod "http://127.0.0.1:$port/api/data-source" -TimeoutSec 10
             if ($source.mode -ne "REAL_FROZEN_HISTORY") {
@@ -1720,7 +1728,7 @@ jobs:
             }
             if(!$alive){throw "Reopened installed app never reached runtime-ready"}
             $readyLines=Get-Content $ready
-            if($readyLines[0] -ne "0.12.4-phase7-session-freshness-windows-hardening"){throw "Reopened runtime version mismatch: $($readyLines[0])"}
+            if($readyLines[0] -ne "0.12.5-phase7-official-daily-refresh-hotfix"){throw "Reopened runtime version mismatch: $($readyLines[0])"}
             $port=[int]$readyLines[1]
             $dash=Invoke-RestMethod "http://127.0.0.1:$port/api/dashboard" -TimeoutSec 10
             if([string]$dash.active_run.run_id -ne $expected){throw "Installed app changed active Run ID after close/reopen"}
@@ -1732,10 +1740,10 @@ jobs:
             if(!$desktop.HasExited){Start-Process -FilePath "taskkill.exe" -ArgumentList @("/PID",$desktop.Id,"/T","/F") -Wait -NoNewWindow | Out-Null}
           }
 
-      - name: Upload 0.12.4 session freshness Windows hardening installer and security report
+      - name: Upload 0.12.5 session freshness Windows hardening installer and security report
         uses: actions/upload-artifact@v4
         with:
-          name: SRE-0.12.4-Phase7-Session-Freshness-Windows-Hardening-Setup
+          name: SRE-0.12.5-Phase7-Official-Daily-Refresh-Hotfix-Setup
           path: |
             native-desktop-0.9.1/src-tauri/target/release/bundle/nsis/*.exe
             native-desktop-0.9.1/src-tauri/target/release/bundle/nsis/installer.sha256
