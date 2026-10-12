@@ -16,7 +16,7 @@ use tauri::Manager;
 #[cfg(target_os = "windows")]
 use std::os::windows::process::CommandExt;
 
-const APP_VERSION: &str = "0.12.7-phase7-official-source-diagnostics-hotfix";
+const APP_VERSION: &str = "0.13.1-phase8-validation-startup-hotfix";
 const CREATE_NO_WINDOW: u32 = 0x08000000;
 
 fn copy_dir_all(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> io::Result<()> {
@@ -38,12 +38,12 @@ fn copy_dir_all(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> io::Result<()> 
 }
 
 fn extract_engine(zip_path: &Path, destination: &Path) -> Result<PathBuf, String> {
-    if destination.join(".sre0127-ready").exists() {
+    if destination.join(".sre0131-ready").exists() {
         return Ok(destination.to_path_buf());
     }
     let parent = destination.parent().ok_or("No engine parent directory")?;
     fs::create_dir_all(parent).map_err(|e| e.to_string())?;
-    let staging = parent.join("engine-v0127-staging");
+    let staging = parent.join("engine-v0131-staging");
     if staging.exists() {
         fs::remove_dir_all(&staging).map_err(|e| e.to_string())?;
     }
@@ -65,7 +65,7 @@ fn extract_engine(zip_path: &Path, destination: &Path) -> Result<PathBuf, String
     }
     copy_dir_all(&staging, destination)
         .map_err(|e| format!("Cannot install local engine files: {e}"))?;
-    fs::write(destination.join(".sre0127-ready"), APP_VERSION.as_bytes())
+    fs::write(destination.join(".sre0131-ready"), APP_VERSION.as_bytes())
         .map_err(|e| e.to_string())?;
     let _ = fs::remove_dir_all(staging);
     Ok(destination.to_path_buf())
@@ -194,7 +194,7 @@ fn main() {
                         .unwrap_or_else(|_| PathBuf::from("."))
                 });
             let shared_app_data = local_base.join("StockRecommendationEngine");
-            let engine_root = shared_app_data.join("native-engine-0.12.7");
+            let engine_root = shared_app_data.join("native-engine-0.13.1");
 
             thread::spawn(move || {
                 let result: Result<(), String> = (|| {
@@ -206,7 +206,7 @@ fn main() {
                     let _ = fs::remove_file(&runtime_port);
                     let _ = fs::remove_file(&runtime_ready);
 
-                    let log_path = shared_app_data.join("native-desktop-0.12.7.log");
+                    let log_path = shared_app_data.join("native-desktop-0.13.1.log");
                     let stdout = fs::File::create(&log_path)
                         .map_err(|e| format!("Cannot create startup log: {e}"))?;
                     let stderr = stdout.try_clone().map_err(|e| e.to_string())?;
