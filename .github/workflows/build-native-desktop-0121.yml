@@ -14,7 +14,7 @@ on:
       - ".ci/native105/**"
       - ".ci/native106/**"
       - ".ci/native107/**"
-      - ".github/workflows/build-native-desktop-0120.yml"
+      - ".github/workflows/build-native-desktop-0121.yml"
   workflow_dispatch:
 
 permissions:
