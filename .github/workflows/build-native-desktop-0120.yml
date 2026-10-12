@@ -1,4 +1,4 @@
-name: Build SRE 0.13.0 Phase 8.1 Historical Replay and Paper Portfolio
+name: Build SRE 0.13.1 Phase 8.1 Upgrade Startup Hotfix
 
 on:
   push:
@@ -61,20 +61,23 @@ jobs:
 
           $main = "native-desktop-0.9.1\src-tauri\src\main.rs"
           $m = Get-Content $main -Raw
-          $m = $m.Replace("0.12.7-phase7-official-source-diagnostics-hotfix", "0.13.0-phase8-validation")
           Set-Content $main $m -Encoding UTF8
+          if ($m -notmatch 'native-engine-0\.13\.1') { throw "Versioned 0.13.1 engine directory missing" }
+          if ($m -notmatch '\.sre0131-ready') { throw "Versioned 0.13.1 ready marker missing" }
+          if ($m -notmatch 'engine-v0131-staging') { throw "Versioned 0.13.1 staging directory missing" }
+          if ($m -notmatch 'native-desktop-0\.13\.1\.log') { throw "Versioned 0.13.1 startup log missing" }
           if ($m -notmatch 'choose_free_port') { throw "Dynamic-port launcher missing" }
           if ($m -notmatch 'health_matches') { throw "Backend-version handshake missing" }
           if ($m -match 'const PORT') { throw "Fixed desktop port must not exist in 0.9.9" }
-          if ($m -notmatch '0.13.0-phase8-validation') { throw "Wrong native launcher version" }
+          if ($m -notmatch '0.13.1-phase8-validation-startup-hotfix') { throw "Wrong native launcher version" }
           if ($m -notmatch 'STOCK_MODERN_UI_PREVIEW", "0') { throw "Preview must remain disabled" }
 
           $cargo = "native-desktop-0.9.1\src-tauri\Cargo.toml"
-          (Get-Content $cargo -Raw).Replace('version = "0.9.1"','version = "0.13.0"') | Set-Content $cargo -Encoding UTF8
+          (Get-Content $cargo -Raw).Replace('version = "0.9.1"','version = "0.13.1"') | Set-Content $cargo -Encoding UTF8
 
           $pkg = "native-desktop-0.9.1\package.json"
           $j = Get-Content $pkg -Raw | ConvertFrom-Json
-          $j.version = "0.13.0"
+          $j.version = "0.13.1"
           $j | ConvertTo-Json -Depth 20 | Set-Content $pkg -Encoding UTF8
 
       - name: Reconstruct canonical engine and apply 0.9.2 and 0.9.3 overlays
@@ -1245,7 +1248,7 @@ jobs:
           $js = Get-Content "$env:SRE_ENGINE_ROOT\modern_ui\frontend\app.js" -Raw
           $html = Get-Content "$env:SRE_ENGINE_ROOT\modern_ui\frontend\index.html" -Raw
           $combined = Get-Content "$env:SRE_ENGINE_ROOT\stock_app\combined_prediction_v2.py" -Raw
-          if ($api -notmatch '0.13.0-phase8-validation') { throw "Phase 6 backend identity missing" }
+          if ($api -notmatch '0.13.1-phase8-validation-startup-hotfix') { throw "Phase 6 backend identity missing" }
           if ($combined -notmatch 'SRE_COMBINED_PREDICTION_V2') { throw "Combined V2 schema missing" }
           if ($combined -notmatch 'AUTHORITY = "SHADOW_ONLY"') { throw "Combined V2 authority changed" }
           if ($combined -notmatch 'target_used_in_score') { throw "Combined V2 target-independence marker missing" }
@@ -1363,7 +1366,7 @@ jobs:
               try{$health=Invoke-RestMethod "http://127.0.0.1:18774/api/health" -TimeoutSec 2;if($health.status -eq "ok"){$ok=$true;break}}catch{}
             }
             if(!$ok){throw "Phase 6 fresh backend health timed out"}
-            if($health.app_version -ne "0.13.0-phase8-validation"){throw "Wrong Phase 6 version"}
+            if($health.app_version -ne "0.13.1-phase8-validation-startup-hotfix"){throw "Wrong Phase 6 version"}
 
             $source=Invoke-RestMethod "http://127.0.0.1:18774/api/data-source" -TimeoutSec 20
             if($source.mode -ne "REAL_OFFICIAL_DATA"){throw "Official market bundle not active: $($source.mode)"}
@@ -1405,7 +1408,7 @@ jobs:
 
           $p = "native-desktop-0.9.1\src-tauri\tauri.conf.json"
           $c = Get-Content $p -Raw | ConvertFrom-Json
-          $c.version = "0.13.0"
+          $c.version = "0.13.1"
           $c.productName = "Stock Recommendation Engine"
           $c | Add-Member -NotePropertyName identifier -NotePropertyValue "com.narayananrg.stockrecommendationengine" -Force
           $c.bundle | Add-Member -NotePropertyName publisher -NotePropertyValue "NarayananRG" -Force
@@ -1510,7 +1513,7 @@ jobs:
           $signing = if (Test-Path (Join-Path $dir "signing-status.txt")) { (Get-Content (Join-Path $dir "signing-status.txt") -Raw).Trim() } else { "AUTHENTICODE_SIGNING=UNKNOWN" }
           @(
             "SRE_RELEASE_SECURITY_REPORT_V1",
-            "VERSION=0.13.0-phase8-validation",
+            "VERSION=0.13.1-phase8-validation-startup-hotfix",
             "SHA256=$hash",
             "DEFENDER_SCAN=$defenderStatus",
             "SIGNATURE_STATUS=$($sig.Status)",
@@ -1599,7 +1602,7 @@ jobs:
           $appData = Join-Path $env:LOCALAPPDATA "StockRecommendationEngine"
           $ready = Join-Path $appData "runtime-ready.txt"
           $portFile = Join-Path $appData "runtime-port.txt"
-          $logFile = Join-Path $appData "native-desktop-0.13.0.log"
+          $logFile = Join-Path $appData "native-desktop-0.13.1.log"
           New-Item -ItemType Directory -Force -Path $appData | Out-Null
           @{
             run_id = "20261012T092526Z-2"
@@ -1614,6 +1617,19 @@ jobs:
             app_version = "0.12.1-phase6-target-hotfix"
           } | ConvertTo-Json | Set-Content (Join-Path $appData "current_ui_state_version.json") -Encoding UTF8
           Remove-Item $ready,$portFile -Force -ErrorAction SilentlyContinue
+
+          # Upgrade-regression guard: simulate the stale engine folders/markers
+          # left by prior installed releases. The new launcher MUST ignore them
+          # and extract/run only native-engine-0.13.1.
+          $legacy127 = Join-Path $appData "native-engine-0.12.7"
+          New-Item -ItemType Directory -Force -Path $legacy127 | Out-Null
+          "0.12.7-phase7-official-source-diagnostics-hotfix" | Set-Content (Join-Path $legacy127 ".sre0127-ready") -Encoding ASCII
+          "raise SystemExit('STALE_0127_ENGINE_MUST_NOT_RUN')" | Set-Content (Join-Path $legacy127 "run_modern_ui.py") -Encoding ASCII
+
+          $legacy130 = Join-Path $appData "native-engine-0.13.0"
+          New-Item -ItemType Directory -Force -Path $legacy130 | Out-Null
+          "0.13.0-phase8-validation" | Set-Content (Join-Path $legacy130 ".sre0130-ready") -Encoding ASCII
+          "raise SystemExit('STALE_0130_ENGINE_MUST_NOT_RUN')" | Set-Content (Join-Path $legacy130 "run_modern_ui.py") -Encoding ASCII
 
           $env:STOCK_REAL_DATA_REPO_ROOT = "$env:SRE099_FIXTURE_ROOT"
           $desktop = Start-Process -FilePath $appExe.FullName -PassThru
@@ -1640,7 +1656,7 @@ jobs:
             }
 
             $readyLines = Get-Content $ready
-            if ($readyLines[0] -ne "0.13.0-phase8-validation") {
+            if ($readyLines[0] -ne "0.13.1-phase8-validation-startup-hotfix") {
               throw "Installed desktop runtime version mismatch: $($readyLines[0])"
             }
             $port = [int]$readyLines[1]
@@ -1649,7 +1665,7 @@ jobs:
 
             $health = Invoke-RestMethod "http://127.0.0.1:$port/api/health" -TimeoutSec 10
             if ($health.status -ne "ok") { throw "Installed app health status is not ok" }
-            if ($health.app_version -ne "0.13.0-phase8-validation") {
+            if ($health.app_version -ne "0.13.1-phase8-validation-startup-hotfix") {
               throw "Installed app backend version mismatch: $($health.app_version)"
             }
 
@@ -1665,7 +1681,7 @@ jobs:
               }
             }
             $stateMarker = Get-Content (Join-Path $appData "current_ui_state_version.json") -Raw | ConvertFrom-Json
-            if ($stateMarker.app_version -ne "0.13.0-phase8-validation") { throw "Current UI state version marker was not upgraded" }
+            if ($stateMarker.app_version -ne "0.13.1-phase8-validation-startup-hotfix") { throw "Current UI state version marker was not upgraded" }
 
             $source = Invoke-RestMethod "http://127.0.0.1:$port/api/data-source" -TimeoutSec 10
             if ($source.mode -ne "REAL_FROZEN_HISTORY") {
@@ -1764,7 +1780,7 @@ jobs:
             }
             if(!$alive){throw "Reopened installed app never reached runtime-ready"}
             $readyLines=Get-Content $ready
-            if($readyLines[0] -ne "0.13.0-phase8-validation"){throw "Reopened runtime version mismatch: $($readyLines[0])"}
+            if($readyLines[0] -ne "0.13.1-phase8-validation-startup-hotfix"){throw "Reopened runtime version mismatch: $($readyLines[0])"}
             $port=[int]$readyLines[1]
             $dash=Invoke-RestMethod "http://127.0.0.1:$port/api/dashboard" -TimeoutSec 10
             if([string]$dash.active_run.run_id -ne $expected){throw "Installed app changed active Run ID after close/reopen"}
@@ -1776,10 +1792,10 @@ jobs:
             if(!$desktop.HasExited){Start-Process -FilePath "taskkill.exe" -ArgumentList @("/PID",$desktop.Id,"/T","/F") -Wait -NoNewWindow | Out-Null}
           }
 
-      - name: Upload 0.13.0 Phase 8.1 installer and security report
+      - name: Upload 0.13.1 Phase 8.1 upgrade startup hotfix installer and security report
         uses: actions/upload-artifact@v4
         with:
-          name: SRE-0.13.0-Phase8.1-Historical-Replay-Paper-Portfolio-Setup
+          name: SRE-0.13.1-Phase8.1-Upgrade-Startup-Hotfix-Setup
           path: |
             native-desktop-0.9.1/src-tauri/target/release/bundle/nsis/*.exe
             native-desktop-0.9.1/src-tauri/target/release/bundle/nsis/installer.sha256
