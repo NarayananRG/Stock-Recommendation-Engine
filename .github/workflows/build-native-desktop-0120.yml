@@ -1,8 +1,8 @@
-name: Build SRE 0.12.0 Phase 6 Combined Prediction V2 FINAL
+name: Build SRE 0.12.1 Phase 6 Target Hotfix FINAL
 
 on:
   push:
-    branches: [ui-0.12.0-phase6-combined-prediction-v2]
+    branches: [ui-0.12.1-phase6-target-hotfix]
     paths:
       - ".ci/native098/**"
       - ".ci/native099/**"
@@ -13,6 +13,7 @@ on:
       - ".ci/native104/**"
       - ".ci/native105/**"
       - ".ci/native106/**"
+      - ".ci/native107/**"
       - ".github/workflows/build-native-desktop-0120.yml"
   workflow_dispatch:
 
@@ -44,7 +45,7 @@ jobs:
           if ($hash -ne "86dd430e933d044d08ae4637787eff52369b46b7ee1013e48af7851d9ea88fcc") { throw "Native shell hash mismatch: $hash" }
           Expand-Archive -LiteralPath $zip -DestinationPath "." -Force
 
-          Copy-Item ".ci\native106\main_dynamic_port_python.rs" "native-desktop-0.9.1\src-tauri\src\main.rs" -Force
+          Copy-Item ".ci\native107\main_dynamic_port_python.rs" "native-desktop-0.9.1\src-tauri\src\main.rs" -Force
           Copy-Item ".ci\native091\Cargo.toml" "native-desktop-0.9.1\src-tauri\Cargo.toml" -Force
 
           $main = "native-desktop-0.9.1\src-tauri\src\main.rs"
@@ -52,15 +53,15 @@ jobs:
           if ($m -notmatch 'choose_free_port') { throw "Dynamic-port launcher missing" }
           if ($m -notmatch 'health_matches') { throw "Backend-version handshake missing" }
           if ($m -match 'const PORT') { throw "Fixed desktop port must not exist in 0.9.9" }
-          if ($m -notmatch '0.12.0-phase6-combined-prediction-v2') { throw "Wrong native launcher version" }
+          if ($m -notmatch '0.12.1-phase6-target-hotfix') { throw "Wrong native launcher version" }
           if ($m -notmatch 'STOCK_MODERN_UI_PREVIEW", "0') { throw "Preview must remain disabled" }
 
           $cargo = "native-desktop-0.9.1\src-tauri\Cargo.toml"
-          (Get-Content $cargo -Raw).Replace('version = "0.9.1"','version = "0.12.0"') | Set-Content $cargo -Encoding UTF8
+          (Get-Content $cargo -Raw).Replace('version = "0.9.1"','version = "0.12.1"') | Set-Content $cargo -Encoding UTF8
 
           $pkg = "native-desktop-0.9.1\package.json"
           $j = Get-Content $pkg -Raw | ConvertFrom-Json
-          $j.version = "0.12.0"
+          $j.version = "0.12.1"
           $j | ConvertTo-Json -Depth 20 | Set-Content $pkg -Encoding UTF8
 
       - name: Reconstruct canonical engine and apply 0.9.2 and 0.9.3 overlays
@@ -1176,7 +1177,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          $branch = "ui-0.12.0-phase6-combined-prediction-v2"
+          $branch = "ui-0.12.1-phase6-target-hotfix"
           $json = gh run list --repo "$env:GITHUB_REPOSITORY" --workflow "phase6-official-market-bundle.yml" --branch $branch --limit 10 --json databaseId,status,conclusion,createdAt
           if ($LASTEXITCODE -ne 0) { throw "Unable to query Phase 6 market-data workflow" }
           $run = @($json | ConvertFrom-Json | Where-Object { $_.status -eq "completed" -and $_.conclusion -eq "success" } | Sort-Object createdAt -Descending) | Select-Object -First 1
@@ -1209,6 +1210,7 @@ jobs:
           python ".ci\native106\patch106.py"
           python ".ci\native106\patch106_api.py"
           python ".ci\native106\patch106_ui.py"
+          python ".ci\native107\patch107_ui.py"
           python -m py_compile "$env:SRE_ENGINE_ROOT\stock_app\combined_prediction_v2.py"
           python -m py_compile "$env:SRE_ENGINE_ROOT\modern_ui\api.py"
           node --check "$env:SRE_ENGINE_ROOT\modern_ui\frontend\app.js"
@@ -1216,7 +1218,7 @@ jobs:
           $js = Get-Content "$env:SRE_ENGINE_ROOT\modern_ui\frontend\app.js" -Raw
           $html = Get-Content "$env:SRE_ENGINE_ROOT\modern_ui\frontend\index.html" -Raw
           $combined = Get-Content "$env:SRE_ENGINE_ROOT\stock_app\combined_prediction_v2.py" -Raw
-          if ($api -notmatch '0.12.0-phase6-combined-prediction-v2') { throw "Phase 6 backend identity missing" }
+          if ($api -notmatch '0.12.1-phase6-target-hotfix') { throw "Phase 6 backend identity missing" }
           if ($combined -notmatch 'SRE_COMBINED_PREDICTION_V2') { throw "Combined V2 schema missing" }
           if ($combined -notmatch 'AUTHORITY = "SHADOW_ONLY"') { throw "Combined V2 authority changed" }
           if ($combined -notmatch 'target_used_in_score') { throw "Combined V2 target-independence marker missing" }
@@ -1280,7 +1282,7 @@ jobs:
         run: |
           python -m pip install --disable-pip-version-check fastapi==0.128.2 uvicorn==0.48.0 pandas numpy
           $engine="$env:SRE_ENGINE_ROOT"
-          $data="$env:RUNNER_TEMP\sre0120-fresh-appdata"
+          $data="$env:RUNNER_TEMP\sre0121-fresh-appdata"
           if(Test-Path $data){Remove-Item $data -Recurse -Force}
           $env:STOCK_MODERN_UI_PREVIEW="0"
           $env:STOCK_REAL_DATA_REPO_ROOT=$engine
@@ -1294,7 +1296,7 @@ jobs:
               try{$health=Invoke-RestMethod "http://127.0.0.1:18774/api/health" -TimeoutSec 2;if($health.status -eq "ok"){$ok=$true;break}}catch{}
             }
             if(!$ok){throw "Phase 6 fresh backend health timed out"}
-            if($health.app_version -ne "0.12.0-phase6-combined-prediction-v2"){throw "Wrong Phase 6 version"}
+            if($health.app_version -ne "0.12.1-phase6-target-hotfix"){throw "Wrong Phase 6 version"}
 
             $source=Invoke-RestMethod "http://127.0.0.1:18774/api/data-source" -TimeoutSec 20
             if($source.mode -ne "REAL_OFFICIAL_DATA"){throw "Official market bundle not active: $($source.mode)"}
@@ -1329,14 +1331,14 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path "native-desktop-0.9.1\resources" | Out-Null
-          Compress-Archive -Path "$env:SRE_ENGINE_ROOT\*" -DestinationPath "native-desktop-0.9.1\resources\SRE0120_ENGINE_SOURCE.zip" -Force
+          Compress-Archive -Path "$env:SRE_ENGINE_ROOT\*" -DestinationPath "native-desktop-0.9.1\resources\SRE0121_ENGINE_SOURCE.zip" -Force
 
           New-Item -ItemType Directory -Force -Path "native-desktop-0.9.1\src-tauri\icons" | Out-Null
           python -c "import struct,pathlib; w=h=32; px=bytes([52,211,153,255])*(w*h); mask=bytes(128); dib=struct.pack('<IIIHHIIIIII',40,w,h*2,1,32,0,len(px),0,0,0,0)+px+mask; ico=struct.pack('<HHH',0,1,1)+struct.pack('<BBBBHHII',w,h,0,0,1,32,len(dib),22)+dib; pathlib.Path(r'native-desktop-0.9.1\src-tauri\icons\icon.ico').write_bytes(ico)"
 
           $p = "native-desktop-0.9.1\src-tauri\tauri.conf.json"
           $c = Get-Content $p -Raw | ConvertFrom-Json
-          $c.version = "0.12.0"
+          $c.version = "0.12.1"
           $c.productName = "Stock Recommendation Engine"
           $c | Add-Member -NotePropertyName identifier -NotePropertyValue "com.narayananrg.stockrecommendationengine" -Force
           $c.bundle | Add-Member -NotePropertyName publisher -NotePropertyValue "NarayananRG" -Force
@@ -1347,7 +1349,7 @@ jobs:
           if (!$c.bundle.windows.nsis) { $c.bundle.windows | Add-Member -NotePropertyName nsis -NotePropertyValue ([pscustomobject]@{}) -Force }
           $c.bundle.windows.nsis | Add-Member -NotePropertyName installMode -NotePropertyValue "currentUser" -Force
           $c.bundle.targets = @("nsis")
-          $c.bundle.resources = @{"../resources/SRE0120_ENGINE_SOURCE.zip"="resources/SRE0120_ENGINE_SOURCE.zip"}
+          $c.bundle.resources = @{"../resources/SRE0121_ENGINE_SOURCE.zip"="resources/SRE0121_ENGINE_SOURCE.zip"}
           $c | ConvertTo-Json -Depth 20 | Set-Content $p -Encoding UTF8
 
       - name: Setup Node
@@ -1430,7 +1432,7 @@ jobs:
           $signing = if (Test-Path (Join-Path $dir "signing-status.txt")) { (Get-Content (Join-Path $dir "signing-status.txt") -Raw).Trim() } else { "AUTHENTICODE_SIGNING=UNKNOWN" }
           @(
             "SRE_RELEASE_SECURITY_REPORT_V1",
-            "VERSION=0.12.0-phase6-combined-prediction-v2",
+            "VERSION=0.12.1-phase6-target-hotfix",
             "SHA256=$hash",
             "DEFENDER_SCAN=$defenderStatus",
             "SIGNATURE_STATUS=$($sig.Status)",
@@ -1461,7 +1463,7 @@ jobs:
           $setup = Get-ChildItem "native-desktop-0.9.1\src-tauri\target\release\bundle\nsis\*.exe" | Select-Object -First 1
           if (!$setup) { throw "Generated installer missing before installed-app test" }
 
-          $installDir = "$env:RUNNER_TEMP\SRE0120Installed"
+          $installDir = "$env:RUNNER_TEMP\SRE0121Installed"
           if (Test-Path $installDir) { Remove-Item $installDir -Recurse -Force }
           New-Item -ItemType Directory -Force -Path $installDir | Out-Null
 
@@ -1547,7 +1549,7 @@ jobs:
             }
 
             $readyLines = Get-Content $ready
-            if ($readyLines[0] -ne "0.12.0-phase6-combined-prediction-v2") {
+            if ($readyLines[0] -ne "0.12.1-phase6-target-hotfix") {
               throw "Installed desktop runtime version mismatch: $($readyLines[0])"
             }
             $port = [int]$readyLines[1]
@@ -1556,7 +1558,7 @@ jobs:
 
             $health = Invoke-RestMethod "http://127.0.0.1:$port/api/health" -TimeoutSec 10
             if ($health.status -ne "ok") { throw "Installed app health status is not ok" }
-            if ($health.app_version -ne "0.12.0-phase6-combined-prediction-v2") {
+            if ($health.app_version -ne "0.12.1-phase6-target-hotfix") {
               throw "Installed app backend version mismatch: $($health.app_version)"
             }
 
@@ -1636,7 +1638,7 @@ jobs:
       - name: Reopen installed app and verify persistent Run ID
         shell: pwsh
         run: |
-          $appExe = Get-ChildItem "$env:RUNNER_TEMP\SRE0120Installed" -Recurse -Filter "*.exe" -ErrorAction SilentlyContinue |
+          $appExe = Get-ChildItem "$env:RUNNER_TEMP\SRE0121Installed" -Recurse -Filter "*.exe" -ErrorAction SilentlyContinue |
             Where-Object { $_.Name -notmatch "uninstall|unins|setup|updater" } |
             Sort-Object Length -Descending | Select-Object -First 1
           if (!$appExe) { throw "Installed 0.11.0 desktop EXE missing for restart test" }
@@ -1657,7 +1659,7 @@ jobs:
             }
             if(!$alive){throw "Reopened installed app never reached runtime-ready"}
             $readyLines=Get-Content $ready
-            if($readyLines[0] -ne "0.12.0-phase6-combined-prediction-v2"){throw "Reopened runtime version mismatch: $($readyLines[0])"}
+            if($readyLines[0] -ne "0.12.1-phase6-target-hotfix"){throw "Reopened runtime version mismatch: $($readyLines[0])"}
             $port=[int]$readyLines[1]
             $dash=Invoke-RestMethod "http://127.0.0.1:$port/api/dashboard" -TimeoutSec 10
             if([string]$dash.active_run.run_id -ne $expected){throw "Installed app changed active Run ID after close/reopen"}
@@ -1669,10 +1671,10 @@ jobs:
             if(!$desktop.HasExited){Start-Process -FilePath "taskkill.exe" -ArgumentList @("/PID",$desktop.Id,"/T","/F") -Wait -NoNewWindow | Out-Null}
           }
 
-      - name: Upload 0.12.0 Phase 6 installer and security report
+      - name: Upload 0.12.1 target-hotfix installer and security report
         uses: actions/upload-artifact@v4
         with:
-          name: SRE-0.12.0-Phase6-Combined-Prediction-V2-FINAL-Setup
+          name: SRE-0.12.1-First-Launch-Target-Hotfix-FINAL-Setup
           path: |
             native-desktop-0.9.1/src-tauri/target/release/bundle/nsis/*.exe
             native-desktop-0.9.1/src-tauri/target/release/bundle/nsis/installer.sha256
@@ -1681,5 +1683,5 @@ jobs:
           if-no-files-found: error
           compression-level: 0
           retention-days: 14
-# Phase 6 combined build: Overview semantics + current official NIFTY200 + Combined Prediction V2; authority remains shadow-only.
+# Phase 6.1 hotfix: first-launch desired return has no hard-coded value; recommendation authority remains unchanged.
 # retrigger Phase 6 final Windows validation after official market bundle success 2026-10-12
