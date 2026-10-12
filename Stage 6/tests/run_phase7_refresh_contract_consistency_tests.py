@@ -58,3 +58,52 @@ class Ctx:
         return {}
     def _read_daily_state(self): return {}
     def ui_run_input(self): return None
+    def latest_prediction_rows(self, limit=100): return []
+''',
+            encoding="utf-8",
+        )
+        (engine / "modern_ui/frontend/app.js").write_text(
+            "function renderPostCloseDaily(x){return x}\nfunction renderToday(d){return d}\n",
+            encoding="utf-8",
+        )
+        (engine / "modern_ui/frontend/styles.css").write_text("", encoding="utf-8")
+        env = os.environ.copy()
+        env["SRE_ENGINE_ROOT"] = str(engine)
+        subprocess.run([sys.executable, str(ROOT / ".ci/native114/patch114_refresh_contract.py")], cwd=ROOT, env=env, check=True)
+
+        sys.path.insert(0, str(engine))
+        spec = importlib.util.spec_from_file_location("api_refresh_contract", engine / "modern_ui/api.py")
+        mod = importlib.util.module_from_spec(spec)
+        assert spec and spec.loader
+        spec.loader.exec_module(mod)
+
+        official = (engine / "stock_app/official_daily_refresh.py").read_text(encoding="utf-8")
+        js = (engine / "modern_ui/frontend/app.js").read_text(encoding="utf-8")
+        policy = json.loads((engine / "phase7/refresh_contract_0127.json").read_text(encoding="utf-8"))
+
+        api_text = (engine / "modern_ui/api.py").read_text(encoding="utf-8")
+        cases: list[tuple[str, bool]] = [
+            ("contract status names", all(x in (official + api_text) for x in policy["statuses"])),
+            ("no legacy refreshed status", '"REFRESHED"' not in official and "status == \"REFRESHED \"" not in official),
+            ("verified status present", "REFRESHED_AND_VERIFIED" in official),
+            ("no automatic yfinance import", "import yfinance" not in official.lower()),
+            ("frontend source detail", "Source detail" in js and "refresh_label" in js),
+            ("blocked icon non-green", "action-ring.blocked" in (engine / "modern_ui/frontend/styles.css").read_text(encoding="utf-8")),
+        ]
+
+        stale = mod.Ctx(latest="2026-10-09").post_close_daily_status()
+        cases.extend([
+            ("stale blocked", stale["run_status"] == "BLOCKED - OFFICIAL SOURCE ERROR"),
+            ("stale not refreshed", stale["refresh_label"] == "FAILED"),
+            ("stale detail preserved", stale["source_detail"] != "UNKNOWN_OFFICIAL_SOURCE_ERROR"),
+            ("latest preserved", stale["latest_available_official_session"] == "2026-10-09"),
+        ])
+        for name, ok in cases:
+            print(f"{name}: {'PASS' if ok else 'FAIL'}")
+        return 0 if all(ok for _, ok in cases) else 1
+    finally:
+        shutil.rmtree(temp, ignore_errors=True)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
