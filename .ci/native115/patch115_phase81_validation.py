@@ -357,3 +357,127 @@ helpers = r'''    def _phase81_db_path(self) -> Path:
         return {**state, "schema": "SRE_PHASE81_PAPER_PORTFOLIO_STATUS_V1", "active": True, "label": "PROSPECTIVE PAPER TRACKING - Forward-only evidence", "journal": events, "authority": self.phase81_authority_trace()}
 
     def phase81_start_paper(self, starting_capital: float = 100000.0) -> dict[str, Any]:
+        from stock_app.phase81_validation import create_portfolio
+        gate = self._daily_data_gate()
+        return create_portfolio(self._phase81_db_path(), starting_session=str(gate.get("target_session") or gate.get("latest_official_session")), starting_capital=float(starting_capital))
+
+    def phase81_record_today(self) -> dict[str, Any]:
+        from stock_app.phase81_validation import record_daily_observation
+        status = self.phase81_paper_status()
+        if not status.get("active"):
+            status = self.phase81_start_paper(100000.0)
+        gate = self._daily_data_gate()
+        run = self.ui_run_input() or {}
+        return record_daily_observation(
+            self._phase81_db_path(),
+            portfolio_id=status["portfolio_id"],
+            market_session=str(gate.get("target_session") or gate.get("latest_official_session")),
+            production_run_id=run.get("run_id"),
+            recommendations=self.latest_prediction_rows(limit=200),
+            capital_plan={"new_buys": [], "excluded": []},
+        )
+
+'''
+s = repl(s, anchor, helpers + anchor, "phase81 helpers")
+route_anchor = '''    @app.get("/api/today")
+'''
+routes = '''    @app.get("/api/validation/authority")
+    def validation_authority() -> dict[str, Any]:
+        return ctx.phase81_authority_trace()
+
+    @app.post("/api/validation/historical-replay")
+    def validation_historical_replay(period: str = "6M", starting_capital: float = 100000.0, benchmark: str = "NIFTY 50") -> dict[str, Any]:
+        return ctx.phase81_historical_replay(period=period, starting_capital=starting_capital, benchmark=benchmark)
+
+    @app.get("/api/validation/paper-portfolio")
+    def validation_paper_status() -> dict[str, Any]:
+        return ctx.phase81_paper_status()
+
+    @app.post("/api/validation/paper-portfolio/start")
+    def validation_paper_start(starting_capital: float = 100000.0) -> dict[str, Any]:
+        return ctx.phase81_start_paper(starting_capital=starting_capital)
+
+    @app.post("/api/validation/paper-portfolio/record-today")
+    def validation_paper_record_today() -> dict[str, Any]:
+        return ctx.phase81_record_today()
+
+'''
+s = repl(s, route_anchor, routes + route_anchor, "phase81 routes")
+api.write_text(s, encoding="utf-8")
+
+html = root / "modern_ui" / "frontend" / "index.html"
+h = html.read_text(encoding="utf-8")
+if 'data-page="validation"' not in h:
+    h = h.replace('data-page="history"', 'data-page="validation"', 1).replace('>History<', '>Validation<', 1) if False else h
+    h = h.replace('</main>', '<section id="validationPage" class="page-section"><div class="page-heading compact"><div><div class="eyebrow">VALIDATION</div><h1>Validation</h1><p>Historical replay and forward-only paper tracking for the frozen production model.</p></div></div><div class="validation-tabs"><button id="validationReplayTab" class="filter-pill active">Historical Replay</button><button id="validationPaperTab" class="filter-pill">Paper Portfolio</button></div><div id="validationReplayPanel" class="panel-card"></div><div id="validationPaperPanel" class="panel-card"></div></section></main>')
+html.write_text(h, encoding="utf-8")
+
+js = root / "modern_ui" / "frontend" / "app.js"
+t = js.read_text(encoding="utf-8")
+if "loadValidation" not in t:
+    t += r'''
+
+function ensureValidationNav(){
+  if(document.querySelector('[data-page="validation"]'))return;
+  const nav=document.querySelector('.sidebar nav,.side-nav,.app-nav,nav');
+  if(!nav)return;
+  const b=document.createElement('button');
+  b.type='button'; b.className='nav-item'; b.dataset.page='validation'; b.textContent='Validation';
+  b.addEventListener('click',()=>switchPage('validation'));
+  const system=nav.querySelector('[data-page="system"]');
+  if(system)nav.insertBefore(b,system);else nav.appendChild(b);
+}
+async function runHistoricalReplay(){
+  busy(true,'Running historical replay','Frozen production rows -> Capital Plan authority -> portfolio metrics');
+  try{const r=await api('/api/validation/historical-replay?period=6M&starting_capital=100000&benchmark=NIFTY%2050',{method:'POST'});renderValidationReplay(r);toast('Historical replay complete')}catch(e){toast(e.message)}finally{busy(false)}
+}
+function renderValidationReplay(r){
+  const el=$('#validationReplayPanel'); if(!el)return; r=r||{}; const m=r.metrics||{}; const s=(r.sessions||[])[0]||{};
+  el.innerHTML=`<div class="card-label">HISTORICAL REPLAY · Not prospective evidence</div><div class="daily-flow-grid success">
+  ${[['Sessions evaluated',m.total_replayable_sessions??0],['Sessions with BUY',m.sessions_with_executable_buy??0],['BUY frequency',fmtPctFraction(m.buy_frequency||0)],['Total BUY signals',m.total_buy_signals??0],['Longest no-BUY streak',m.longest_no_buy_streak??0],['Portfolio return',fmtPctFraction(m.portfolio_return||0)],['Benchmark return',fmtPctFraction(m.benchmark_return||0)],['Excess return',fmtPctFraction(m.excess_return||0)],['Cash retained',fmtINR(s.cash_retained||100000)],['PIT status',s.pit_status||'—'],['Activity',m.activity_classification||'—']].map(([k,v])=>`<div><span>${escapeHtml(k)}</span><strong>${escapeHtml(String(v))}</strong></div>`).join('')}</div><button class="primary-btn" id="runHistoricalReplay">RUN HISTORICAL REPLAY</button>`;
+  $('#runHistoricalReplay')?.addEventListener('click',runHistoricalReplay);
+}
+async function startPaperPortfolio(){busy(true,'Starting paper portfolio','Forward-only paper ledger, no broker execution');try{await api('/api/validation/paper-portfolio/start?starting_capital=100000',{method:'POST'});await loadValidation();toast('Prospective tracking started')}catch(e){toast(e.message)}finally{busy(false)}}
+async function recordPaperToday(){busy(true,'Recording paper observation','Idempotent journal event for the active production run');try{await api('/api/validation/paper-portfolio/record-today',{method:'POST'});await loadValidation();toast('Paper observation recorded')}catch(e){toast(e.message)}finally{busy(false)}}
+function renderValidationPaper(p){
+  const el=$('#validationPaperPanel'); if(!el)return; p=p||{};
+  if(!p.active){el.innerHTML=`<div class="card-label">PROSPECTIVE PAPER TRACKING · Forward-only evidence</div><h3>Rs 100,000 Prospective Paper Portfolio</h3><p>No real money, no broker execution, WATCH is never purchased, and virtual fills use next official session open.</p><button id="startPaperPortfolio" class="primary-btn">START PROSPECTIVE TRACKING</button>`;$('#startPaperPortfolio')?.addEventListener('click',startPaperPortfolio);return}
+  const events=p.journal||[]; el.innerHTML=`<div class="card-label">PROSPECTIVE PAPER TRACKING · Forward-only evidence</div><div class="daily-flow-grid success">${[['Portfolio value',fmtINR(p.nav||p.starting_capital||100000)],['Cash',fmtINR(p.cash||0)],['Invested value',fmtINR((p.nav||0)-(p.cash||0))],['Positions',(p.positions||[]).length],['Journal events',events.length],['Total return',fmtPctFraction(((p.nav||p.starting_capital||100000)/(p.starting_capital||100000))-1)]].map(([k,v])=>`<div><span>${escapeHtml(k)}</span><strong>${escapeHtml(String(v))}</strong></div>`).join('')}</div><button id="recordPaperToday" class="secondary-btn">Record Today</button>`;
+  $('#recordPaperToday')?.addEventListener('click',recordPaperToday);
+}
+async function loadValidation(){try{const r=await api('/api/validation/historical-replay',{method:'POST'});renderValidationReplay(r)}catch{};try{renderValidationPaper(await api('/api/validation/paper-portfolio'))}catch{}}
+ensureValidationNav();
+'''
+    t = t.replace("if(page==='today')loadToday();", "if(page==='today')loadToday(); if(page==='validation')loadValidation();")
+js.write_text(t, encoding="utf-8")
+
+css = root / "modern_ui" / "frontend" / "styles.css"
+c = css.read_text(encoding="utf-8")
+if ".validation-tabs" not in c:
+    c += "\n.validation-tabs{display:flex;gap:8px;margin:8px 0 14px}.validation-tabs+.panel-card{margin-bottom:14px}\n"
+css.write_text(c, encoding="utf-8")
+
+policy = root / "phase8" / "phase81_validation_policy.json"
+policy.parent.mkdir(parents=True, exist_ok=True)
+policy.write_text("""{
+  "schema": "SRE_PHASE81_VALIDATION_POLICY_V1",
+  "release": "0.13.0-phase8-validation",
+  "purpose": "Measure frozen production model activity and paper portfolio behavior without strategy changes.",
+  "production_recommendation_authority_changed": false,
+  "production_rank_authority_changed": false,
+  "technical_v2_authority": "SHADOW_ONLY",
+  "fundamental_v3_authority": "SHADOW_ONLY",
+  "combined_v2_authority": "SHADOW_ONLY",
+  "combined_v2_target_used_in_score": false,
+  "combined_v2_promotion_allowed": false,
+  "automatic_yfinance_fallback": false,
+  "broker_execution": false,
+  "paper_execution": "NEXT_SESSION_OPEN_WHOLE_SHARES_WITH_SLIPPAGE_AND_COSTS"
+}
+""", encoding="utf-8")
+
+assert "0.13.0-phase8-validation" in api.read_text(encoding="utf-8")
+assert "phase81_historical_replay" in api.read_text(encoding="utf-8")
+assert "START PROSPECTIVE TRACKING" in js.read_text(encoding="utf-8")
+assert "import yfinance" not in module.lower()
+print("0.13.0 Phase 8.1 validation overlay applied")
