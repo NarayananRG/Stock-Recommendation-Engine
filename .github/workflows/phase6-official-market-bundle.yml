@@ -1,0 +1,81 @@
+name: Phase 6 Official NIFTY200 Market Bundle
+
+on:
+  push:
+    branches: [ui-0.12.0-phase6-combined-prediction-v2]
+    paths:
+      - ".github/workflows/phase6-official-market-bundle.yml"
+      - "NextGen Research/scripts/build_phase6_official_nifty200_bundle.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sre-phase6-official-market-bundle
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install runtime dependencies
+        run: python -m pip install --disable-pip-version-check requests
+
+      - name: Build current official NIFTY200 histories
+        env:
+          PHASE6_MARKET_OUT: ${{ runner.temp }}/phase6-market
+        run: python "NextGen Research/scripts/build_phase6_official_nifty200_bundle.py"
+
+      - name: Validate bundle contract
+        env:
+          PHASE6_MARKET_OUT: ${{ runner.temp }}/phase6-market
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import csv, json, os
+          root=Path(os.environ["PHASE6_MARKET_OUT"])/"payload"
+          m=json.loads((root/"phase6_official_market_manifest.json").read_text())
+          assert m["schema"]=="SRE_PHASE6_OFFICIAL_NIFTY200_MARKET_BUNDLE_V1",m
+          assert m["synthetic_data"] is False,m
+          assert m["automatic_yfinance_fallback"] is False,m
+          assert 190 <= m["nifty200_members"] <= 210,m
+          assert m["identity_coverage"] >= 0.98,m
+          assert m["history_coverage"] >= 0.95,m
+          assert m["acquired_sessions"] >= 450,m
+          assert m["index_rows"] >= 450,m
+          caches=list((root/"data"/"normalized"/"nse_official"/"equity_bhavcopy").glob("expanded_universe_*"))
+          assert len(caches)==1,caches
+          files=list(caches[0].glob("*.csv"))
+          equities=[p for p in files if not p.name.startswith("INDEX_")]
+          assert len(equities) >= 190,len(equities)
+          latest=m["latest_session"]
+          sample=next(p for p in equities if p.stat().st_size>1000)
+          rows=list(csv.DictReader(sample.open(encoding="utf-8")))
+          assert len(rows) >= 150,(sample,len(rows))
+          assert rows[-1]["Date"] <= latest
+          print(json.dumps(m,indent=2))
+          PY
+
+      - name: Package compact official market bundle
+        env:
+          PHASE6_MARKET_OUT: ${{ runner.temp }}/phase6-market
+        run: |
+          cd "$PHASE6_MARKET_OUT/payload"
+          zip -9 -r "$GITHUB_WORKSPACE/SRE_Phase6_Official_NIFTY200_Market.zip" .
+          cd "$GITHUB_WORKSPACE"
+          sha256sum SRE_Phase6_Official_NIFTY200_Market.zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SRE-Phase6-Official-NIFTY200-Market
+          path: SRE_Phase6_Official_NIFTY200_Market.zip
+          if-no-files-found: error
+          retention-days: 14
