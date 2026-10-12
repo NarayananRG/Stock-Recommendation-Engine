@@ -22,24 +22,29 @@ h = html.read_text(encoding="utf-8")
 
 tag_re = re.compile(r'<input\\b[^>]*\\bid=(["\\\'])oppTarget\\1[^>]*>', re.I)
 match = tag_re.search(h)
-if not match:
-    raise RuntimeError("oppTarget input missing")
-tag = match.group(0)
-tag = re.sub(r'\\s+value\\s*=\\s*(["\\\']).*?\\1', '', tag, flags=re.I)
-tag = re.sub(r'\\s+placeholder\\s*=\\s*(["\\\']).*?\\1', '', tag, flags=re.I)
-tag = tag[:-1].rstrip() + ' placeholder="Optional">'
-h = h[:match.start()] + tag + h[match.end():]
-html.write_text(h, encoding="utf-8")
+if match:
+    tag = match.group(0)
+    tag = re.sub(r'\\s+value\\s*=\\s*(["\\\']).*?\\1', '', tag, flags=re.I)
+    tag = re.sub(r'\\s+placeholder\\s*=\\s*(["\\\']).*?\\1', '', tag, flags=re.I)
+    tag = tag[:-1].rstrip() + ' placeholder="Optional">'
+    h = h[:match.start()] + tag + h[match.end():]
+    html.write_text(h, encoding="utf-8")
 
-# Contract: the shipped HTML itself must not seed any desired-return value.
-check = tag_re.search(h)
-if not check:
-    raise RuntimeError("oppTarget input disappeared")
-fixed_tag = check.group(0)
-if re.search(r'\\bvalue\\s*=', fixed_tag, re.I):
-    raise RuntimeError("oppTarget still contains a hard-coded value")
-if 'placeholder="Optional"' not in fixed_tag:
-    raise RuntimeError("oppTarget optional placeholder missing")
+    # Contract: if the legacy target input exists, it must not seed a desired return.
+    check = tag_re.search(h)
+    if not check:
+        raise RuntimeError("oppTarget input disappeared")
+    fixed_tag = check.group(0)
+    if re.search(r'\\bvalue\\s*=', fixed_tag, re.I):
+        raise RuntimeError("oppTarget still contains a hard-coded value")
+    if 'placeholder="Optional"' not in fixed_tag:
+        raise RuntimeError("oppTarget optional placeholder missing")
+else:
+    # Newer UI shells may omit the legacy target input entirely. Absence is
+    # compliant because it cannot seed an implicit desired-return target.
+    if "oppTarget" in h:
+        raise RuntimeError("oppTarget marker exists but is not the expected input")
+    fixed_tag = "<oppTarget input absent; no desired-return value seeded>"
 
 phase = root / "phase6"
 phase.mkdir(parents=True, exist_ok=True)
