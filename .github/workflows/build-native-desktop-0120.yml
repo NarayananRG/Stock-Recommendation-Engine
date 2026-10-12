@@ -14,6 +14,7 @@ on:
       - ".ci/native105/**"
       - ".ci/native106/**"
       - ".ci/native107/**"
+      - ".ci/native108/**"
       - ".github/workflows/build-native-desktop-0120.yml"
   workflow_dispatch:
 
@@ -1211,6 +1212,7 @@ jobs:
           python ".ci\native106\patch106_api.py"
           python ".ci\native106\patch106_ui.py"
           python ".ci\native107\patch107_ui.py"
+          python ".ci\native108\patch108_combined_explainability.py"
           python -m py_compile "$env:SRE_ENGINE_ROOT\stock_app\combined_prediction_v2.py"
           python -m py_compile "$env:SRE_ENGINE_ROOT\modern_ui\api.py"
           node --check "$env:SRE_ENGINE_ROOT\modern_ui\frontend\app.js"
@@ -1222,11 +1224,13 @@ jobs:
           if ($combined -notmatch 'SRE_COMBINED_PREDICTION_V2') { throw "Combined V2 schema missing" }
           if ($combined -notmatch 'AUTHORITY = "SHADOW_ONLY"') { throw "Combined V2 authority changed" }
           if ($combined -notmatch 'target_used_in_score') { throw "Combined V2 target-independence marker missing" }
+          if ($combined -notmatch 'SRE_COMBINED_V2_EXPLAINABILITY_V1') { throw "Combined V2 explainability missing" }
           if ($api -notmatch 'LEGACY_RESTORED_UNCONFIRMED') { throw "Legacy target-state protection missing" }
           if ($api -match 'latest = self.historical.get_latest_run') { throw "Historical run is still silently activated" }
           if ($js -notmatch 'TOP WATCH CANDIDATE') { throw "Watch hero semantics missing" }
           if ($js -notmatch 'NO ACTIONABLE OPPORTUNITY') { throw "No-actionable hero semantics missing" }
           if ($html -notmatch 'combinedV2Panel' -or $js -notmatch 'renderCombinedV2') { throw "Combined V2 UI missing" }
+          if ($js -notmatch 'combinedV2Explainability') { throw "Combined V2 explainability UI missing" }
           Write-Host "PHASE 6 PATCH PASS"
 
       - name: Combined V2 target-independence and authority regression
