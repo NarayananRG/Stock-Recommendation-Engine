@@ -296,7 +296,7 @@ def record_daily_observation(db_path: Path, *, portfolio_id: str, market_session
 
 api = root / "modern_ui" / "api.py"
 s = api.read_text(encoding="utf-8")
-s = s.replace('APP_VERSION = "0.12.7-phase7-official-source-diagnostics-hotfix"', 'APP_VERSION = "0.13.0-phase8-validation"')
+s = s.replace('APP_VERSION = "0.12.7-phase7-official-source-diagnostics-hotfix"', 'APP_VERSION = "0.13.1-phase8-validation-startup-hotfix"')
 anchor = '''    def latest_prediction_rows(self, limit: int = 20) -> list[dict[str, Any]]:
 '''
 helpers = r'''    def _phase81_db_path(self) -> Path:
@@ -462,7 +462,7 @@ policy = root / "phase8" / "phase81_validation_policy.json"
 policy.parent.mkdir(parents=True, exist_ok=True)
 policy.write_text("""{
   "schema": "SRE_PHASE81_VALIDATION_POLICY_V1",
-  "release": "0.13.0-phase8-validation",
+  "release": "0.13.1-phase8-validation-startup-hotfix",
   "purpose": "Measure frozen production model activity and paper portfolio behavior without strategy changes.",
   "production_recommendation_authority_changed": false,
   "production_rank_authority_changed": false,
@@ -477,7 +477,7 @@ policy.write_text("""{
 }
 """, encoding="utf-8")
 
-assert "0.13.0-phase8-validation" in api.read_text(encoding="utf-8")
+assert "0.13.1-phase8-validation-startup-hotfix" in api.read_text(encoding="utf-8")
 assert "phase81_historical_replay" in api.read_text(encoding="utf-8")
 assert "START PROSPECTIVE TRACKING" in js.read_text(encoding="utf-8")
 assert "import yfinance" not in module.lower()
