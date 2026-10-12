@@ -1177,7 +1177,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          $branch = "ui-0.12.1-phase6-target-hotfix"
+          $branch = "ui-0.12.0-phase6-combined-prediction-v2"
           $json = gh run list --repo "$env:GITHUB_REPOSITORY" --workflow "phase6-official-market-bundle.yml" --branch $branch --limit 10 --json databaseId,status,conclusion,createdAt
           if ($LASTEXITCODE -ne 0) { throw "Unable to query Phase 6 market-data workflow" }
           $run = @($json | ConvertFrom-Json | Where-Object { $_.status -eq "completed" -and $_.conclusion -eq "success" } | Sort-Object createdAt -Descending) | Select-Object -First 1
