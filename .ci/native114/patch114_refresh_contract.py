@@ -298,3 +298,103 @@ def _last_session(path: Path) -> str | None:
         return None
     dates = sorted({str(row.get("Date") or "")[:10] for row in rows if row.get("Date")})
     return dates[-1] if dates else None
+
+
+def _write_atomic(path: Path, payload: bytes) -> None:
+    tmp = path.with_name(path.name + ".sre-refresh.tmp")
+    tmp.write_bytes(payload)
+    os.replace(tmp, path)
+
+
+def refresh_official_session(cache_roots: list[str], expected_session: str) -> dict[str, Any]:
+    roots = [Path(p) for p in cache_roots if p and Path(p).exists()]
+    root = next((p for p in roots if len(list(p.glob("*.NS.csv"))) >= 190), None)
+    if root is None:
+        return _contract(expected_session=expected_session, status="LOCAL_VERIFICATION_FAILED", stage="cache_root", reason_code="OFFICIAL_CACHE_ROOT_NOT_FOUND", reason_detail="No official cache root with at least 190 *.NS.csv files was found")
+
+    stock_files = sorted(root.glob("*.NS.csv"))
+    stock_files_expected = len(stock_files)
+    try:
+        bhav_payload, bhav_meta = _download_candidates(_bhavcopy_candidates(expected_session))
+    except OfficialDataNotReady as exc:
+        return _contract(expected_session=expected_session, status="OFFICIAL_NOT_READY", stage="equity_download", reason_code="OFFICIAL_REPORT_NOT_READY", reason_detail=str(exc), stock_files_expected=stock_files_expected)
+    except Exception as exc:
+        return _contract(expected_session=expected_session, status="OFFICIAL_DOWNLOAD_FAILED", stage="equity_download", reason_code="OFFICIAL_DOWNLOAD_FAILED", reason_detail=str(exc), stock_files_expected=stock_files_expected)
+
+    try:
+        bhav_rows, bhav_parse = _parse_bhav(bhav_payload, expected_session)
+    except Exception as exc:
+        return _contract(expected_session=expected_session, status="OFFICIAL_SCHEMA_ERROR", stage="equity_parse", reason_code="OFFICIAL_BHAVCOPY_SCHEMA_ERROR", reason_detail=str(exc), source_url_or_provider=bhav_meta.get("url"), http_status=bhav_meta.get("http_status"), payload_size=bhav_meta.get("payload_size"), content_type=bhav_meta.get("content_type"), filename=bhav_meta.get("filename"), stock_files_expected=stock_files_expected)
+
+    try:
+        nifty, index_session, index_meta = _fetch_index(expected_session)
+    except OfficialDataNotReady as exc:
+        return _contract(expected_session=expected_session, status="OFFICIAL_NOT_READY", stage="index_download", reason_code="OFFICIAL_INDEX_NOT_READY", reason_detail=str(exc), source_url_or_provider=bhav_meta.get("url"), http_status=bhav_meta.get("http_status"), equity_session=bhav_parse.get("equity_session"), stock_files_expected=stock_files_expected, schema_headers=bhav_parse.get("schema_headers"))
+    except Exception as exc:
+        return _contract(expected_session=expected_session, status="OFFICIAL_INDEX_FAILED", stage="index_download", reason_code="OFFICIAL_INDEX_FAILED", reason_detail=str(exc), source_url_or_provider=bhav_meta.get("url"), http_status=bhav_meta.get("http_status"), equity_session=bhav_parse.get("equity_session"), stock_files_expected=stock_files_expected, schema_headers=bhav_parse.get("schema_headers"))
+
+    planned: list[tuple[Path, bytes]] = []
+    missing: list[str] = []
+    for path in stock_files:
+        symbol = path.name[:-7].upper() if path.name.upper().endswith(".NS.CSV") else path.stem.upper()
+        values = bhav_rows.get(symbol)
+        if values is None:
+            missing.append(symbol)
+            continue
+        try:
+            planned.append((path, _render_with_session(path, expected_session, values)))
+        except Exception as exc:
+            return _contract(expected_session=expected_session, status="LOCAL_PERSISTENCE_FAILED", stage="stage_equity", reason_code="LOCAL_MARKET_CSV_RENDER_FAILED", reason_detail=str(exc), equity_session=bhav_parse.get("equity_session"), index_session=index_session, stock_files_expected=stock_files_expected, stock_files_matched=len(planned), stock_coverage=round(len(planned) / max(1, stock_files_expected), 6), schema_headers=bhav_parse.get("schema_headers"))
+
+    matched = len(planned)
+    coverage = matched / max(1, stock_files_expected)
+    if stock_files_expected < 190 or coverage < 0.95:
+        return _contract(expected_session=expected_session, status="OFFICIAL_COVERAGE_FAILED", stage="coverage", reason_code="OFFICIAL_SESSION_COVERAGE_TOO_LOW", reason_detail=f"Matched {matched}/{stock_files_expected}; missing sample: {missing[:30]}", equity_session=bhav_parse.get("equity_session"), index_session=index_session, stock_files_expected=stock_files_expected, stock_files_matched=matched, stock_coverage=round(coverage, 6), schema_headers=bhav_parse.get("schema_headers"))
+
+    index_path = root / "INDEX_NSEI.csv"
+    if not index_path.exists():
+        return _contract(expected_session=expected_session, status="OFFICIAL_INDEX_FAILED", stage="index_cache", reason_code="OFFICIAL_INDEX_CACHE_MISSING", reason_detail=str(index_path), equity_session=bhav_parse.get("equity_session"), index_session=index_session, stock_files_expected=stock_files_expected, stock_files_matched=matched, stock_coverage=round(coverage, 6), schema_headers=bhav_parse.get("schema_headers"))
+    try:
+        planned.append((index_path, _render_with_session(index_path, expected_session, (*nifty, "0"))))
+    except Exception as exc:
+        return _contract(expected_session=expected_session, status="OFFICIAL_INDEX_FAILED", stage="stage_index", reason_code="OFFICIAL_INDEX_RENDER_FAILED", reason_detail=str(exc), equity_session=bhav_parse.get("equity_session"), index_session=index_session, stock_files_expected=stock_files_expected, stock_files_matched=matched, stock_coverage=round(coverage, 6), schema_headers=bhav_parse.get("schema_headers"))
+
+    staged_latest = [_last_session(path) for path, _ in planned[: min(5, len(planned))]]
+    if any(session and session > expected_session for session in staged_latest):
+        return _contract(expected_session=expected_session, status="LOCAL_VERIFICATION_FAILED", stage="stage_verify", reason_code="LOCAL_CACHE_HAS_FUTURE_SESSION", reason_detail=str(staged_latest), equity_session=bhav_parse.get("equity_session"), index_session=index_session, stock_files_expected=stock_files_expected, stock_files_matched=matched, stock_coverage=round(coverage, 6), schema_headers=bhav_parse.get("schema_headers"))
+
+    try:
+        for path, payload in planned:
+            _write_atomic(path, payload)
+    except Exception as exc:
+        return _contract(expected_session=expected_session, status="LOCAL_PERSISTENCE_FAILED", stage="commit", reason_code="LOCAL_ATOMIC_WRITE_FAILED", reason_detail=str(exc), equity_session=bhav_parse.get("equity_session"), index_session=index_session, stock_files_expected=stock_files_expected, stock_files_matched=matched, stock_coverage=round(coverage, 6), schema_headers=bhav_parse.get("schema_headers"))
+
+    verified = _last_session(stock_files[0]) if stock_files else None
+    verified_index = _last_session(index_path)
+    if verified != expected_session or verified_index != expected_session:
+        return _contract(expected_session=expected_session, status="LOCAL_VERIFICATION_FAILED", stage="reread", reason_code="LOCAL_REREAD_SESSION_MISMATCH", reason_detail=f"equity={verified} index={verified_index}", equity_session=bhav_parse.get("equity_session"), index_session=index_session, stock_files_expected=stock_files_expected, stock_files_matched=matched, stock_coverage=round(coverage, 6), persisted=True, verified_latest_session=verified, schema_headers=bhav_parse.get("schema_headers"))
+
+    manifest = {
+        "schema": "SRE_OFFICIAL_DAILY_REFRESH_V2",
+        "session": expected_session,
+        "source": "NSE_CM_UDIFF_AND_NIFTY50_OFFICIAL",
+        "bhavcopy_url": bhav_meta.get("url"),
+        "index_url_or_provider": index_meta.get("url") or "NSE_INDEX_API",
+        "stock_files": stock_files_expected,
+        "matched": matched,
+        "coverage": round(coverage, 6),
+        "automatic_yfinance_fallback": False,
+        "refreshed_at": datetime.now().isoformat(timespec="seconds"),
+    }
+    _write_atomic(root / ".sre_official_refresh_manifest.json", (json.dumps(manifest, indent=2) + "\n").encode("utf-8"))
+    return _contract(expected_session=expected_session, status="REFRESHED_AND_VERIFIED", stage="verified", source_url_or_provider=bhav_meta.get("url"), http_status=bhav_meta.get("http_status"), reason_code="OK", reason_detail="Official NSE equity and NIFTY 50 data persisted and reread", equity_session=bhav_parse.get("equity_session"), index_session=index_session, stock_files_expected=stock_files_expected, stock_files_matched=matched, stock_coverage=round(coverage, 6), persisted=True, verified_latest_session=expected_session, payload_size=bhav_meta.get("payload_size"), content_type=bhav_meta.get("content_type"), filename=bhav_meta.get("filename"), schema_headers=bhav_parse.get("schema_headers"))
+'''
+
+(root / "stock_app" / "official_daily_refresh.py").write_text(module, encoding="utf-8")
+
+api = root / "modern_ui" / "api.py"
+s = api.read_text(encoding="utf-8")
+daily_block = r'''    def _refresh_official_first_market_data(self) -> dict[str, Any]:
+        expected = self.expected_market_session()["expected_market_session"]
+        try:
+            before = self.data_source_status()
