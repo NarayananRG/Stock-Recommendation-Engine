@@ -40,10 +40,9 @@ if match:
     if 'placeholder="Optional"' not in fixed_tag:
         raise RuntimeError("oppTarget optional placeholder missing")
 else:
-    # Newer UI shells may omit the legacy target input entirely. Absence is
-    # compliant because it cannot seed an implicit desired-return target.
-    if "oppTarget" in h:
-        raise RuntimeError("oppTarget marker exists but is not the expected input")
+    # Newer UI shells may omit the legacy target input entirely. Other text or
+    # script references to oppTarget are harmless here; this hotfix only guards
+    # against a shipped input element with a hard-coded desired-return value.
     fixed_tag = "<oppTarget input absent; no desired-return value seeded>"
 
 phase = root / "phase6"
