@@ -498,3 +498,103 @@ daily_block = r'''    def _refresh_official_first_market_data(self) -> dict[str,
             "freshness_gate": freshness_gate,
             "official_mode": source.get("mode") == "REAL_OFFICIAL_DATA",
             "analysis_data_current": ready,
+            "universe_coverage": active.get("history_coverage"),
+            "identity_coverage": active.get("identity_coverage"),
+            "ready": ready,
+            "blocked_reason": blocked,
+            "refresh_error_detail": detail,
+            "refresh_status": refresh,
+        }
+
+'''
+s = replace_between(s, "    def _refresh_official_first_market_data", "    def post_close_daily_status", daily_block, "daily refresh gate")
+
+status_block = r'''    def post_close_daily_status(self) -> dict[str, Any]:
+        gate = self._daily_data_gate()
+        state = self._read_daily_state()
+        latest_success = state.get("last_successful_run")
+        refresh_result = ((gate.get("refresh_status") or {}).get("refresh_result") or {})
+        refresh_status = str(refresh_result.get("status") or "")
+        if refresh_status in {"REFRESHED_AND_VERIFIED"}:
+            refresh_label = "REFRESHED & VERIFIED"
+        elif refresh_status == "ALREADY_CURRENT":
+            refresh_label = "ALREADY CURRENT"
+        elif refresh_status == "OFFICIAL_NOT_READY":
+            refresh_label = "NOT READY"
+        elif refresh_status:
+            refresh_label = "FAILED"
+        else:
+            refresh_label = "UNKNOWN"
+        source_detail = refresh_result.get("reason_detail") or gate.get("refresh_error_detail") or "No official refresh detail was returned"
+        if refresh_status in {"REFRESHED_AND_VERIFIED", "ALREADY_CURRENT"}:
+            source_detail = f"NSE OFFICIAL - {refresh_result.get('verified_latest_session') or gate.get('latest_official_session') or gate.get('target_session')}"
+        return {
+            "schema": "SRE_POST_CLOSE_DAILY_FLOW_STATUS_V2",
+            "authority": "FROZEN_PRODUCTION_RECOMMENDATIONS_UNCHANGED",
+            "current_calendar_date": gate.get("current_calendar_date"),
+            "expected_market_session": gate.get("expected_market_session"),
+            "target_session": gate["target_session"],
+            "latest_available_official_session": gate["latest_official_session"],
+            "active_analysis_session": None if not self.ui_run_input() else self.ui_run_input().get("market_session"),
+            "data_freshness": gate["data_freshness"],
+            "freshness_gate": gate["freshness_gate"],
+            "universe_coverage": gate["universe_coverage"],
+            "identity_coverage": gate["identity_coverage"],
+            "run_status": "READY" if gate["ready"] else ("BLOCKED - OFFICIAL SOURCE ERROR" if gate.get("blocked_reason") == "OFFICIAL_SOURCE_ERROR" else "BLOCKED - OFFICIAL DATA NOT READY"),
+            "recommendation_count": len(self.latest_prediction_rows(limit=100)),
+            "executable_count": len([x for x in self.latest_prediction_rows(limit=100) if x.get("executable")]),
+            "shadow_analysis_status": "Technical V2/Fundamental V3/Combined V2 remain SHADOW_ONLY",
+            "validation_snapshot_status": "SUPPORTED_WHEN_MONITORING_ROWS_EXIST",
+            "last_successful_daily_run": latest_success,
+            "last_result": state.get("last_result"),
+            "refresh_label": refresh_label,
+            "source_detail": source_detail,
+            "refresh_error_detail": gate.get("refresh_error_detail"),
+            "refresh_status": gate.get("refresh_status"),
+            "no_yfinance": True,
+            "automatic_yfinance_fallback": False,
+        }
+
+'''
+s = replace_between(s, "    def post_close_daily_status", "    def run_post_close_daily_flow", status_block, "daily status")
+api.write_text(s, encoding="utf-8")
+
+js = root / "modern_ui" / "frontend" / "app.js"
+t = js.read_text(encoding="utf-8")
+t = replace_between(
+    t,
+    "function renderPostCloseDaily",
+    "function renderToday",
+    """function renderPostCloseDaily(x){const el=$('#postCloseDailyStatus');if(!el)return;x=x||{};const last=x.last_successful_daily_run||{};const blocked=String(x.run_status||'').startsWith('BLOCKED');const error=String(x.run_status||'').includes('SOURCE ERROR')||String(x.refresh_label||'').includes('FAILED');const cls=error?'error':(blocked?'blocked':(String(x.freshness_gate||'')==='PASS'?'success':'idle'));const ring=document.querySelector('.today-banner .action-ring');if(ring){ring.classList.remove('success','blocked','error','idle');ring.classList.add(cls);const span=ring.querySelector('span');if(span)span.textContent=cls==='success'?'✓':(cls==='error'?'!':(cls==='blocked'?'!':'•'))}el.className='daily-flow-grid '+cls;el.innerHTML=[['Current date',x.current_calendar_date||'—'],['Expected session',x.expected_market_session||x.target_session||'—'],['Latest official session',x.latest_available_official_session||'—'],['Active analysis session',x.active_analysis_session||'—'],['Data freshness',(x.freshness_gate||'—')+' / '+(x.data_freshness||'—')],['Run status',x.run_status||'—'],['Refresh',x.refresh_label||'—'],['Source detail',x.source_detail||x.refresh_error_detail||'—'],['Recommendations',String((blocked?'previous ':'')+(x.recommendation_count??0))],['Executable',String((blocked?'previous ':'')+(x.executable_count??0))],['Shadow analysis',x.shadow_analysis_status||'—'],['Validation snapshot',x.validation_snapshot_status||'—'],['Last successful run',last.run_id?last.run_id+' · '+(last.market_session||'—'):'—']].map(([k,v])=>`<div><span>${escapeHtml(k)}</span><strong>${escapeHtml(String(v))}</strong></div>`).join('')}
+""",
+    "post-close renderer",
+)
+js.write_text(t, encoding="utf-8")
+css = root / "modern_ui" / "frontend" / "styles.css"
+c = css.read_text(encoding="utf-8")
+if ".daily-flow-grid.error" not in c:
+    c += """
+.action-ring.success{background:rgba(15,118,110,.12);color:#0f766e}.action-ring.blocked{background:rgba(217,119,6,.14);color:#b45309}.action-ring.error{background:rgba(185,28,28,.12);color:#b91c1c}.action-ring.idle{background:rgba(100,116,139,.12);color:#64748b}
+.daily-flow-grid.blocked>div{border-color:rgba(217,119,6,.28);background:rgba(254,243,199,.34)}.daily-flow-grid.error>div{border-color:rgba(185,28,28,.24);background:rgba(254,226,226,.36)}.daily-flow-grid.success>div{border-color:rgba(15,118,110,.22);background:rgba(204,251,241,.26)}
+"""
+css.write_text(c, encoding="utf-8")
+
+policy = root / "phase7" / "refresh_contract_0127.json"
+policy.write_text("""{
+  "schema": "SRE_PHASE7_REFRESH_CONTRACT_0127",
+  "release": "0.12.7-phase7-official-source-diagnostics-hotfix",
+  "statuses": [
+    "ALREADY_CURRENT",
+    "REFRESHED_AND_VERIFIED",
+    "OFFICIAL_NOT_READY",
+    "OFFICIAL_DOWNLOAD_FAILED",
+    "OFFICIAL_SCHEMA_ERROR",
+    "OFFICIAL_COVERAGE_FAILED",
+    "OFFICIAL_INDEX_FAILED",
+    "LOCAL_PERSISTENCE_FAILED",
+    "LOCAL_VERIFICATION_FAILED"
+  ],
+  "refreshed_and_verified_requires_latest_equals_expected": true,
+  "partial_update_safety": "stage_then_atomic_write_no_equity_commit_before_index",
+  "automatic_yfinance_fallback": false,
+  "production_recommendation_authority_changed": false,
