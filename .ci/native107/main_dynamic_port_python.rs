@@ -183,7 +183,7 @@ fn main() {
             let resource_dir = app.path().resource_dir()?;
             let zip_path = resource_dir
                 .join("resources")
-                .join("SRE0120_ENGINE_SOURCE.zip");
+                .join("SRE0121_ENGINE_SOURCE.zip");
 
             let local_base = std::env::var_os("LOCALAPPDATA")
                 .map(PathBuf::from)
@@ -193,7 +193,7 @@ fn main() {
                         .unwrap_or_else(|_| PathBuf::from("."))
                 });
             let shared_app_data = local_base.join("StockRecommendationEngine");
-            let engine_root = shared_app_data.join("native-engine-0.12.0");
+            let engine_root = shared_app_data.join("native-engine-0.12.1");
 
             thread::spawn(move || {
                 let result: Result<(), String> = (|| {
@@ -205,7 +205,7 @@ fn main() {
                     let _ = fs::remove_file(&runtime_port);
                     let _ = fs::remove_file(&runtime_ready);
 
-                    let log_path = shared_app_data.join("native-desktop-0.12.0.log");
+                    let log_path = shared_app_data.join("native-desktop-0.12.1.log");
                     let stdout = fs::File::create(&log_path)
                         .map_err(|e| format!("Cannot create startup log: {e}"))?;
                     let stderr = stdout.try_clone().map_err(|e| e.to_string())?;
