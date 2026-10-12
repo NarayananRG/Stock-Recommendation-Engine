@@ -16,7 +16,7 @@ use tauri::Manager;
 #[cfg(target_os = "windows")]
 use std::os::windows::process::CommandExt;
 
-const APP_VERSION: &str = "0.12.3-phase7-daily-flow-ui-hotfix";
+const APP_VERSION: &str = "0.12.4-phase7-session-freshness-windows-hardening";
 const CREATE_NO_WINDOW: u32 = 0x08000000;
 
 fn copy_dir_all(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> io::Result<()> {
@@ -193,7 +193,7 @@ fn main() {
                         .unwrap_or_else(|_| PathBuf::from("."))
                 });
             let shared_app_data = local_base.join("StockRecommendationEngine");
-            let engine_root = shared_app_data.join("native-engine-0.12.3");
+            let engine_root = shared_app_data.join("native-engine-0.12.4");
 
             thread::spawn(move || {
                 let result: Result<(), String> = (|| {
@@ -205,7 +205,7 @@ fn main() {
                     let _ = fs::remove_file(&runtime_port);
                     let _ = fs::remove_file(&runtime_ready);
 
-                    let log_path = shared_app_data.join("native-desktop-0.12.3.log");
+                    let log_path = shared_app_data.join("native-desktop-0.12.4.log");
                     let stdout = fs::File::create(&log_path)
                         .map_err(|e| format!("Cannot create startup log: {e}"))?;
                     let stderr = stdout.try_clone().map_err(|e| e.to_string())?;
