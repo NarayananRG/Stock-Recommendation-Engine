@@ -84,7 +84,7 @@ class Ctx:
         api_text = (engine / "modern_ui/api.py").read_text(encoding="utf-8")
         cases: list[tuple[str, bool]] = [
             ("contract status names", all(x in (official + api_text) for x in policy["statuses"])),
-            ("no legacy refreshed status", '"REFRESHED"' not in official and "status == \"REFRESHED \"" not in official),
+            ("no legacy refreshed status", '"REFRESHED"' not in official and "status == \"REFRESHED\"" not in official),
             ("verified status present", "REFRESHED_AND_VERIFIED" in official),
             ("no automatic yfinance import", "import yfinance" not in official.lower()),
             ("frontend source detail", "Source detail" in js and "refresh_label" in js),
