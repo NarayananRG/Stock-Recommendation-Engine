@@ -237,4 +237,123 @@ def create_portfolio(db_path: Path, *, starting_session: str, starting_capital: 
         "portfolio_id": portfolio_id,
         "created_at": created,
         "starting_session": starting_session,
-        "starting_capital": starting_capital,
+        "starting_capital": starting_capital,        "cash": starting_capital,
+        "positions": [],
+        "nav": starting_capital,
+        "realized_pnl": 0.0,
+        "unrealized_pnl": 0.0,
+        "status": "ACTIVE",
+        "authority": AUTHORITY,
+    }
+    with connect(db_path) as con:
+        con.execute("insert or ignore into paper_portfolios values (?,?,?,?,?)", (portfolio_id, created, starting_session, starting_capital, json.dumps(state, sort_keys=True)))
+    return state
+
+
+def record_daily_observation(db_path: Path, *, portfolio_id: str, market_session: str, production_run_id: str | None, recommendations: list[dict[str, Any]], capital_plan: dict[str, Any] | None = None, benchmark_value: float | None = None) -> dict[str, Any]:
+    executable = [r for r in recommendations if is_executable(r)]
+    decision = "CASH / NO EXECUTABLE BUY" if not executable else "SIGNAL_GENERATED"
+    event = {
+        "schema": "SRE_PHASE81_PROSPECTIVE_JOURNAL_EVENT_V1",
+        "portfolio_id": portfolio_id,
+        "market_session": market_session,
+        "production_run_id": production_run_id,
+        "created_at": datetime.now().isoformat(timespec="seconds"),
+        "model_identity": "FROZEN_PRODUCTION_MODEL",
+        "official_data_provenance": "OFFICIAL_FIRST",
+        "recommendations_observed": len(recommendations),
+        "executable_buys": len(executable),
+        "capital_plan": capital_plan or {"new_buys": [], "excluded": []},
+        "orders_simulated": [],
+        "positions_before": [],
+        "positions_after": [],
+        "cash_before": 100000.0,
+        "cash_after": 100000.0,
+        "nav": 100000.0,
+        "benchmark_value": benchmark_value,
+        "reason": decision,
+        "decision": decision,
+        "automatic_yfinance_fallback": False,
+        "broker_execution": False,
+    }
+    event_id = stable_id("SRE81EVT", event)
+    event["journal_event_id"] = event_id
+    event["integrity_hash"] = hashlib.sha256(json.dumps(event, sort_keys=True, default=str).encode("utf-8")).hexdigest()
+    with connect(db_path) as con:
+        try:
+            con.execute("insert into paper_journal values (?,?,?,?,?,?)", (event_id, portfolio_id, market_session, production_run_id, event["created_at"], json.dumps(event, sort_keys=True)))
+            duplicate = False
+        except sqlite3.IntegrityError:
+            row = con.execute("select event_json from paper_journal where portfolio_id=? and market_session=? and production_run_id is ?", (portfolio_id, market_session, production_run_id)).fetchone()
+            event = json.loads(row[0]) if row else event
+            duplicate = True
+    event["duplicate"] = duplicate
+    return event
+'''
+
+(root / "stock_app" / "phase81_validation.py").write_text(module, encoding="utf-8")
+
+api = root / "modern_ui" / "api.py"
+s = api.read_text(encoding="utf-8")
+s = s.replace('APP_VERSION = "0.12.7-phase7-official-source-diagnostics-hotfix"', 'APP_VERSION = "0.13.0-phase8-validation"')
+anchor = '''    def latest_prediction_rows(self, limit: int = 20) -> list[dict[str, Any]]:
+'''
+helpers = r'''    def _phase81_db_path(self) -> Path:
+        return self.config.app_data_dir / "phase81_validation.sqlite3"
+
+    def phase81_authority_trace(self) -> dict[str, Any]:
+        from stock_app.phase81_validation import AUTHORITY
+        return {**AUTHORITY, "backend_version": APP_VERSION}
+
+    def phase81_historical_replay(self, period: str = "6M", starting_capital: float = 100000.0, benchmark: str = "NIFTY 50") -> dict[str, Any]:
+        from stock_app.phase81_validation import ExecutionAssumptions, replay_metrics, session_summary, stable_id
+        gate = self._daily_data_gate()
+        assumptions = ExecutionAssumptions(starting_capital=float(starting_capital), benchmark=benchmark)
+        rows = self.latest_prediction_rows(limit=200)
+        run = self.ui_run_input()
+        session = gate.get("latest_official_session") or gate.get("target_session")
+        source = gate.get("source") or {}
+        summary = session_summary(
+            str(session or "UNKNOWN"),
+            rows,
+            capital_plan={"new_buys": [], "excluded": []},
+            assumptions=assumptions,
+            pit_status="FULL_PIT_VALID" if gate.get("ready") else "PIT_DATA_INCOMPLETE",
+            model_identity=APP_VERSION,
+            source_identity={"mode": source.get("mode"), "latest_official_session": gate.get("latest_official_session")},
+        )
+        metrics = replay_metrics([summary], nav=[float(starting_capital), float(summary["portfolio_nav"])], benchmark_nav=[float(starting_capital), float(starting_capital)])
+        result = {
+            "schema": "SRE_PHASE81_HISTORICAL_REPLAY_RESULT_V1",
+            "label": "HISTORICAL REPLAY - Not prospective evidence",
+            "period": period,
+            "date_range": {"end": session, "requested": period},
+            "replay_id": stable_id("SRE81REPLAY", {"period": period, "capital": starting_capital, "benchmark": benchmark, "session": session, "version": APP_VERSION}),
+            "status": "COMPLETED_WITH_AVAILABLE_PIT_WINDOW",
+            "pit_audit": {
+                "default_window_note": "Only sessions with PIT-safe production inputs are replayable. Missing historical PIT fundamentals are not backfilled from current data.",
+                "largest_trustworthy_window": "current accepted official session" if gate.get("ready") else "none",
+            },
+            "assumptions": summary["assumptions"],
+            "sessions": [summary],
+            "metrics": metrics,
+            "authority": self.phase81_authority_trace(),
+            "automatic_yfinance_fallback": False,
+            "broker_execution": False,
+        }
+        from stock_app.phase81_validation import connect
+        with connect(self._phase81_db_path()) as con:
+            con.execute("insert or replace into replay_runs values (?,?,?,?)", (result["replay_id"], datetime.now().isoformat(timespec="seconds"), json.dumps({"period": period, "starting_capital": starting_capital, "benchmark": benchmark}, sort_keys=True), json.dumps(result, sort_keys=True)))
+        return result
+
+    def phase81_paper_status(self) -> dict[str, Any]:
+        from stock_app.phase81_validation import connect
+        with connect(self._phase81_db_path()) as con:
+            row = con.execute("select state_json from paper_portfolios order by created_at desc limit 1").fetchone()
+            events = [json.loads(x[0]) for x in con.execute("select event_json from paper_journal order by created_at desc limit 50").fetchall()]
+        if not row:
+            return {"schema": "SRE_PHASE81_PAPER_PORTFOLIO_STATUS_V1", "active": False, "label": "PROSPECTIVE PAPER TRACKING - Forward-only evidence", "starting_capital": 100000.0, "authority": self.phase81_authority_trace()}
+        state = json.loads(row[0])
+        return {**state, "schema": "SRE_PHASE81_PAPER_PORTFOLIO_STATUS_V1", "active": True, "label": "PROSPECTIVE PAPER TRACKING - Forward-only evidence", "journal": events, "authority": self.phase81_authority_trace()}
+
+    def phase81_start_paper(self, starting_capital: float = 100000.0) -> dict[str, Any]:
