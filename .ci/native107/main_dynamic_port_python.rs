@@ -16,7 +16,7 @@ use tauri::Manager;
 #[cfg(target_os = "windows")]
 use std::os::windows::process::CommandExt;
 
-const APP_VERSION: &str = "0.12.4-phase7-session-freshness-windows-hardening";
+const APP_VERSION: &str = "0.12.5-phase7-official-daily-refresh-hotfix";
 const CREATE_NO_WINDOW: u32 = 0x08000000;
 
 fn copy_dir_all(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> io::Result<()> {
