@@ -118,3 +118,123 @@ def session_summary(
         "assumptions": asdict(assumptions),
         "authority": AUTHORITY,
     }
+
+
+def next_open_fill(signal_session: str, next_session: str, open_price: float, side: str, assumptions: ExecutionAssumptions | None = None) -> dict[str, Any]:
+    assumptions = assumptions or ExecutionAssumptions()
+    if next_session <= signal_session:
+        raise ValueError("POST_CLOSE_SIGNAL_REQUIRES_NEXT_SESSION_OPEN")
+    sign = 1 if side.upper() == "BUY" else -1
+    slippage = float(open_price) * float(assumptions.slippage_bps) / 10000.0
+    cost = float(open_price) * float(assumptions.transaction_cost_bps) / 10000.0
+    fill = float(open_price) + sign * slippage
+    return {
+        "signal_session": signal_session,
+        "fill_session": next_session,
+        "timing": "NEXT_SESSION_OPEN",
+        "side": side.upper(),
+        "open_price": round(float(open_price), 6),
+        "slippage_per_share": round(slippage, 6),
+        "cost_per_share": round(cost, 6),
+        "fill_price": round(fill, 6),
+        "net_price": round(fill + cost if sign > 0 else fill - cost, 6),
+        "broker_execution": False,
+    }
+
+
+def whole_share_quantity(cash: float, price: float, assumptions: ExecutionAssumptions | None = None) -> int:
+    assumptions = assumptions or ExecutionAssumptions()
+    if price <= 0:
+        return 0
+    effective = price * (1 + (assumptions.slippage_bps + assumptions.transaction_cost_bps) / 10000.0)
+    return int(max(0.0, cash) // effective)
+
+
+def max_drawdown(values: list[float]) -> float:
+    peak = None
+    worst = 0.0
+    for value in values:
+        value = float(value)
+        peak = value if peak is None else max(peak, value)
+        if peak and peak > 0:
+            worst = min(worst, (value - peak) / peak)
+    return round(worst, 6)
+
+
+def replay_metrics(sessions: list[dict[str, Any]], nav: list[float] | None = None, benchmark_nav: list[float] | None = None) -> dict[str, Any]:
+    replayable = [s for s in sessions if str(s.get("pit_status")) in {"FULL_PIT_VALID", "PIT_VALID_WITH_MISSING_OPTIONAL_DATA"}]
+    buy_sessions = [s for s in replayable if int(s.get("executable_buy_count") or 0) > 0]
+    streak = 0
+    longest = 0
+    total_buys = 0
+    cash_pct = []
+    deployed_pct = []
+    for s in replayable:
+        buys = int(s.get("executable_buy_count") or 0)
+        total_buys += buys
+        if buys:
+            streak = 0
+        else:
+            streak += 1
+            longest = max(longest, streak)
+        nav_value = float(s.get("portfolio_nav") or 100000.0)
+        cash = float(s.get("cash_retained") or 0.0)
+        deployed = float(s.get("capital_deployed") or 0.0)
+        if nav_value > 0:
+            cash_pct.append(cash / nav_value)
+            deployed_pct.append(deployed / nav_value)
+    nav = nav or [100000.0]
+    benchmark_nav = benchmark_nav or [100000.0]
+    portfolio_return = (nav[-1] - nav[0]) / nav[0] if len(nav) > 1 and nav[0] else 0.0
+    benchmark_return = (benchmark_nav[-1] - benchmark_nav[0]) / benchmark_nav[0] if len(benchmark_nav) > 1 and benchmark_nav[0] else 0.0
+    buy_frequency = len(buy_sessions) / len(replayable) if replayable else 0.0
+    if buy_frequency == 0:
+        activity = "HIGHLY_RESTRICTIVE"
+    elif buy_frequency < 0.10:
+        activity = "LOW_ACTIVITY"
+    else:
+        activity = "NORMAL_ACTIVITY"
+    return {
+        "schema": "SRE_PHASE81_REPLAY_METRICS_V1",
+        "total_replayable_sessions": len(replayable),
+        "sessions_with_executable_buy": len(buy_sessions),
+        "buy_frequency": round(buy_frequency, 6),
+        "average_executable_buys_per_active_session": round(total_buys / len(buy_sessions), 6) if buy_sessions else 0.0,
+        "total_buy_signals": total_buys,
+        "longest_no_buy_streak": longest,
+        "average_cash_pct": round(sum(cash_pct) / len(cash_pct), 6) if cash_pct else 0.0,
+        "average_capital_deployed_pct": round(sum(deployed_pct) / len(deployed_pct), 6) if deployed_pct else 0.0,
+        "maximum_capital_deployed_pct": round(max(deployed_pct), 6) if deployed_pct else 0.0,
+        "portfolio_return": round(portfolio_return, 6),
+        "benchmark_return": round(benchmark_return, 6),
+        "excess_return": round(portfolio_return - benchmark_return, 6),
+        "maximum_drawdown": max_drawdown(nav),
+        "benchmark_max_drawdown": max_drawdown(benchmark_nav),
+        "activity_classification": activity,
+    }
+
+
+def connect(db_path: Path) -> sqlite3.Connection:
+    db_path.parent.mkdir(parents=True, exist_ok=True)
+    con = sqlite3.connect(db_path)
+    con.execute("create table if not exists replay_runs (replay_id text primary key, created_at text not null, config_json text not null, result_json text not null)")
+    con.execute("create table if not exists paper_portfolios (portfolio_id text primary key, created_at text not null, starting_session text not null, starting_capital real not null, state_json text not null)")
+    con.execute("create table if not exists paper_journal (event_id text primary key, portfolio_id text not null, market_session text not null, production_run_id text, created_at text not null, event_json text not null)")
+    con.execute("create unique index if not exists idx_paper_journal_idempotency on paper_journal(portfolio_id, market_session, production_run_id)")
+    return con
+
+
+def stable_id(prefix: str, payload: dict[str, Any]) -> str:
+    raw = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return prefix + "_" + hashlib.sha256(raw).hexdigest()[:16]
+
+
+def create_portfolio(db_path: Path, *, starting_session: str, starting_capital: float = 100000.0) -> dict[str, Any]:
+    created = datetime.now().isoformat(timespec="seconds")
+    payload = {"starting_session": starting_session, "starting_capital": starting_capital, "created_at": created}
+    portfolio_id = stable_id("SRE81PAPER", payload)
+    state = {
+        "portfolio_id": portfolio_id,
+        "created_at": created,
+        "starting_session": starting_session,
+        "starting_capital": starting_capital,
