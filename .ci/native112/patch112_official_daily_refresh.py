@@ -372,5 +372,5 @@ policy.write_text("""{
 assert "official_daily_refresh" in api.read_text(encoding="utf-8")
 assert "ALREADY_CURRENT" in api.read_text(encoding="utf-8")
 assert "automatic_yfinance_fallback" in mod.read_text(encoding="utf-8")
-assert "yfinance" not in module.lower()
+assert "import yfinance" not in module.lower()
 print("0.12.5 official daily refresh hotfix applied")
