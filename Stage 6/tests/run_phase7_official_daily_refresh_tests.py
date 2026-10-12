@@ -61,14 +61,14 @@ def last_date(path: Path) -> str:
 def run_success_case() -> None:
     with tempfile.TemporaryDirectory() as td:
         cache = make_cache(Path(td))
-        original_request = mod._request
+        original_download = mod._download_candidates
         original_index = mod._fetch_index
         try:
-            mod._request = lambda url, timeout=35: make_bhav()
+            mod._download_candidates = lambda urls, timeout=40: (make_bhav(), urls[0])
             mod._fetch_index = lambda session: ("25100", "25300", "25000", "25250")
             result = mod.refresh_official_session([str(cache)], "2026-10-12")
         finally:
-            mod._request = original_request
+            mod._download_candidates = original_download
             mod._fetch_index = original_index
         assert result["status"] == "REFRESHED", result
         assert result["matched"] == 200, result
@@ -82,14 +82,14 @@ def run_success_case() -> None:
 def run_not_ready_case() -> None:
     with tempfile.TemporaryDirectory() as td:
         cache = make_cache(Path(td))
-        original_request = mod._request
+        original_download = mod._download_candidates
         try:
-            def not_ready(url, timeout=35):
+            def not_ready(urls, timeout=40):
                 raise mod.OfficialDataNotReady("OFFICIAL_REPORT_NOT_READY")
-            mod._request = not_ready
+            mod._download_candidates = not_ready
             result = mod.refresh_official_session([str(cache)], "2026-10-12")
         finally:
-            mod._request = original_request
+            mod._download_candidates = original_download
         assert result["status"] == "NOT_READY", result
         assert last_date(cache / "STK001.NS.csv") == "2026-10-09"
 
@@ -97,14 +97,14 @@ def run_not_ready_case() -> None:
 def run_coverage_case() -> None:
     with tempfile.TemporaryDirectory() as td:
         cache = make_cache(Path(td))
-        original_request = mod._request
+        original_download = mod._download_candidates
         original_index = mod._fetch_index
         try:
-            mod._request = lambda url, timeout=35: make_bhav(180)
+            mod._download_candidates = lambda urls, timeout=40: (make_bhav(180), urls[0])
             mod._fetch_index = lambda session: ("25100", "25300", "25000", "25250")
             result = mod.refresh_official_session([str(cache)], "2026-10-12")
         finally:
-            mod._request = original_request
+            mod._download_candidates = original_download
             mod._fetch_index = original_index
         assert result["status"] == "ERROR", result
         assert result["reason"] == "OFFICIAL_SESSION_COVERAGE_TOO_LOW", result
