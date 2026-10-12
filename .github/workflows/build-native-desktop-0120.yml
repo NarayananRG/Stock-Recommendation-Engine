@@ -61,7 +61,7 @@ jobs:
 
           $main = "native-desktop-0.9.1\src-tauri\src\main.rs"
           $m = Get-Content $main -Raw
-          $m = $m.Replace("0.13.0-phase8-validation", "0.13.0-phase8-validation")
+          $m = $m.Replace("0.12.7-phase7-official-source-diagnostics-hotfix", "0.13.0-phase8-validation")
           Set-Content $main $m -Encoding UTF8
           if ($m -notmatch 'choose_free_port') { throw "Dynamic-port launcher missing" }
           if ($m -notmatch 'health_matches') { throw "Backend-version handshake missing" }
