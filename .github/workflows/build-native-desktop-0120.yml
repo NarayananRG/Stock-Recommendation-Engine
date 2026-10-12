@@ -20,7 +20,9 @@ on:
       - ".ci/native111/**"
       - ".ci/native112/**"
       - ".ci/native113/**"
+      - ".ci/native114/**"
       - "Stage 6/tests/run_phase7_official_daily_refresh_tests.py"
+      - "Stage 6/tests/run_phase7_refresh_contract_consistency_tests.py"
       - ".github/workflows/build-native-desktop-0120.yml"
   workflow_dispatch:
 
@@ -1214,19 +1216,26 @@ jobs:
       - name: Apply Phase 6 Combined Prediction V2 and Overview fixes
         shell: pwsh
         run: |
-          python ".ci\native106\patch106.py"
-          python ".ci\native106\patch106_api.py"
-          python ".ci\native106\patch106_ui.py"
-          python ".ci\native107\patch107_ui.py"
-          python ".ci\native108\patch108_combined_explainability.py"
-          python ".ci\native109\patch109_first_launch_state.py"
-          python ".ci\native110\patch110_daily_flow_ui.py"
-          python ".ci\native111\patch111_session_freshness_windows.py"
-          python ".ci\native112\patch112_official_daily_refresh.py"
-          python ".ci\native113\patch113_official_source_diagnostics.py"
-          python -m py_compile "$env:SRE_ENGINE_ROOT\stock_app\combined_prediction_v2.py"
-          python -m py_compile "$env:SRE_ENGINE_ROOT\modern_ui\api.py"
+          $ErrorActionPreference = "Stop"
+          function Invoke-CheckedPython {
+            python @args
+            if ($LASTEXITCODE -ne 0) { throw "python failed: $($args -join ' ')" }
+          }
+          Invoke-CheckedPython ".ci\native106\patch106.py"
+          Invoke-CheckedPython ".ci\native106\patch106_api.py"
+          Invoke-CheckedPython ".ci\native106\patch106_ui.py"
+          Invoke-CheckedPython ".ci\native107\patch107_ui.py"
+          Invoke-CheckedPython ".ci\native108\patch108_combined_explainability.py"
+          Invoke-CheckedPython ".ci\native109\patch109_first_launch_state.py"
+          Invoke-CheckedPython ".ci\native110\patch110_daily_flow_ui.py"
+          Invoke-CheckedPython ".ci\native111\patch111_session_freshness_windows.py"
+          Invoke-CheckedPython ".ci\native112\patch112_official_daily_refresh.py"
+          Invoke-CheckedPython ".ci\native113\patch113_official_source_diagnostics.py"
+          Invoke-CheckedPython ".ci\native114\patch114_refresh_contract.py"
+          Invoke-CheckedPython -m py_compile "$env:SRE_ENGINE_ROOT\stock_app\combined_prediction_v2.py"
+          Invoke-CheckedPython -m py_compile "$env:SRE_ENGINE_ROOT\modern_ui\api.py"
           node --check "$env:SRE_ENGINE_ROOT\modern_ui\frontend\app.js"
+          if ($LASTEXITCODE -ne 0) { throw "node --check failed" }
           $api = Get-Content "$env:SRE_ENGINE_ROOT\modern_ui\api.py" -Raw
           $js = Get-Content "$env:SRE_ENGINE_ROOT\modern_ui\frontend\app.js" -Raw
           $html = Get-Content "$env:SRE_ENGINE_ROOT\modern_ui\frontend\index.html" -Raw
@@ -1250,17 +1259,30 @@ jobs:
       - name: Phase 7 first-launch stale-state regression
         shell: pwsh
         run: |
+          $ErrorActionPreference = "Stop"
           python "Stage 6\tests\run_phase7_first_launch_state_hotfix_tests.py"
+          if ($LASTEXITCODE -ne 0) { throw "Phase 7 first-launch stale-state regression failed" }
 
       - name: Phase 7 session freshness and Windows hardening regression
         shell: pwsh
         run: |
+          $ErrorActionPreference = "Stop"
           python "Stage 6\tests\run_phase7_session_freshness_windows_hardening_tests.py"
+          if ($LASTEXITCODE -ne 0) { throw "Phase 7 session freshness regression failed" }
 
       - name: Phase 7 official daily refresh regression
         shell: pwsh
         run: |
+          $ErrorActionPreference = "Stop"
           python "Stage 6\tests\run_phase7_official_daily_refresh_tests.py"
+          if ($LASTEXITCODE -ne 0) { throw "Phase 7 official daily refresh regression failed" }
+
+      - name: Phase 7 refresh contract consistency regression
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          python "Stage 6\tests\run_phase7_refresh_contract_consistency_tests.py"
+          if ($LASTEXITCODE -ne 0) { throw "Phase 7 refresh contract consistency regression failed" }
 
       - name: Combined V2 target-independence and authority regression
         shell: pwsh
