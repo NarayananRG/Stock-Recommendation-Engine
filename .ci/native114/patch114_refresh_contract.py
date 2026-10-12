@@ -398,3 +398,103 @@ daily_block = r'''    def _refresh_official_first_market_data(self) -> dict[str,
         expected = self.expected_market_session()["expected_market_session"]
         try:
             before = self.data_source_status()
+            active_before = dict(before.get("active") or {})
+            if before.get("mode") == "REAL_OFFICIAL_DATA" and active_before.get("latest_session") == expected:
+                return {
+                    "status": "PASS",
+                    "refresh_result": {
+                        "expected_session": expected,
+                        "status": "ALREADY_CURRENT",
+                        "stage": "precheck",
+                        "source": "LOCAL_OFFICIAL_CACHE",
+                        "source_url_or_provider": None,
+                        "http_status": None,
+                        "reason_code": "LOCAL_OFFICIAL_CACHE_CURRENT",
+                        "reason_detail": f"Local official cache already contains {expected}",
+                        "equity_session": expected,
+                        "index_session": expected,
+                        "stock_files_expected": None,
+                        "stock_files_matched": None,
+                        "stock_coverage": active_before.get("history_coverage"),
+                        "persisted": True,
+                        "verified_latest_session": expected,
+                        "automatic_yfinance_fallback": False,
+                    },
+                    "source": before,
+                    "automatic_yfinance_fallback": False,
+                }
+            from stock_app.official_daily_refresh import refresh_official_session
+            refresh = refresh_official_session(list(active_before.get("cache_roots") or []), expected)
+            if refresh.get("status") == "REFRESHED_AND_VERIFIED":
+                for attr in ("_cache", "cache", "_history_cache", "_data_cache"):
+                    value = getattr(self.prices, attr, None)
+                    if isinstance(value, dict):
+                        value.clear()
+            source = self.data_source_status()
+            latest = (source.get("active") or {}).get("latest_session")
+            if source.get("mode") == "REAL_OFFICIAL_DATA" and latest == expected:
+                status = "PASS"
+            elif refresh.get("status") == "OFFICIAL_NOT_READY":
+                status = "NOT_READY"
+            else:
+                status = "ERROR"
+            if status == "PASS" and refresh.get("status") != "REFRESHED_AND_VERIFIED":
+                refresh = {**refresh, "status": "LOCAL_VERIFICATION_FAILED", "reason_code": "REFRESH_VERIFICATION_CONTRACT_MISMATCH", "reason_detail": "PASS requires REFRESHED_AND_VERIFIED or ALREADY_CURRENT"}
+                status = "ERROR"
+            return {
+                "status": status,
+                "refresh_result": refresh,
+                "source": source,
+                "automatic_yfinance_fallback": False,
+            }
+        except Exception as exc:
+            source = self.data_source_status()
+            return {
+                "status": "ERROR",
+                "error": str(exc),
+                "refresh_result": {
+                    "expected_session": expected,
+                    "status": "OFFICIAL_DOWNLOAD_FAILED",
+                    "stage": "exception",
+                    "source": "NSE_OFFICIAL",
+                    "reason_code": type(exc).__name__,
+                    "reason_detail": str(exc),
+                    "automatic_yfinance_fallback": False,
+                },
+                "source": source,
+                "automatic_yfinance_fallback": False,
+            }
+
+    def _daily_data_gate(self) -> dict[str, Any]:
+        expected = self.expected_market_session()
+        refresh = self._refresh_official_first_market_data()
+        source = refresh.get("source") or self.data_source_status()
+        active = dict(source.get("active") or {})
+        latest = active.get("latest_session")
+        refresh_result = dict(refresh.get("refresh_result") or {})
+        status = str(refresh_result.get("status") or "").upper()
+        ready = bool(source.get("mode") == "REAL_OFFICIAL_DATA" and latest == expected["expected_market_session"] and refresh.get("status") == "PASS")
+        if ready:
+            freshness_gate = "PASS"
+            freshness_status = "CURRENT"
+            blocked = None
+        elif status == "OFFICIAL_NOT_READY":
+            freshness_gate = "BLOCKED"
+            freshness_status = "OFFICIAL DATA NOT READY"
+            blocked = "OFFICIAL_DATA_NOT_READY"
+        else:
+            freshness_gate = "BLOCKED"
+            freshness_status = "OFFICIAL SOURCE ERROR" if refresh.get("status") == "ERROR" else "OFFICIAL DATA NOT READY"
+            blocked = "OFFICIAL_SOURCE_ERROR" if refresh.get("status") == "ERROR" else "OFFICIAL_DATA_NOT_READY"
+        detail = refresh.get("error") or refresh_result.get("reason_detail") or refresh_result.get("reason_code")
+        if not detail:
+            detail = "No official refresh detail was returned"
+        return {
+            "source": source,
+            **expected,
+            "target_session": expected["expected_market_session"],
+            "latest_official_session": latest,
+            "data_freshness": freshness_status,
+            "freshness_gate": freshness_gate,
+            "official_mode": source.get("mode") == "REAL_OFFICIAL_DATA",
+            "analysis_data_current": ready,
