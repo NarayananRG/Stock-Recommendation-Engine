@@ -286,7 +286,7 @@ s = api.read_text(encoding="utf-8")
 s = repl(
     s,
     'APP_VERSION = "0.12.4-phase7-session-freshness-windows-hardening"',
-    'APP_VERSION = "0.12.5-phase7-official-daily-refresh-hotfix"',
+    'APP_VERSION = "0.12.6-phase7-upgrade-startup-hotfix"',
     "backend version",
 )
 old = '''    def _refresh_official_first_market_data(self) -> dict[str, Any]:
@@ -356,7 +356,7 @@ js.write_text(t, encoding="utf-8")
 policy = root / "phase7" / "official_daily_refresh_0125.json"
 policy.write_text("""{
   "schema": "SRE_PHASE7_OFFICIAL_DAILY_REFRESH_0125",
-  "release": "0.12.5-phase7-official-daily-refresh-hotfix",
+  "release": "0.12.6-phase7-upgrade-startup-hotfix",
   "source_priority": ["NSE_OFFICIAL_CM_UDIFF", "NSE_OFFICIAL_NIFTY50"],
   "automatic_yfinance_fallback": false,
   "minimum_stock_coverage": 0.95,
