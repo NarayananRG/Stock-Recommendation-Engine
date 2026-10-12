@@ -198,3 +198,103 @@ def _parse_bhav(payload: bytes, expected_session: str) -> tuple[dict[str, tuple[
 
 
 def _normalize_key(value: str) -> str:
+    return "".join(ch for ch in str(value).lower() if ch.isalnum())
+
+
+def _parse_index_close_report(payload: bytes, expected_session: str) -> tuple[tuple[str, str, str, str], str] | None:
+    text = payload.decode("utf-8-sig", errors="replace")
+    reader = csv.DictReader(io.StringIO(text))
+    for raw in reader:
+        row = {_normalize_key(k): v for k, v in raw.items() if k is not None}
+        name = str(row.get("indexname") or row.get("index") or "").strip().upper()
+        if name != "NIFTY 50":
+            continue
+        parsed = None
+        raw_date = str(row.get("indexdate") or row.get("date") or "").strip()
+        if raw_date:
+            for fmt in ("%d-%m-%Y", "%d-%b-%Y", "%Y-%m-%d", "%d/%m/%Y"):
+                try:
+                    parsed = datetime.strptime(raw_date, fmt).date().isoformat()
+                    break
+                except ValueError:
+                    pass
+            if parsed and parsed != expected_session:
+                raise RuntimeError(f"OFFICIAL_INDEX_SESSION_MISMATCH:{parsed}:{expected_session}")
+        def get(*keys: str) -> str:
+            for key in keys:
+                val = row.get(key)
+                if val not in (None, ""):
+                    return str(val).replace(",", "").strip()
+            return ""
+        vals = (get("openindexvalue", "open"), get("highindexvalue", "high"), get("lowindexvalue", "low"), get("closingindexvalue", "close"))
+        if all(vals):
+            return vals, parsed or expected_session
+    return None
+
+
+def _fetch_index_from_api(expected_session: str) -> tuple[tuple[str, str, str, str], str, dict[str, Any]]:
+    d = datetime.strptime(expected_session, "%Y-%m-%d").strftime("%d-%m-%Y")
+    sess = _session()
+    try:
+        sess.get(NSE + "/", timeout=20)
+        url = f"{NSE}/api/historicalOR/indicesHistory?indexType=NIFTY%2050&from={d}&to={d}"
+        resp = sess.get(url, timeout=35, headers={**sess.headers, "Accept": "application/json,*/*"})
+        resp.raise_for_status()
+        payload = resp.json()
+    except Exception as exc:
+        raise OfficialDataNotReady(f"OFFICIAL_NIFTY50_NOT_READY:{type(exc).__name__}:{exc}") from exc
+    for raw in payload.get("data", []):
+        if str(raw.get("EOD_INDEX_NAME") or "").upper() != "NIFTY 50":
+            continue
+        raw_date = datetime.strptime(raw["EOD_TIMESTAMP"], "%d-%b-%Y").date().isoformat()
+        if raw_date != expected_session:
+            continue
+        vals = (str(raw["EOD_OPEN_INDEX_VAL"]), str(raw["EOD_HIGH_INDEX_VAL"]), str(raw["EOD_LOW_INDEX_VAL"]), str(raw["EOD_CLOSE_INDEX_VAL"]))
+        return vals, raw_date, {"url": url, "http_status": int(resp.status_code), "content_type": str(resp.headers.get("content-type") or ""), "payload_size": len(resp.content)}
+    raise OfficialDataNotReady("OFFICIAL_NIFTY50_NOT_READY:NO_ROW")
+
+
+def _fetch_index(expected_session: str) -> tuple[tuple[str, str, str, str], str, dict[str, Any]]:
+    d = datetime.strptime(expected_session, "%Y-%m-%d").strftime("%d%m%Y")
+    report = f"{ARCHIVE}/content/indices/ind_close_all_{d}.csv"
+    try:
+        payload, meta = _download_candidates([report])
+        row = _parse_index_close_report(payload, expected_session)
+        if row:
+            vals, session = row
+            return vals, session, meta
+    except OfficialDataNotReady:
+        pass
+    return _fetch_index_from_api(expected_session)
+
+
+def _read_rows(path: Path) -> tuple[list[str], list[dict[str, str]]]:
+    with path.open("r", newline="", encoding="utf-8-sig") as h:
+        reader = csv.DictReader(h)
+        return list(reader.fieldnames or []), list(reader)
+
+
+def _render_with_session(path: Path, expected_session: str, values: tuple[str, str, str, str, str]) -> bytes:
+    fields, rows = _read_rows(path)
+    required = ["Date", "Open", "High", "Low", "Close", "Volume"]
+    if not all(x in fields for x in required):
+        raise RuntimeError(f"LOCAL_MARKET_CSV_SCHEMA_MISMATCH:{path.name}:{fields}")
+    out = [row for row in rows if str(row.get("Date") or "")[:10] != expected_session]
+    op, hi, lo, cl, vol = values
+    out.append({"Date": expected_session, "Open": op, "High": hi, "Low": lo, "Close": cl, "Volume": vol})
+    out.sort(key=lambda row: str(row.get("Date") or ""))
+    buf = io.StringIO(newline="")
+    writer = csv.DictWriter(buf, fieldnames=fields, lineterminator="\n")
+    writer.writeheader()
+    for row in out:
+        writer.writerow({key: row.get(key, "") for key in fields})
+    return buf.getvalue().encode("utf-8")
+
+
+def _last_session(path: Path) -> str | None:
+    try:
+        _, rows = _read_rows(path)
+    except Exception:
+        return None
+    dates = sorted({str(row.get("Date") or "")[:10] for row in rows if row.get("Date")})
+    return dates[-1] if dates else None
