@@ -79,3 +79,4 @@ jobs:
           path: SRE_Phase6_Official_NIFTY200_Market.zip
           if-no-files-found: error
           retention-days: 14
+# retrigger Phase 6 official market bundle validation 2026-10-12
