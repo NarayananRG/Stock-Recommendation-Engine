@@ -598,3 +598,15 @@ policy.write_text("""{
   "partial_update_safety": "stage_then_atomic_write_no_equity_commit_before_index",
   "automatic_yfinance_fallback": false,
   "production_recommendation_authority_changed": false,
+  "production_rank_authority_changed": false,
+  "technical_v2_authority": "SHADOW_ONLY",
+  "fundamental_v3_authority": "SHADOW_ONLY",
+  "combined_v2_authority": "SHADOW_ONLY"
+}
+""", encoding="utf-8")
+
+assert "REFRESHED_AND_VERIFIED" in (root / "stock_app" / "official_daily_refresh.py").read_text(encoding="utf-8")
+assert "refresh_label" in api.read_text(encoding="utf-8")
+assert "refresh_label" in js.read_text(encoding="utf-8")
+assert "import yfinance" not in (root / "stock_app" / "official_daily_refresh.py").read_text(encoding="utf-8").lower()
+print("0.12.7 refresh contract consistency hotfix applied")
