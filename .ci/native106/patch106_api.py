@@ -180,6 +180,41 @@ helper = '''    def combined_v2_context(
 if "def combined_v2_context" not in s:
     s = repl(s, stock_anchor, helper + stock_anchor, "combined helper")
 
+ranking_helper = '''    def combined_v2_rankings(self, limit: int = 20) -> list[dict[str, Any]]:
+        source_rows = self.latest_prediction_rows(limit=max(1, min(100, int(limit) * 3)))
+        shadow_rows = []
+        for row in source_rows:
+            symbol = str(row.get("symbol") or "").upper().replace(".NS", "").replace(".BO", "")
+            if not symbol:
+                continue
+            bars = self.prices.history(symbol, limit=5000)
+            latest_price = _finite(bars[-1].get("close")) if bars else None
+            combined = self.combined_v2_context(symbol, row, bars, latest_price)
+            shadow_rows.append({
+                "symbol": symbol,
+                "production_rank": row.get("rank"),
+                "production_status": row.get("opportunity_status"),
+                "combined_score": combined.get("combined_score"),
+                "combined_label": combined.get("combined_label"),
+                "combined_confidence": combined.get("confidence"),
+                "combined_evidence_coverage": combined.get("evidence_coverage"),
+                "authority": combined.get("authority"),
+                "promotion_allowed": combined.get("promotion_allowed"),
+            })
+        shadow_rows.sort(key=lambda x: (
+            x.get("combined_score") is None,
+            -(float(x.get("combined_score")) if x.get("combined_score") is not None else -1.0),
+            int(x.get("production_rank") or 10**9),
+            str(x.get("symbol") or ""),
+        ))
+        for index, row in enumerate(shadow_rows, start=1):
+            row["combined_shadow_rank"] = index
+        return shadow_rows[: max(1, int(limit))]
+
+'''
+if "def combined_v2_rankings" not in s:
+    s = repl(s, stock_anchor, ranking_helper + stock_anchor, "combined ranking helper")
+
 old = '''            "fundamental_v3": self.fundamental_v3_context(
                 symbol,
                 close,
@@ -216,6 +251,22 @@ route = fund_route + '''    @app.get("/api/stocks/{symbol}/combined-v2")
 
 '''
 s = repl(s, fund_route, route, "combined endpoint")
+rank_route = '''    @app.get("/api/combined-v2/rankings")
+    def combined_v2_rankings(limit: int = Query(20, ge=1, le=50)) -> dict[str, Any]:
+        rows = ctx.combined_v2_rankings(limit)
+        return {
+            "schema": "SRE_COMBINED_PREDICTION_V2_RANKINGS",
+            "authority": "SHADOW_ONLY",
+            "production_rank_changed": False,
+            "promotion_allowed": False,
+            "items": rows,
+            "count": len(rows),
+        }
+
+'''
+health_anchor = '    @app.get("/api/stocks/{symbol}")\n'
+if rank_route not in s:
+    s = repl(s, health_anchor, rank_route + health_anchor, "combined ranking route")
 s = repl(s, '        return {"items": rows, "count": len(rows), "run": ctx.latest_run_input()}\n', '        return {"items": rows, "count": len(rows), "run": ctx.ui_run_input(), "target_state": ctx.active_target_state()}\n', "opportunities get")
 s = repl(s, '        return {"ok": True, "items": rows, "count": len(rows), "fundamentals": None, "run": dict(active.get("run") or {}), "reused_run": reused}\n', '        return {"ok": True, "items": rows, "count": len(rows), "fundamentals": None, "run": ctx.ui_run_input(), "target_state": ctx.active_target_state(), "reused_run": reused}\n', "opportunities post")
 s = repl(s, '        latest = ctx.latest_run_input()\n        return {"latest_run": latest}\n', '        latest = ctx.ui_run_input()\n        return {"latest_run": latest, "target_state": ctx.active_target_state()}\n', "capital default")
