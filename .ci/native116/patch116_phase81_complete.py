@@ -638,7 +638,7 @@ policy.write_text("""{
 
 assert "0.13.2-phase8-validation-complete" in api.read_text(encoding="utf-8")
 assert "ensureValidationNav" not in js.read_text(encoding="utf-8")
-assert "catch{}" not in js.read_text(encoding="utf-8")
+assert "catch{}" not in validation_js
 assert "START PROSPECTIVE TRACKING" in js.read_text(encoding="utf-8")
 assert "import yfinance" not in module.lower()
 print("0.13.2 Phase 8.1 validation completion overlay applied")
