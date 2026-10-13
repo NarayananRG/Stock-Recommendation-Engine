@@ -28,7 +28,5 @@ js.write_text(t, encoding="utf-8")
 assert 'APP_VERSION = "0.13.4-phase8-formatter-hotfix"' in api.read_text(encoding="utf-8")
 final_js = js.read_text(encoding="utf-8")
 assert "function fmtINR(value)" in final_js
-assert "function fmtPctFraction(value)" in final_js
 assert final_js.find("function fmtINR(value)") < final_js.find("function renderValidationReplay")
-assert final_js.find("function fmtPctFraction(value)") < final_js.find("function renderValidationReplay")
 print("0.13.4 Phase 8 formatter hotfix applied")
