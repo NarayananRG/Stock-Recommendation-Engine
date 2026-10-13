@@ -16,11 +16,6 @@ function fmtINR(value){
   if(!Number.isFinite(n))return '—';
   return new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:2}).format(n);
 }
-function fmtPctFraction(value){
-  const n=Number(value);
-  if(!Number.isFinite(n))return '—';
-  return new Intl.NumberFormat('en-IN',{style:'percent',maximumFractionDigits:2}).format(n);
-}
 '''
 if "function fmtINR(value)" not in t:
     anchor = "function renderValidationReplay"
