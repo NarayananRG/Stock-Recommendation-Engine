@@ -28,6 +28,7 @@ on:
       - "Stage 6/tests/run_phase7_refresh_contract_consistency_tests.py"
       - "Stage 6/tests/run_phase81_validation_tests.py"
       - "Stage 6/tests/run_phase81_validation_complete_tests.py"
+      - "Stage 6/tests/run_phase81_runtime_fix_tests.py"
       - ".github/workflows/build-native-desktop-0120.yml"
   workflow_dispatch:
 
@@ -1304,6 +1305,13 @@ jobs:
           python "Stage 6\tests\run_phase81_validation_tests.py"
           python "Stage 6\tests\run_phase81_validation_complete_tests.py"
           if ($LASTEXITCODE -ne 0) { throw "Phase 8.1 validation regression failed" }
+
+      - name: Phase 8 runtime fix regression
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          python "Stage 6\tests\run_phase81_runtime_fix_tests.py"
+          if ($LASTEXITCODE -ne 0) { throw "Phase 8 runtime fix regression failed" }
 
       - name: Combined V2 target-independence and authority regression
         shell: pwsh
