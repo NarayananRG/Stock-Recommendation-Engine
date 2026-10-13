@@ -19,6 +19,7 @@ def main() -> int:
         (engine / "modern_ui/frontend").mkdir(parents=True)
         (engine / "modern_ui/api.py").write_text('APP_VERSION = "0.13.3-phase8-runtime-fix"\n', encoding="utf-8")
         (engine / "modern_ui/frontend/app.js").write_text(
+            "const fmtPctFraction=(value)=>new Intl.NumberFormat('en-IN',{style:'percent',maximumFractionDigits:2}).format(Number(value)||0);\n"
             "function renderValidationReplay(r){return fmtPctFraction((r||{}).x||0)+fmtINR((r||{}).cash||100000)}\n"
             "function renderValidationPaper(p){return fmtINR((p||{}).nav||100000)+fmtPctFraction((p||{}).ret||0)}\n",
             encoding="utf-8",
@@ -31,9 +32,8 @@ def main() -> int:
         cases = [
             ("version bumped", '0.13.4-phase8-formatter-hotfix' in api),
             ("currency formatter defined", "function fmtINR(value)" in js),
-            ("percent formatter defined", "function fmtPctFraction(value)" in js),
+            ("existing percent formatter preserved", js.count("fmtPctFraction=") == 1),
             ("currency formatter before renderer", js.find("function fmtINR(value)") < js.find("function renderValidationReplay")),
-            ("percent formatter before renderer", js.find("function fmtPctFraction(value)") < js.find("function renderValidationReplay")),
         ]
         for name, ok in cases:
             print(f"{name}: {'PASS' if ok else 'FAIL'}")
