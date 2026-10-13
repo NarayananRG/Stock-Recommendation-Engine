@@ -66,11 +66,12 @@ def build_app():
             encoding="utf-8",
         )
         (engine / "modern_ui/frontend/app.js").write_text("function switchPage(page){if(page==='today')loadToday();}\nfunction loadToday(){}\n", encoding="utf-8")
-        (engine / "modern_ui/frontend/index.html").write_text("<main></main>", encoding="utf-8")
+        (engine / "modern_ui/frontend/index.html").write_text('<nav><button type="button" class="nav-item" data-page="today">Today</button><button type="button" class="nav-item" data-page="system">System</button></nav><main></main>', encoding="utf-8")
         (engine / "modern_ui/frontend/styles.css").write_text("", encoding="utf-8")
         env = os.environ.copy()
         env["SRE_ENGINE_ROOT"] = str(engine)
         subprocess.run([sys.executable, str(ROOT / ".ci/native115/patch115_phase81_validation.py")], cwd=ROOT, env=env, check=True)
+        subprocess.run([sys.executable, str(ROOT / ".ci/native116/patch116_phase81_complete.py")], cwd=ROOT, env=env, check=True)
         sys.path.insert(0, str(engine))
         from stock_app import phase81_validation as v
 
@@ -79,8 +80,9 @@ def build_app():
             {"symbol": "BBB", "opportunity_status": "WATCH - TECHNICAL ONLY", "executable": False, "execution_reason": "WATCH_NON_EXECUTABLE"},
         ]
         zero = [{"symbol": "CCC", "opportunity_status": "WATCH - TECHNICAL ONLY", "executable": False, "execution_reason": "WATCH_NON_EXECUTABLE"}]
-        s1 = v.session_summary("2026-10-12", zero)
-        s2 = v.session_summary("2026-10-13", rows, capital_plan={"new_buys": [{"capital": 50000}], "excluded": []})
+        assumptions = v.ExecutionAssumptions()
+        s1 = v.session_summary("2026-10-12", zero, capital_plan={"new_buys": [], "excluded": []}, assumptions=assumptions, pit_status="FULL_PIT_VALID", model_identity="test")
+        s2 = v.session_summary("2026-10-13", rows, capital_plan={"new_buys": [{"capital": 50000}], "excluded": []}, assumptions=assumptions, pit_status="FULL_PIT_VALID", model_identity="test")
         fill = v.next_open_fill("2026-10-12", "2026-10-13", 100.0, "BUY", v.ExecutionAssumptions(slippage_bps=10, transaction_cost_bps=5))
         db = temp / "paper.sqlite3"
         p = v.create_portfolio(db, starting_session="2026-10-12")
@@ -95,12 +97,12 @@ def build_app():
             ("next open timing", fill["fill_session"] == "2026-10-13" and fill["fill_price"] == 100.1 and fill["net_price"] == 100.15),
             ("same day fill rejected", _raises(lambda: v.next_open_fill("2026-10-12", "2026-10-12", 100, "BUY"))),
             ("whole shares", v.whole_share_quantity(100000, 100.0, v.ExecutionAssumptions(slippage_bps=10, transaction_cost_bps=5)) == 998),
-            ("duplicate idempotent", e1["journal_event_id"] == e2["journal_event_id"] and e2["duplicate"] is True),
+            ("duplicate idempotent", e1["event_id"] == e2["event_id"] and e2["duplicate"] is True),
             ("metrics buy frequency", metrics["total_replayable_sessions"] == 2 and metrics["sessions_with_executable_buy"] == 1 and metrics["buy_frequency"] == 0.5),
             ("cash periods counted", metrics["average_cash_pct"] > 0),
             ("drawdown computed", v.max_drawdown([100, 120, 90]) == -0.25),
             ("no yfinance import", "import yfinance" not in (engine / "stock_app/phase81_validation.py").read_text(encoding="utf-8").lower()),
-            ("validation nav hook", "ensureValidationNav" in (engine / "modern_ui/frontend/app.js").read_text(encoding="utf-8")),
+            ("static validation nav", 'data-page="validation"' in (engine / "modern_ui/frontend/index.html").read_text(encoding="utf-8")),
         ]
         for name, ok in cases:
             print(f"{name}: {'PASS' if ok else 'FAIL'}")
