@@ -1749,7 +1749,7 @@ jobs:
           "0.13.0-phase8-validation" | Set-Content (Join-Path $legacy130 ".sre0130-ready") -Encoding ASCII
           "raise SystemExit('STALE_0130_ENGINE_MUST_NOT_RUN')" | Set-Content (Join-Path $legacy130 "run_modern_ui.py") -Encoding ASCII
 
-          foreach ($oldVersion in @("0.12.7", "0.13.0", "0.13.1", "0.13.2", "0.13.3", "0.13.4", "0.13.5", "0.14.0")) {
+          foreach ($oldVersion in @("0.12.7", "0.13.0", "0.13.1", "0.13.2", "0.13.3", "0.13.4", "0.13.5", "0.14.0", "0.14.1")) {
             $oldEngine = Join-Path $appData "native-engine-$oldVersion"
             New-Item -ItemType Directory -Force -Path $oldEngine | Out-Null
             "raise SystemExit('STALE_ENGINE_MUST_NOT_RUN')" | Set-Content (Join-Path $oldEngine "run_modern_ui.py") -Encoding ASCII
