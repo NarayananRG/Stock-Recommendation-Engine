@@ -86,6 +86,11 @@ class UxContractTests(unittest.TestCase):
         self.assertIn("humanReason(c)", self.js)
         self.assertIn("Diagnostics / audit", self.js)
 
+    def test_dashboard_prefers_canonical_official_session(self):
+        self.assertIn("data.ui_state?.latest_official_session", self.js)
+        self.assertIn("const asOf=$('#asOfSession')", self.js)
+        self.assertIn("t.latest_official_session", self.js)
+
     def test_stock_intelligence_navigation_is_bound(self):
         self.assertIn("data-open-stock-intelligence", self.js)
         self.assertIn("openStock(sym)", self.js)
