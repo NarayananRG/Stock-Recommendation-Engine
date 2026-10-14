@@ -83,12 +83,12 @@ class UxContractTests(unittest.TestCase):
     def test_human_readable_reasons_primary(self):
         self.assertIn("Business / earnings evidence is incomplete", self.js)
         self.assertIn("Historical PIT valuation comparison is unavailable", self.js)
-        self.assertIn("return code?humanReason(code)", self.js)
+        self.assertIn("humanReason(c)", self.js)
         self.assertIn("Diagnostics / audit", self.js)
 
     def test_stock_intelligence_navigation_is_bound(self):
         self.assertIn("data-open-stock-intelligence", self.js)
-        self.assertIn("openStock(symbol)", self.js)
+        self.assertIn("openStock(sym)", self.js)
         self.assertIn("Browse stocks ->", self.js)
 
     def test_drawer_layout_is_summary_first(self):
