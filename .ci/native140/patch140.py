@@ -60,6 +60,8 @@ methods = '''    def _live_file(self, run_id: str) -> Path:
             original = entry.get(pos.get("id"))
             if not original: continue
             current = decisions.get(pos["symbol"])
+            bars = self.prices.history(pos["symbol"], limit=5000)
+            original = {**original, "sessions_held": sum(str(b["date"])[:10] > str(pos["buy_date"]) for b in bars)}
             action, reason = monitor(original, current) if current else ("WEAKENING", "Current thesis evidence unavailable; review required.")
             actions.append({**existing.get(pos["id"], {}), "position_id": pos["id"], "symbol": pos["symbol"], "action": action,
                             "strategy_style": original["strategy_style"], "explanation": reason, "reason_codes": [reason],
@@ -70,6 +72,7 @@ methods = '''    def _live_file(self, run_id: str) -> Path:
         for pos in paper.get("positions", []):
             if pos.get("state") == "CLOSED": continue
             current = decisions.get(pos["symbol"])
+            pos = {**pos, "sessions_held": sum(str(b["date"])[:10] > str(pos["entry_fill_date"]) for b in self.prices.history(pos["symbol"], limit=5000))}
             action, reason = monitor(pos, current) if current else ("WEAKENING", "Current thesis evidence unavailable; review required.")
             actions.append({"symbol":pos["symbol"], "action":action, "thesis_health":action,
                             "strategy_style":pos.get("strategy_style"), "explanation":reason, "reason_codes":[reason], "simulated":True})
@@ -190,8 +193,14 @@ edit('modern_ui/api.py', '        run = self.ui_run_input() or {}\n        retur
         run = self.ui_run_input() or {}
         if str(run.get("market_session")) != session:
             return {"active": True, "status": "BLOCKED_ANALYSIS_SESSION", "recorded": False}
+        rows = self.latest_prediction_rows(limit=200)
+        positions = {p["symbol"]: p for p in status.get("positions", []) if p.get("state") != "CLOSED"}
+        for row in rows:
+            pos = positions.get(row["symbol"])
+            if pos:
+                row["holding_sessions"] = sum(str(pos["entry_fill_date"]) < str(b["date"])[:10] <= session for b in index_bars)
         mark_daily_hold_exit(self._phase81_db_path(), portfolio_id=status["portfolio_id"], market_session=session,
-                             production_run_id=run.get("run_id"), recommendations=self.latest_prediction_rows(limit=200))
+                             production_run_id=run.get("run_id"), recommendations=rows)
         return record_daily_observation''')
 edit('modern_ui/api.py', 'capital_plan=self.build_capital_plan(float(status.get("cash") or status.get("starting_capital") or 100000), int(run.get("horizon_sessions") or 20), None))', 'capital_plan=self._paper_capital_plan(status, run))')
 edit('modern_ui/api.py', '            "technical_v2": self.technical_v2_context(symbol, bars),', '            "live_decision": (prediction or {}).get("live_decision"),\n            "technical_v2": self.technical_v2_context(symbol, bars),')
@@ -232,6 +241,7 @@ edit('stock_app/phase81_validation.py', '                con.execute("insert or 
                 con.execute("insert or replace into paper_positions''')
 edit('stock_app/phase81_validation.py', '            if "EXIT" in decision or "SELL" in decision:', '''            if row.get("live_decision"):
                 from .live_decision_v1 import monitor
+                held[symbol]["sessions_held"] = row.get("holding_sessions")
                 decision, thesis_reason = monitor(held[symbol], row["live_decision"])
                 row = {**row, "monitoring_reason": thesis_reason}
             if "EXIT" in decision or "SELL" in decision:''')

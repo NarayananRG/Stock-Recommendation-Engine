@@ -181,6 +181,7 @@ def route(symbol: str, market_session: str, technical: dict, fundamental: dict,
                 invalidation="Material business deterioration, uncontrolled downside or loss of the original thesis; recovery also requires review when valuation advantage disappears.",
                 confidence=confidence, priority="HIGH" if confidence == "HIGH" else "MEDIUM" if action in BUY_ACTIONS else "LOW",
                 executable=action in BUY_ACTIONS and official_current and close is not None and close > 0,
+                review_after_sessions=60 if primary == "RECOVERY" else 20,
                 reason_codes=reasons, target_used_in_score=False, **s,
                 evidence=dict(technical=technical, fundamental=fundamental, price_context=price_context,
                               legacy_production_evidence=legacy, official_current=official_current),
@@ -238,6 +239,11 @@ def monitor(position, decision):
     style = position.get("primary_style") or position.get("strategy_style") or ""
     if decision.get("structural_deterioration"):
         return "EXIT", "Original business safety thesis invalidated by material deterioration."
+    if decision.get("technical_state") == "BREAKDOWN" and style:
+        return "EXIT", "Original " + style.lower() + " thesis breached its downside-risk protection."
+    review = (position.get("entry_thesis") or position).get("review_after_sessions", 60 if "RECOVERY" in style else 20)
+    if position.get("sessions_held") is not None and int(position["sessions_held"]) >= int(review):
+        return "WEAKENING", "Original holding-period review policy has been reached; review the investment thesis."
     if "RECOVERY" in style:
         if decision.get("technical_state") == "BREAKDOWN":
             return "EXIT", "Recovery downside risk is uncontrolled."

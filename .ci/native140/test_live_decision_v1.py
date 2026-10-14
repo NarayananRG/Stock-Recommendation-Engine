@@ -124,5 +124,10 @@ class RouterTests(unittest.TestCase):
         stock.append(dict(date='2026-10-14',open=101))
         self.assertEqual(live.next_official_open(stock,index,'2026-10-13','2026-10-15'),('2026-10-14',101))
 
+    def test_recovery_holding_period_requests_review(self):
+        t,f=evidence()
+        decision=run(t,f,True)
+        self.assertEqual(live.monitor(dict(primary_style='RECOVERY',sessions_held=60),decision)[0],'WEAKENING')
+
 
 if __name__ == '__main__': unittest.main()
