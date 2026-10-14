@@ -101,8 +101,15 @@ methods = '''    def _live_file(self, run_id: str) -> Path:
         session = str(run["market_session"])
         gate = self._daily_data_gate()
         current = bool(gate.get("ready") and str(gate.get("target_session")) == session)
+        source = self.data_source_status()
+        members = [m["symbol"] for m in (source.get("active") or {}).get("members", [])] if source.get("mode") == "REAL_OFFICIAL_DATA" else []
+        universe = set(members) if members else set(self.historical._load_histories())
+        legacy_rows = {row["symbol"]: row for row in data["candidates"]}
+        candidate_rows = [legacy_rows.get(symbol) or {"symbol":symbol, "rank":0, "expected_return":None,
+                         "profit_probability":None, "confidence_label":"UNAVAILABLE", "opportunity_status":"LEGACY ANALOGUES UNAVAILABLE",
+                         "evidence_json":"{}", "raw_json":"{}"} for symbol in sorted(universe)]
         rows = []
-        for row in data["candidates"]:
+        for row in candidate_rows:
             symbol = str(row["symbol"]).upper().replace(".NS", "")
             bars = [b for b in self.prices.history(symbol, limit=5000) if str(b.get("date"))[:10] <= session]
             technical = self.technical_v2_context(symbol, bars)
@@ -159,6 +166,11 @@ edit('modern_ui/api.py', '        return self._prediction_run_by_id(self._saved_
         return self._prediction_run_by_id(run_id)''')
 edit('modern_ui/api.py', '            return match, True', '            return self._materialize_live_run(match), True')
 edit('modern_ui/api.py', '        return data, False', '        return self._materialize_live_run(data), False')
+edit('modern_ui/api.py', 'if prior_success.get("market_session") == gate["target_session"] and not force:', 'if prior_success.get("market_session") == gate["target_session"] and prior_success.get("model_version") == APP_VERSION and not force:')
+edit('modern_ui/api.py', '"run_timestamp": datetime.now().isoformat(timespec="seconds"),', '"run_timestamp": datetime.now().isoformat(timespec="seconds"),\n            "model_version": APP_VERSION,')
+edit('modern_ui/api.py', '        rows = self.latest_prediction_rows(limit=100)', '        rows = self.latest_prediction_rows(limit=200)')
+edit('modern_ui/api.py', 'def opportunities(limit: int = Query(12, ge=1, le=100))', 'def opportunities(limit: int = Query(200, ge=1, le=200))')
+edit('modern_ui/api.py', '        rows = ctx.latest_prediction_rows(limit=100)', '        rows = ctx.latest_prediction_rows(limit=200)')
 edit('modern_ui/api.py', '            item = dict(row)\n            item["run_id"]', '            item = dict(row)\n            live = item.get("live_decision") or {}\n            item.update({key: value for key, value in live.items() if key != "evidence"})\n            item["run_id"]')
 # Budget suitability is separate from the BUY thesis; both are needed to execute.
 edit('modern_ui/api.py', '"executable": bool(execution.get("executable")),', '"executable": bool(execution.get("executable")) and live.get("executable") is True and bool(self._daily_data_gate().get("ready")) and str(self._daily_data_gate().get("target_session")) == str(run["market_session"]),')

@@ -84,6 +84,7 @@ class IntegrationTests(unittest.TestCase):
         bars=[dict(date='2026-10-13',close=100,high=130,low=98,open=100,volume=1000)]*126
         ctx.prices=SimpleNamespace(history=lambda *a,**k:bars)
         ctx._daily_data_gate=lambda:dict(ready=True,target_session='2026-10-13')
+        ctx.data_source_status=lambda:dict(mode='REAL_OFFICIAL_DATA',active=dict(members=[dict(symbol='M')]))
         t,f=fixtures.evidence(True)
         ctx.technical_v2_context=lambda *a:t
         ctx.fundamental_v3_context=lambda *a:dict(f)
@@ -93,6 +94,40 @@ class IntegrationTests(unittest.TestCase):
         second=ctx._materialize_live_run(data)
         self.assertEqual(first,second)
         self.assertEqual(len(second['candidates']),1)
+        t['trend']['close']=100
+        data['run']['run_id']='NO_LEGACY_ANALOGUES'
+        data['candidates']=[]
+        independent=ctx._materialize_live_run(data)
+        self.assertEqual(independent['candidates'][0]['live_decision']['final_action'],'MOMENTUM + RECOVERY BUY')
+
+    def test_upgrade_recomputes_once_then_daily_run_is_idempotent(self):
+        from modern_ui.api import ModernAppContext,APP_VERSION
+        from types import SimpleNamespace
+        ctx=ModernAppContext.__new__(ModernAppContext)
+        saved=dict(last_successful_run=dict(market_session='2026-10-13',model_version='0.13.5-phase8-paper-journal-hotfix'))
+        calls=[]
+        ctx._daily_data_gate=lambda:dict(ready=True,target_session='2026-10-13',latest_official_session='2026-10-13',source=dict(mode='REAL_OFFICIAL_DATA'))
+        ctx._read_daily_state=lambda:saved
+        ctx._write_daily_state=lambda data:saved.update(data)
+        ctx.post_close_daily_status=lambda:{}
+        ctx.active_target_state=lambda:dict(explicit=False)
+        def ensure(*args):
+            calls.append(args)
+            return dict(run=dict(run_id='NEW')),False
+        ctx.ensure_analysis_run=ensure
+        ctx.latest_prediction_rows=lambda **kw:self.rows
+        ctx.ui_run_input=lambda:dict(run_id='NEW')
+        ctx.prices=SimpleNamespace(history=lambda *a,**kw:[])
+        ctx.technical_v2_context=lambda *a:{}
+        ctx.fundamental_v3_context=lambda *a:{}
+        ctx.combined_v2_context=lambda *a:{}
+        ctx.monitoring=SimpleNamespace(run_daily_monitoring=lambda *a:None)
+        ctx.phase81_paper_status=lambda:dict(active=False)
+        first=ctx.run_post_close_daily_flow()
+        self.assertFalse(first['duplicate'])
+        self.assertEqual(saved['last_successful_run']['model_version'],APP_VERSION)
+        self.assertTrue(ctx.run_post_close_daily_flow()['duplicate'])
+        self.assertEqual(len(calls),1)
 
 
 if __name__=='__main__':unittest.main()

@@ -173,6 +173,7 @@ def route(symbol: str, market_session: str, technical: dict, fundamental: dict,
     narrative = fundamental_narrative(fundamental, s)
     thesis = momentum_reason if primary == "MOMENTUM" or action == "WATCH - MOMENTUM" else recovery_reason
     return dict(schema="SRE_LIVE_DECISION_V1", authority=AUTHORITY, model_version=MODEL,
+                legacy_engine_authority="LEGACY_PRODUCTION_EVIDENCE",
                 market_session=market_session, symbol=symbol, final_action=action,
                 strategy_style=action if action in BUY_ACTIONS else "NONE", primary_style=primary,
                 secondary_style=("RECOVERY" if primary == "MOMENTUM" else "MOMENTUM") if momentum_valid and recovery_valid else None,
