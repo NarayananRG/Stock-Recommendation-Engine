@@ -110,6 +110,11 @@ class UxContractTests(unittest.TestCase):
         self.assertIn("Stocks affected", self.js)
         self.assertIn("one stock may appear under more than one reason", self.js)
 
+    def test_capital_summary_selector_is_valid(self):
+        self.assertIn("$('#capitalLiveSummary')", self.js)
+        self.assertNotIn("$('#apitalLiveSummary')", self.js)
+        self.assertIn("Why no capital was deployed", self.js)
+
     def test_consistency_endpoint_exists(self):
         self.assertIn('@app.get("/api/ui-consistency")', self.api)
         self.assertIn("overview_run_id", self.api)
