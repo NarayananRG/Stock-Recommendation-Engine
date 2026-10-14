@@ -205,6 +205,14 @@ def next_official_open(stock_bars, index_bars, signal_session, observed_session)
     return (session, price) if price is not None and price > 0 else None
 
 
+def paper_entry_rows(rows, plan):
+    allocated = {r["symbol"] for r in plan.get("new_buys", []) if int(r.get("shares") or 0) > 0}
+    return [{**row, "executable": row.get("symbol") in allocated and
+             (row.get("live_decision") or {}).get("executable") is True and
+             (row.get("live_decision") or {}).get("final_action") in BUY_ACTIONS,
+             "execution_context": "PAPER_PORTFOLIO_CAPITAL_PLAN"} for row in rows]
+
+
 def rank_candidates(rows):
     """Rank each thesis by its own evidence, then merge without a lane quota."""
     rows = list(rows)

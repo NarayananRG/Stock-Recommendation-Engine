@@ -112,7 +112,7 @@ methods = '''    def _live_file(self, run_id: str) -> Path:
         for row in candidate_rows:
             symbol = str(row["symbol"]).upper().replace(".NS", "")
             bars = [b for b in self.prices.history(symbol, limit=5000) if str(b.get("date"))[:10] <= session]
-            technical = self.technical_v2_context(symbol, bars)
+            technical = self.technical_v2_context(symbol, bars, int(run.get("horizon_sessions") or 20))
             price = _finite(bars[-1].get("close")) if bars else None
             fundamental = self.fundamental_v3_context(symbol, price, session)
             # Every comparison re-evaluates filings at that historical cutoff.
@@ -163,7 +163,9 @@ edit('modern_ui/api.py', '    def active_prediction_run(self) -> dict[str, Any] 
 edit('modern_ui/api.py', '        return self._prediction_run_by_id(self._saved_active_run_id())', '''        run_id = self._saved_active_run_id()
         if run_id and self._live_file(run_id).exists():
             return json.loads(self._live_file(run_id).read_text(encoding="utf-8"))
-        return self._prediction_run_by_id(run_id)''')
+        return None''')
+edit('modern_ui/api.py', 'def technical_v2_context(self, symbol: str, bars: list[dict[str, Any]] | None = None)', 'def technical_v2_context(self, symbol: str, bars: list[dict[str, Any]] | None = None, horizon_override: int | None = None)')
+edit('modern_ui/api.py', '        horizon = int(active.get("horizon_sessions") or 20)', '        horizon = int(horizon_override or active.get("horizon_sessions") or 20)')
 edit('modern_ui/api.py', '            return match, True', '            return self._materialize_live_run(match), True')
 edit('modern_ui/api.py', '        return data, False', '        return self._materialize_live_run(data), False')
 edit('modern_ui/api.py', 'if prior_success.get("market_session") == gate["target_session"] and not force:', 'if prior_success.get("market_session") == gate["target_session"] and prior_success.get("model_version") == APP_VERSION and not force:')
@@ -215,6 +217,12 @@ edit('modern_ui/api.py', '        run = self.ui_run_input() or {}\n        retur
                              production_run_id=run.get("run_id"), recommendations=rows)
         return record_daily_observation''')
 edit('modern_ui/api.py', 'capital_plan=self.build_capital_plan(float(status.get("cash") or status.get("starting_capital") or 100000), int(run.get("horizon_sessions") or 20), None))', 'capital_plan=self._paper_capital_plan(status, run))')
+edit('modern_ui/api.py', '        return record_daily_observation(self._phase81_db_path(), portfolio_id=status["portfolio_id"]', '''        from stock_app.live_decision_v1 import paper_entry_rows
+        status = self.phase81_paper_status()
+        paper_plan = self._paper_capital_plan(status, run)
+        paper_rows = paper_entry_rows(rows, paper_plan)
+        return record_daily_observation(self._phase81_db_path(), portfolio_id=status["portfolio_id"]''')
+edit('modern_ui/api.py', 'recommendations=self.latest_prediction_rows(limit=200), capital_plan=self._paper_capital_plan(status, run))', 'recommendations=paper_rows, capital_plan=paper_plan)')
 edit('modern_ui/api.py', '            "technical_v2": self.technical_v2_context(symbol, bars),', '            "live_decision": (prediction or {}).get("live_decision"),\n            "technical_v2": self.technical_v2_context(symbol, bars),')
 edit('modern_ui/api.py', '        prediction = dict(pred) if pred else None', '''        prediction = next((r for r in self.latest_prediction_rows(limit=200) if r.get("symbol") == symbol), None)''')
 edit('modern_ui/api.py', '        return {"ok": True, "position_id": position_id, **ctx.portfolio_summary()}', '        ctx._persist_position_thesis(position_id, req.symbol)\n        return {"ok": True, "position_id": position_id, **ctx.portfolio_summary()}')

@@ -99,6 +99,10 @@ class IntegrationTests(unittest.TestCase):
         data['candidates']=[]
         independent=ctx._materialize_live_run(data)
         self.assertEqual(independent['candidates'][0]['live_decision']['final_action'],'MOMENTUM + RECOVERY BUY')
+        from modern_ui.api import APP_VERSION
+        ctx._active_run_metadata=lambda:dict(app_version=APP_VERSION)
+        ctx._saved_active_run_id=lambda:'UNFINISHED_RUN'
+        self.assertIsNone(ctx.active_prediction_run())
 
     def test_upgrade_recomputes_once_then_daily_run_is_idempotent(self):
         from modern_ui.api import ModernAppContext,APP_VERSION
