@@ -72,6 +72,25 @@ def interpret(f: dict[str, Any]) -> dict[str, Any]:
                 fundamental_data_quality=quality, financial_domain=financial)
 
 
+def fundamental_narrative(f, states):
+    growth = f.get("growth") or {}
+    parts = []
+    for label,key in (("Revenue","revenue_yoy_symmetric_pct"),("PAT","pat_yoy_symmetric_pct"),("EPS","eps_yoy_symmetric_pct")):
+        value = number(growth.get(key))
+        direction = "unavailable" if value is None else "improving" if value >= 5 else "weakening" if value <= -5 else "stable"
+        parts.append(f"{label} direction is {direction}.")
+    parts.append("Cash-flow evidence is " + states["cash_flow_state"].lower() + ".")
+    parts.append("Balance-sheet evidence is " + states["balance_sheet_state"].lower() + ".")
+    parts.append("PIT valuation comparison is " + states["valuation_state"].lower() + ".")
+    if states["financial_domain"]:
+        parts.append("Industrial debt and cash-flow rules do not apply; banking-specific PIT data is insufficient for a Recovery BUY.")
+    if states["structural_deterioration"]:
+        parts.append("The observed business deterioration invalidates a temporary-mispricing thesis.")
+    elif states["price_condition"] == "DEPRESSED":
+        parts.append("Price is depressed; the cause of the decline is not established by these data.")
+    return " ".join(parts)
+
+
 def route(symbol: str, market_session: str, technical: dict, fundamental: dict,
           *, price_context: dict, official_current: bool, legacy: dict | None = None) -> dict:
     s = interpret(fundamental)
@@ -151,12 +170,14 @@ def route(symbol: str, market_session: str, technical: dict, fundamental: dict,
                            s["cash_flow_state"] == "SUPPORTIVE", s["balance_sheet_state"] == "HEALTHY"))
     primary = ("RECOVERY" if recovery_quality > momentum_quality else "MOMENTUM") if momentum_valid and recovery_valid else "MOMENTUM" if momentum_valid else "RECOVERY" if recovery_valid else None
     confidence = "HIGH" if momentum_valid and recovery_valid else "MEDIUM" if momentum_valid or recovery_valid else "LOW"
+    narrative = fundamental_narrative(fundamental, s)
+    thesis = momentum_reason if primary == "MOMENTUM" or action == "WATCH - MOMENTUM" else recovery_reason
     return dict(schema="SRE_LIVE_DECISION_V1", authority=AUTHORITY, model_version=MODEL,
                 market_session=market_session, symbol=symbol, final_action=action,
                 strategy_style=action if action in BUY_ACTIONS else "NONE", primary_style=primary,
                 secondary_style=("RECOVERY" if primary == "MOMENTUM" else "MOMENTUM") if momentum_valid and recovery_valid else None,
                 momentum_thesis=m, recovery_thesis=r, momentum_reason=momentum_reason,
-                recovery_reason=recovery_reason, thesis=momentum_reason if primary == "MOMENTUM" else recovery_reason,
+                recovery_reason=recovery_reason, fundamental_narrative=narrative, thesis=narrative + " " + thesis,
                 invalidation="Material business deterioration, uncontrolled downside or loss of the original thesis; recovery also requires review when valuation advantage disappears.",
                 confidence=confidence, priority="HIGH" if confidence == "HIGH" else "MEDIUM" if action in BUY_ACTIONS else "LOW",
                 executable=action in BUY_ACTIONS and official_current and close is not None and close > 0,
@@ -171,6 +192,15 @@ def lane_counts(rows):
     return dict(momentum_buy=counts["MOMENTUM BUY"], recovery_buy=counts["RECOVERY BUY"],
                 both=counts["MOMENTUM + RECOVERY BUY"], watch=sum(v for k,v in counts.items() if k and k.startswith("WATCH")),
                 avoid=sum(v for k,v in counts.items() if k and k.startswith("AVOID")), no_opportunity=counts["NO OPPORTUNITY"])
+
+
+def next_official_open(stock_bars, index_bars, signal_session, observed_session):
+    sessions = sorted({str(b["date"])[:10] for b in index_bars if signal_session < str(b["date"])[:10] <= observed_session})
+    if not sessions: return None
+    session = sessions[0]
+    bar = next((b for b in stock_bars if str(b["date"])[:10] == session), None)
+    price = number(bar.get("open")) if bar else None
+    return (session, price) if price is not None and price > 0 else None
 
 
 def rank_candidates(rows):

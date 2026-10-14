@@ -117,5 +117,12 @@ class RouterTests(unittest.TestCase):
         f['growth']['pat_yoy_symmetric_pct']=-15
         self.assertFalse(run(t,f,True)['executable'])
 
+    def test_missing_t_plus_one_open_cannot_skip_to_later_session(self):
+        index=[dict(date='2026-10-14'),dict(date='2026-10-15')]
+        stock=[dict(date='2026-10-15',open=100)]
+        self.assertIsNone(live.next_official_open(stock,index,'2026-10-13','2026-10-15'))
+        stock.append(dict(date='2026-10-14',open=101))
+        self.assertEqual(live.next_official_open(stock,index,'2026-10-13','2026-10-15'),('2026-10-14',101))
+
 
 if __name__ == '__main__': unittest.main()

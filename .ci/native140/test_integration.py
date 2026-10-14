@@ -65,6 +65,9 @@ class IntegrationTests(unittest.TestCase):
         self.assertGreaterEqual(result['cash'],0)
         events=mark_daily_hold_exit(db,portfolio_id=state['portfolio_id'],market_session='2026-10-14',production_run_id='RUN2',recommendations=self.rows)
         self.assertEqual({e['event_type'] for e in events},{'HELD'})
+        marked=load_portfolio(db,state['portfolio_id'])
+        self.assertEqual(marked['valuation_quality'],'CURRENT_OFFICIAL_MARKS')
+        self.assertLess(marked['nav'],100000)  # slippage and transaction costs remain real simulation costs
 
     def test_paper_watch_never_bought(self):
         db=self.root/'paper.sqlite3'

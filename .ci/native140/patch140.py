@@ -173,13 +173,17 @@ edit('modern_ui/api.py', 'capital_plan={"new_buys": [], "excluded": []})', 'capi
 edit('modern_ui/api.py', '        run = self.ui_run_input() or {}\n        return record_daily_observation', '''        if not gate.get("ready"):
             return {"active": True, "status": "BLOCKED_OFFICIAL_DATA", "recorded": False}
         from stock_app.phase81_validation import apply_open_fills, mark_daily_hold_exit
+        from stock_app.live_decision_v1 import next_official_open
         session = str(gate["target_session"])
         next_opens = {}
+        index_bars = []
+        for index_symbol in ("INDEX_NSEI", "NSEI", "^NSEI", "NIFTY"):
+            index_bars = self.prices.history(index_symbol, limit=5000)
+            if index_bars: break
         for order in status.get("pending_orders", []):
-            bars = [b for b in self.prices.history(order["symbol"], limit=5000) if str(order["signal_session"]) < str(b["date"])[:10] <= session]
-            if bars:
-                next_bar = bars[0]
-                next_opens.setdefault(str(next_bar["date"])[:10], {})[order["symbol"]] = float(next_bar["open"])
+            quote = next_official_open(self.prices.history(order["symbol"], limit=5000), index_bars, str(order["signal_session"]), session)
+            if quote:
+                next_opens.setdefault(quote[0], {})[order["symbol"]] = quote[1]
         for fill_session, prices in sorted(next_opens.items()):
             apply_open_fills(self._phase81_db_path(), portfolio_id=status["portfolio_id"], fill_session=fill_session, open_prices=prices)
         status = self.phase81_paper_status()
@@ -231,6 +235,18 @@ edit('stock_app/phase81_validation.py', '            if "EXIT" in decision or "S
                 decision, thesis_reason = monitor(held[symbol], row["live_decision"])
                 row = {**row, "monitoring_reason": thesis_reason}
             if "EXIT" in decision or "SELL" in decision:''')
+edit('stock_app/phase81_validation.py', '            decision = str(row.get("opportunity_status") or row.get("decision") or "").upper()\n            if row.get("live_decision"):', '''            price = row.get("latest_close")
+            if price is not None and math.isfinite(float(price)) and float(price) > 0 and str(row.get("market_session") or market_session) == market_session:
+                held[symbol].update(last_price=float(price), last_valuation_session=market_session,
+                                    unrealized_pnl=round(int(held[symbol]["qty"]) * (float(price) - float(held[symbol]["entry_price"])), 2))
+                con.execute("update paper_positions set state_json=? where position_id=?", (json.dumps(held[symbol], sort_keys=True), held[symbol]["position_id"]))
+            decision = str(row.get("opportunity_status") or row.get("decision") or "").upper()
+            if row.get("live_decision"):''')
+edit('stock_app/phase81_validation.py', '    return events\n', '''        state["nav"] = round(float(state["cash"]) + sum(int(p["qty"]) * float(p.get("last_price") or p["entry_price"]) for p in held.values()), 2)
+        state["valuation_quality"] = "CURRENT_OFFICIAL_MARKS" if all(p.get("last_valuation_session") == market_session for p in held.values()) else "PARTIAL_OR_STALE_MARKS"
+        _save_state(con, state)
+    return events
+''')
 edit('stock_app/phase81_validation.py', '"model_identity": "FROZEN_PRODUCTION_MODEL"', '"model_identity": "0.14.0-live-dual-strategy-v1"')
 paper_path = root / 'stock_app/phase81_validation.py'
 paper_text = paper_path.read_text(encoding='utf-8')
