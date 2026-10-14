@@ -1,4 +1,4 @@
-name: Build SRE 0.14.1 Fundamental Coverage UI Repair
+name: Build SRE 0.14.2 Session Truth UX Repair
 
 on:
   push:
@@ -15,6 +15,7 @@ on:
       - ".ci/native106/**"
       - ".ci/native140/**"
       - ".ci/native141/**"
+      - ".ci/native142/**"
       - ".ci/native108/**"
       - ".ci/native109/**"
       - ".ci/native110/**"
@@ -66,28 +67,28 @@ jobs:
           if ($hash -ne "86dd430e933d044d08ae4637787eff52369b46b7ee1013e48af7851d9ea88fcc") { throw "Native shell hash mismatch: $hash" }
           Expand-Archive -LiteralPath $zip -DestinationPath "." -Force
 
-          Copy-Item ".ci\native141\main_dynamic_port_python.rs" "native-desktop-0.9.1\src-tauri\src\main.rs" -Force
+          Copy-Item ".ci\native142\main_dynamic_port_python.rs" "native-desktop-0.9.1\src-tauri\src\main.rs" -Force
           Copy-Item ".ci\native091\Cargo.toml" "native-desktop-0.9.1\src-tauri\Cargo.toml" -Force
 
           $main = "native-desktop-0.9.1\src-tauri\src\main.rs"
           $m = Get-Content $main -Raw
           Set-Content $main $m -Encoding UTF8
-          if ($m -notmatch 'native-engine-0\.14\.1') { throw "Versioned 0.14.1 engine directory missing" }
-          if ($m -notmatch '\.sre0141-ready') { throw "Versioned 0.14.1 ready marker missing" }
-          if ($m -notmatch 'engine-v0141-staging') { throw "Versioned 0.14.1 staging directory missing" }
-          if ($m -notmatch 'native-desktop-0\.14\.1\.log') { throw "Versioned 0.14.1 startup log missing" }
+          if ($m -notmatch 'native-engine-0\.14\.2') { throw "Versioned 0.14.2 engine directory missing" }
+          if ($m -notmatch '\.sre0142-ready') { throw "Versioned 0.14.2 ready marker missing" }
+          if ($m -notmatch 'engine-v0142-staging') { throw "Versioned 0.14.2 staging directory missing" }
+          if ($m -notmatch 'native-desktop-0\.14\.2\.log') { throw "Versioned 0.14.2 startup log missing" }
           if ($m -notmatch 'choose_free_port') { throw "Dynamic-port launcher missing" }
           if ($m -notmatch 'health_matches') { throw "Backend-version handshake missing" }
           if ($m -match 'const PORT') { throw "Fixed desktop port must not exist in 0.9.9" }
-          if ($m -notmatch '0.14.1-fundamental-coverage-ui-repair') { throw "Wrong native launcher version" }
+          if ($m -notmatch '0.14.2-session-truth-ux-repair') { throw "Wrong native launcher version" }
           if ($m -notmatch 'STOCK_MODERN_UI_PREVIEW", "0') { throw "Preview must remain disabled" }
 
           $cargo = "native-desktop-0.9.1\src-tauri\Cargo.toml"
-          (Get-Content $cargo -Raw).Replace('version = "0.9.1"','version = "0.14.1"') | Set-Content $cargo -Encoding UTF8
+          (Get-Content $cargo -Raw).Replace('version = "0.9.1"','version = "0.14.2"') | Set-Content $cargo -Encoding UTF8
 
           $pkg = "native-desktop-0.9.1\package.json"
           $j = Get-Content $pkg -Raw | ConvertFrom-Json
-          $j.version = "0.14.1"
+          $j.version = "0.14.2"
           $j | ConvertTo-Json -Depth 20 | Set-Content $pkg -Encoding UTF8
 
       - name: Reconstruct canonical engine and apply 0.9.2 and 0.9.3 overlays
@@ -1502,6 +1503,12 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw "Complete-universe Opportunities UI repair failed" }
           python ".ci\native141\test_coverage_ui.py"
           if ($LASTEXITCODE -ne 0) { throw "0.14.1 coverage and UI tests failed" }
+          python ".ci\native142\patch142.py"
+          if ($LASTEXITCODE -ne 0) { throw "0.14.2 session truth backend repair failed" }
+          python ".ci\native142\patch142_ui.py"
+          if ($LASTEXITCODE -ne 0) { throw "0.14.2 UX repair failed" }
+          python ".ci\native142\test_session_ux.py"
+          if ($LASTEXITCODE -ne 0) { throw "0.14.2 session/UX regression failed" }
           python -m compileall -q "$env:SRE_ENGINE_ROOT\stock_app" "$env:SRE_ENGINE_ROOT\modern_ui"
           if ($LASTEXITCODE -ne 0) { throw "Backend compilation failed" }
           node --check "$env:SRE_ENGINE_ROOT\modern_ui\frontend\app.js"
@@ -1511,7 +1518,7 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path "native-desktop-0.9.1\resources" | Out-Null
-          Compress-Archive -Path "$env:SRE_ENGINE_ROOT\*" -DestinationPath "native-desktop-0.9.1\resources\SRE0141_ENGINE_SOURCE.zip" -Force
+          Compress-Archive -Path "$env:SRE_ENGINE_ROOT\*" -DestinationPath "native-desktop-0.9.1\resources\SRE0142_ENGINE_SOURCE.zip" -Force
 
           New-Item -ItemType Directory -Force -Path "native-desktop-0.9.1\src-tauri\icons" | Out-Null
           python -c "import struct,pathlib; w=h=32; px=bytes([52,211,153,255])*(w*h); mask=bytes(128); dib=struct.pack('<IIIHHIIIIII',40,w,h*2,1,32,0,len(px),0,0,0,0)+px+mask; ico=struct.pack('<HHH',0,1,1)+struct.pack('<BBBBHHII',w,h,0,0,1,32,len(dib),22)+dib; pathlib.Path(r'native-desktop-0.9.1\src-tauri\icons\icon.ico').write_bytes(ico)"
@@ -1519,7 +1526,7 @@ jobs:
 
           $p = "native-desktop-0.9.1\src-tauri\tauri.conf.json"
           $c = Get-Content $p -Raw | ConvertFrom-Json
-          $c.version = "0.14.1"
+          $c.version = "0.14.2"
           $c.productName = "Stock Recommendation Engine"
           $c | Add-Member -NotePropertyName identifier -NotePropertyValue "com.narayananrg.stockrecommendationengine" -Force
           $c.bundle | Add-Member -NotePropertyName publisher -NotePropertyValue "NarayananRG" -Force
@@ -1533,7 +1540,7 @@ jobs:
           $c.bundle.windows.nsis | Add-Member -NotePropertyName startMenuFolder -NotePropertyValue "Stock Recommendation Engine" -Force
           $c.bundle.windows.nsis | Add-Member -NotePropertyName compression -NotePropertyValue "lzma" -Force
           $c.bundle.targets = @("nsis")
-          $c.bundle.resources = @{"../resources/SRE0141_ENGINE_SOURCE.zip"="resources/SRE0141_ENGINE_SOURCE.zip"}
+          $c.bundle.resources = @{"../resources/SRE0142_ENGINE_SOURCE.zip"="resources/SRE0142_ENGINE_SOURCE.zip"}
           $c | ConvertTo-Json -Depth 20 | Set-Content $p -Encoding UTF8
 
       - name: Setup Node
@@ -1624,7 +1631,7 @@ jobs:
           $signing = if (Test-Path (Join-Path $dir "signing-status.txt")) { (Get-Content (Join-Path $dir "signing-status.txt") -Raw).Trim() } else { "AUTHENTICODE_SIGNING=UNKNOWN" }
           @(
             "SRE_RELEASE_SECURITY_REPORT_V1",
-            "VERSION=0.14.1-fundamental-coverage-ui-repair",
+            "VERSION=0.14.2-session-truth-ux-repair",
             "SHA256=$hash",
             "DEFENDER_SCAN=$defenderStatus",
             "SIGNATURE_STATUS=$($sig.Status)",
@@ -1644,7 +1651,7 @@ jobs:
         shell: pwsh
         run: |
           $setup = Get-ChildItem "native-desktop-0.9.1\src-tauri\target\release\bundle\nsis\*.exe" | Select-Object -First 1
-          if (!$setup) { throw "0.14.1 native Setup.exe missing" }
+          if (!$setup) { throw "0.14.2 native Setup.exe missing" }
           Write-Host "SETUP: $($setup.FullName)"
           Write-Host "SIZE: $($setup.Length)"
           Get-FileHash $setup.FullName -Algorithm SHA256
@@ -1655,7 +1662,7 @@ jobs:
           $setup = Get-ChildItem "native-desktop-0.9.1\src-tauri\target\release\bundle\nsis\*.exe" | Select-Object -First 1
           if (!$setup) { throw "Generated installer missing before installed-app test" }
 
-          $installDir = "$env:RUNNER_TEMP\SRE0141Installed"
+          $installDir = "$env:RUNNER_TEMP\SRE0142Installed"
           if (Test-Path $installDir) { Remove-Item $installDir -Recurse -Force }
           New-Item -ItemType Directory -Force -Path $installDir | Out-Null
 
@@ -1713,7 +1720,7 @@ jobs:
           $appData = Join-Path $env:LOCALAPPDATA "StockRecommendationEngine"
           $ready = Join-Path $appData "runtime-ready.txt"
           $portFile = Join-Path $appData "runtime-port.txt"
-          $logFile = Join-Path $appData "native-desktop-0.14.1.log"
+          $logFile = Join-Path $appData "native-desktop-0.14.2.log"
           New-Item -ItemType Directory -Force -Path $appData | Out-Null
           @{
             run_id = "20261012T092526Z-2"
@@ -1731,7 +1738,7 @@ jobs:
 
           # Upgrade-regression guard: simulate the stale engine folders/markers
           # left by prior installed releases. The new launcher MUST ignore them
-          # and extract/run only native-engine-0.14.1.
+          # and extract/run only native-engine-0.14.2.
           $legacy127 = Join-Path $appData "native-engine-0.12.7"
           New-Item -ItemType Directory -Force -Path $legacy127 | Out-Null
           "0.12.7-phase7-official-source-diagnostics-hotfix" | Set-Content (Join-Path $legacy127 ".sre0127-ready") -Encoding ASCII
@@ -1774,7 +1781,7 @@ jobs:
             }
 
             $readyLines = Get-Content $ready
-            if ($readyLines[0] -ne "0.14.1-fundamental-coverage-ui-repair") {
+            if ($readyLines[0] -ne "0.14.2-session-truth-ux-repair") {
               throw "Installed desktop runtime version mismatch: $($readyLines[0])"
             }
             $port = [int]$readyLines[1]
@@ -1783,7 +1790,7 @@ jobs:
 
             $health = Invoke-RestMethod "http://127.0.0.1:$port/api/health" -TimeoutSec 10
             if ($health.status -ne "ok") { throw "Installed app health status is not ok" }
-            if ($health.app_version -ne "0.14.1-fundamental-coverage-ui-repair") {
+            if ($health.app_version -ne "0.14.2-session-truth-ux-repair") {
               throw "Installed app backend version mismatch: $($health.app_version)"
             }
 
@@ -1799,7 +1806,7 @@ jobs:
               }
             }
             $stateMarker = Get-Content (Join-Path $appData "current_ui_state_version.json") -Raw | ConvertFrom-Json
-            if ($stateMarker.app_version -ne "0.14.1-fundamental-coverage-ui-repair") { throw "Current UI state version marker was not upgraded" }
+            if ($stateMarker.app_version -ne "0.14.2-session-truth-ux-repair") { throw "Current UI state version marker was not upgraded" }
 
             $source = Invoke-RestMethod "http://127.0.0.1:$port/api/data-source" -TimeoutSec 10
             if ($source.mode -ne "REAL_FROZEN_HISTORY") {
@@ -1877,10 +1884,10 @@ jobs:
       - name: Reopen installed app and verify persistent Run ID
         shell: pwsh
         run: |
-          $appExe = Get-ChildItem "$env:RUNNER_TEMP\SRE0141Installed" -Recurse -Filter "*.exe" -ErrorAction SilentlyContinue |
+          $appExe = Get-ChildItem "$env:RUNNER_TEMP\SRE0142Installed" -Recurse -Filter "*.exe" -ErrorAction SilentlyContinue |
             Where-Object { $_.Name -notmatch "uninstall|unins|setup|updater" } |
             Sort-Object Length -Descending | Select-Object -First 1
-          if (!$appExe) { throw "Installed 0.14.1 desktop EXE missing for restart test" }
+          if (!$appExe) { throw "Installed 0.14.2 desktop EXE missing for restart test" }
           $expected = (Get-Content "$env:RUNNER_TEMP\installed-phase2-run.txt" -Raw).Trim()
           $appData = Join-Path $env:LOCALAPPDATA "StockRecommendationEngine"
           $ready = Join-Path $appData "runtime-ready.txt"
@@ -1898,7 +1905,7 @@ jobs:
             }
             if(!$alive){throw "Reopened installed app never reached runtime-ready"}
             $readyLines=Get-Content $ready
-            if($readyLines[0] -ne "0.14.1-fundamental-coverage-ui-repair"){throw "Reopened runtime version mismatch: $($readyLines[0])"}
+            if($readyLines[0] -ne "0.14.2-session-truth-ux-repair"){throw "Reopened runtime version mismatch: $($readyLines[0])"}
             $port=[int]$readyLines[1]
             $dash=Invoke-RestMethod "http://127.0.0.1:$port/api/dashboard" -TimeoutSec 10
             if([string]$dash.active_run.run_id -ne $expected){throw "Installed app changed active Run ID after close/reopen"}
@@ -1910,10 +1917,10 @@ jobs:
             if(!$desktop.HasExited){Start-Process -FilePath "taskkill.exe" -ArgumentList @("/PID",$desktop.Id,"/T","/F") -Wait -NoNewWindow | Out-Null}
           }
 
-      - name: Upload 0.14.1 Fundamental Coverage UI Repair installer and security report
+      - name: Upload 0.14.2 Session Truth UX Repair installer and security report
         uses: actions/upload-artifact@v4
         with:
-          name: SRE-0.14.1-Fundamental-Coverage-UI-Repair-Setup
+          name: SRE-0.14.2-Session-Truth-UX-Repair-Setup
           path: |
             native-desktop-0.9.1/src-tauri/target/release/bundle/nsis/*.exe
             native-desktop-0.9.1/src-tauri/target/release/bundle/nsis/installer.sha256
