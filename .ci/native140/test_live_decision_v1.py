@@ -128,6 +128,8 @@ class RouterTests(unittest.TestCase):
         t,f=evidence()
         decision=run(t,f,True)
         self.assertEqual(live.monitor(dict(primary_style='RECOVERY',sessions_held=60),decision)[0],'WEAKENING')
+        decision['valuation_state']='FULL'
+        self.assertEqual(live.monitor(dict(primary_style='RECOVERY',sessions_held=60),decision)[0],'EXIT')
 
     def test_paper_uses_live_thesis_and_own_budget_not_ui_target_filter(self):
         t,f=evidence()

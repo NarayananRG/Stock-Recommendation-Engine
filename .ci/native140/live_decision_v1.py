@@ -250,6 +250,8 @@ def monitor(position, decision):
         return "EXIT", "Original business safety thesis invalidated by material deterioration."
     if decision.get("technical_state") == "BREAKDOWN" and style:
         return "EXIT", "Original " + style.lower() + " thesis breached its downside-risk protection."
+    if "RECOVERY" in style and decision.get("valuation_state") in ("FULL", "EXPENSIVE"):
+        return "EXIT", "Recovery valuation advantage has disappeared."
     review = (position.get("entry_thesis") or position).get("review_after_sessions", 60 if "RECOVERY" in style else 20)
     if position.get("sessions_held") is not None and int(position["sessions_held"]) >= int(review):
         return "WEAKENING", "Original holding-period review policy has been reached; review the investment thesis."

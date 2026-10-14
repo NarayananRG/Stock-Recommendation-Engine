@@ -38,6 +38,11 @@ replace("$('#decisionReason').textContent=`Frozen engine confidence:", "$('#deci
 replace("escapeHtml(b.reason_text||'')", "escapeHtml((b.thesis||b.reason_text||'')+' · Confidence '+(b.confidence||'UNAVAILABLE')+' · Risk '+(b.technical_state||'UNAVAILABLE'))")
 s=s.replace('Official data freshness → frozen production run → shadow evidence → validation snapshot','Official data freshness → live Momentum and Recovery theses → validation snapshot')
 s=s.replace('Using the same persisted combined recommendation run and frozen allocation policy','Allocating qualified live Momentum and Recovery opportunities within portfolio limits')
+for field in ('technical_score', 'fundamental_score', 'combined_score'):
+    s=s.replace(f'Number.isFinite(+x.{field})?', f'x.{field}!=null&&Number.isFinite(+x.{field})?')
+s=s.replace('Math.min(100,Math.max(8,(+item.profit_probability||.45)*100))', 'item.profit_probability==null?0:Math.min(100,Math.max(0,+item.profit_probability*100))')
+s=s.replace("String(c['HOLD-WEAKENING']||0)", "String((c.WEAKENING||0)+(c['HOLD-WEAKENING']||0))")
+s=s.replace('escapeHtml(x.symbol)}</strong><span><em class="status-badge', 'escapeHtml(x.symbol)}<small>${escapeHtml((x.simulated?"Paper · ":"")+(x.strategy_style||"Legacy position"))}</small></strong><span><em class="status-badge')
 p.write_text(s,encoding='utf-8')
 p=root/'index.html';s=p.read_text(encoding='utf-8')
 s=s.replace('<article id="technicalV2Panel"','<article id="liveThesisPanel" class="panel-card"></article>\n        <article id="technicalV2Panel"',1)

@@ -55,6 +55,9 @@ class IntegrationTests(unittest.TestCase):
         again=record_daily_observation(db,**args)
         self.assertEqual(len(first['orders']),3)
         self.assertTrue(again['duplicate'])
+        replanned=record_daily_observation(db,**{**args,'recommendations':[{**r,'executable':False} for r in self.rows],'capital_plan':dict(new_buys=[])})
+        self.assertTrue(replanned['duplicate'])
+        self.assertEqual(replanned['event_id'],first['event_id'])
         self.assertEqual(apply_open_fills(db,portfolio_id=state['portfolio_id'],fill_session='2026-10-13',open_prices=dict(M=100,R=100,B=100)),[])
         fills=apply_open_fills(db,portfolio_id=state['portfolio_id'],fill_session='2026-10-14',open_prices=dict(M=100,R=100,B=100))
         self.assertEqual(len(fills),3)
@@ -132,6 +135,35 @@ class IntegrationTests(unittest.TestCase):
         self.assertEqual(saved['last_successful_run']['model_version'],APP_VERSION)
         self.assertTrue(ctx.run_post_close_daily_flow()['duplicate'])
         self.assertEqual(len(calls),1)
+
+    def test_today_uses_current_original_thesis_and_blocks_stale_hold(self):
+        import sqlite3
+        from types import SimpleNamespace
+        from modern_ui.api import ModernAppContext
+        from stock_app.phase81_validation import _ClosingConnection
+        db=self.root/'today.sqlite3'
+        original=self.rows[1]['live_decision']
+        with sqlite3.connect(db,factory=_ClosingConnection) as con:
+            con.execute('create table live_position_theses (position_id integer primary key, thesis_json text not null)')
+            con.execute('insert into live_position_theses values (?,?)',(1,json.dumps(original)))
+        ctx=ModernAppContext.__new__(ModernAppContext)
+        ctx.db=SimpleNamespace(connect=lambda:sqlite3.connect(db,factory=_ClosingConnection))
+        ctx.monitoring=SimpleNamespace(summary=lambda:dict(actions=[dict(position_id=1,symbol='R',action='EXIT')]))
+        ctx.portfolio=SimpleNamespace(list_positions=lambda:[dict(id=1,symbol='R',buy_date='2026-10-12')])
+        ctx.prices=SimpleNamespace(history=lambda *a,**kw:[dict(date='2026-10-13')])
+        ctx.phase81_paper_status=lambda:dict(positions=[])
+        ctx.latest_prediction_rows=lambda *a:self.rows
+        ctx.active_prediction_run=lambda:dict(run=dict(market_session='2026-10-13'))
+        ctx._daily_data_gate=lambda:dict(ready=True,target_session='2026-10-14')
+        ctx.expected_market_session=lambda:dict(expected_market_session='2026-10-14')
+        ctx.data_source_status=lambda:dict(mode='REAL_OFFICIAL_DATA',active=dict(latest_session='2026-10-14'))
+        summary=ctx.live_today_summary()
+        self.assertEqual(summary['actions'][0]['action'],'WEAKENING')
+        self.assertEqual(summary['health_counts']['WEAKENING'],1)
+        ctx._daily_data_gate=lambda:dict(ready=True,target_session='2026-10-13')
+        ctx.expected_market_session=lambda:dict(expected_market_session='2026-10-13')
+        ctx.data_source_status=lambda:dict(mode='REAL_OFFICIAL_DATA',active=dict(latest_session='2026-10-13'))
+        self.assertEqual(ctx.live_today_summary()['actions'][0]['action'],'HOLD')
 
 
 if __name__=='__main__':unittest.main()

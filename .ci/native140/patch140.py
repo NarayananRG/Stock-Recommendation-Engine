@@ -36,10 +36,16 @@ methods = '''    def _live_file(self, run_id: str) -> Path:
         import hashlib
         return self.config.app_data_dir / "live_decision_v1" / (hashlib.sha256(run_id.encode()).hexdigest() + ".json")
 
-    def _persist_position_thesis(self, position_id: int, symbol: str) -> None:
-        row = next((r for r in self.latest_prediction_rows(200) if r["symbol"] == symbol.upper().replace(".NS", "")), {})
+    def _persist_position_thesis(self, position_id: int, symbol: str, buy_date: str) -> None:
+        active = self.active_prediction_run() or {}
+        row = next((r for r in active.get("candidates", []) if r["symbol"] == symbol.upper().replace(".NS", "")), {})
         live = row.get("live_decision")
-        if not live or not row.get("executable"):
+        if not live or not live.get("executable"):
+            return
+        try:
+            if date.fromisoformat(str(buy_date)) <= date.fromisoformat(str(live["market_session"])):
+                return  # Never manufacture a historical entry thesis from later evidence.
+        except (ValueError, TypeError):
             return
         with self.db.connect() as con:
             con.execute("create table if not exists live_position_theses (position_id integer primary key, thesis_json text not null)")
@@ -49,7 +55,11 @@ methods = '''    def _live_file(self, run_id: str) -> Path:
         from stock_app.live_decision_v1 import monitor
         from collections import Counter
         summary = self.monitoring.summary()
-        decisions = {r["symbol"]: r.get("live_decision") for r in self.latest_prediction_rows(200)}
+        expected = self.expected_market_session()["expected_market_session"]
+        source = self.data_source_status()
+        active = self.active_prediction_run() or {}
+        current = bool(source.get("mode") == "REAL_OFFICIAL_DATA" and str((source.get("active") or {}).get("latest_session")) == expected and str((active.get("run") or {}).get("market_session")) == expected)
+        decisions = {r["symbol"]: r.get("live_decision") for r in self.latest_prediction_rows(200)} if current else {}
         with self.db.connect() as con:
             con.execute("create table if not exists live_position_theses (position_id integer primary key, thesis_json text not null)")
             entry = {r[0]: json.loads(r[1]) for r in con.execute("select position_id,thesis_json from live_position_theses")}
@@ -59,7 +69,7 @@ methods = '''    def _live_file(self, run_id: str) -> Path:
             if str(pos.get("position_status") or "OPEN") == "CLOSED": continue
             original = entry.get(pos.get("id"))
             if not original: continue
-            current = decisions.get(pos["symbol"])
+            current = decisions.get(pos["symbol"]) if original.get("symbol") == pos["symbol"] else None
             bars = self.prices.history(pos["symbol"], limit=5000)
             original = {**original, "sessions_held": sum(str(b["date"])[:10] > str(pos["buy_date"]) for b in bars)}
             action, reason = monitor(original, current) if current else ("WEAKENING", "Current thesis evidence unavailable; review required.")
@@ -76,7 +86,11 @@ methods = '''    def _live_file(self, run_id: str) -> Path:
             action, reason = monitor(pos, current) if current else ("WEAKENING", "Current thesis evidence unavailable; review required.")
             actions.append({"symbol":pos["symbol"], "action":action, "thesis_health":action,
                             "strategy_style":pos.get("strategy_style"), "explanation":reason, "reason_codes":[reason], "simulated":True})
-        return {**summary, "actions":actions, "action_counts":dict(Counter(a["action"] for a in actions))}
+        counts = Counter(a["action"] for a in actions)
+        health = {"HEALTHY":counts["HOLD"], "WEAKENING":counts["WEAKENING"] + counts["HOLD-WEAKENING"],
+                  "BROKEN / EXIT":sum(v for k,v in counts.items() if k.startswith("EXIT"))}
+        return {**summary, "actions":actions, "action_counts":dict(counts), "health_counts":health,
+                "stale_count":summary.get("stale_count", 0) if current else len(actions)}
 
     def _paper_capital_plan(self, state: dict, run: dict) -> dict:
         from stock_app.allocation import Holding
@@ -225,7 +239,7 @@ edit('modern_ui/api.py', '        return record_daily_observation(self._phase81_
 edit('modern_ui/api.py', 'recommendations=self.latest_prediction_rows(limit=200), capital_plan=self._paper_capital_plan(status, run))', 'recommendations=paper_rows, capital_plan=paper_plan)')
 edit('modern_ui/api.py', '            "technical_v2": self.technical_v2_context(symbol, bars),', '            "live_decision": (prediction or {}).get("live_decision"),\n            "technical_v2": self.technical_v2_context(symbol, bars),')
 edit('modern_ui/api.py', '        prediction = dict(pred) if pred else None', '''        prediction = next((r for r in self.latest_prediction_rows(limit=200) if r.get("symbol") == symbol), None)''')
-edit('modern_ui/api.py', '        return {"ok": True, "position_id": position_id, **ctx.portfolio_summary()}', '        ctx._persist_position_thesis(position_id, req.symbol)\n        return {"ok": True, "position_id": position_id, **ctx.portfolio_summary()}')
+edit('modern_ui/api.py', '        return {"ok": True, "position_id": position_id, **ctx.portfolio_summary()}', '        ctx._persist_position_thesis(position_id, req.symbol, req.buy_date)\n        return {"ok": True, "position_id": position_id, **ctx.portfolio_summary()}')
 api_path = root / 'modern_ui/api.py'
 api_text = api_path.read_text(encoding='utf-8').replace('ctx.monitoring.summary()', 'ctx.live_today_summary()')
 api_text = api_text.replace('"authority": "FROZEN_PRODUCTION_RECOMMENDATIONS_UNCHANGED"', '"authority": "LIVE_DECISION_V1"')
@@ -241,6 +255,10 @@ api_path.write_text(api_text, encoding='utf-8')
 edit('stock_app/phase81_validation.py', '"production_recommendation_authority": "FROZEN_PRODUCTION_MODEL"', '"production_recommendation_authority": "LIVE_DECISION_V1"')
 edit('stock_app/phase81_validation.py', '"production_rank_authority_changed": False', '"production_rank_authority_changed": True')
 edit('stock_app/phase81_validation.py', '"production_action_authority_changed": False', '"production_action_authority_changed": True')
+edit('stock_app/phase81_validation.py', '        before = json.loads(json.dumps(state, sort_keys=True))', '''        previous = con.execute("select event_json from paper_journal where portfolio_id=? and market_session=? and production_run_id is ? and event_type in ('DAILY_DECISION','SIGNAL_GENERATED') order by created_at limit 1", (portfolio_id, market_session, production_run_id)).fetchone()
+        if previous:
+            return {**json.loads(previous[0]), "duplicate": True}
+        before = json.loads(json.dumps(state, sort_keys=True))''')
 edit('stock_app/phase81_validation.py', '    return bool(row.get("executable")) and "BUY" in decision and "WATCH" not in decision', '    from .live_decision_v1 import BUY_ACTIONS\n    return bool(row.get("executable")) and decision in BUY_ACTIONS')
 for field, authority in [('technical_v2','LIVE_EVIDENCE'), ('fundamental_v3','LIVE_EVIDENCE'), ('combined_v2','DIAGNOSTIC_ONLY')]:
     edit('stock_app/phase81_validation.py', f'"{field}_authority": "SHADOW_ONLY"', f'"{field}_authority": "{authority}"')
