@@ -1877,10 +1877,10 @@ jobs:
       - name: Reopen installed app and verify persistent Run ID
         shell: pwsh
         run: |
-          $appExe = Get-ChildItem "$env:RUNNER_TEMP\SRE0121Installed" -Recurse -Filter "*.exe" -ErrorAction SilentlyContinue |
+          $appExe = Get-ChildItem "$env:RUNNER_TEMP\SRE0141Installed" -Recurse -Filter "*.exe" -ErrorAction SilentlyContinue |
             Where-Object { $_.Name -notmatch "uninstall|unins|setup|updater" } |
             Sort-Object Length -Descending | Select-Object -First 1
-          if (!$appExe) { throw "Installed 0.11.0 desktop EXE missing for restart test" }
+          if (!$appExe) { throw "Installed 0.14.1 desktop EXE missing for restart test" }
           $expected = (Get-Content "$env:RUNNER_TEMP\installed-phase2-run.txt" -Raw).Trim()
           $appData = Join-Path $env:LOCALAPPDATA "StockRecommendationEngine"
           $ready = Join-Path $appData "runtime-ready.txt"
