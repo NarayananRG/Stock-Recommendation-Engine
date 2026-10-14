@@ -75,8 +75,21 @@ methods = '''    def _live_file(self, run_id: str) -> Path:
                             "strategy_style":pos.get("strategy_style"), "explanation":reason, "reason_codes":[reason], "simulated":True})
         return {**summary, "actions":actions, "action_counts":dict(Counter(a["action"] for a in actions))}
 
+    def _paper_capital_plan(self, state: dict, run: dict) -> dict:
+        from stock_app.allocation import Holding
+        active = self.active_prediction_run() or {"candidates": []}
+        reserved = sum(float((o.get("allocation") or {}).get("capital") or 0) for o in state.get("pending_orders", []) if o.get("side") == "BUY")
+        capital = max(0, float(state["cash"]) - reserved)
+        if capital <= 0: return {"new_buys": [], "excluded": []}
+        held = [p for p in state.get("positions", []) if p.get("state") != "CLOSED"]
+        excluded_symbols = {p["symbol"] for p in held} | {p["symbol"] for p in state.get("pending_orders", [])}
+        candidates = self.allocator.candidates_from_latest_run(active)
+        candidates = [c for c in candidates if is_executable_decision(c.opportunity_status) and c.symbol not in excluded_symbols]
+        holdings = [Holding(p["symbol"], int(p["qty"]), float(p.get("last_price") or p["entry_price"]), self.allocator.sectors.get(p["symbol"], {}).get("sector", "UNKNOWN")) for p in held]
+        return self.allocator.allocate(AllocationRequest(capital, int(run.get("horizon_sessions") or 20), None), candidates, holdings)
+
     def _materialize_live_run(self, data: dict) -> dict:
-        from stock_app.live_decision_v1 import route, lane_counts
+        from stock_app.live_decision_v1 import route, lane_counts, rank_candidates
         import os
         run = data["run"]
         path = self._live_file(str(run["run_id"]))
@@ -118,10 +131,7 @@ methods = '''    def _live_file(self, run_id: str) -> Path:
                          "opportunity_status": live["final_action"], "confidence_label": live["confidence"],
                          "final_action": live["final_action"], "strategy_style": live["strategy_style"],
                          "latest_close": price, "target_used_in_score": False})
-        priority = {"HIGH":0, "MEDIUM":1, "LOW":2}
-        rows.sort(key=lambda x: (not x["live_decision"]["executable"], priority[x["live_decision"]["priority"]],
-                                 x["live_decision"]["business_health"] not in ("HEALTHY", "STRONG"), x["symbol"]))
-        for rank, row in enumerate(rows, 1): row["rank"] = rank
+        rows = rank_candidates(rows)
         result = {"run": {**run, "production_authority": "LIVE_DECISION_V1", "model_version": APP_VERSION,
                             "lane_counts": lane_counts([r["live_decision"] for r in rows])}, "candidates": rows}
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -179,7 +189,7 @@ edit('modern_ui/api.py', '        run = self.ui_run_input() or {}\n        retur
         mark_daily_hold_exit(self._phase81_db_path(), portfolio_id=status["portfolio_id"], market_session=session,
                              production_run_id=run.get("run_id"), recommendations=self.latest_prediction_rows(limit=200))
         return record_daily_observation''')
-edit('modern_ui/api.py', 'capital_plan=self.build_capital_plan(float(status.get("cash") or status.get("starting_capital") or 100000), int(run.get("horizon_sessions") or 20), None))', 'capital_plan=self.build_capital_plan(float(status["cash"]), int(run.get("horizon_sessions") or 20), None) if float(status["cash"]) > 0 else {"new_buys": [], "excluded": []})')
+edit('modern_ui/api.py', 'capital_plan=self.build_capital_plan(float(status.get("cash") or status.get("starting_capital") or 100000), int(run.get("horizon_sessions") or 20), None))', 'capital_plan=self._paper_capital_plan(status, run))')
 edit('modern_ui/api.py', '            "technical_v2": self.technical_v2_context(symbol, bars),', '            "live_decision": (prediction or {}).get("live_decision"),\n            "technical_v2": self.technical_v2_context(symbol, bars),')
 edit('modern_ui/api.py', '        prediction = dict(pred) if pred else None', '''        prediction = next((r for r in self.latest_prediction_rows(limit=200) if r.get("symbol") == symbol), None)''')
 edit('modern_ui/api.py', '        return {"ok": True, "position_id": position_id, **ctx.portfolio_summary()}', '        ctx._persist_position_thesis(position_id, req.symbol)\n        return {"ok": True, "position_id": position_id, **ctx.portfolio_summary()}')
@@ -222,6 +232,11 @@ edit('stock_app/phase81_validation.py', '            if "EXIT" in decision or "S
                 row = {**row, "monitoring_reason": thesis_reason}
             if "EXIT" in decision or "SELL" in decision:''')
 edit('stock_app/phase81_validation.py', '"model_identity": "FROZEN_PRODUCTION_MODEL"', '"model_identity": "0.14.0-live-dual-strategy-v1"')
+paper_path = root / 'stock_app/phase81_validation.py'
+paper_text = paper_path.read_text(encoding='utf-8')
+for event_type in ('EXIT_SIGNAL_GENERATED', 'WEAKENING', 'HELD'):
+    paper_text = paper_text.replace('"event_type": "' + event_type + '",', '"event_type": "' + event_type + '", "reason": row.get("monitoring_reason") or decision, "entry_thesis": held[symbol].get("entry_thesis"),')
+paper_path.write_text(paper_text, encoding='utf-8')
 edit('stock_app/phase81_validation.py', 'def connect(db_path: Path) -> sqlite3.Connection:', '''class _ClosingConnection(sqlite3.Connection):
     def __exit__(self, *args):
         try:

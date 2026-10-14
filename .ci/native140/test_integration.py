@@ -9,7 +9,7 @@ import importlib.util
 sys.path.insert(0, os.environ['SRE_ENGINE_ROOT'])
 spec=importlib.util.spec_from_file_location('fixtures',Path(__file__).with_name('test_live_decision_v1.py'))
 fixtures=importlib.util.module_from_spec(spec);spec.loader.exec_module(fixtures)
-from stock_app.live_decision_v1 import route
+from stock_app.live_decision_v1 import route,rank_candidates
 from stock_app.allocation import PortfolioAllocator,AllocationRequest,is_executable_decision
 from stock_app.phase81_validation import create_portfolio,record_daily_observation,apply_open_fills,load_portfolio,mark_daily_hold_exit
 
@@ -38,6 +38,13 @@ class IntegrationTests(unittest.TestCase):
         self.assertEqual(len(plan['new_buys']),3)
         self.assertLessEqual(plan['capital_summary']['estimated_spend'],100000)
         self.assertFalse(is_executable_decision('WATCH - RECOVERY'))
+
+    def test_lane_ranking_and_symbol_deduplication(self):
+        ranked=rank_candidates(self.rows)
+        both=next(r for r in ranked if r['symbol']=='B')['live_decision']
+        self.assertEqual(set(both['lane_ranks']),{'MOMENTUM','RECOVERY'})
+        inputs=self.allocator.candidates_from_latest_run(dict(candidates=self.rows+[self.rows[-1]]))
+        self.assertEqual(len(inputs),3)
 
     def test_paper_both_lanes_idempotent_next_open(self):
         db=self.root/'paper.sqlite3'

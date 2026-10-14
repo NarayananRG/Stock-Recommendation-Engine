@@ -1450,7 +1450,15 @@ jobs:
             if($source.mode -ne "REAL_OFFICIAL_DATA"){throw "Official market bundle not active: $($source.mode)"}
             if([int]$source.active.stock_files -lt 190){throw "Current equity history coverage below 190: $($source.active.stock_files)"}
             if([double]$source.active.history_coverage -lt 0.95){throw "Current NIFTY200 history coverage below 95%"}
-            if(!$source.active.analysis_data_current){throw "Official market data did not pass freshness gate"}
+            # The downloaded official archive is a dated fixture. Verify its
+            # real freshness state; never relabel an old cache as current.
+            $fixtureDate = [datetime]::Parse([string]$source.active.latest_session).Date
+            $fixtureLag = 0
+            for ($cursor = $fixtureDate.AddDays(1); $cursor -le (Get-Date).Date; $cursor = $cursor.AddDays(1)) {
+              if ($cursor.DayOfWeek -notin @([DayOfWeek]::Saturday, [DayOfWeek]::Sunday)) { $fixtureLag++ }
+            }
+            if ([bool]$source.active.analysis_data_current -ne ($fixtureLag -le 2)) { throw "Official fixture freshness classification mismatch" }
+            Write-Host "DATED OFFICIAL FIXTURE: session=$fixtureDate business-day-lag=$fixtureLag current=$($source.active.analysis_data_current)"
 
             $dash=Invoke-RestMethod "http://127.0.0.1:18774/api/dashboard" -TimeoutSec 20
             if($null -ne $dash.active_run){throw "Fresh Phase 6 launch silently activated a historical run"}

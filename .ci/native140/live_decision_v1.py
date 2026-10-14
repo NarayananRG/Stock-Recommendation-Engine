@@ -173,6 +173,36 @@ def lane_counts(rows):
                 avoid=sum(v for k,v in counts.items() if k and k.startswith("AVOID")), no_opportunity=counts["NO OPPORTUNITY"])
 
 
+def rank_candidates(rows):
+    """Rank each thesis by its own evidence, then merge without a lane quota."""
+    rows = list(rows)
+    quality = {"STRONG":0, "HEALTHY":1, "MIXED":2, "WEAK":3, "DETERIORATING":4, "UNAVAILABLE":5}
+    lane_ranks = {}
+    for lane in ("MOMENTUM", "RECOVERY"):
+        members = [row for row in rows if row["live_decision"][lane.lower() + "_thesis"] == "VALID"]
+        def key(row):
+            d = row["live_decision"]
+            t = d["evidence"]["technical"]
+            risk = number((t.get("volatility") or {}).get("atr_pct"))
+            if lane == "MOMENTUM":
+                rs = number((t.get("relative_strength") or {}).get("rs20_vs_nifty"))
+                adx = number((t.get("momentum") or {}).get("adx14"))
+                return (quality[d["business_health"]], risk if risk is not None else 100,
+                        -(rs if rs is not None else -100), -(adx if adx is not None else 0), row["symbol"])
+            return (quality[d["business_health"]], d["earnings_direction"] != "IMPROVING",
+                    d["cash_flow_state"] != "SUPPORTIVE", d["valuation_state"] != "ATTRACTIVE",
+                    risk if risk is not None else 100, d["technical_state"] == "WEAK", row["symbol"])
+        for rank, row in enumerate(sorted(members,key=key),1):
+            lane_ranks.setdefault(row["symbol"], {})[lane] = rank
+    for row in rows:
+        row["live_decision"]["lane_ranks"] = lane_ranks.get(row["symbol"], {})
+    confidence = {"HIGH":0,"MEDIUM":1,"LOW":2}
+    rows.sort(key=lambda row: (not row["live_decision"]["executable"], confidence[row["live_decision"]["confidence"]],
+                              min(lane_ranks.get(row["symbol"], {}).values(),default=len(rows)+1), row["symbol"]))
+    for rank,row in enumerate(rows,1):row["rank"] = rank
+    return rows
+
+
 def monitor(position, decision):
     """Use persisted entry style. Never exit Recovery merely for weak momentum."""
     style = position.get("primary_style") or position.get("strategy_style") or ""
