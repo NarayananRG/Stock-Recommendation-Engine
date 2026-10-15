@@ -70,9 +70,15 @@ helper=r'''function capitalRationale(b){
   raw=raw.replace(/Cash-flow evidence is supportive\.\s*Balance-sheet evidence is healthy\.\s*PIT valuation comparison is attractive\./i,'Cash flow is supportive, balance sheet is healthy, and PIT valuation is attractive.');
   const parts=(raw.match(/[^.!?]+[.!?]+|[^.!?]+$/g)||[]).map(x=>x.trim()).filter(Boolean);
   const seen=new Set(),clean=[];
+  const declineKey='the cause of the decline is not established by these data';
+  let declineSeen=false;
   for(const part of parts){
     const key=part.toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
     if(!key||seen.has(key))continue;
+    if(key.includes(declineKey)){
+      if(declineSeen&&key===declineKey)continue;
+      declineSeen=true;
+    }
     seen.add(key);clean.push(part);
   }
   let core=clean.join(' ').trim();
