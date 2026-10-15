@@ -10,6 +10,9 @@ from collections import Counter
 from datetime import datetime
 from pathlib import Path
 from typing import Any
+from urllib.error import HTTPError
+from urllib.request import HTTPCookieProcessor, Request, build_opener
+from http.cookiejar import CookieJar
 from urllib.parse import urlencode
 from uuid import uuid4
 
@@ -72,15 +75,40 @@ def _contract(
     }
 
 
-def _session():
-    import requests
-    sess = requests.Session()
-    sess.headers.update({
-        "User-Agent": UA,
-        "Accept-Language": "en-US,en;q=0.9",
-        "Referer": "https://www.nseindia.com/",
-    })
-    return sess
+class _Response:
+    def __init__(self, status_code: int, headers: Any, content: bytes):
+        self.status_code = int(status_code)
+        self.headers = headers
+        self.content = content
+
+    def raise_for_status(self) -> None:
+        if self.status_code >= 400:
+            raise RuntimeError(f"HTTP_{self.status_code}")
+
+    def json(self) -> Any:
+        return json.loads(self.content.decode("utf-8"))
+
+
+class _OfficialSession:
+    def __init__(self):
+        self.headers = {
+            "User-Agent": UA,
+            "Accept-Language": "en-US,en;q=0.9",
+            "Referer": "https://www.nseindia.com/",
+        }
+        self._opener = build_opener(HTTPCookieProcessor(CookieJar()))
+
+    def get(self, url: str, *, timeout: int, headers: dict[str, str] | None = None) -> _Response:
+        request = Request(url, headers={**self.headers, **(headers or {})})
+        try:
+            with self._opener.open(request, timeout=timeout) as response:
+                return _Response(response.status, response.headers, response.read())
+        except HTTPError as exc:
+            return _Response(exc.code, exc.headers, exc.read())
+
+
+def _session() -> _OfficialSession:
+    return _OfficialSession()
 
 
 def _download_candidates(urls: list[str], *, timeout: int = 40) -> tuple[bytes, dict[str, Any]]:
