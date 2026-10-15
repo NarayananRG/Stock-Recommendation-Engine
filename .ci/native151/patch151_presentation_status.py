@@ -82,6 +82,16 @@ helper=r'''function capitalRationale(b){
     seen.add(key);clean.push(part);
   }
   let core=clean.join(' ').trim();
+  const declinePhrase='the cause of the decline is not established by these data';
+  const lower=core.toLowerCase();
+  const first=lower.indexOf(declinePhrase);
+  if(first>=0){
+    const before=core.slice(0,first+declinePhrase.length);
+    const after=core.slice(first+declinePhrase.length).replace(new RegExp(declinePhrase.replace(/[.*+?^$\\{\}()|[\]\\]/g,'\\  let core=clean.join(' ').trim();
+  if(core.length>520)core=core.slice(0,517).trimEnd()+'...';
+'),'ig'),'');
+    core=(before+after).replace(/\s{2,}/g,' ').replace(/\.\s*\./g,'.').trim();
+  }
   if(core.length>520)core=core.slice(0,517).trimEnd()+'...';
   const meta=[];
   if(b?.confidence)meta.push('Confidence: '+String(b.confidence));
