@@ -76,12 +76,22 @@ report={
 # display-validated official ratio should now qualify under unchanged rules.
 assert domain_blocked < 200,report
 assert buy_count >= 1,report
-for symbol in ("GODREJCP","HINDZINC","OFSS"):
+for symbol in ("GODREJCP","HINDZINC"):
     item=symbols.get(symbol)
     assert item is not None,(symbol,report)
     assert item["supplement"] and item["supplement"].get("applied") is True,(symbol,item)
     assert item["action"]=="RECOVERY BUY",(symbol,item)
     assert item["executable"] is True,(symbol,item)
+
+# OFSS proves the repair does not force a BUY: its official debt ratio is
+# available, but an already-existing finance-cost caution keeps balance-sheet
+# safety from qualifying.
+ofss=symbols.get("OFSS")
+assert ofss is not None,report
+assert ofss["supplement"] and ofss["supplement"].get("applied") is True,ofss
+assert ofss["action"]=="WATCH - RECOVERY",ofss
+assert ofss["balance_sheet_state"]=="CAUTION",ofss
+assert "BALANCE_SHEET_NOT_ACCEPTABLE_OR_UNAVAILABLE" in ofss["reason_codes"],ofss
 
 # Missing official facts stay missing; no zero-fill.
 for symbol in ("BDL","BSE"):
