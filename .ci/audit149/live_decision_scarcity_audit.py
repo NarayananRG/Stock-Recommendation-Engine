@@ -206,6 +206,127 @@ historical_summary={
     ],
 }
 
+
+# Deep evidence-path diagnostics. This remains strictly read-only: no router,
+# threshold, provider or production state is modified.
+state_counts = {
+    "technical_state": Counter(),
+    "nifty_regime": Counter(),
+    "business_health": Counter(),
+    "earnings_direction": Counter(),
+    "fundamental_event_state": Counter(),
+    "cash_flow_state": Counter(),
+    "balance_sheet_state": Counter(),
+    "valuation_state": Counter(),
+    "price_condition": Counter(),
+    "fundamental_data_quality": Counter(),
+}
+technical_components = Counter()
+debt_source_status = Counter()
+cash_source_status = Counter()
+asset_source_status = Counter()
+financial_group_coverage: dict[str, Counter] = {}
+financial_adapter_status = Counter()
+nonfinancial_domain_safety = Counter()
+financial_domain_safety = Counter()
+
+def _bool_component(name, value):
+    technical_components[name + ("_PASS" if value else "_FAIL")] += 1
+
+for row in rows:
+    live = row.get("live_decision") or {}
+    ev = live.get("evidence") or {}
+    tech = ev.get("technical") or {}
+    fund = ev.get("fundamental") or {}
+    trend = tech.get("trend") or {}
+    mom = tech.get("momentum") or {}
+    pc = ev.get("price_context") or {}
+
+    for key in state_counts:
+        if key == "nifty_regime":
+            value = (tech.get("market_context") or {}).get("nifty_regime")
+        else:
+            value = live.get(key)
+        state_counts[key][str(value or "UNAVAILABLE")] += 1
+
+    close = num(trend.get("close"))
+    ema50 = num(trend.get("ema50"))
+    slope = num(trend.get("ema50_slope_5d_pct"))
+    roc = num(mom.get("roc20_pct"))
+    rs = num((tech.get("relative_strength") or {}).get("rs20_vs_nifty"))
+    flow = num((tech.get("volume_flow") or {}).get("cmf20"))
+    macd = num(mom.get("macd_hist"))
+    weekly = (tech.get("multi_timeframe") or {}).get("weekly_trend_confirmed") is True
+    _bool_component("technical_status_ready", tech.get("status") == "READY")
+    _bool_component("close_above_ema50", close is not None and ema50 is not None and close > ema50)
+    _bool_component("ema50_slope_positive", slope is not None and slope > 0)
+    _bool_component("roc20_positive", roc is not None and roc > 0)
+    _bool_component("relative_strength_positive", rs is not None and rs > 0)
+    _bool_component("cmf20_positive", flow is not None and flow > 0)
+    _bool_component("macd_hist_positive", macd is not None and macd > 0)
+    _bool_component("weekly_trend_confirmed", weekly)
+
+    bs = fund.get("balance_sheet") or {}
+    sources = bs.get("sources") or {}
+    debt_source_status[str((sources.get("debt_equity_ratio") or {}).get("status") or "MISSING")] += 1
+    cash_source_status[str((sources.get("cash_and_equivalents") or {}).get("status") or "MISSING")] += 1
+    asset_source_status[str((sources.get("total_assets") or {}).get("status") or "MISSING")] += 1
+
+    adapter = fund.get("financial_domain_adapter") or {}
+    if live.get("financial_domain") is True:
+        financial_adapter_status[str(adapter.get("status") or "MISSING")] += 1
+        financial_domain_safety["READY" if live.get("financial_domain_ready") is True else "BLOCKED"] += 1
+        for group, item in (adapter.get("metrics") or {}).items():
+            financial_group_coverage.setdefault(str(group), Counter())[str((item or {}).get("status") or "MISSING")] += 1
+    else:
+        cash_ready = live.get("cash_flow_state") in ("SUPPORTIVE", "ADEQUATE")
+        balance_ready = live.get("balance_sheet_state") in ("HEALTHY", "ACCEPTABLE")
+        nonfinancial_domain_safety["READY" if cash_ready and balance_ready else "BLOCKED"] += 1
+
+# Diagnostic counterfactuals: count rows that would clear all other current
+# gates if ONE named gate (or one PAIR) were hypothetically supplied. These do
+# not alter the router and are not recommendations.
+def single_release(profiles, field):
+    all_gates = sorted({g for p in profiles for g in p[field]})
+    return {
+        gate: sum(1 for p in profiles if set(p[field]).issubset({gate}))
+        for gate in all_gates
+    }
+
+def pair_release(profiles, field, top_n=12):
+    from itertools import combinations
+    gates = sorted({g for p in profiles for g in p[field]})
+    scored = []
+    for a,b in combinations(gates,2):
+        n = sum(1 for p in profiles if set(p[field]).issubset({a,b}))
+        if n:
+            scored.append({"gates":[a,b],"would_clear":n})
+    scored.sort(key=lambda x:(-x["would_clear"],x["gates"]))
+    return scored[:top_n]
+
+counterfactual = {
+    "momentum_single_gate_release": single_release(today["profiles"], "momentum_failures"),
+    "recovery_single_gate_release": single_release(today["profiles"], "recovery_failures"),
+    "momentum_two_gate_release_top": pair_release(today["profiles"], "momentum_failures"),
+    "recovery_two_gate_release_top": pair_release(today["profiles"], "recovery_failures"),
+    "interpretation": "Diagnostic only. Counts show structural proximity if missing evidence/gates were resolved; they are NOT proposed threshold relaxations or BUY recommendations.",
+}
+
+deep_diagnostics = {
+    "state_distributions": {k:dict(v.most_common()) for k,v in state_counts.items()},
+    "technical_component_counts": dict(technical_components),
+    "balance_sheet_source_status": {
+        "debt_equity_ratio": dict(debt_source_status),
+        "cash_and_equivalents": dict(cash_source_status),
+        "total_assets": dict(asset_source_status),
+    },
+    "nonfinancial_domain_safety": dict(nonfinancial_domain_safety),
+    "financial_domain_safety": dict(financial_domain_safety),
+    "financial_adapter_status": dict(financial_adapter_status),
+    "financial_required_group_coverage": {k:dict(v) for k,v in sorted(financial_group_coverage.items())},
+    "counterfactual_gate_release": counterfactual,
+}
+
 coverage_summary={
     k:coverage.get(k) for k in (
         "universe_size","fundamental_ready","fundamental_partial","fundamental_unavailable",
@@ -227,6 +348,7 @@ report={
         "dominant_gate_failures":dominance[:20],
     },
     "historical_restrictiveness_sample":historical_summary,
+    "deep_diagnostics": deep_diagnostics,
     "policy_changes":False,
     "threshold_changes":False,
     "provider_policy_changes":False,
@@ -243,6 +365,19 @@ elif sum(1 for p in today["profiles"] if len(p["momentum_failures"])<=1 or len(p
 else:
     verdict="ZERO_BUYS_BROAD_MULTI_GATE_REJECTION"
 report["verdict"]=verdict
+
+# Root-cause classification is evidence-based and conservative.
+debt_missing = (coverage.get("feature_coverage_counts") or {}).get("Debt/Leverage", {}).get("MISSING", 0)
+domain_fail = today["recovery_gate_failure_counts"].get("domain_safety_ready", 0)
+financial_blocked = financial_domain_safety.get("BLOCKED", 0)
+nonfinancial_blocked = nonfinancial_domain_safety.get("BLOCKED", 0)
+if domain_fail == today["universe"] and debt_missing == today["universe"] and nonfinancial_blocked == coverage.get("nonfinancial_count") and financial_blocked == coverage.get("financial_domain_count"):
+    root_cause_classification = "STRUCTURAL_EVIDENCE_COVERAGE_BLOCKER"
+elif domain_fail == today["universe"]:
+    root_cause_classification = "STRUCTURAL_DOMAIN_SAFETY_BLOCKER"
+else:
+    root_cause_classification = "MULTI_GATE_MARKET_AND_EVIDENCE_SCARCITY"
+report["root_cause_classification"] = root_cause_classification
 
 (OUT/"scarcity_audit.json").write_text(json.dumps(report,indent=2,default=str),encoding="utf-8")
 
@@ -298,6 +433,24 @@ md.append(f"- Financial-domain symbols: {coverage.get('financial_domain_count')}
 for name,counts in (coverage.get("feature_coverage_counts") or {}).items():
     md.append(f"- {name}: {counts}")
 md.append("")
+md.append("## Deep root-cause diagnostics")
+md.append(f"- Root-cause classification: **{root_cause_classification}**")
+md.append(f"- Non-financial domain safety: {dict(nonfinancial_domain_safety)}")
+md.append(f"- Financial-domain safety: {dict(financial_domain_safety)}")
+md.append(f"- Debt/equity source status: {dict(debt_source_status)}")
+md.append(f"- Financial adapter status: {dict(financial_adapter_status)}")
+md.append("### Financial required-group coverage")
+for group,counts in sorted(financial_group_coverage.items()): md.append(f"- {group}: {dict(counts)}")
+md.append("### State distributions")
+for name,counts in state_counts.items(): md.append(f"- {name}: {dict(counts)}")
+md.append("### Technical component coverage")
+for name,count in sorted(technical_components.items()): md.append(f"- {name}: {count}")
+md.append("### Diagnostic single-gate release")
+md.append(f"- Momentum: {counterfactual['momentum_single_gate_release']}")
+md.append(f"- Recovery: {counterfactual['recovery_single_gate_release']}")
+md.append("### Diagnostic two-gate release (top)")
+for item in counterfactual["recovery_two_gate_release_top"][:8]: md.append(f"- Recovery {item['gates']}: {item['would_clear']}")
+md.append("")
 md.append("## Sampled historical restrictiveness")
 for x in historical:
     md.append(f"- {x['session']}: {x['buy_count']} BUY(s) / {x['universe']} symbols")
@@ -325,4 +478,6 @@ print(json.dumps({
     "fundamental_partial":coverage.get("fundamental_partial"),
     "fundamental_unavailable":coverage.get("fundamental_unavailable"),
     "historical_sample":historical_summary,
+    "root_cause_classification":root_cause_classification,
+    "deep_diagnostics":deep_diagnostics,
 },indent=2,default=str))
