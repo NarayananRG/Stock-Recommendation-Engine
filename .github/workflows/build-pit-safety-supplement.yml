@@ -1,0 +1,46 @@
+name: Build Official PIT Safety Supplement
+
+on:
+  push:
+    branches: [ui-0.12.1-phase6-target-hotfix]
+    paths:
+      - ".ci/native150/build_official_safety_supplement.py"
+      - ".github/workflows/build-pit-safety-supplement.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: sre-pit-safety-supplement
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --disable-pip-version-check requests
+      - name: Download governed Phase 5 official diagnostics
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/phase5diag"
+          gh run download 38163955223 --repo "$GITHUB_REPOSITORY" --name "SRE-Phase5-Fundamental-Pipeline-Diagnostics" --dir "$RUNNER_TEMP/phase5diag"
+          test -f "$RUNNER_TEMP/phase5diag/fundamental_v2_phase2a1_scaled/all_target_events.json"
+          echo "SRE_PHASE5_DIAGNOSTICS_ROOT=$RUNNER_TEMP/phase5diag" >> "$GITHUB_ENV"
+      - name: Build official display-validated safety supplement
+        run: |
+          export SRE_SAFETY_SUPPLEMENT_OUT="$RUNNER_TEMP/pit-safety-supplement"
+          python ".ci/native150/build_official_safety_supplement.py"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SRE-PIT-Safety-Supplement
+          path: ${{ runner.temp }}/pit-safety-supplement
+          if-no-files-found: error
+          retention-days: 30
