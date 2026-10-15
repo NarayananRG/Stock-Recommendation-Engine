@@ -1,0 +1,32 @@
+<!doctype html>
+<html><body>
+<button id="browse" data-browse-stocks="true" disabled>Browse stocks</button>
+<button id="runMonitoring">Run position check</button>
+<button id="runPostCloseDaily">Run post close</button>
+<button id="buildCapitalPlan">Build capital</button>
+<nav><button class="nav-item active" data-page="today">Today</button><button class="nav-item" data-page="opportunities">Opportunities</button></nav>
+<section id="todayPage">today</section>
+<section id="opportunitiesPage" class="hidden" style="display:none">opps</section>
+<script>
+window.__calls={monitor:0,daily:0,capital:0};
+window.runMonitoring=()=>{window.__calls.monitor++};
+window.runPostCloseDaily=()=>{window.__calls.daily++};
+window.buildCapitalPlan=()=>{window.__calls.capital++};
+</script>
+<script src="interaction-bootstrap.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('browse').click();
+  document.getElementById('runMonitoring').click();
+  document.getElementById('runPostCloseDaily').click();
+  document.getElementById('buildCapitalPlan').click();
+  const ok =
+    !document.getElementById('browse').disabled &&
+    !document.getElementById('opportunitiesPage').classList.contains('hidden') &&
+    window.__calls.monitor===1 &&
+    window.__calls.daily===1 &&
+    window.__calls.capital===1;
+  document.body.setAttribute('data-interaction-test', ok?'PASS':'FAIL');
+});
+</script>
+</body></html>
