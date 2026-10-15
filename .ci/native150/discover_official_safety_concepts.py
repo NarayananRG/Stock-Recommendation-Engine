@@ -90,11 +90,13 @@ def process(event):
     domain=classify_domain(doc.get("domain_source_url") or doc.get("source_url"))
     contexts=context_map(doc)
     hits={k:[] for k in PATTERNS}
+    all_concepts=set()
     seen=set()
     for fact in doc.get("numeric_facts",[]):
         concept=str(fact.get("concept_local_name") or "")
         if not concept:
             continue
+        all_concepts.add(concept)
         ctx=contexts.get(fact.get("context_ref")) or {}
         dims=ctx.get("dimensions") or []
         signature=(concept,fact.get("context_ref"),fact.get("raw_value"))
@@ -116,7 +118,7 @@ def process(event):
     return {
       "symbol":event.get("symbol"),"quarter_end":event.get("quarter_end"),
       "reporting_basis":event.get("reporting_basis"),"domain":domain,
-      "source_url":url,"hits":hits,"numeric_fact_count":len(doc.get("numeric_facts",[])),
+      "source_url":url,"hits":hits,"all_concepts":sorted(all_concepts),"numeric_fact_count":len(doc.get("numeric_facts",[])),
     }
 
 events=json.loads(EVENTS.read_text(encoding="utf-8"))
@@ -141,11 +143,14 @@ with ThreadPoolExecutor(max_workers=8) as pool:
             print(f"[{done}/{len(selected)}] ok={len(rows)} fail={len(failures)}",flush=True)
 
 concepts=defaultdict(Counter)
+domain_all_concepts=defaultdict(Counter)
 domain_concepts=defaultdict(lambda:defaultdict(Counter))
 symbol_group_presence=defaultdict(Counter)
 examples=defaultdict(lambda:defaultdict(list))
 for row in rows:
     domain=row["domain"]
+    for concept in row.get("all_concepts") or []:
+        domain_all_concepts[domain][concept]+=1
     for group,hits in row["hits"].items():
         unique={h["concept"] for h in hits}
         symbol_group_presence[domain][group]+=int(bool(unique))
@@ -169,6 +174,8 @@ report={
  "group_document_presence":{d:dict(v) for d,v in symbol_group_presence.items()},
  "concept_frequency":{g:dict(c.most_common()) for g,c in concepts.items()},
  "domain_concept_frequency":{d:{g:dict(c.most_common()) for g,c in groups.items()} for d,groups in domain_concepts.items()},
+ "domain_all_concept_frequency":{d:dict(c.most_common()) for d,c in domain_all_concepts.items()},
+ "symbol_safety_hits":[{"symbol":row["symbol"],"domain":row["domain"],"quarter_end":row["quarter_end"],"basis":row["reporting_basis"],"hits":row["hits"]} for row in rows],
  "examples":{g:dict(v) for g,v in examples.items()},
  "production_logic_changed":False,
  "thresholds_changed":False,
@@ -186,6 +193,11 @@ for domain,groups in report["group_document_presence"].items():
     for group,count in groups.items():
         md.append(f"- {group}: present in {count} documents")
 md.append("")
+for domain,counter in domain_all_concepts.items():
+    md.append("## "+domain+" common numeric concepts")
+    for concept,count in counter.most_common(120):
+        md.append(f"- {concept}: {count}")
+    md.append("")
 for group,counter in concepts.items():
     md.append("## "+group+" top concepts")
     for concept,count in counter.most_common(15):
@@ -197,5 +209,7 @@ print(json.dumps({
  "domain_counts":report["domain_counts"],
  "group_document_presence":report["group_document_presence"],
  "top_concepts":{g:list(c.most_common(12)) for g,c in concepts.items()},
+ "bank_common_concepts":list(domain_all_concepts.get("BANK",Counter()).most_common(100)),
+ "nbfc_common_concepts":list(domain_all_concepts.get("NBFC",Counter()).most_common(100)),
  "failures":len(failures)
 },indent=2),flush=True)
