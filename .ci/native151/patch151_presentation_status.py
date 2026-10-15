@@ -56,7 +56,7 @@ app=front/"app.js"
 s=app.read_text(encoding="utf-8")
 
 old_heading="<b>Why no capital was deployed</b>"
-new_heading="<b>\${buys.length?'Why other stocks were not allocated':'Why no capital was deployed'}</b>"
+new_heading="<b>${buys.length?'Why other stocks were not allocated':'Why no capital was deployed'}</b>"
 if old_heading not in s:
     raise RuntimeError("capital blocker heading missing")
 s=s.replace(old_heading,new_heading,1)
