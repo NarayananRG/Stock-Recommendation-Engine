@@ -42,6 +42,19 @@ for e in selected:
           "start_date":c.get("start_date"),"end_date":c.get("end_date"),
           "dimensions":c.get("dimensions"),
         })
-    out.append({"symbol":e.get("symbol"),"quarter_end":e.get("quarter_end"),"basis":e.get("reporting_basis"),"hits":hits})
+    display_snippets=[]
+    ixurl=e.get("ixbrl_url")
+    if ixurl:
+        try:
+            hr=s.get(ixurl,timeout=45)
+            if hr.ok:
+                text=hr.text
+                for token in ("Debt Equity Ratio","Debt-Equity Ratio","DebtEquityRatio"):
+                    pos=text.lower().find(token.lower())
+                    if pos>=0:
+                        display_snippets.append(text[max(0,pos-500):pos+1200])
+        except Exception as exc:
+            display_snippets.append("IXBRL_DISPLAY_ERROR:"+type(exc).__name__+":"+str(exc))
+    out.append({"symbol":e.get("symbol"),"quarter_end":e.get("quarter_end"),"basis":e.get("reporting_basis"),"hits":hits,"display_snippets":display_snippets})
 print(json.dumps(out,indent=2))
 Path(os.environ["SRE_DEBT_SEMANTICS_OUT"]).write_text(json.dumps(out,indent=2),encoding="utf-8")
