@@ -22,7 +22,7 @@ if old not in s: raise RuntimeError('reason mapper patch point missing')
 s=s.replace(old,new,1)
 
 start=s.find('function openOpportunityDetails(symbol){')
-end=s.find('\nfunction filteredOpportunityRows(){',start)
+end=s.find('\nfunction renderLiveThesis',start)
 if start<0 or end<0: raise RuntimeError('drawer boundaries missing')
 drawer=r"""function openOpportunityDetails(symbol){
  const i=state.opportunityItems.find(x=>x.symbol===symbol);if(!i)return;const x=i.live_decision||i,codes=x.reason_codes||[],miss=x.missing_evidence||[];

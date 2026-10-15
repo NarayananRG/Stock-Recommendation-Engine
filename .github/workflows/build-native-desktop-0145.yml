@@ -1532,38 +1532,40 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw "Backend compilation failed" }
           node --check "$env:SRE_ENGINE_ROOT\modern_ui\frontend\app.js"
           if ($LASTEXITCODE -ne 0) { throw "UI syntax failed" }
+          python ".ci\native145\write_frontend_manifest.py"
+          if ($LASTEXITCODE -ne 0) { throw "Frontend release manifest failed" }
 
-      - name: Browser-click interaction regression
+      - name: Setup Node for Playwright
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install Playwright managed Chromium
         shell: pwsh
         run: |
           $ErrorActionPreference = "Stop"
-          Copy-Item "$env:SRE_ENGINE_ROOT\modern_ui\frontend\interaction-bootstrap.js" ".ci\native145\interaction-bootstrap.js" -Force
+          npm install --no-save --no-package-lock playwright@1.56.1
+          if ($LASTEXITCODE -ne 0) { throw "Playwright package installation failed" }
+          npx playwright install chromium
+          if ($LASTEXITCODE -ne 0) { throw "Playwright Chromium installation failed" }
 
-          $edgeCandidates = @(
-            (Get-Command msedge.exe -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source -ErrorAction SilentlyContinue),
-            "$env:ProgramFiles\Microsoft\Edge\Application\msedge.exe",
-            "$env:ProgramFiles(x86)\Microsoft\Edge\Application\msedge.exe"
-          ) | Where-Object { $_ -and (Test-Path $_) }
-          $edge = $edgeCandidates | Select-Object -First 1
-          if (!$edge) { throw "Microsoft Edge executable not found for interaction regression" }
-
-          $fixture = (Resolve-Path ".ci\native145\interaction-test.html").Path
-          $uri = ([System.Uri]$fixture).AbsoluteUri
-          $domFile = "$env:RUNNER_TEMP\interaction-test-dom.html"
-          & $edge --headless=new --disable-gpu --allow-file-access-from-files --virtual-time-budget=1500 --dump-dom $uri | Set-Content $domFile -Encoding UTF8
-          if ($LASTEXITCODE -ne 0) { throw "Headless Edge interaction fixture failed" }
-          $dom = Get-Content $domFile -Raw
-          if ($dom -notmatch 'data-interaction-test="PASS"') {
-            Write-Host $dom
-            throw "Real browser interaction regression FAILED"
-          }
-          Write-Host "REAL BROWSER INTERACTION REGRESSION PASS"
+      - name: Real FastAPI frontend interaction regression
+        shell: pwsh
+        env:
+          SRE_BROWSER_PORT: "8875"
+          SRE_BROWSER_APP_DATA: ${{ runner.temp }}\sre-browser-app-data
+        run: |
+          $ErrorActionPreference = "Stop"
+          node ".ci\native145\real_frontend_interactions.mjs"
+          if ($LASTEXITCODE -ne 0) { throw "Real Chromium frontend interaction regression failed" }
 
       - name: Package native application
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path "native-desktop-0.9.1\resources" | Out-Null
           Compress-Archive -Path "$env:SRE_ENGINE_ROOT\*" -DestinationPath "native-desktop-0.9.1\resources\SRE0145_ENGINE_SOURCE.zip" -Force
+          python ".ci\native145\verify_packaged_frontend.py" "native-desktop-0.9.1\resources\SRE0145_ENGINE_SOURCE.zip"
+          if ($LASTEXITCODE -ne 0) { throw "Packaged frontend differs from browser-tested frontend" }
 
           New-Item -ItemType Directory -Force -Path "native-desktop-0.9.1\src-tauri\icons" | Out-Null
           python -c "import struct,pathlib; w=h=32; px=bytes([52,211,153,255])*(w*h); mask=bytes(128); dib=struct.pack('<IIIHHIIIIII',40,w,h*2,1,32,0,len(px),0,0,0,0)+px+mask; ico=struct.pack('<HHH',0,1,1)+struct.pack('<BBBBHHII',w,h,0,0,1,32,len(dib),22)+dib; pathlib.Path(r'native-desktop-0.9.1\src-tauri\icons\icon.ico').write_bytes(ico)"
@@ -1794,7 +1796,7 @@ jobs:
           "0.13.0-phase8-validation" | Set-Content (Join-Path $legacy130 ".sre0130-ready") -Encoding ASCII
           "raise SystemExit('STALE_0130_ENGINE_MUST_NOT_RUN')" | Set-Content (Join-Path $legacy130 "run_modern_ui.py") -Encoding ASCII
 
-          foreach ($oldVersion in @("0.12.7", "0.13.0", "0.13.1", "0.13.2", "0.13.3", "0.13.4", "0.13.5", "0.14.0", "0.14.1")) {
+          foreach ($oldVersion in @("0.12.7", "0.13.0", "0.13.1", "0.13.2", "0.13.3", "0.13.4", "0.13.5", "0.14.0", "0.14.1", "0.14.2", "0.14.3", "0.14.4")) {
             $oldEngine = Join-Path $appData "native-engine-$oldVersion"
             New-Item -ItemType Directory -Force -Path $oldEngine | Out-Null
             "raise SystemExit('STALE_ENGINE_MUST_NOT_RUN')" | Set-Content (Join-Path $oldEngine "run_modern_ui.py") -Encoding ASCII
@@ -1828,6 +1830,13 @@ jobs:
             $readyLines = Get-Content $ready
             if ($readyLines[0] -ne "0.14.5-runtime-interaction-bootstrap") {
               throw "Installed desktop runtime version mismatch: $($readyLines[0])"
+            }
+            $newEngine = Join-Path $appData "native-engine-0.14.5"
+            if (!(Test-Path (Join-Path $newEngine ".sre0145-ready"))) {
+              throw "Installed app did not extract the versioned 0.14.5 engine/ready marker"
+            }
+            if (!(Test-Path (Join-Path $newEngine "modern_ui\frontend\release-frontend-manifest.json")) -and !(Test-Path (Join-Path $newEngine "release-frontend-manifest.json"))) {
+              throw "Installed 0.14.5 engine is missing the tested frontend manifest"
             }
             $port = [int]$readyLines[1]
             if ($port -le 0) { throw "Installed desktop runtime port invalid" }
