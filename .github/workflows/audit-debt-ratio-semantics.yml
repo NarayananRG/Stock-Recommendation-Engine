@@ -1,0 +1,41 @@
+name: Audit Debt Equity Ratio Semantics
+
+on:
+  push:
+    branches: [ui-0.12.1-phase6-target-hotfix]
+    paths:
+      - ".ci/native150/debt_ratio_semantics.py"
+      - ".github/workflows/audit-debt-ratio-semantics.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --disable-pip-version-check requests
+      - name: Download Phase 5 diagnostics
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/phase5diag"
+          gh run download 38163955223 --repo "$GITHUB_REPOSITORY" --name "SRE-Phase5-Fundamental-Pipeline-Diagnostics" --dir "$RUNNER_TEMP/phase5diag"
+          echo "SRE_PHASE5_DIAGNOSTICS_ROOT=$RUNNER_TEMP/phase5diag" >> "$GITHUB_ENV"
+      - name: Inspect near-miss debt ratio semantics
+        run: |
+          echo "SRE_DEBT_SEMANTICS_OUT=$RUNNER_TEMP/debt_ratio_semantics.json" >> "$GITHUB_ENV"
+          SRE_DEBT_SEMANTICS_OUT="$RUNNER_TEMP/debt_ratio_semantics.json" python ".ci/native150/debt_ratio_semantics.py"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SRE-Debt-Ratio-Semantics
+          path: ${{ runner.temp }}/debt_ratio_semantics.json
+          if-no-files-found: error
+          retention-days: 14
