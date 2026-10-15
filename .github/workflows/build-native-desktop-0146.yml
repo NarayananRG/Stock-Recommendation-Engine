@@ -77,10 +77,10 @@ jobs:
           $main = "native-desktop-0.9.1\src-tauri\src\main.rs"
           $m = Get-Content $main -Raw
           Set-Content $main $m -Encoding UTF8
-          if ($m -notmatch 'native-engine-0\.14\.5') { throw "Versioned 0.14.6 engine directory missing" }
+          if ($m -notmatch 'native-engine-0\.14\.6') { throw "Versioned 0.14.6 engine directory missing" }
           if ($m -notmatch '\.sre0146-ready') { throw "Versioned 0.14.6 ready marker missing" }
           if ($m -notmatch 'engine-v0146-staging') { throw "Versioned 0.14.6 staging directory missing" }
-          if ($m -notmatch 'native-desktop-0\.14\.5\.log') { throw "Versioned 0.14.6 startup log missing" }
+          if ($m -notmatch 'native-desktop-0\.14\.6\.log') { throw "Versioned 0.14.6 startup log missing" }
           if ($m -notmatch 'choose_free_port') { throw "Dynamic-port launcher missing" }
           if ($m -notmatch 'health_matches') { throw "Backend-version handshake missing" }
           if ($m -match 'const PORT') { throw "Fixed desktop port must not exist in 0.9.9" }
