@@ -70,27 +70,25 @@ helper=r'''function capitalRationale(b){
   raw=raw.replace(/Cash-flow evidence is supportive\.\s*Balance-sheet evidence is healthy\.\s*PIT valuation comparison is attractive\./i,'Cash flow is supportive, balance sheet is healthy, and PIT valuation is attractive.');
   const parts=(raw.match(/[^.!?]+[.!?]+|[^.!?]+$/g)||[]).map(x=>x.trim()).filter(Boolean);
   const seen=new Set(),clean=[];
-  const declineKey='the cause of the decline is not established by these data';
-  let declineSeen=false;
   for(const part of parts){
     const key=part.toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
     if(!key||seen.has(key))continue;
-    if(key.includes(declineKey)){
-      if(declineSeen&&key===declineKey)continue;
-      declineSeen=true;
-    }
-    seen.add(key);clean.push(part);
+    seen.add(key);
+    clean.push(part);
   }
   let core=clean.join(' ').trim();
   const declinePhrase='the cause of the decline is not established by these data';
-  const lower=core.toLowerCase();
-  const first=lower.indexOf(declinePhrase);
+  const first=core.toLowerCase().indexOf(declinePhrase);
   if(first>=0){
-    const before=core.slice(0,first+declinePhrase.length);
-    const after=core.slice(first+declinePhrase.length).replace(new RegExp(declinePhrase.replace(/[.*+?^$\\{\}()|[\]\\]/g,'\\  let core=clean.join(' ').trim();
-  if(core.length>520)core=core.slice(0,517).trimEnd()+'...';
-'),'ig'),'');
-    core=(before+after).replace(/\s{2,}/g,' ').replace(/\.\s*\./g,'.').trim();
+    const keepEnd=first+declinePhrase.length;
+    const prefix=core.slice(0,keepEnd);
+    let suffix=core.slice(keepEnd);
+    while(true){
+      const repeat=suffix.toLowerCase().indexOf(declinePhrase);
+      if(repeat<0)break;
+      suffix=suffix.slice(0,repeat)+suffix.slice(repeat+declinePhrase.length);
+    }
+    core=(prefix+suffix).replace(/\s{2,}/g,' ').replace(/\.\s*\./g,'.').trim();
   }
   if(core.length>520)core=core.slice(0,517).trimEnd()+'...';
   const meta=[];
