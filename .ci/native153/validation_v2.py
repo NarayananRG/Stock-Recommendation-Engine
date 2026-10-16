@@ -785,6 +785,132 @@ def mark_to_market(
         return nav_row
 
 
+
+def record_monitoring_event(
+    db_path: Path,
+    *,
+    portfolio_id: str,
+    market_session: str,
+    production_run_id: str,
+    symbol: str,
+    action: str,
+    reason: str,
+) -> dict[str, Any]:
+    symbol = symbol.upper().replace(".NS", "")
+    action = str(action or "HOLD").upper()
+    if action not in {"HOLD", "WEAKENING"}:
+        raise ValueError("UNSUPPORTED_MONITORING_ACTION")
+    with connect(db_path) as con:
+        event, _ = _journal(
+            con,
+            portfolio_id=portfolio_id,
+            market_session=market_session,
+            production_run_id=production_run_id,
+            event_type=action,
+            idempotency_key=f"{portfolio_id}|{market_session}|{production_run_id}|{action}|{symbol}",
+            event={"symbol": symbol, "decision": action, "reason": reason},
+        )
+        if action == "WEAKENING":
+            row = con.execute(
+                "select position_id,state_json from v2_positions where portfolio_id=? and symbol=? and state in ('HELD','WEAKENING') order by rowid limit 1",
+                (portfolio_id, symbol),
+            ).fetchone()
+            if row:
+                pos = json.loads(row[1])
+                pos["state"] = "WEAKENING"
+                con.execute(
+                    "update v2_positions set state='WEAKENING',state_json=? where position_id=?",
+                    (_json(pos), row[0]),
+                )
+        return event
+
+
+def technical_snapshot_from_features(features: Any, session: str) -> dict[str, Any]:
+    """Create the exact technical fields LIVE_DECISION_V1 consumes from a causal feature frame."""
+    if features is None or getattr(features, "empty", True):
+        return {"status": "NO_DATA", "point_in_time_safe": True}
+    try:
+        import pandas as pd
+    except Exception:
+        return {"status": "NO_DATA", "point_in_time_safe": True}
+    idx = pd.Timestamp(session)
+    if idx not in features.index:
+        return {"status": "NO_SESSION_ROW", "point_in_time_safe": True}
+    row = features.loc[idx]
+    if getattr(row, "ndim", 1) > 1:
+        row = row.iloc[-1]
+
+    def num(name: str) -> float | None:
+        value = row.get(name)
+        try:
+            value = float(value)
+        except (TypeError, ValueError):
+            return None
+        return value if math.isfinite(value) else None
+
+    regime_code = num("MarketRegimeCode")
+    regime = "UNAVAILABLE" if regime_code is None else "BULL" if regime_code > 0.5 else "BEAR" if regime_code < -0.5 else "MIXED"
+    weekly_raw = row.get("WeeklyTrendConfirmed")
+    weekly = None if pd.isna(weekly_raw) else bool(weekly_raw)
+    return {
+        "status": "READY" if len(features.loc[:idx]) >= 200 else "LIMITED_HISTORY",
+        "as_of_session": session,
+        "trend": {
+            "close": num("Close"),
+            "ema50": num("EMA50"),
+            "ema50_slope_5d_pct": num("EMA50Slope5Pct"),
+            "supertrend_direction": "BULL" if (num("SupertrendDirection") or 0.0) >= 0 else "BEAR",
+        },
+        "momentum": {
+            "roc20_pct": num("ROC20"),
+            "macd_hist": num("MACDHist"),
+            "adx14": num("ADX14"),
+        },
+        "volatility": {"atr_pct": num("ATRPct")},
+        "volume_flow": {"cmf20": num("CMF20")},
+        "relative_strength": {"rs20_vs_nifty": num("RS20VsNifty")},
+        "multi_timeframe": {
+            "weekly_trend_confirmed": weekly,
+            "point_in_time_policy": "PRIOR_COMPLETED_WEEK_ONLY",
+        },
+        "market_context": {"nifty_regime": regime},
+        "point_in_time_safe": True,
+    }
+
+
+def historical_price_context(bars: list[dict[str, Any]], session: str) -> dict[str, Any]:
+    usable = [b for b in bars if str(b.get("date"))[:10] <= session]
+    if not usable:
+        return {"drawdown_from_126_high_pct": None, "prior_support": None}
+    price = usable[-1].get("close")
+    try:
+        price = float(price)
+    except (TypeError, ValueError):
+        price = None
+    highs = []
+    for b in usable[-126:]:
+        try:
+            value = float(b.get("high"))
+            if math.isfinite(value) and value > 0:
+                highs.append(value)
+        except (TypeError, ValueError):
+            pass
+    lows = []
+    for b in usable[-21:-1]:
+        try:
+            value = float(b.get("low"))
+            if math.isfinite(value) and value > 0:
+                lows.append(value)
+        except (TypeError, ValueError):
+            pass
+    drawdown = None
+    if price is not None and highs and len(usable[-126:]) >= 126:
+        drawdown = (price / max(highs) - 1.0) * 100.0
+    return {
+        "drawdown_from_126_high_pct": drawdown,
+        "prior_support": min(lows) if len(lows) == 20 else None,
+    }
+
 def benchmark_nav_series(starting_capital: float, closes: list[tuple[str, float]]) -> list[dict[str, Any]]:
     valid = [(s, float(v)) for s, v in closes if math.isfinite(float(v)) and float(v) > 0]
     if not valid:
