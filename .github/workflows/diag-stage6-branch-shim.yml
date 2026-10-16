@@ -5,6 +5,7 @@ on:
     branches: [diag-stage6-parallel-20261016]
     paths:
       - ".github/workflows/diag-stage6-branch-shim.yml"
+      - ".gitattributes"
   workflow_dispatch:
 
 permissions:
