@@ -1991,7 +1991,18 @@ jobs:
             if ([string]$runAgain.run.run_id -ne $installedRunId -or !$runAgain.reused_run) { throw "Installed app identical inputs did not reuse Run ID" }
 
             $planBody = @{deployable_capital=1000; horizon_sessions=20; target_return_percent=5} | ConvertTo-Json
-            $plan = Invoke-RestMethod "http://127.0.0.1:$port/api/capital-plan" -Method Post -ContentType "application/json" -Body $planBody -TimeoutSec 60
+            try {
+              $plan = Invoke-RestMethod "http://127.0.0.1:$port/api/capital-plan" -Method Post -ContentType "application/json" -Body $planBody -TimeoutSec 60
+            }
+            catch {
+              $backendLog = Join-Path $env:LOCALAPPDATA "StockRecommendationEngine\native-desktop-0.14.11.log"
+              if (Test-Path $backendLog) {
+                Write-Host "===== INSTALLED BACKEND LOG ====="
+                Get-Content $backendLog -Tail 250
+                Write-Host "===== END INSTALLED BACKEND LOG ====="
+              }
+              throw
+            }
             if ([double]$plan.capital_summary.deployable_capital -ne 1000) { throw "Installed app Capital Plan lost the ₹1,000 budget" }
             if (!$plan.capital_summary.desired_return_is_minimum_threshold) { throw "Installed app did not enforce desired return as a minimum threshold" }
             if ([double]$plan.capital_summary.estimated_spend -gt 1000.001) { throw "Installed Capital Plan overspent the ₹1,000 budget" }
