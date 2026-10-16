@@ -15,6 +15,12 @@ shutil.copy2(source, target)
 
 api_path = root / "modern_ui" / "api.py"
 api = api_path.read_text(encoding="utf-8")
+if "from collections import Counter" not in api:
+    future_import = "from __future__ import annotations\n"
+    if future_import in api:
+        api = api.replace(future_import, future_import + "\nfrom collections import Counter\n", 1)
+    else:
+        api = "from collections import Counter\n" + api
 for prior_version in ("0.14.11-missing-evidence-coverage-repair", "0.14.12-validation-v2"):
     api = api.replace(f'APP_VERSION = "{prior_version}"', 'APP_VERSION = "0.14.13-paper-trading-repair"', 1)
 if 'APP_VERSION = "0.14.13-paper-trading-repair"' not in api:
@@ -344,3 +350,4 @@ if router_before != router_after:
     raise RuntimeError("LIVE_DECISION_V1 router changed")
 (root / "validation_v2_router_sha256.txt").write_text(router_before + "\n", encoding="utf-8")
 print(f"0.14.13 paper-trading repair applied; router SHA unchanged: {router_before}")
+
