@@ -1371,6 +1371,43 @@ jobs:
         run: |
           $ErrorActionPreference = "Stop"
 
+          # Fast-resume is allowed only when the exact production/test tree is
+          # unchanged from a prior release run whose complete Stage 5D/6 gate
+          # passed. Workflow-only edits (for later acceptance/infrastructure)
+          # do not justify re-running ~30 minutes of frozen regressions.
+          $trustedCommit = "a10ed3b01c1328ce62cecddc0eb363136640a582"
+          $trustedRun = "38907089289"
+          git merge-base --is-ancestor $trustedCommit HEAD
+          $trustedAncestor = ($LASTEXITCODE -eq 0)
+          $changedSinceTrusted = @()
+          if ($trustedAncestor) {
+            $changedSinceTrusted = @(git diff --name-only "$trustedCommit..HEAD")
+            if ($LASTEXITCODE -ne 0) { throw "Unable to compare release tree with trusted regression commit" }
+          }
+          $nonWorkflowChanges = @($changedSinceTrusted | Where-Object { $_ -ne ".github/workflows/build-native-desktop-01413.yml" })
+
+          if ($trustedAncestor -and $nonWorkflowChanges.Count -eq 0) {
+            $jobsJson = gh api "repos/$env:GITHUB_REPOSITORY/actions/runs/$trustedRun/jobs?per_page=100"
+            if ($LASTEXITCODE -ne 0) { throw "Unable to verify trusted Stage 5D/6 regression run" }
+            $trustedGate = @(
+              ($jobsJson | ConvertFrom-Json).jobs |
+                ForEach-Object { $_.steps } |
+                Where-Object { $_.name -eq "Existing Stage 5D and Stage 6 regression suites" }
+            ) | Select-Object -First 1
+
+            if ($trustedGate -and $trustedGate.conclusion -eq "success") {
+              Write-Host "FAST-RESUME STAGE 5D/6 GATE:"
+              Write-Host "  trusted_commit=$trustedCommit"
+              Write-Host "  trusted_run=$trustedRun"
+              Write-Host "  trusted_gate=success"
+              Write-Host "  changes_since_trusted=workflow_only"
+              Write-Host "No production, model, policy, Stage 5D, Stage 6, or test-source files changed."
+              exit 0
+            }
+          }
+
+          Write-Host "FAST-RESUME NOT APPLICABLE — executing complete Stage 5D/6 regression gate"
+
           # Frozen Stage 6 suites carry historical CI assumptions:
           # 1) acceptance-only checks for their original development branch name;
           # 2) Stage 8 reads Git metadata through REPO/_git;
