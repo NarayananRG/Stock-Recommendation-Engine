@@ -23,6 +23,7 @@ for(let i=0;i<120;i++){
 
 let active=false;
 let recorded=false;
+let replayRequests=0;
 const portfolioInactive={
   schema:'SRE_VALIDATION_V2_PAPER_STATUS',schema_version:2,active:false,legacy_v1_excluded:true,portfolios:[]
 };
@@ -73,7 +74,7 @@ await page.route('**/api/**',async route=>{
   if(url.pathname==='/api/history')return route.fulfill(json({prediction_runs:[],monitoring:[]}));
   if(url.pathname==='/api/system')return route.fulfill(json({health:{overall_status:'HEALTHY',checks:[]}}));
   if(url.pathname==='/api/glossary')return route.fulfill(json({items:[]}));
-  if(url.pathname==='/api/validation/historical-replay')return route.fulfill(json(replay));
+  if(url.pathname==='/api/validation/historical-replay'){replayRequests+=1;await sleep(1200);return route.fulfill(json(replay));}
   if(url.pathname==='/api/validation/paper-portfolio'&&method==='GET')return route.fulfill(json(active?portfolioActive():portfolioInactive));
   if(url.pathname==='/api/validation/paper-portfolio/start'&&method==='POST'){active=true;return route.fulfill(json(portfolioActive()))}
   if(url.pathname==='/api/validation/paper-portfolio/record-today'&&method==='POST'){recorded=true;return route.fulfill(json({status:'RECORDED',portfolio:portfolioActive()}))}
@@ -83,17 +84,18 @@ await page.route('**/api/**',async route=>{
 
 await page.goto('http://127.0.0.1:'+port,{waitUntil:'networkidle'});
 await page.locator('.nav-item[data-page="validation"]').click();
-await page.waitForTimeout(250);
+await page.waitForTimeout(350);
 
-const replayText=String(await page.locator('#validationReplayPanel').textContent());
-assert(replayText.includes('POINT-IN-TIME HISTORICAL SIMULATION'),'V2 replay label missing: '+replayText);
-assert(replayText.includes('CURRENT_UNIVERSE_SURVIVORSHIP_BIAS'),'Survivorship warning missing');
-assert(replayText.includes('4.00%'),'Portfolio replay metric missing');
-assert(replayText.includes('3.00%'),'Actual benchmark metric missing');
+// Regression for the real installed-app hang: opening Validation must NOT start replay.
+assert(replayRequests===0,'Historical Replay auto-started and can block Paper Portfolio');
+let replayText=String(await page.locator('#validationReplayPanel').textContent());
+assert(replayText.includes('POINT-IN-TIME HISTORICAL SIMULATION'),'V2 replay idle label missing: '+replayText);
+assert(replayText.includes('NOT RUN YET'),'Replay idle state missing: '+replayText);
 
-await page.locator('#validationPaperTab').click();
-await page.waitForTimeout(100);
+// Paper is the lightweight default and must render before any replay request exists.
 let paperText=String(await page.locator('#validationPaperPanel').textContent());
+assert(paperText.includes('PAPER PORTFOLIO V2'),'V2 paper label missing');
+assert(paperText.includes('START NEW PAPER PORTFOLIO'),'Clean start action missing');
 assert(paperText.includes('PAPER PORTFOLIO V2'),'V2 paper label missing');
 assert(paperText.includes('START NEW PAPER PORTFOLIO'),'Clean start action missing');
 
@@ -112,8 +114,18 @@ assert(paperText.includes('HINDZINC'),'Pending BUY not rendered');
 assert(paperText.includes('PENDING_NEXT_OPEN'),'Next-open state missing');
 assert(paperText.includes('BUY SIGNAL'),'Humanized journal event missing');
 
+// Replay should run only after the user explicitly requests it.
+await page.locator('#validationReplayTab').click();
+await page.locator('#runHistoricalReplay').click();
+await page.waitForTimeout(1450);
+assert(replayRequests===1,'Historical Replay request count after explicit run is wrong: '+replayRequests);
+replayText=String(await page.locator('#validationReplayPanel').textContent());
+assert(replayText.includes('CURRENT_UNIVERSE_SURVIVORSHIP_BIAS'),'Survivorship warning missing');
+assert(replayText.includes('4.00%'),'Portfolio replay metric missing');
+assert(replayText.includes('3.00%'),'Actual benchmark metric missing');
+
 assert(errors.length===0,'Browser errors: '+errors.join('\n'));
 console.log('0.14.12 VALIDATION V2 BROWSER PASS');
-console.log('Clean start PASS; pending next-open PASS; replay truth labels PASS; zero browser errors');
+console.log('Lazy replay PASS; Paper independent PASS; pending next-open PASS; explicit replay PASS; zero browser errors');
 await browser.close();
 stop();
