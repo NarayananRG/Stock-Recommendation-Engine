@@ -1,0 +1,13 @@
+# Keep hashed/frozen text artifacts byte-stable across Windows and Linux.
+*.json text eol=lf
+*.csv text eol=lf
+*.md text eol=lf
+*.py text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.rs text eol=lf
+*.toml text eol=lf
+*.js text eol=lf
+*.mjs text eol=lf
+*.txt text eol=lf
+*.b64 text eol=lf
