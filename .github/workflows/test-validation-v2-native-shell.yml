@@ -1,0 +1,43 @@
+name: Validation V2 Native Shell Preflight
+
+on:
+  push:
+    branches: [validation-v2-rebuild]
+    paths:
+      - ".ci/native153/Cargo.toml"
+      - ".ci/native153/main_dynamic_port_python.rs"
+      - ".github/workflows/test-validation-v2-native-shell.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  native-shell:
+    runs-on: windows-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Resolve pinned native dependencies
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $root = Join-Path $env:RUNNER_TEMP "v2-native-preflight"
+          New-Item -ItemType Directory -Force -Path (Join-Path $root "src") | Out-Null
+          Copy-Item ".ci\native153\Cargo.toml" (Join-Path $root "Cargo.toml") -Force
+          Copy-Item ".ci\native153\main_dynamic_port_python.rs" (Join-Path $root "src\main.rs") -Force
+          Push-Location $root
+          try {
+            cargo metadata --format-version 1 | Out-Null
+            if ($LASTEXITCODE -ne 0) { throw "Cargo dependency resolution failed" }
+            $cargo = Get-Content "Cargo.toml" -Raw
+            if ($cargo -notmatch 'zip = \{ version = "=8\.6\.0"') { throw "ZIP dependency is not pinned to =8.6.0" }
+            $main = Get-Content "src\main.rs" -Raw
+            if ($main -notmatch 'SRE01412_ENGINE_SOURCE\.zip') { throw "Launcher resource is not SRE01412_ENGINE_SOURCE.zip" }
+            if ($main -match 'SRE01411_ENGINE_SOURCE\.zip') { throw "Stale 0.14.11 resource reference remains" }
+          }
+          finally {
+            Pop-Location
+          }
+          Write-Host "VALIDATION V2 NATIVE SHELL PREFLIGHT PASS"
