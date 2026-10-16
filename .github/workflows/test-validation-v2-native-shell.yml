@@ -32,7 +32,7 @@ jobs:
             cargo metadata --format-version 1 | Out-Null
             if ($LASTEXITCODE -ne 0) { throw "Cargo dependency resolution failed" }
             $cargo = Get-Content "Cargo.toml" -Raw
-            if ($cargo -notmatch 'zip = \{ version = "=8\.6\.0"') { throw "ZIP dependency is not pinned to =8.6.0" }
+            if ($cargo -notmatch 'zip = \{ version = "=9\.0\.3"') { throw "ZIP dependency is not pinned to =9.0.3" }
             $main = Get-Content "src\main.rs" -Raw
             if ($main -notmatch 'SRE01412_ENGINE_SOURCE\.zip') { throw "Launcher resource is not SRE01412_ENGINE_SOURCE.zip" }
             if ($main -match 'SRE01411_ENGINE_SOURCE\.zip') { throw "Stale 0.14.11 resource reference remains" }
