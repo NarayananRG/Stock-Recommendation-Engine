@@ -1,2 +1,9 @@
-# Frozen Stage 6 contract hashes are raw-byte sensitive; keep only these JSON contracts LF-stable.
+# Frozen raw-byte hashes must be stable across Windows and Linux.
 "Stage 6/contracts/*.json" text eol=lf
+"Stage 4A.3/*.md" text eol=lf
+"Stage 4A.3/*.txt" text eol=lf
+"Stage 4A.3/config/*.json" text eol=lf
+"Stage 4A.3/scripts/*.bat" text eol=lf
+"Stage 4A.3/scripts/*.ps1" text eol=lf
+"Stage 4A.3/scripts/*.py" text eol=lf
+"Stage 4A.3/stage4a3/*.py" text eol=lf
