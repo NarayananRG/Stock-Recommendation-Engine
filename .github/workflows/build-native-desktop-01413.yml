@@ -641,16 +641,7 @@ jobs:
           $engine = "$env:SRE_ENGINE_ROOT"
           $data = "$env:RUNNER_TEMP\sre099-appdata"
           $env:STOCK_MODERN_UI_PREVIEW = "0"
-          # Give the installed black-box test an official-data fixture whose
-          # final bar is Friday 2025-11-28. The existing deterministic fixture
-          # has exactly one executable recommendation; only its provenance is
-          # promoted here so the production official-data gate is exercised.
-          $paperFixture = "$env:RUNNER_TEMP\sre01413-paper-official"
-          $paperCache = Join-Path $paperFixture "data\normalized\nse_official\equity_bhavcopy\acceptance"
-          New-Item -ItemType Directory -Force -Path $paperCache | Out-Null
-          Copy-Item "$env:SRE099_FIXTURE_ROOT\stage2_2_1\data\frozen\*.csv" $paperCache -Force
-          $env:STOCK_REAL_DATA_REPO_ROOT = $paperFixture
-          $env:SRE_EXPECTED_SESSION_NOW = "2025-11-28T19:00:00+05:30"
+          $env:STOCK_REAL_DATA_REPO_ROOT = "$env:SRE099_FIXTURE_ROOT"
 
           $p = Start-Process -FilePath python -ArgumentList "`"$engine\run_modern_ui.py`" --no-browser --host 127.0.0.1 --port 18765 --repo-root `"$engine`" --app-data-dir `"$data`"" -PassThru -NoNewWindow
           try {
@@ -1955,7 +1946,16 @@ jobs:
           New-Item -ItemType Directory -Force -Path $sameVersionStale | Out-Null
           @("version=0.14.13-paper-trading-repair", "bundle_sha256=BUILD_A_STALE_FINGERPRINT") | Set-Content (Join-Path $sameVersionStale ".sre01413-ready") -Encoding ASCII
           "raise SystemExit('SAME_VERSION_STALE_RUNTIME_MUST_NOT_RUN')" | Set-Content (Join-Path $sameVersionStale "run_modern_ui.py") -Encoding ASCII
-          $env:STOCK_REAL_DATA_REPO_ROOT = "$env:SRE099_FIXTURE_ROOT"
+          # Give the installed black-box test an official-data fixture whose
+          # final bar is Friday 2025-11-28. The existing deterministic fixture
+          # has exactly one executable recommendation; only its provenance is
+          # promoted here so the production official-data gate is exercised.
+          $paperFixture = "$env:RUNNER_TEMP\sre01413-paper-official"
+          $paperCache = Join-Path $paperFixture "data\normalized\nse_official\equity_bhavcopy\acceptance"
+          New-Item -ItemType Directory -Force -Path $paperCache | Out-Null
+          Copy-Item "$env:SRE099_FIXTURE_ROOT\stage2_2_1\data\frozen\*.csv" $paperCache -Force
+          $env:STOCK_REAL_DATA_REPO_ROOT = $paperFixture
+          $env:SRE_EXPECTED_SESSION_NOW = "2025-11-28T19:00:00+05:30"
           $desktop = Start-Process -FilePath $appExe.FullName -PassThru
           try {
             $alive = $false
