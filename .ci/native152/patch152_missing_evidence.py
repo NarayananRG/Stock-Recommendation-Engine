@@ -91,6 +91,7 @@ replace_once(api,
         summary["live_universe_size"] = len(live_rows)
 ''',
 '''        summary["blocker_count_semantics"] = "UNIQUE_SYMBOLS"
+        from collections import Counter
         evidence_counts = Counter()
         for item in live_rows:
             live = item.get("live_decision") or {}
