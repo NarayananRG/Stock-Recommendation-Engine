@@ -1732,7 +1732,7 @@ jobs:
           cargo metadata --manifest-path "src-tauri\Cargo.toml" --format-version 1 --no-deps | Out-Null
           if ($LASTEXITCODE -ne 0) { throw "Native shell Cargo dependency resolution failed before installer build" }
           $cargo = Get-Content "src-tauri\Cargo.toml" -Raw
-          if ($cargo -notmatch 'zip = \{ version = "=8\.6\.0"') { throw "ZIP crate is not pinned to the validated non-yanked release" }
+          if ($cargo -notmatch 'zip = \{ version = "=9\.0\.3"') { throw "ZIP crate is not pinned to validated release 9.0.3" }
           $main = Get-Content "src-tauri\src\main.rs" -Raw
           if ($main -notmatch 'SRE01412_ENGINE_SOURCE\.zip') { throw "0.14.12 launcher still references the wrong bundled engine resource" }
 
