@@ -1672,6 +1672,16 @@ jobs:
           node ".ci\native151\presentation_consistency.mjs"
           if ($LASTEXITCODE -ne 0) { throw "0.14.10 presentation browser regression failed" }
 
+      - name: 0.14.12 Validation V2 browser regression
+        shell: pwsh
+        env:
+          SRE_V2_BROWSER_PORT: "8896"
+          SRE_V2_BROWSER_APP_DATA: ${{ runner.temp }}\sre-v2-browser-app-data
+        run: |
+          $ErrorActionPreference = "Stop"
+          node ".ci\native153\validation_v2_browser.mjs"
+          if ($LASTEXITCODE -ne 0) { throw "0.14.12 Validation V2 browser regression failed" }
+
       - name: Package native application
         shell: pwsh
         run: |
