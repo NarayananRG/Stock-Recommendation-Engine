@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 import os
+import sys
 import tempfile
 from pathlib import Path
 
@@ -11,6 +12,7 @@ module_path = engine / "stock_app" / "validation_v2.py" if engine and (engine / 
 spec = importlib.util.spec_from_file_location("sre_validation_v2", module_path)
 v2 = importlib.util.module_from_spec(spec)
 assert spec and spec.loader
+sys.modules[spec.name] = v2
 spec.loader.exec_module(v2)
 
 
