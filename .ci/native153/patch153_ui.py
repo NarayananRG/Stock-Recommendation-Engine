@@ -76,6 +76,19 @@ function renderValidationPaper(p){
   $('#startPaperPortfolio')?.addEventListener('click',startPaperPortfolio);
 }
 function v2Metric(v,formatter){return v==null?'NOT AVAILABLE':formatter(v)}
+function renderValidationReplayIdle(){
+  const el=$('#validationReplayPanel');if(!el)return;
+  el.innerHTML='<div class="card-label">POINT-IN-TIME HISTORICAL SIMULATION</div>'+
+    '<div class="warning-note">Historical Replay does not run automatically. Choose a period and click RUN POINT-IN-TIME REPLAY when you want to start the heavier simulation.</div>'+
+    '<div class="validation-controls"><label>Period<select id="validationPeriod"><option>1M</option><option>3M</option><option selected>6M</option><option>1Y</option></select></label>'+
+    '<label>Starting capital<input id="validationCapital" type="number" value="100000"></label>'+
+    '<label>Slippage bps<input id="validationSlippage" type="number" value="10"></label>'+
+    '<label>Transaction cost bps<input id="validationCost" type="number" value="5"></label>'+
+    '<button class="primary-btn" id="runHistoricalReplay">RUN POINT-IN-TIME REPLAY</button></div>'+
+    '<div class="daily-flow-grid"><div><span>Status</span><strong>NOT RUN YET</strong></div></div>'+
+    '<p class="muted">Paper Portfolio remains independent and usable while replay is idle.</p>';
+  $('#runHistoricalReplay')?.addEventListener('click',runHistoricalReplay);
+}
 function renderValidationReplay(r){
   const el=$('#validationReplayPanel');if(!el)return;r=r||{};
   const m=r.metrics||{},range=r.trustworthy_replayable_range||{},pit=r.pit_completeness||{};
@@ -119,6 +132,20 @@ async function runHistoricalReplay(){
   }catch(e){validationError('Historical Replay V2 failed',e)}
   finally{busy(false)}
 }
+
+async function loadValidation(){
+  // VALIDATION_V2_LAZY_LOAD: Paper state is lightweight and must never wait for replay.
+  bindValidationTabs();
+  renderValidationReplayIdle();
+  setValidationTab('paper');
+  $('#validationError')?.classList.add('hidden');
+  try{
+    const p=await api('/api/validation/paper-portfolio');
+    renderValidationPaper(p);
+  }catch(e){
+    validationError('Paper Portfolio V2 failed',e);
+  }
+}
 '''
 js += "\n" + override + "\n"
 front.write_text(js, encoding="utf-8")
@@ -131,4 +158,5 @@ css.write_text(ctext, encoding="utf-8")
 
 assert "PAPER PORTFOLIO V2" in front.read_text(encoding="utf-8")
 assert "POINT-IN-TIME HISTORICAL SIMULATION" in front.read_text(encoding="utf-8")
+assert "VALIDATION_V2_LAZY_LOAD" in front.read_text(encoding="utf-8")
 print("0.14.12 Validation V2 UI override applied")
