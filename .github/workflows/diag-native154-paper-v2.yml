@@ -1,0 +1,35 @@
+name: Diagnose Native154 Paper V2
+
+on:
+  push:
+    branches: [diag-stage6-parallel-20261016]
+    paths:
+      - ".github/workflows/diag-native154-paper-v2.yml"
+      - ".ci/native154/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deterministic:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install deterministic dependencies
+        shell: pwsh
+        run: |
+          python -m pip install --disable-pip-version-check pandas numpy tzdata fastapi==0.128.2 uvicorn==0.48.0
+          if ($LASTEXITCODE -ne 0) { throw "Dependency install failed" }
+      - name: Run native154 deterministic Paper Trading V2 tests
+        shell: pwsh
+        run: |
+          $ErrorActionPreference="Stop"
+          python ".ci\native154\test_validation_v2.py"
+          if ($LASTEXITCODE -ne 0) { throw "native154 deterministic Paper Trading V2 tests failed" }
