@@ -447,7 +447,7 @@ def record_signal_session(
                 "authority": "LIVE_DECISION_V1",
             }
             con.execute(
-                "insert into v2_orders values(?,?,?,?,?,?,?,?)",
+                "insert into v2_orders values(?,?,?,?,?,?,?,?,?)",
                 (
                     order["order_id"],
                     portfolio_id,
@@ -689,7 +689,7 @@ def queue_exit(
             "authority": "LIVE_DECISION_V1_MONITOR",
         }
         con.execute(
-            "insert into v2_orders values(?,?,?,?,?,?,?,?)",
+            "insert into v2_orders values(?,?,?,?,?,?,?,?,?)",
             (order_id, portfolio_id, symbol, "SELL", "PENDING_EXIT_NEXT_OPEN", market_session, None, production_run_id, _json(order)),
         )
         position = json.loads(pos[1])
