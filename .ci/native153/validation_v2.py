@@ -9,6 +9,7 @@ import hashlib
 import json
 import math
 import sqlite3
+from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -41,7 +42,7 @@ def _json(value: Any) -> str:
     return json.dumps(value, sort_keys=True, separators=(",", ":"), default=str)
 
 
-def connect(db_path: Path) -> sqlite3.Connection:
+def _open_connection(db_path: Path) -> sqlite3.Connection:
     db_path.parent.mkdir(parents=True, exist_ok=True)
     con = sqlite3.connect(db_path)
     con.execute("pragma foreign_keys=on")
@@ -129,6 +130,19 @@ def connect(db_path: Path) -> sqlite3.Connection:
     )
     con.execute("insert or replace into v2_meta(key,value) values('schema_version',?)", (str(SCHEMA_VERSION),))
     return con
+
+
+@contextmanager
+def connect(db_path: Path):
+    con = _open_connection(db_path)
+    try:
+        yield con
+        con.commit()
+    except Exception:
+        con.rollback()
+        raise
+    finally:
+        con.close()
 
 
 def create_portfolio(
