@@ -1610,6 +1610,8 @@ jobs:
           if ($routerCoverageBefore -ne $routerCoverageAfter) { throw "LIVE_DECISION_V1 router changed during missing-evidence repair" }
           python ".ci\native152\test_missing_evidence.py"
           if ($LASTEXITCODE -ne 0) { throw "0.14.11 missing evidence regression failed" }
+          python -m pip install --disable-pip-version-check requests
+          if ($LASTEXITCODE -ne 0) { throw "Unable to install official filing transport dependency" }
           $env:SRE_EVIDENCE_AUDIT_OUT = "$env:RUNNER_TEMP\sre01411-evidence-audit"
           python ".ci\native152\financial_domain_research.py"
           if ($LASTEXITCODE -ne 0) { throw "0.14.11 financial-domain research audit failed" }
