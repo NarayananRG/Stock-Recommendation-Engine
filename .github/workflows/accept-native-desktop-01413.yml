@@ -34,8 +34,9 @@ jobs:
           New-Item -ItemType Directory -Force -Path $dest | Out-Null
           gh run download $env:SOURCE_RUN_ID --repo $env:GITHUB_REPOSITORY --name $env:SOURCE_ARTIFACT --dir $dest
           if ($LASTEXITCODE -ne 0) { throw "Unable to download exact pre-acceptance installer" }
-          $setup = Get-ChildItem $dest -Filter "*.exe" -Recurse | Select-Object -Single
-          if (!$setup) { throw "Pre-acceptance Setup.exe missing" }
+          $setups = @(Get-ChildItem $dest -Filter "*.exe" -Recurse)
+          if ($setups.Count -ne 1) { throw "Expected exactly one pre-acceptance Setup.exe, found $($setups.Count)" }
+          $setup = $setups[0]
           $sha = (Get-FileHash $setup.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
           "SRE_ACCEPTANCE_SETUP=$($setup.FullName)" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
           "SRE_ACCEPTANCE_SETUP_SHA256=$sha" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
