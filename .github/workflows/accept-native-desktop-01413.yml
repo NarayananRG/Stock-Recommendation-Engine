@@ -2,6 +2,10 @@ name: Accept SRE 0.14.13 Prebuilt Installer
 
 on:
   workflow_dispatch:
+  push:
+    branches: [fix-paper-trading-root-causes-20261016]
+    paths:
+      - ".github/workflows/accept-native-desktop-01413.yml"
 
 permissions:
   contents: read
