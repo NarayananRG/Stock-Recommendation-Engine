@@ -25,8 +25,16 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw "Validation V2 module compilation failed" }
           python -m py_compile ".ci\native153\test_validation_v2.py"
           if ($LASTEXITCODE -ne 0) { throw "Validation V2 test compilation failed" }
+          python -m py_compile ".ci\native153\test_validation_v2_lazy_ui.py"
+          if ($LASTEXITCODE -ne 0) { throw "Validation V2 lazy UI test compilation failed" }
       - name: Deterministic paper and replay primitives
         shell: pwsh
         run: |
           python ".ci\native153\test_validation_v2.py"
           if ($LASTEXITCODE -ne 0) { throw "Validation V2 deterministic core tests failed" }
+
+      - name: Validation V2 lazy UI preflight
+        shell: pwsh
+        run: |
+          python ".ci\native153\test_validation_v2_lazy_ui.py"
+          if ($LASTEXITCODE -ne 0) { throw "Validation V2 lazy UI preflight failed" }
