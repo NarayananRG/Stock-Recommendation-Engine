@@ -83,10 +83,10 @@ jobs:
           $main = "native-desktop-0.9.1\src-tauri\src\main.rs"
           $m = Get-Content $main -Raw
           Set-Content $main $m -Encoding UTF8
-          if ($m -notmatch 'native-engine-0\.14\.11') { throw "Versioned 0.14.12 engine directory missing" }
+          if ($m -notmatch 'native-engine-0\.14\.12') { throw "Versioned 0.14.12 engine directory missing" }
           if ($m -notmatch '\.sre01412-ready') { throw "Versioned 0.14.12 ready marker missing" }
           if ($m -notmatch 'engine-v01412-staging') { throw "Versioned 0.14.12 staging directory missing" }
-          if ($m -notmatch 'native-desktop-0\.14\.11\.log') { throw "Versioned 0.14.12 startup log missing" }
+          if ($m -notmatch 'native-desktop-0\.14\.12\.log') { throw "Versioned 0.14.12 startup log missing" }
           if ($m -notmatch 'choose_free_port') { throw "Dynamic-port launcher missing" }
           if ($m -notmatch 'health_matches') { throw "Backend-version handshake missing" }
           if ($m -match 'const PORT') { throw "Fixed desktop port must not exist in 0.9.9" }
@@ -1821,7 +1821,7 @@ jobs:
         shell: pwsh
         run: |
           $setup = Get-ChildItem "native-desktop-0.9.1\src-tauri\target\release\bundle\nsis\*.exe" | Select-Object -First 1
-          if (!$setup) { throw "0.14.11 native Setup.exe missing" }
+          if (!$setup) { throw "0.14.12 native Setup.exe missing" }
           Write-Host "SETUP: $($setup.FullName)"
           Write-Host "SIZE: $($setup.Length)"
           Get-FileHash $setup.FullName -Algorithm SHA256
