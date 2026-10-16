@@ -1448,6 +1448,22 @@ jobs:
 
           foreach ($test in $tests) {
             $env:SRE_LEGACY_EXPECTED_BRANCH = ""
+            $legacyRuntimeFixture = $null
+
+            # Stage 8A's frozen harness predates the repository-wide runtime
+            # ignore rule and asserts the old local fixture file contents.
+            # Recreate it only for that test; never track or preserve it.
+            if ($test.Name -eq "run_stage6_8a_tests.py") {
+              $legacyRuntimeDir = "Stage 6/runtime/prospective_validation"
+              New-Item -ItemType Directory -Force -Path $legacyRuntimeDir | Out-Null
+              $legacyRuntimeFixture = Join-Path $legacyRuntimeDir ".gitignore"
+              [IO.File]::WriteAllText(
+                $legacyRuntimeFixture,
+                "*`n!.gitignore`n",
+                [Text.UTF8Encoding]::new($false)
+              )
+            }
+
             switch -Regex ($test.Name) {
               '^run_stage6_4a_tests\.py$' { $env:SRE_LEGACY_EXPECTED_BRANCH = "stage6-historical-analogue" }
               '^run_stage6_5[a-d]_tests\.py$' { $env:SRE_LEGACY_EXPECTED_BRANCH = "stage6-portfolio-intelligence" }
@@ -1461,7 +1477,12 @@ jobs:
               Write-Host "RUN $($test.Name)"
             }
             python $test.FullName
-            if ($LASTEXITCODE -ne 0) { throw "Regression failed: $($test.Name)" }
+            $testExit = $LASTEXITCODE
+
+            if ($legacyRuntimeFixture -and (Test-Path $legacyRuntimeFixture)) {
+              Remove-Item $legacyRuntimeFixture -Force
+            }
+            if ($testExit -ne 0) { throw "Regression failed: $($test.Name)" }
           }
 
           $env:SRE_LEGACY_EXPECTED_BRANCH = ""
