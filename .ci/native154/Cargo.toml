@@ -1,0 +1,18 @@
+[package]
+name = "stock-recommendation-engine"
+version = "0.9.1"
+description = "Stock Recommendation Engine native desktop shell"
+authors = ["NarayananRG"]
+edition = "2021"
+
+[[bin]]
+name = "StockRecommendationEngine"
+path = "src/main.rs"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+zip = { version = "=9.0.3", default-features = false, features = ["deflate"] }
+sha2 = "0.10"

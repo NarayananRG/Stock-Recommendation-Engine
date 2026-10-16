@@ -1,0 +1,32 @@
+{
+  "schema": "SRE_VALIDATION_V2_RELEASE_REPORT",
+  "release": "0.14.13-paper-trading-repair",
+  "paper_v2": {
+    "forward_only": true,
+    "next_open_entry": true,
+    "next_open_exit": true,
+    "atomic_session_commit": true,
+    "deterministic_idempotency": true,
+    "restart_persistence": true,
+    "legacy_continuity_migrated": true,
+    "legacy_lineage_preserved": true,
+    "installed_schema_version": 4,
+    "database_constraints_enforced": true,
+    "runtime_content_fingerprint_enforced": true
+  },
+  "historical_replay_v2": {
+    "point_in_time_reconstruction": true,
+    "current_recommendation_substitution": false,
+    "future_filing_rejection": true,
+    "future_price_rejection": true,
+    "actual_nifty_50_required": true,
+    "incomplete_metrics_are_null": true
+  },
+  "production_authority": {
+    "router_changed": false,
+    "model_changed": false,
+    "thresholds_changed": false,
+    "provider_policy_changed": false,
+    "automatic_yfinance": false
+  }
+}

@@ -1,0 +1,9 @@
+Historical Replay V2 deterministic E2E contract
+- Future price bars are rejected at the cutoff.
+- Future filings are rejected by effective_availability_ts.
+- Valuation references contain only observations strictly before T.
+- Signals at T fill no earlier than the next replayable official open.
+- Cash, positions, orders, NAV, realized P&L, and unrealized P&L remain continuous.
+- Benchmark units use starting_capital / first actual NIFTY 50 close.
+- A 100 -> 110 benchmark series produces NAV 110000 and return +10%.
+- NOT_REPLAYABLE sessions are excluded and insufficient metrics are null / NOT AVAILABLE.

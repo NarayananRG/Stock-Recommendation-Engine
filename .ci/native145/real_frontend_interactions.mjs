@@ -30,6 +30,7 @@ const browser = await chromium.launch({ headless: true });
 const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
 const browserErrors = [];
 const requests = [];
+page.on('dialog', dialog => dialog.accept());
 page.on('pageerror', error => browserErrors.push(`pageerror: ${error.message}`));
 page.on('console', message => { if (message.type() === 'error') browserErrors.push(`console: ${message.text()}`); });
 

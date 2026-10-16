@@ -1,0 +1,9 @@
+Paper Portfolio V2 deterministic E2E contract
+- D0: two LIVE_DECISION_V1 BUY fixtures create pending orders; cash unchanged.
+- D1: next official opens fill whole shares with slippage and transaction costs.
+- D2: accepted official closes update marks, NAV, and unrealized P&L.
+- D3: EXIT SIGNAL creates a pending next-open exit; no same-close exit.
+- D4: next official open fills the exit and records realized P&L.
+- Duplicate session/run execution returns the committed result and creates no duplicate order, fill, or journal row.
+- Restart uses a new SQLite connection and restores pending orders.
+- Injected crash after fill journal insertion rolls back the entire transaction; restart fills exactly once.

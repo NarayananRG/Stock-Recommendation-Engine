@@ -1,0 +1,9 @@
+{
+  "schema": "SRE_VALIDATION_V2_PIT_COVERAGE_REPORT",
+  "status": "GENERATED_AT_RUNTIME_FROM_ACCEPTED_OFFICIAL_DATA",
+  "classifications": ["FULL_PIT_VALID", "PIT_VALID_WITH_OPTIONAL_GAPS", "NOT_REPLAYABLE"],
+  "required_columns": ["date", "market_data_status", "fundamental_pit_status", "valuation_pit_status", "universe_status", "live_decision_v1_run_status", "replayability"],
+  "incomplete_session_policy": "EXCLUDE_FROM_PORTFOLIO_AND_PERFORMANCE",
+  "benchmark_policy": "ACTUAL_NIFTY_50_OR_NOT_AVAILABLE",
+  "survivorship_policy": "CURRENT_UNIVERSE_SURVIVORSHIP_BIAS_IS_DISCLOSED"
+}
