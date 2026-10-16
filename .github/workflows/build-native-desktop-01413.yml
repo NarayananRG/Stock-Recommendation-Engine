@@ -26,6 +26,8 @@ on:
       - ".ci/native151/**"
       - ".ci/native152/**"
       - ".ci/native154/**"
+      - ".gitignore"
+      - "Stage 6/runtime/**"
       - ".ci/native108/**"
       - ".ci/native109/**"
       - ".ci/native110/**"
