@@ -1,0 +1,32 @@
+name: Validation V2 Core Gate
+
+on:
+  push:
+    branches:
+      - validation-v2-rebuild
+    paths:
+      - ".ci/native153/**"
+      - ".github/workflows/test-validation-v2-core.yml"
+  workflow_dispatch:
+
+jobs:
+  core:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile Validation V2
+        shell: pwsh
+        run: |
+          python -m py_compile ".ci\native153\validation_v2.py"
+          if ($LASTEXITCODE -ne 0) { throw "Validation V2 module compilation failed" }
+          python -m py_compile ".ci\native153\test_validation_v2.py"
+          if ($LASTEXITCODE -ne 0) { throw "Validation V2 test compilation failed" }
+      - name: Deterministic paper and replay primitives
+        shell: pwsh
+        run: |
+          python ".ci\native153\test_validation_v2.py"
+          if ($LASTEXITCODE -ne 0) { throw "Validation V2 deterministic core tests failed" }
