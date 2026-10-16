@@ -78,7 +78,7 @@ jobs:
           Expand-Archive -LiteralPath $zip -DestinationPath "." -Force
 
           Copy-Item ".ci\native153\main_dynamic_port_python.rs" "native-desktop-0.9.1\src-tauri\src\main.rs" -Force
-          Copy-Item ".ci\native091\Cargo.toml" "native-desktop-0.9.1\src-tauri\Cargo.toml" -Force
+          Copy-Item ".ci\native153\Cargo.toml" "native-desktop-0.9.1\src-tauri\Cargo.toml" -Force
 
           $main = "native-desktop-0.9.1\src-tauri\src\main.rs"
           $m = Get-Content $main -Raw
@@ -94,7 +94,7 @@ jobs:
           if ($m -notmatch 'STOCK_MODERN_UI_PREVIEW", "0') { throw "Preview must remain disabled" }
 
           $cargo = "native-desktop-0.9.1\src-tauri\Cargo.toml"
-          (Get-Content $cargo -Raw).Replace('version = "0.9.1"','version = "0.14.12"') | Set-Content $cargo -Encoding UTF8
+          Set-Content $cargo (Get-Content $cargo -Raw) -Encoding UTF8
 
           $pkg = "native-desktop-0.9.1\package.json"
           $j = Get-Content $pkg -Raw | ConvertFrom-Json
@@ -1723,6 +1723,18 @@ jobs:
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
+
+      - name: Native shell dependency preflight
+        working-directory: native-desktop-0.9.1
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          cargo metadata --manifest-path "src-tauri\Cargo.toml" --format-version 1 --no-deps | Out-Null
+          if ($LASTEXITCODE -ne 0) { throw "Native shell Cargo dependency resolution failed before installer build" }
+          $cargo = Get-Content "src-tauri\Cargo.toml" -Raw
+          if ($cargo -notmatch 'zip = \{ version = "=8\.6\.0"') { throw "ZIP crate is not pinned to the validated non-yanked release" }
+          $main = Get-Content "src-tauri\src\main.rs" -Raw
+          if ($main -notmatch 'SRE01412_ENGINE_SOURCE\.zip') { throw "0.14.12 launcher still references the wrong bundled engine resource" }
 
       - name: Rust cache
         uses: Swatinem/rust-cache@v2
