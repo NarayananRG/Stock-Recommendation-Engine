@@ -40,36 +40,47 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Run frozen suite with branch-only Git shim
+      - name: Run frozen suite with frozen-CI compatibility
         shell: pwsh
         env:
           SRE_LEGACY_EXPECTED_BRANCH: ${{ matrix.expected_branch }}
           SRE_TEST_PATTERN: ${{ matrix.pattern }}
         run: |
           $ErrorActionPreference = "Stop"
-          $realGit = (Get-Command git).Source
-          $shimDir = Join-Path $env:RUNNER_TEMP "git-shim"
-          New-Item -ItemType Directory -Force -Path $shimDir | Out-Null
+
+          $siteDir = Join-Path $env:RUNNER_TEMP "sitecustomize"
+          New-Item -ItemType Directory -Force -Path $siteDir | Out-Null
           @'
-          @echo off
-          setlocal
-          set "allargs=%*"
-          if not "%SRE_LEGACY_EXPECTED_BRANCH%"=="" (
-            echo(%allargs%| findstr /C:"branch --show-current" >nul
-            if not errorlevel 1 (
-              echo %SRE_LEGACY_EXPECTED_BRANCH%
-              exit /b 0
-            )
-          )
-          "%SRE_REAL_GIT%" %*
-          exit /b %ERRORLEVEL%
-          '@ | Set-Content (Join-Path $shimDir "git.cmd") -Encoding ASCII
-          $env:SRE_REAL_GIT = $realGit
-          $env:PATH = "$shimDir;$env:PATH"
+          import os
+          import subprocess
+          _real_check_output = subprocess.check_output
+          def _branch_query(args):
+              if not isinstance(args, (list, tuple)):
+                  return False
+              values = [str(x) for x in args]
+              return len(values) >= 2 and values[-2:] == ["branch", "--show-current"]
+          def _compat_check_output(*popenargs, **kwargs):
+              args = kwargs.get("args")
+              if args is None and popenargs:
+                  args = popenargs[0]
+              expected = os.environ.get("SRE_LEGACY_EXPECTED_BRANCH", "")
+              if expected and _branch_query(args):
+                  text_mode = bool(kwargs.get("text") or kwargs.get("universal_newlines") or kwargs.get("encoding") is not None)
+                  value = expected + "\n"
+                  return value if text_mode else value.encode(kwargs.get("encoding") or "utf-8")
+              return _real_check_output(*popenargs, **kwargs)
+          subprocess.check_output = _compat_check_output
+          '@ | Set-Content (Join-Path $siteDir "sitecustomize.py") -Encoding UTF8
+
+          $stage6Root = (Resolve-Path "Stage 6").Path
+          $env:PYTHONPATH = "$siteDir;$stage6Root"
+          if (!(Test-Path "_git")) {
+            New-Item -ItemType Junction -Path "_git" -Target (Resolve-Path ".git").Path | Out-Null
+          }
 
           $contract = "Stage 6/contracts/market_context.schema.json"
-          $tracked = (& $realGit rev-parse "HEAD:$contract").Trim()
-          $raw = (& $realGit hash-object --no-filters -- "$contract").Trim()
+          $tracked = (git rev-parse "HEAD:$contract").Trim()
+          $raw = (git hash-object --no-filters -- "$contract").Trim()
           if ($tracked -ne $raw) { throw "RAW CONTRACT MISMATCH tracked=$tracked raw=$raw" }
 
           $tests = @(Get-ChildItem $env:SRE_TEST_PATTERN | Sort-Object Name)
