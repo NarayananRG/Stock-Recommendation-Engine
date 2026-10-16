@@ -1368,6 +1368,8 @@ jobs:
 
       - name: Existing Stage 5D and Stage 6 regression suites
         shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           $ErrorActionPreference = "Stop"
 
