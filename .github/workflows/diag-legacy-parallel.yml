@@ -1,0 +1,126 @@
+name: Parallel Legacy Regression Diagnostic
+
+on:
+  push:
+    branches: [diag-stage6-parallel-20261016]
+    paths:
+      - ".github/workflows/diag-legacy-parallel.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  stage5d:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - shell: pwsh
+        run: |
+          $ErrorActionPreference="Stop"
+          Get-ChildItem "Stage 5D\tests\run_stage5d*_tests.py" | Sort-Object Name | ForEach-Object {
+            Write-Host "RUN $($_.Name)"
+            python $_.FullName
+            if($LASTEXITCODE -ne 0){ throw "FAILED $($_.Name)" }
+          }
+
+  stage6_1x:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - shell: pwsh
+        run: |
+          $ErrorActionPreference="Stop"
+          Get-ChildItem "Stage 6\tests\run_stage6_1*_tests.py" | Sort-Object Name | ForEach-Object {
+            Write-Host "RUN $($_.Name)"
+            python $_.FullName
+            if($LASTEXITCODE -ne 0){ throw "FAILED $($_.Name)" }
+          }
+
+  stage6_2x:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - shell: pwsh
+        run: |
+          $ErrorActionPreference="Stop"
+          Get-ChildItem "Stage 6\tests\run_stage6_2*_tests.py" | Sort-Object Name | ForEach-Object {
+            Write-Host "RUN $($_.Name)"
+            python $_.FullName
+            if($LASTEXITCODE -ne 0){ throw "FAILED $($_.Name)" }
+          }
+
+  stage6_3x:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - shell: pwsh
+        run: |
+          $ErrorActionPreference="Stop"
+          Get-ChildItem "Stage 6\tests\run_stage6_3*_tests.py" | Sort-Object Name | ForEach-Object {
+            Write-Host "RUN $($_.Name)"
+            python $_.FullName
+            if($LASTEXITCODE -ne 0){ throw "FAILED $($_.Name)" }
+          }
+
+  stage6_4x:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - shell: pwsh
+        run: |
+          $ErrorActionPreference="Stop"
+          $contract="Stage 6/contracts/market_context.schema.json"
+          $tracked=(git rev-parse "HEAD:$contract").Trim()
+          $raw=(git hash-object --no-filters -- "$contract").Trim()
+          if($tracked -ne $raw){throw "RAW CONTRACT MISMATCH tracked=$tracked raw=$raw"}
+          Get-ChildItem "Stage 6\tests\run_stage6_4*_tests.py" |
+            Where-Object {$_.Name -ne "run_stage6_4a_tests.py"} |
+            Sort-Object Name | ForEach-Object {
+              Write-Host "RUN $($_.Name)"
+              python $_.FullName
+              if($LASTEXITCODE -ne 0){ throw "FAILED $($_.Name)" }
+            }
+
+  stage6_5_to_8:
+    runs-on: windows-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - shell: pwsh
+        run: |
+          $ErrorActionPreference="Stop"
+          $tests=@(
+            Get-ChildItem "Stage 6\tests\run_stage6_5*_tests.py"
+            Get-ChildItem "Stage 6\tests\run_stage6_6*_tests.py"
+            Get-ChildItem "Stage 6\tests\run_stage6_7*_tests.py"
+            Get-ChildItem "Stage 6\tests\run_stage6_8*_tests.py"
+          ) | Sort-Object Name
+          foreach($test in $tests){
+            Write-Host "RUN $($test.Name)"
+            python $test.FullName
+            if($LASTEXITCODE -ne 0){ throw "FAILED $($test.Name)" }
+          }
