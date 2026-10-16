@@ -16,7 +16,7 @@ jobs:
     runs-on: windows-latest
     timeout-minutes: 45
     env:
-      SOURCE_RUN_ID: "38913775215"
+      SOURCE_RUN_ID: "38947491769"
       SOURCE_ARTIFACT: SRE-0.14.13-PREACCEPTANCE-CANDIDATE
     steps:
       - uses: actions/checkout@v4
@@ -106,6 +106,29 @@ jobs:
               $script = $script.Replace('$setup = Get-ChildItem "native-desktop-0.9.1\src-tauri\target\release\bundle\nsis\*.exe" | Select-Object -First 1', '$setup = Get-Item $env:SRE_ACCEPTANCE_SETUP')
               $script = $script.Replace('$expectedFingerprint = ((Get-Content "native-desktop-0.9.1\resources\SRE01413_ENGINE_SOURCE.sha256" -Raw).Trim() -split ''\s+'')[0]', '$expectedFingerprint = $readyLines[2]')
             }
+            # YAML leaves two structural spaces inside PowerShell here-strings.
+            # Remove them from every embedded Python block before execution,
+            # while preserving Python's relative indentation.
+            $scriptLines = @($script -split "`n")
+            $pythonBlocks = [Collections.Generic.List[string]]::new()
+            for ($lineIndex = 0; $lineIndex -lt $scriptLines.Count; $lineIndex++) {
+              if ($scriptLines[$lineIndex] -ne "@'") { continue }
+              $endIndex = $lineIndex + 1
+              while ($endIndex -lt $scriptLines.Count -and !$scriptLines[$endIndex].StartsWith("'@")) { $endIndex++ }
+              if ($endIndex -ge $scriptLines.Count -or $scriptLines[$endIndex] -ne "'@ | python -") { continue }
+              for ($bodyIndex = $lineIndex + 1; $bodyIndex -lt $endIndex; $bodyIndex++) {
+                if ($scriptLines[$bodyIndex].StartsWith("  ")) {
+                  $scriptLines[$bodyIndex] = $scriptLines[$bodyIndex].Substring(2)
+                }
+              }
+              $pythonBlocks.Add(($scriptLines[($lineIndex + 1)..($endIndex - 1)] -join "`n"))
+              $lineIndex = $endIndex
+            }
+            $script = $scriptLines -join "`n"
+            foreach ($pythonBlock in $pythonBlocks) {
+              $pythonBlock | python -c "import sys; compile(sys.stdin.read(), '<installed-acceptance>', 'exec')"
+              if ($LASTEXITCODE -ne 0) { throw "Embedded Python parse failed for $name" }
+            }
             $tokens = $null
             $errors = $null
             [Management.Automation.Language.Parser]::ParseInput($script, [ref]$tokens, [ref]$errors) | Out-Null
@@ -154,3 +177,4 @@ jobs:
           if-no-files-found: error
           compression-level: 0
           retention-days: 14
+
