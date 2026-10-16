@@ -1,0 +1,61 @@
+name: Diagnose Phase 7 and 8 Regressions
+
+on:
+  push:
+    branches: [diag-stage6-parallel-20261016]
+    paths:
+      - ".github/workflows/diag-phase7-8-regressions.yml"
+      - "Stage 6/tests/run_phase7_*"
+      - "Stage 6/tests/run_phase81_*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  phase7:
+    runs-on: windows-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - shell: pwsh
+        run: |
+          python -m pip install --disable-pip-version-check pandas numpy tzdata
+          if($LASTEXITCODE -ne 0){throw "deps failed"}
+          foreach($test in @(
+            "Stage 6\tests\run_phase7_first_launch_state_hotfix_tests.py",
+            "Stage 6\tests\run_phase7_session_freshness_windows_hardening_tests.py",
+            "Stage 6\tests\run_phase7_official_daily_refresh_tests.py",
+            "Stage 6\tests\run_phase7_refresh_contract_consistency_tests.py"
+          )){
+            Write-Host "RUN $test"
+            python $test
+            if($LASTEXITCODE -ne 0){throw "FAILED $test"}
+          }
+
+  phase8:
+    runs-on: windows-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - shell: pwsh
+        run: |
+          python -m pip install --disable-pip-version-check pandas numpy tzdata
+          if($LASTEXITCODE -ne 0){throw "deps failed"}
+          foreach($test in @(
+            "Stage 6\tests\run_phase81_validation_tests.py",
+            "Stage 6\tests\run_phase81_validation_complete_tests.py",
+            "Stage 6\tests\run_phase81_runtime_fix_tests.py",
+            "Stage 6\tests\run_phase81_formatter_hotfix_tests.py",
+            "Stage 6\tests\run_phase81_paper_journal_duplicate_tests.py"
+          )){
+            Write-Host "RUN $test"
+            python $test
+            if($LASTEXITCODE -ne 0){throw "FAILED $test"}
+          }
