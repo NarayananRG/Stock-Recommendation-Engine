@@ -86,7 +86,16 @@ jobs:
           $tests = @(Get-ChildItem $env:SRE_TEST_PATTERN | Sort-Object Name)
           if ($tests.Count -eq 0) { throw "No tests matched $env:SRE_TEST_PATTERN" }
           foreach ($test in $tests) {
+            $fixture = $null
+            if ($test.Name -eq "run_stage6_8a_tests.py") {
+              $runtimeDir = "Stage 6/runtime/prospective_validation"
+              New-Item -ItemType Directory -Force -Path $runtimeDir | Out-Null
+              $fixture = Join-Path $runtimeDir ".gitignore"
+              [IO.File]::WriteAllText($fixture, "*`n!.gitignore`n", [Text.UTF8Encoding]::new($false))
+            }
             Write-Host "RUN $($test.Name) AS $env:SRE_LEGACY_EXPECTED_BRANCH"
             python $test.FullName
-            if ($LASTEXITCODE -ne 0) { throw "FAILED $($test.Name)" }
+            $exit = $LASTEXITCODE
+            if ($fixture -and (Test-Path $fixture)) { Remove-Item $fixture -Force }
+            if ($exit -ne 0) { throw "FAILED $($test.Name)" }
           }
