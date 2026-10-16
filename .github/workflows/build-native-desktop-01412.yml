@@ -1630,6 +1630,9 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw "0.14.12 Validation V2 lifecycle tests failed" }
           python ".ci\native153\test_validation_v2_pit.py"
           if ($LASTEXITCODE -ne 0) { throw "0.14.12 Validation V2 PIT anti-lookahead tests failed" }
+          $env:SRE_V2_API_E2E_PORT = "8897"
+          python ".ci\native153\validation_v2_api_e2e.py"
+          if ($LASTEXITCODE -ne 0) { throw "0.14.12 Validation V2 real FastAPI E2E failed" }
           $routerV2After = (Get-FileHash "$env:SRE_ENGINE_ROOT\stock_app\live_decision_v1.py" -Algorithm SHA256).Hash
           if ($routerV2Before -ne $routerV2After) { throw "LIVE_DECISION_V1 router changed during Validation V2" }
           python -m compileall -q "$env:SRE_ENGINE_ROOT\stock_app" "$env:SRE_ENGINE_ROOT\modern_ui"

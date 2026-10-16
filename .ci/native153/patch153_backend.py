@@ -17,7 +17,13 @@ def replace_once(path: Path, old: str, new: str, label: str) -> None:
 
 
 # Install V2 module; leave legacy Phase 8.1 implementation intact/read-only.
-shutil.copy2(root / ".ci" / "native153" / "validation_v2.py", root / "stock_app" / "validation_v2.py")
+# SRE_ENGINE_ROOT is the reconstructed engine, while this overlay lives in the
+# checked-out repository. Resolve the sibling source from this script, not from
+# the reconstructed engine root.
+v2_source = Path(__file__).resolve().with_name("validation_v2.py")
+if not v2_source.exists():
+    raise RuntimeError("Validation V2 source module missing: " + str(v2_source))
+shutil.copy2(v2_source, root / "stock_app" / "validation_v2.py")
 
 api = root / "modern_ui" / "api.py"
 replace_once(
