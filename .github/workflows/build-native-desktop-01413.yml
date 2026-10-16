@@ -1479,6 +1479,29 @@ jobs:
             $env:SRE_LEGACY_EXPECTED_BRANCH = ""
             $legacyRuntimeFixture = $null
 
+            # Stage 8C verifies that the frozen Stage 5D decision system is
+            # pristine. Earlier Stage 5D regression scripts rewrite only their
+            # tracked result artifacts as part of testing, so isolate 8C from
+            # that serial test contamination by restoring Stage 5D's working
+            # tree to this exact release HEAD. This does not change HEAD,
+            # production logic, model artifacts, or any user/runtime data.
+            if ($test.Name -eq "run_stage6_8c_tests.py") {
+              $stage5dDirty = @(git status --porcelain -- "Stage 5D")
+              if ($stage5dDirty.Count -gt 0) {
+                Write-Host "RESTORING STAGE5D TEST-GENERATED WORKTREE MUTATIONS BEFORE 8C:"
+                $stage5dDirty | ForEach-Object { Write-Host $_ }
+                git restore --source=HEAD --worktree -- "Stage 5D"
+                if ($LASTEXITCODE -ne 0) { throw "Unable to isolate Stage 8C from Stage 5D test-generated mutations" }
+              }
+              $stage5dAfter = @(git status --porcelain -- "Stage 5D")
+              if ($stage5dAfter.Count -ne 0) {
+                Write-Host "STAGE5D STILL DIRTY BEFORE 8C:"
+                $stage5dAfter | ForEach-Object { Write-Host $_ }
+                throw "Stage 8C frozen Stage 5D integrity precondition not restored"
+              }
+              Write-Host "STAGE8C STAGE5D WORKTREE ISOLATION PASS"
+            }
+
             # Stage 8A's frozen harness predates the repository-wide runtime
             # ignore rule and asserts the old local fixture file contents.
             # Recreate it only for that test; never track or preserve it.
