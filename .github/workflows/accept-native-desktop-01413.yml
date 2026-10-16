@@ -105,6 +105,10 @@ jobs:
             if ($name -eq "Install and launch generated Setup.exe") {
               $script = $script.Replace('$setup = Get-ChildItem "native-desktop-0.9.1\src-tauri\target\release\bundle\nsis\*.exe" | Select-Object -First 1', '$setup = Get-Item $env:SRE_ACCEPTANCE_SETUP')
               $script = $script.Replace('$expectedFingerprint = ((Get-Content "native-desktop-0.9.1\resources\SRE01413_ENGINE_SOURCE.sha256" -Raw).Trim() -split ''\s+'')[0]', '$expectedFingerprint = $readyLines[2]')
+              $script = $script.Replace('$dash = Invoke-RestMethod "http://127.0.0.1:$port/api/dashboard" -TimeoutSec 10', '$acceptedActiveRunId = [string]$duplicatePaper.last_successful_daily_run.run_id' + "`n  " + 'if (!$acceptedActiveRunId) { $acceptedActiveRunId = $installedRunId }' + "`n  " + '$dash = Invoke-RestMethod "http://127.0.0.1:$port/api/dashboard" -TimeoutSec 10')
+              $script = $script.Replace('if ([string]$dash.active_run.run_id -ne $installedRunId) { throw "Installed Dashboard active Run ID mismatch" }', 'if ([string]$dash.active_run.run_id -ne $acceptedActiveRunId) { throw "Installed Dashboard active Run ID mismatch" }')
+              $script = $script.Replace('if ([string]$stockPhase.active_run.run_id -ne $installedRunId) { throw "Installed Stock Intelligence active Run ID mismatch" }', 'if ([string]$stockPhase.active_run.run_id -ne $acceptedActiveRunId) { throw "Installed Stock Intelligence active Run ID mismatch" }')
+              $script = $script.Replace('$installedRunId | Set-Content "$env:RUNNER_TEMP\installed-phase2-run.txt" -Encoding ASCII', '$acceptedActiveRunId | Set-Content "$env:RUNNER_TEMP\installed-phase2-run.txt" -Encoding ASCII')
             }
             # YAML leaves two structural spaces inside PowerShell here-strings.
             # Remove them from every embedded Python block before execution,
