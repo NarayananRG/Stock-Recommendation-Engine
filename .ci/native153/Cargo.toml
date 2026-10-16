@@ -14,4 +14,4 @@ tauri-build = { version = "2", features = [] }
 
 [dependencies]
 tauri = { version = "2", features = [] }
-zip = { version = "=8.6.0", default-features = false, features = ["deflate"] }
+zip = { version = "=9.0.3", default-features = false, features = ["deflate"] }
