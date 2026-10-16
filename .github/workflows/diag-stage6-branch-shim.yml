@@ -1,0 +1,81 @@
+name: Validate Frozen Branch Shim
+
+on:
+  push:
+    branches: [diag-stage6-parallel-20261016]
+    paths:
+      - ".github/workflows/diag-stage6-branch-shim.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  frozen-stage6:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - suite: stage6_4a
+            pattern: "Stage 6/tests/run_stage6_4a_tests.py"
+            expected_branch: stage6-historical-analogue
+          - suite: stage6_5x
+            pattern: "Stage 6/tests/run_stage6_5*_tests.py"
+            expected_branch: stage6-portfolio-intelligence
+          - suite: stage6_6x
+            pattern: "Stage 6/tests/run_stage6_6*_tests.py"
+            expected_branch: stage6-persistent-thesis
+          - suite: stage6_7x
+            pattern: "Stage 6/tests/run_stage6_7*_tests.py"
+            expected_branch: stage6-morning-revalidation
+          - suite: stage6_8x
+            pattern: "Stage 6/tests/run_stage6_8*_tests.py"
+            expected_branch: stage6-prospective-shadow-validation
+    runs-on: windows-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run frozen suite with branch-only Git shim
+        shell: pwsh
+        env:
+          SRE_LEGACY_EXPECTED_BRANCH: ${{ matrix.expected_branch }}
+          SRE_TEST_PATTERN: ${{ matrix.pattern }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          $realGit = (Get-Command git).Source
+          $shimDir = Join-Path $env:RUNNER_TEMP "git-shim"
+          New-Item -ItemType Directory -Force -Path $shimDir | Out-Null
+          @'
+          @echo off
+          setlocal
+          set "allargs=%*"
+          if not "%SRE_LEGACY_EXPECTED_BRANCH%"=="" (
+            echo(%allargs%| findstr /C:"branch --show-current" >nul
+            if not errorlevel 1 (
+              echo %SRE_LEGACY_EXPECTED_BRANCH%
+              exit /b 0
+            )
+          )
+          "%SRE_REAL_GIT%" %*
+          exit /b %ERRORLEVEL%
+          '@ | Set-Content (Join-Path $shimDir "git.cmd") -Encoding ASCII
+          $env:SRE_REAL_GIT = $realGit
+          $env:PATH = "$shimDir;$env:PATH"
+
+          $contract = "Stage 6/contracts/market_context.schema.json"
+          $tracked = (& $realGit rev-parse "HEAD:$contract").Trim()
+          $raw = (& $realGit hash-object --no-filters -- "$contract").Trim()
+          if ($tracked -ne $raw) { throw "RAW CONTRACT MISMATCH tracked=$tracked raw=$raw" }
+
+          $tests = @(Get-ChildItem $env:SRE_TEST_PATTERN | Sort-Object Name)
+          if ($tests.Count -eq 0) { throw "No tests matched $env:SRE_TEST_PATTERN" }
+          foreach ($test in $tests) {
+            Write-Host "RUN $($test.Name) AS $env:SRE_LEGACY_EXPECTED_BRANCH"
+            python $test.FullName
+            if ($LASTEXITCODE -ne 0) { throw "FAILED $($test.Name)" }
+          }
