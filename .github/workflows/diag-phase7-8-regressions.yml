@@ -36,6 +36,21 @@ jobs:
             if($LASTEXITCODE -ne 0){throw "FAILED $test"}
           }
 
+  phase7_contract:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - name: Run self-contained Phase 7 refresh-contract consistency
+        shell: pwsh
+        run: |
+          $ErrorActionPreference="Stop"
+          python "Stage 6\tests\run_phase7_refresh_contract_consistency_tests.py"
+          if($LASTEXITCODE -ne 0){throw "Phase 7 refresh contract consistency failed"}
+
   phase8:
     runs-on: windows-latest
     timeout-minutes: 25
