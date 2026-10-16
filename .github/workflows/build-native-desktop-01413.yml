@@ -1444,6 +1444,32 @@ jobs:
           }
           Write-Host "STAGE 6 CONTRACT BYTE IDENTITY PASS: $rawContract"
 
+          @'
+          import hashlib
+          import json
+          from pathlib import Path
+
+          root = Path("Stage 4A.3")
+          manifest = json.loads((root / "results/stage4a3_source_manifest.json").read_text(encoding="utf-8"))
+          failures = []
+          for item in manifest.get("files", []):
+              path = root / item["Path"]
+              data = path.read_bytes() if path.is_file() else b""
+              digest = hashlib.sha256(data).hexdigest() if data else "MISSING"
+              if not path.is_file() or len(data) != item["Bytes"] or digest != item["SHA256"]:
+                  failures.append({
+                      "path": item["Path"],
+                      "expected_bytes": item["Bytes"],
+                      "actual_bytes": len(data) if path.is_file() else None,
+                      "expected_sha256": item["SHA256"],
+                      "actual_sha256": digest,
+                  })
+          if failures:
+              raise SystemExit("STAGE4A3_SOURCE_COMPONENT_DRIFT_PRECHECK:" + json.dumps(failures[:5], sort_keys=True))
+          print(f"STAGE 4A.3 SOURCE PACKAGE BYTE IDENTITY PASS: {len(manifest.get('files', []))} files")
+          '@ | python -
+          if ($LASTEXITCODE -ne 0) { throw "Stage 4A.3 frozen source-package byte identity failed" }
+
           $tests = @(
             Get-ChildItem "Stage 5D\tests\run_stage5d*_tests.py" | Sort-Object Name
             Get-ChildItem "Stage 6\tests\run_stage6_*_tests.py" | Sort-Object Name
