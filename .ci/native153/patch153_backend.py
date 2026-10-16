@@ -33,79 +33,9 @@ replace_once(
     "release identity",
 )
 
-# Cache immutable parsed fundamental source rows for replay performance only.
-fund = root / "stock_app" / "fundamental_v3.py"
-ftext = fund.read_text(encoding="utf-8")
-old_read = '''def _read_rows(path: Path | None) -> list[dict[str, Any]]:
-    if path is None:
-        return []
-    if path.suffix.lower() == ".csv":
-        with path.open("r", encoding="utf-8-sig", newline="") as handle:
-            return [dict(row) for row in csv.DictReader(handle)]
-    rows = []
-    with path.open("r", encoding="utf-8") as handle:
-        for line in handle:
-            if line.strip():
-                rows.append(json.loads(line))
-    return rows
-'''
-new_read = '''_READ_ROWS_CACHE: dict[tuple[str, int, int], list[dict[str, Any]]] = {}
-_SYMBOL_ROWS_CACHE: dict[tuple[int, str], list[dict[str, Any]]] = {}
-
-
-def _read_rows(path: Path | None) -> list[dict[str, Any]]:
-    if path is None:
-        return []
-    stat = path.stat()
-    key = (str(path.resolve()), int(stat.st_mtime_ns), int(stat.st_size))
-    cached = _READ_ROWS_CACHE.get(key)
-    if cached is not None:
-        return cached
-    if path.suffix.lower() == ".csv":
-        with path.open("r", encoding="utf-8-sig", newline="") as handle:
-            rows = [dict(row) for row in csv.DictReader(handle)]
-    else:
-        rows = []
-        with path.open("r", encoding="utf-8") as handle:
-            for line in handle:
-                if line.strip():
-                    rows.append(json.loads(line))
-    _READ_ROWS_CACHE[key] = rows
-    return rows
-
-
-def _rows_for_symbol(rows: Iterable[dict[str, Any]], symbol: str) -> list[dict[str, Any]]:
-    wanted = _symbol(symbol)
-    key = (id(rows), wanted)
-    cached = _SYMBOL_ROWS_CACHE.get(key)
-    if cached is None:
-        cached = [row for row in rows if _symbol(row.get("symbol")) == wanted]
-        _SYMBOL_ROWS_CACHE[key] = cached
-    return cached
-'''
-if old_read not in ftext:
-    raise RuntimeError("fundamental read cache anchor missing")
-ftext = ftext.replace(old_read, new_read, 1)
-needle = '''    for row in rows:
-        if _symbol(row.get("symbol")) != wanted:
-            continue
-        available = _dt(row.get("availability_ts") or row.get("effective_availability_ts"))
-'''
-if needle in ftext:
-    ftext = ftext.replace(needle, '''    for row in _rows_for_symbol(rows, wanted):
-        available = _dt(row.get("availability_ts") or row.get("effective_availability_ts"))
-''', 1)
-needle2 = '''    for row in rows:
-        if _symbol(row.get("symbol")) != _symbol(symbol):
-            continue
-        if basis and str(row.get("reporting_basis") or "").upper() != basis:
-'''
-for _ in range(2):
-    if needle2 in ftext:
-        ftext = ftext.replace(needle2, '''    for row in _rows_for_symbol(rows, symbol):
-        if basis and str(row.get("reporting_basis") or "").upper() != basis:
-''', 1)
-fund.write_text(ftext, encoding="utf-8")
+# Keep the accepted 0.14.11 Fundamental V3 implementation byte-for-byte unchanged.
+# Replay performance optimizations are deferred until Validation V2 is fully green;
+# correctness and PIT semantics take priority over speculative caching.
 
 atext = api.read_text(encoding="utf-8")
 anchor = "    def latest_prediction_rows"
