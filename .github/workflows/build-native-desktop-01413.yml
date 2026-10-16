@@ -1479,27 +1479,53 @@ jobs:
             $env:SRE_LEGACY_EXPECTED_BRANCH = ""
             $legacyRuntimeFixture = $null
 
-            # Stage 8C verifies that the frozen Stage 5D decision system is
-            # pristine. Earlier Stage 5D regression scripts rewrite only their
-            # tracked result artifacts as part of testing, so isolate 8C from
-            # that serial test contamination by restoring Stage 5D's working
-            # tree to this exact release HEAD. This does not change HEAD,
-            # production logic, model artifacts, or any user/runtime data.
+            # Stage 8C intentionally fail-closes unless the complete Stage 5D
+            # decision subtree is clean. Earlier Stage 5D regression scripts
+            # legitimately rewrite only generated evidence under Stage 5D/results.
+            # Permit cleanup of that generated evidence only. Any dirty Stage 5D
+            # path outside results is treated as real integrity drift and aborts.
             if ($test.Name -eq "run_stage6_8c_tests.py") {
-              $stage5dDirty = @(git status --porcelain -- "Stage 5D")
-              if ($stage5dDirty.Count -gt 0) {
-                Write-Host "RESTORING STAGE5D TEST-GENERATED WORKTREE MUTATIONS BEFORE 8C:"
-                $stage5dDirty | ForEach-Object { Write-Host $_ }
-                git restore --source=HEAD --worktree -- "Stage 5D"
-                if ($LASTEXITCODE -ne 0) { throw "Unable to isolate Stage 8C from Stage 5D test-generated mutations" }
+              $stage5dDirty = @(git status --porcelain --untracked-files=all -- "Stage 5D")
+              if ($LASTEXITCODE -ne 0) { throw "Unable to inspect Stage 5D cleanliness before Stage 6.8C" }
+
+              $unexpectedStage5d = @()
+              foreach ($line in $stage5dDirty) {
+                if ([string]::IsNullOrWhiteSpace($line)) { continue }
+                $pathText = if ($line.Length -gt 3) { $line.Substring(3) } else { "" }
+                $pathsToCheck = @($pathText)
+                if ($pathText -match ' -> ') { $pathsToCheck = @($pathText -split ' -> ') }
+                foreach ($dirtyPath in $pathsToCheck) {
+                  $normalized = $dirtyPath.Trim('"').Replace("\", "/")
+                  if ($normalized -notlike "Stage 5D/results/*") {
+                    $unexpectedStage5d += $line
+                    break
+                  }
+                }
               }
-              $stage5dAfter = @(git status --porcelain -- "Stage 5D")
+
+              if ($unexpectedStage5d.Count -gt 0) {
+                Write-Host "===== PROTECTED STAGE 5D DIRTY PATHS ====="
+                $unexpectedStage5d | ForEach-Object { Write-Host $_ }
+                throw "Protected Stage 5D source/policy drift detected before Stage 6.8C"
+              }
+
+              if ($stage5dDirty.Count -gt 0) {
+                Write-Host "RESTORING TEST-GENERATED STAGE 5D RESULTS BEFORE 8C:"
+                $stage5dDirty | ForEach-Object { Write-Host $_ }
+                git restore --source=HEAD --worktree -- "Stage 5D/results"
+                if ($LASTEXITCODE -ne 0) { throw "Unable to restore tracked Stage 5D/results evidence" }
+                git clean -fd -- "Stage 5D/results"
+                if ($LASTEXITCODE -ne 0) { throw "Unable to clean untracked Stage 5D/results evidence" }
+              }
+
+              $stage5dAfter = @(git status --porcelain --untracked-files=all -- "Stage 5D")
+              if ($LASTEXITCODE -ne 0) { throw "Unable to re-check Stage 5D cleanliness before Stage 6.8C" }
               if ($stage5dAfter.Count -ne 0) {
                 Write-Host "STAGE5D STILL DIRTY BEFORE 8C:"
                 $stage5dAfter | ForEach-Object { Write-Host $_ }
                 throw "Stage 8C frozen Stage 5D integrity precondition not restored"
               }
-              Write-Host "STAGE8C STAGE5D WORKTREE ISOLATION PASS"
+              Write-Host "STAGE8C GUARDED STAGE5D RESULTS CLEANUP PASS"
             }
 
             # Stage 8A's frozen harness predates the repository-wide runtime
