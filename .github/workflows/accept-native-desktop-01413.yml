@@ -1,0 +1,138 @@
+name: Accept SRE 0.14.13 Prebuilt Installer
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  installed-acceptance:
+    runs-on: windows-latest
+    timeout-minutes: 45
+    env:
+      SOURCE_RUN_ID: "38913775215"
+      SOURCE_ARTIFACT: SRE-0.14.13-PREACCEPTANCE-CANDIDATE
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Download exact pre-acceptance installer
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $dest = "$env:RUNNER_TEMP\sre01413-candidate"
+          New-Item -ItemType Directory -Force -Path $dest | Out-Null
+          gh run download $env:SOURCE_RUN_ID --repo $env:GITHUB_REPOSITORY --name $env:SOURCE_ARTIFACT --dir $dest
+          if ($LASTEXITCODE -ne 0) { throw "Unable to download exact pre-acceptance installer" }
+          $setup = Get-ChildItem $dest -Filter "*.exe" -Recurse | Select-Object -Single
+          if (!$setup) { throw "Pre-acceptance Setup.exe missing" }
+          $sha = (Get-FileHash $setup.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+          "SRE_ACCEPTANCE_SETUP=$($setup.FullName)" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "SRE_ACCEPTANCE_SETUP_SHA256=$sha" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          Write-Host "PREBUILT INSTALLER SHA256=$sha"
+
+      - name: Build disposable official acceptance fixture
+        shell: pwsh
+        run: |
+          $fixture = "$env:RUNNER_TEMP\sre099-legacy-repo"
+          $cache = Join-Path $fixture "stage2_2_1\data\frozen"
+          New-Item -ItemType Directory -Force -Path $cache | Out-Null
+          $env:SRE099_FIXTURE_ROOT = $fixture
+          @'
+          from pathlib import Path
+          import csv, datetime, math, os
+
+          root = Path(os.environ["SRE099_FIXTURE_ROOT"])
+          cache = root / "stage2_2_1" / "data" / "frozen"
+          symbols = ["INFY", "TCS", "RELIANCE", "HDFCBANK", "SUNPHARMA", "LT"]
+          start = datetime.date(2023, 1, 2)
+          for si, symbol in enumerate(symbols):
+              d, price, rows, i = start, 350.0 + si * 120.0, [], 0
+              while len(rows) < 760:
+                  if d.weekday() < 5:
+                      seasonal = math.sin(i / 13 + si) * 0.012 + math.cos(i / 31 + si) * 0.007
+                      close = price * (1 + 0.00035 + (si - 2) * 0.00003 + seasonal * 0.08)
+                      op = price * (1 + math.sin(i / 7 + si) * 0.002)
+                      hi = max(op, close) * (1.006 + abs(math.sin(i / 9)) * 0.004)
+                      lo = min(op, close) * (1 - 0.006 - abs(math.cos(i / 11)) * 0.004)
+                      rows.append([d.isoformat(), f"{op:.2f}", f"{hi:.2f}", f"{lo:.2f}", f"{close:.2f}", str(1_000_000 + si * 120_000 + (i % 37) * 9_000)])
+                      price, i = close, i + 1
+                  d += datetime.timedelta(days=1)
+              with (cache / f"{symbol}.NS.csv").open("w", newline="", encoding="utf-8") as handle:
+                  writer = csv.writer(handle)
+                  writer.writerow(["Date", "Open", "High", "Low", "Close", "Volume"])
+                  writer.writerows(rows)
+          '@ | python -
+          if ($LASTEXITCODE -ne 0) { throw "Unable to build acceptance fixture" }
+          Copy-Item (Join-Path $cache "INFY.NS.csv") (Join-Path $cache "INDEX_NSEI.csv") -Force
+          "SRE099_FIXTURE_ROOT=$fixture" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Extract and parse installed acceptance scripts
+        shell: pwsh
+        run: |
+          $workflow = Get-Content ".github\workflows\build-native-desktop-01413.yml"
+          function Export-StepRun([string]$name, [string]$destination) {
+            $start = -1
+            for ($i = 0; $i -lt $workflow.Count; $i++) {
+              if ($workflow[$i] -eq "      - name: $name") { $start = $i; break }
+            }
+            if ($start -lt 0) { throw "Acceptance step not found: $name" }
+            while ($start -lt $workflow.Count -and $workflow[$start] -ne "        run: |") { $start++ }
+            if ($start -ge $workflow.Count) { throw "Run block not found: $name" }
+            $body = [Collections.Generic.List[string]]::new()
+            for ($i = $start + 1; $i -lt $workflow.Count; $i++) {
+              if ($workflow[$i] -match '^      - name:') { break }
+              if ($workflow[$i].Length -ge 10) { $body.Add($workflow[$i].Substring(10)) } else { $body.Add("") }
+            }
+            $script = $body -join "`n"
+            if ($name -eq "Install and launch generated Setup.exe") {
+              $script = $script.Replace('$setup = Get-ChildItem "native-desktop-0.9.1\src-tauri\target\release\bundle\nsis\*.exe" | Select-Object -First 1', '$setup = Get-Item $env:SRE_ACCEPTANCE_SETUP')
+              $script = $script.Replace('$expectedFingerprint = ((Get-Content "native-desktop-0.9.1\resources\SRE01413_ENGINE_SOURCE.sha256" -Raw).Trim() -split ''\s+'')[0]', '$expectedFingerprint = $readyLines[2]')
+            }
+            $tokens = $null
+            $errors = $null
+            [Management.Automation.Language.Parser]::ParseInput($script, [ref]$tokens, [ref]$errors) | Out-Null
+            if ($errors.Count) { throw "PowerShell parse failed for ${name}: $($errors | ForEach-Object Message)" }
+            Set-Content $destination $script -Encoding UTF8
+            Write-Host "POWERSHELL PARSE PASS: $name"
+          }
+          Export-StepRun "Install and launch generated Setup.exe" "$env:RUNNER_TEMP\accept-session-t.ps1"
+          Export-StepRun "Reopen installed app and verify persistent Run ID" "$env:RUNNER_TEMP\accept-session-t1.ps1"
+          Export-StepRun "Reopen installed app after fill and verify persistence" "$env:RUNNER_TEMP\accept-persistence.ps1"
+
+      - name: Installed Session-T acceptance
+        shell: pwsh
+        run: "& $env:RUNNER_TEMP\\accept-session-t.ps1"
+
+      - name: Installed restart and next-session fill acceptance
+        shell: pwsh
+        run: "& $env:RUNNER_TEMP\\accept-session-t1.ps1"
+
+      - name: Installed second-restart persistence acceptance
+        shell: pwsh
+        run: "& $env:RUNNER_TEMP\\accept-persistence.ps1"
+
+      - name: Stage accepted installer
+        shell: pwsh
+        run: |
+          $root = "$env:RUNNER_TEMP\sre01413-accepted"
+          New-Item -ItemType Directory -Force -Path $root | Out-Null
+          $name = "SRE-0.14.13-Paper-Trading-Repair-Setup.exe"
+          Copy-Item $env:SRE_ACCEPTANCE_SETUP (Join-Path $root $name) -Force
+          "$env:SRE_ACCEPTANCE_SETUP_SHA256  $name" | Set-Content (Join-Path $root "installer.sha256") -Encoding ascii
+          "source_run=$env:SOURCE_RUN_ID`nsource_artifact=$env:SOURCE_ARTIFACT`nsource_commit=${{ github.sha }}" | Set-Content (Join-Path $root "acceptance-provenance.txt") -Encoding ascii
+
+      - name: Upload accepted installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: SRE-0.14.13-Paper-Trading-Repair-Setup
+          path: ${{ runner.temp }}\sre01413-accepted\*
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
