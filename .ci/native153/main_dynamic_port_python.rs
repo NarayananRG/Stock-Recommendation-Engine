@@ -183,7 +183,7 @@ fn main() {
             let resource_dir = app.path().resource_dir()?;
             let zip_path = resource_dir
                 .join("resources")
-                .join("SRE01411_ENGINE_SOURCE.zip");
+                .join("SRE01412_ENGINE_SOURCE.zip");
 
             let local_base = std::env::var_os("LOCALAPPDATA")
                 .map(PathBuf::from)
