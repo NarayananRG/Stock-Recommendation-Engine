@@ -176,10 +176,16 @@ await page.locator('.nav-item[data-page="validation"]').click();
 await page.waitForTimeout(150);
 assert(await page.locator('#validationPage').isVisible(), 'Validation route did not open');
 await page.locator('#validationPaperTab').click();
+page.once('dialog', async dialog => {
+  assert(dialog.type() === 'prompt', 'Paper Portfolio V2 start did not request starting capital');
+  await dialog.accept('100000');
+});
 await page.locator('#startPaperPortfolio').click();
+await page.waitForTimeout(150);
+assert(requests.includes('POST /api/validation/paper-portfolio/start'), 'Prospective tracking did not start');
 await page.locator('#validationReplayTab').click();
 await page.locator('#runHistoricalReplay').click();
-assert(requests.includes('POST /api/validation/paper-portfolio/start'), 'Prospective tracking did not start');
+await page.waitForTimeout(150);
 assert(requests.includes('POST /api/validation/historical-replay'), 'Historical replay did not trigger');
 
 await page.locator('.nav-item[data-page="dashboard"]').click();
