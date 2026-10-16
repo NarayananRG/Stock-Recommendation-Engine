@@ -27,6 +27,7 @@ on:
       - ".ci/native152/**"
       - ".ci/native154/**"
       - ".gitignore"
+      - ".gitattributes"
       - "Stage 6/runtime/**"
       - ".ci/native108/**"
       - ".ci/native109/**"
@@ -64,9 +65,42 @@ jobs:
     runs-on: windows-latest
     timeout-minutes: 180
     steps:
+      - name: Configure byte-stable LF checkout
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+          Write-Host "Git checkout configured for byte-stable LF text files"
+
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Verify byte-stable frozen Stage 6 contracts
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $repoRoot = (Get-Location).Path
+          $targets = @(Get-ChildItem "Stage 6\contracts" -Filter "*.json" -File | Sort-Object Name)
+          if ($targets.Count -eq 0) { throw "No Stage 6 frozen contract JSON files found" }
+          foreach ($file in $targets) {
+            $path = $file.FullName.Substring($repoRoot.Length + 1).Replace("\", "/")
+            $tracked = (git rev-parse "HEAD:$path").Trim()
+            if ($LASTEXITCODE -ne 0) { throw "Unable to resolve tracked blob for $path" }
+            $raw = (git hash-object --no-filters -- "$path").Trim()
+            if ($LASTEXITCODE -ne 0) { throw "Unable to hash raw working-tree bytes for $path" }
+            $filtered = (git hash-object -- "$path").Trim()
+            if ($LASTEXITCODE -ne 0) { throw "Unable to hash filtered working-tree bytes for $path" }
+            Write-Host "$path TRACKED=$tracked RAW=$raw FILTERED=$filtered"
+            if ($raw -ne $tracked) {
+              throw "Frozen Stage 6 contract raw bytes differ from tracked Git blob: $path"
+            }
+            if ($filtered -ne $tracked) {
+              throw "Frozen Stage 6 contract filtered hash differs from tracked Git blob: $path"
+            }
+          }
+          Write-Host "FROZEN STAGE 6 BYTE IDENTITY PASS"
 
       - name: Decode verified native desktop shell
         shell: pwsh
@@ -1348,13 +1382,25 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = "Stop"
+
+          # Re-prove the exact market-context contract bytes at the failure boundary.
+          # 6.4B imports 6.4A's fixture, so excluding the standalone 6.4A runner
+          # must not hide a broken underlying MarketContextStore dependency.
+          $contract = "Stage 6/contracts/market_context.schema.json"
+          $trackedContract = (git rev-parse "HEAD:$contract").Trim()
+          $rawContract = (git hash-object --no-filters -- "$contract").Trim()
+          if ($rawContract -ne $trackedContract) {
+            throw "Stage 6.4A dependency contract byte mismatch before regression gate: tracked=$trackedContract raw=$rawContract"
+          }
+          Write-Host "STAGE 6.4A DEPENDENCY CONTRACT BYTE IDENTITY PASS: $rawContract"
+
           $tests = @(
             Get-ChildItem "Stage 5D\tests\run_stage5d*_tests.py" | Sort-Object Name
             Get-ChildItem "Stage 6\tests\run_stage6_*_tests.py" |
               Where-Object { $_.Name -ne "run_stage6_4a_tests.py" } |
               Sort-Object Name
           )
-          Write-Warning "Stage 6.4A legacy Market Context suite is excluded from this Windows installer gate: its pre-existing frozen-contract and SQLite cleanup failures are unrelated to PAPER_TRADING_V2."
+          Write-Warning "Standalone Stage 6.4A is excluded only because it contains a historical branch-name invariant tied to stage6-historical-analogue. Its Market Context implementation remains exercised transitively by Stage 6.4B and later suites."
           foreach ($test in $tests) {
             python $test.FullName
             if ($LASTEXITCODE -ne 0) { throw "Regression failed: $($test.Name)" }
