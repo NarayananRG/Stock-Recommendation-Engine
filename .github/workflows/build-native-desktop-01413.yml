@@ -1383,6 +1383,9 @@ jobs:
           # remain byte-for-byte unchanged, and all substantive Git ancestry,
           # hash, diff, PIT, persistence, and runtime assertions still execute.
 
+          python -m pip install --disable-pip-version-check tzdata==2025.2
+          if ($LASTEXITCODE -ne 0) { throw "Unable to install Windows tzdata required by frozen Stage 8C" }
+
           $siteDir = Join-Path $env:RUNNER_TEMP "sre-legacy-sitecustomize"
           New-Item -ItemType Directory -Force -Path $siteDir | Out-Null
           @'
