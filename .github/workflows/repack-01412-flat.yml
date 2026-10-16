@@ -1,0 +1,81 @@
+name: Repack SRE 0.14.12 Flat Artifact
+
+on:
+  push:
+    branches: [validation-v2-rebuild]
+    paths:
+      - ".github/workflows/repack-01412-flat.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  repack:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - name: Download accepted 0.14.12 artifact
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          New-Item -ItemType Directory -Force -Path "$env:RUNNER_TEMP\source" | Out-Null
+          gh run download 38861175662 --repo "$env:GITHUB_REPOSITORY" --name "SRE-0.14.12-Validation-V2-Setup" --dir "$env:RUNNER_TEMP\source"
+          if ($LASTEXITCODE -ne 0) { throw "Unable to download accepted 0.14.12 artifact" }
+
+      - name: Build flat release layout and verify installer
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $src = "$env:RUNNER_TEMP\source"
+          $flat = "flat-release"
+          New-Item -ItemType Directory -Force -Path $flat | Out-Null
+
+          $setup = Get-ChildItem $src -Recurse -Filter "*.exe" | Where-Object { $_.Name -match "setup" } | Select-Object -First 1
+          if (!$setup) { throw "Accepted 0.14.12 installer not found" }
+
+          $hashFile = Get-ChildItem $src -Recurse -Filter "installer.sha256" | Select-Object -First 1
+          if (!$hashFile) { throw "Accepted installer.sha256 not found" }
+
+          $expected = ((Get-Content $hashFile.FullName -Raw).Trim() -split "\s+")[0].ToLowerInvariant()
+          $actual = (Get-FileHash $setup.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($expected -ne $actual) { throw "Installer SHA mismatch: expected=$expected actual=$actual" }
+
+          $destSetup = Join-Path $flat "SRE-0.14.12-Setup.exe"
+          Copy-Item $setup.FullName $destSetup -Force
+          "$actual  SRE-0.14.12-Setup.exe" | Set-Content (Join-Path $flat "installer.sha256") -Encoding ascii
+
+          $security = Get-ChildItem $src -Recurse -Filter "release-security-report.txt" | Select-Object -First 1
+          if ($security) { Copy-Item $security.FullName (Join-Path $flat "security-report.txt") -Force }
+
+          $signing = Get-ChildItem $src -Recurse -Filter "signing-status.txt" | Select-Object -First 1
+          if ($signing) { Copy-Item $signing.FullName (Join-Path $flat "signing-status.txt") -Force }
+
+          $summary = Get-ChildItem $src -Recurse -Filter "missing_evidence_summary.json" | Select-Object -First 1
+          if ($summary) { Copy-Item $summary.FullName (Join-Path $flat "evidence-summary.json") -Force }
+
+          $audit = Get-ChildItem $src -Recurse -Filter "current_evidence_repair_audit.json" | Select-Object -First 1
+          if ($audit) { Copy-Item $audit.FullName (Join-Path $flat "evidence-repair-audit.json") -Force }
+
+          $items = Get-ChildItem $flat -File
+          if ($items.Count -lt 3) { throw "Flat release staging unexpectedly incomplete" }
+          foreach ($item in $items) {
+            if ($item.Name.Length -gt 80) { throw "Flat artifact filename too long: $($item.Name)" }
+            Write-Host "FLAT: $($item.Name) bytes=$($item.Length)"
+          }
+
+          $check = (Get-FileHash $destSetup -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($check -ne $actual) { throw "Flat installer copy hash mismatch" }
+          Write-Host "FLAT ARTIFACT VERIFIED SHA256=$actual"
+
+      - name: Upload flat 0.14.12 artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SRE-0.14.12-Validation-V2-FLAT
+          path: flat-release/*
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
