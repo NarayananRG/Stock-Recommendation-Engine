@@ -2360,7 +2360,7 @@ jobs:
             $env:SRE_ACCEPTANCE_RUN_ID = $installedRunId
             $env:SRE_ACCEPTANCE_SEED_RESULT = $seedResultPath
           @'
-            import json
+          import json
           import os
           import sys
           from pathlib import Path
