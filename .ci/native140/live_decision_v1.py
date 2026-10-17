@@ -221,7 +221,18 @@ def next_official_open(stock_bars, index_bars, signal_session, observed_session)
 
 
 def paper_entry_rows(rows, plan):
-    allocated = {r["symbol"] for r in plan.get("new_buys", []) if int(r.get("shares") or 0) > 0}
+    # Only positive whole-number allocations qualify; booleans and decimals
+    # must never turn a malformed plan into an executable paper order.
+    def positive_whole_shares(value):
+        if isinstance(value, bool):
+            return False
+        try:
+            shares = float(value)
+            return math.isfinite(shares) and shares > 0 and shares.is_integer()
+        except (TypeError, ValueError, OverflowError):
+            return False
+    allocated = {r["symbol"] for r in plan.get("new_buys", [])
+                 if isinstance(r, dict) and r.get("symbol") and positive_whole_shares(r.get("shares"))}
     return [{**row, "executable": row.get("symbol") in allocated and
              (row.get("live_decision") or {}).get("executable") is True and
              (row.get("live_decision") or {}).get("final_action") in BUY_ACTIONS,
@@ -261,7 +272,7 @@ def rank_candidates(rows):
 def monitor(position, decision):
     """Use persisted entry style. Never exit Recovery merely for weak momentum."""
     style = position.get("primary_style") or position.get("strategy_style") or ""
-    if decision.get("structural_deterioration"):
+    if decision.get("structural_deterioration") is True:
         return "EXIT", "Original business safety thesis invalidated by material deterioration."
     if decision.get("technical_state") == "BREAKDOWN" and style:
         return "EXIT", "Original " + style.lower() + " thesis breached its downside-risk protection."
