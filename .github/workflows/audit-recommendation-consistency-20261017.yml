@@ -18,6 +18,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Validate missing-field source taxonomy
+        run: python .ci/recommendation_audit/test_missing_field_taxonomy.py -v
       - name: Validate fundamental panel numeric hygiene
         run: python .ci/recommendation_audit/test_panel_numeric_quality.py -v
       - name: Validate evidence trace audit
