@@ -174,8 +174,8 @@ def route(symbol: str, market_session: str, technical: dict, fundamental: dict,
         action = "WATCH - MOMENTUM"
     else:
         action = "NO OPPORTUNITY"
-    m = "VALID" if momentum_valid else "REJECT" if s["structural_deterioration"] or breakdown else "WATCH"
-    r = "VALID" if recovery_valid else "REJECT" if s["structural_deterioration"] or breakdown else "WATCH"
+    m = "VALID" if momentum_valid and official_current is True else "REJECT" if s["structural_deterioration"] or breakdown else "WATCH"
+    r = "VALID" if recovery_valid and official_current is True else "REJECT" if s["structural_deterioration"] or breakdown else "WATCH"
     momentum_reason = "Trend, relative strength, volume and completed weekly confirmation support continuation; fundamentals show no material deterioration." if m == "VALID" else "Momentum confirmation or fundamental safety is incomplete. " + ", ".join(reasons)
     recovery_reason = ("Price is depressed while business, earnings, cash flow and PIT valuation evidence support recovery. Weak technical momentum increases entry risk without invalidating this thesis. The cause of the decline is not established by these data."
                        if r == "VALID" else "A price decline alone is insufficient. " + ", ".join(reasons))
