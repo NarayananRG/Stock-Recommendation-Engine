@@ -21,17 +21,16 @@ replace_once(api, 'APP_VERSION = "0.14.10-recommendation-presentation-status-rep
 replace_once(api, "from stock_app.storage import AppDatabase\n",
              "from stock_app.storage import AppDatabase\nfrom stock_app.evidence_coverage_v1 import classify_live_decision\n",
              "classification import")
+# Anchor on the unchanged router call, not the mutable subsequent rows.append:
+# later diagnostic overlays legitimately insert statements between those lines.
 replace_once(api,
 '''            live = route(symbol, session, technical, fundamental, price_context=context,
                          official_current=current and bool(bars) and str(bars[-1].get("date"))[:10] == session, legacy=dict(row))
-            rows.append({**row, "legacy_opportunity_status": row.get("opportunity_status"), "live_decision": live,
 ''',
 '''            live = route(symbol, session, technical, fundamental, price_context=context,
                          official_current=current and bool(bars) and str(bars[-1].get("date"))[:10] == session, legacy=dict(row))
-            # Diagnostic annotation only. The router has already produced its
-            # action and remains byte-for-byte unchanged.
+            # Diagnostic annotation only; the router action remains unchanged.
             live["evidence_classification"] = classify_live_decision(live)
-            rows.append({**row, "legacy_opportunity_status": row.get("opportunity_status"), "live_decision": live,
 ''', "live evidence annotation")
 
 text = api.read_text(encoding="utf-8")
