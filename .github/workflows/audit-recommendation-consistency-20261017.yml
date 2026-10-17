@@ -18,6 +18,10 @@ jobs:
           python-version: '3.12'
       - name: Verify production LIVE_DECISION_V1 router regression
         run: python .ci/native140/test_live_decision_v1.py -v
+      - name: Validate official daily-market refresh with deterministic test cases
+        run: python .ci/native146/test_official_refresh.py -v
+      - name: Audit model calibration provenance without promotion
+        run: python .ci/forecast_audit/real_evidence_audit.py
       - name: Trace decision/forecast separation and freshness contracts
         run: |
           python - <<'PY'
