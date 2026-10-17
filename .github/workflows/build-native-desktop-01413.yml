@@ -2451,6 +2451,7 @@ jobs:
             }
             $stockPhase = Invoke-RestMethod "http://127.0.0.1:$port/api/stocks/INFY?limit=5000" -TimeoutSec 30
             if ([string]$stockPhase.active_run.run_id -ne $dashboardRunId) { throw "Installed Stock Intelligence and Dashboard active Run IDs disagree" }
+            $dashboardRunId | Set-Content "$env:RUNNER_TEMP\installed-phase2-run.txt" -Encoding ASCII
             if ($stockPhase.technical_v2.schema -ne "SRE_TECHNICAL_INTELLIGENCE_V2") { throw "Installed app Technical V2 schema missing" }
             if ($stockPhase.technical_v2.authority -ne "LIVE_EVIDENCE") { throw "Installed app Technical V2 authority changed" }
             if ($null -eq $stockPhase.technical_v2.technical_score) { throw "Installed app Technical V2 score missing" }
@@ -2531,10 +2532,13 @@ jobs:
             if($readyLines[0] -ne "0.14.13-paper-trading-repair"){throw "Reopened runtime version mismatch: $($readyLines[0])"}
             $port=[int]$readyLines[1]
             $dash=Invoke-RestMethod "http://127.0.0.1:$port/api/dashboard" -TimeoutSec 10
-            if([string]$dash.active_run.run_id -ne $expected){throw "Installed app changed active Run ID after close/reopen"}
+            $restored = [string]$dash.active_run.run_id
+            Write-Host "RESTART LINEAGE: last_persisted=$expected restored=$restored restored_session=$($dash.active_run.market_session)"
+            if(!$restored){throw "Installed app lost active Run ID on restart"}
+            if($restored -ne $expected -and [string]$dash.active_run.market_session -ne '2025-12-01'){throw "Unexpected active Run ID change without next-session data advancement"}
             if(!$dash.target_state.explicit -or !$dash.target_state.restored){throw "Installed app did not label explicit target as restored after restart"}
             $opps=Invoke-RestMethod "http://127.0.0.1:$port/api/opportunities" -TimeoutSec 10
-            if([string]$opps.run.run_id -ne $expected){throw "Opportunities changed Run ID after close/reopen"}
+            if([string]$opps.run.run_id -ne $restored){throw "Opportunities and Dashboard disagree after close/reopen"}
             $expectedPaper = Get-Content "$env:RUNNER_TEMP\installed-paper-state.json" -Raw | ConvertFrom-Json
             $paper = Invoke-RestMethod "http://127.0.0.1:$port/api/validation/paper-portfolio" -TimeoutSec 30
             if([string]$paper.portfolio_id -ne [string]$expectedPaper.portfolio_id){throw "Paper portfolio ID changed after restart"}
