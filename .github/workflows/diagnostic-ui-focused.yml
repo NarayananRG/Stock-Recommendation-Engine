@@ -1,0 +1,31 @@
+name: SRE Forecast Diagnostic UI Focused Gate
+on:
+  push:
+    branches: [feat-recommendation-conflict-diagnostics-20261017]
+    paths:
+      - ".ci/forecast_audit/**"
+      - ".ci/native140/patch140.py"
+      - ".github/workflows/diagnostic-ui-focused.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  focused:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Frontend patch and syntax checks
+        run: python .ci/forecast_audit/test_patch_forecast_ui.py -v
+      - name: Backend diagnostic integration regression
+        run: python .ci/forecast_audit/test_runtime_diagnostic_wiring.py -v
+      - name: Conflict evidence and production router tests
+        run: |
+          python .ci/forecast_audit/test_forecast_conflict_diagnostic.py -v
+          python .ci/native140/test_live_decision_v1.py -v
