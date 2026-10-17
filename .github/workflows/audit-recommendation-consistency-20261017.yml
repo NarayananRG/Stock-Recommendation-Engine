@@ -18,6 +18,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Validate indicator and weekly technical batch
+        run: python .ci/recommendation_audit/test_technical_batch.py -v
       - name: Validate batched recommendation router safeguards
         run: python .ci/recommendation_audit/test_router_batch_sanity.py -v
       - name: Validate technical price sanity
