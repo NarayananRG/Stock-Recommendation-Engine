@@ -1,0 +1,29 @@
+name: SRE Real Forecast Lineage and Evidence Audit
+on:
+  push:
+    branches: [audit-forecast-lineage-real-evidence-20261017]
+    paths:
+      - ".ci/forecast_audit/**"
+      - ".github/workflows/audit-forecast-real-evidence.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real-evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Real historical lineage, calibration authority and sample adequacy
+        run: python .ci/forecast_audit/real_evidence_audit.py
+      - name: Baseline LIVE_DECISION_V1 regression
+        run: python .ci/native140/test_live_decision_v1.py -v
+      - name: Publish audit evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: SRE-Real-Forecast-Lineage-Evidence
+          path: forecast-lineage-evidence-report.json
+          retention-days: 14
