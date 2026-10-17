@@ -35,6 +35,7 @@ jobs:
         with:
           ref: automation-overnight-validation-20261018
           persist-credentials: false
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         if: steps.guard.outputs.run_it == 'true'
         with:
