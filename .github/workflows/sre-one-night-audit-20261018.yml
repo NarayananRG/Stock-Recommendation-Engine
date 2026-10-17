@@ -1,0 +1,57 @@
+name: SRE one-night independent audit
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/sre-one-night-audit-20261018.yml
+  workflow_dispatch:
+  schedule:
+    - cron: '30 21,22,23 17 10 *'
+    - cron: '30 0,1 18 10 *'
+permissions:
+  contents: read
+concurrency:
+  group: sre-one-night-readonly-audit
+  cancel-in-progress: false
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Restrict scheduled runs to October 2026 overnight window
+        id: guard
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" != "schedule" ]]; then
+            echo "run_it=true" >> "$GITHUB_OUTPUT"
+          elif [[ "$(date -u +%Y)" == "2026" ]]; then
+            echo "run_it=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run_it=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Check out validated isolated branch, never production code
+        if: steps.guard.outputs.run_it == 'true'
+        uses: actions/checkout@v4
+        with:
+          ref: automation-overnight-validation-20261018
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        if: steps.guard.outputs.run_it == 'true'
+        with:
+          python-version: '3.12'
+      - name: Install audit dependencies
+        if: steps.guard.outputs.run_it == 'true'
+        run: python -m pip install numpy pandas requests
+      - name: Run bounded read-only multi-stage audit
+        if: steps.guard.outputs.run_it == 'true'
+        env:
+          SRE_AUDIT_REPORT_DIR: audit-output
+        run: python .ci/overnight/overnight_validation.py
+      - name: Preserve audit report and individual logs even on failures
+        if: always() && steps.guard.outputs.run_it == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: sre-overnight-${{ github.run_id }}-${{ github.run_attempt }}
+          path: audit-output/
+          retention-days: 14
+          if-no-files-found: warn
