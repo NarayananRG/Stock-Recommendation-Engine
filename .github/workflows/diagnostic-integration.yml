@@ -1,0 +1,26 @@
+name: SRE Recommendation Conflict Diagnostics Integration
+on:
+  push:
+    branches: [feat-recommendation-conflict-diagnostics-20261017]
+    paths:
+      - ".ci/native140/patch140.py"
+      - ".ci/forecast_audit/**"
+      - ".github/workflows/diagnostic-integration.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Diagnostic integration and immutability checks
+        run: python .ci/forecast_audit/test_runtime_diagnostic_wiring.py -v
+      - name: Original conflict classifier tests
+        run: python .ci/forecast_audit/test_forecast_conflict_diagnostic.py -v
+      - name: Existing live strategy regression suite
+        run: python .ci/native140/test_live_decision_v1.py -v
