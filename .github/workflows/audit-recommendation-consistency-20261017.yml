@@ -18,6 +18,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Validate technical price sanity
+        run: python .ci/recommendation_audit/test_technical_price_sanity.py -v
       - name: Validate strict fundamental PIT availability gate
         run: python .ci/recommendation_audit/test_fundamental_pit_gate.py -v
       - name: Validate quantitative evidence type safeguards
