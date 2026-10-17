@@ -3,14 +3,8 @@ from pathlib import Path
 root=Path(os.environ["SRE_ENGINE_ROOT"])/"modern_ui/frontend"
 app=root/"app.js"
 s=app.read_text(encoding="utf-8")
-if "function forecastDiagnosticInline(item){
-  const d=item&&item.forecast_diagnostic;
-  if(!d)return '';
-  const flags=Array.isArray(d.flags)?d.flags:[];
-  if(d.conflict_severity!=='MATERIAL'&&d.conflict_severity!=='DIRECTIONAL'&&!flags.includes('LOW_POSITIVE_ANALOGUE_RATE'))return '';
-  return '<small class="forecast-conflict-flag">Forecast evidence: '+escapeHtml(d.conflict_severity||'UNKNOWN')+'; review conflicting or weak short-term signals.</small>';
-}
-function forecastDiagnosticHtml(item){" in s: raise RuntimeError("Diagnostic already applied")
+if "function forecastDiagnosticInline(item){" in s or "function forecastDiagnosticHtml(item){" in s:
+    raise RuntimeError("Diagnostic already applied")
 # Native 0.14.3 replaces renderOpportunityTable, so the old liveEvidenceHtml call is no longer present.
 # Insert a visible diagnostic into the final table's Evidence cell, with one exact verified anchor.
 anchor='<small>${escapeHtml(decisionBasisText(x))}</small>'
@@ -19,6 +13,13 @@ if s.count(anchor) != 1:
 s=s.replace(anchor,anchor+'${forecastDiagnosticInline(i)}',1)
 s+="""
 
+function forecastDiagnosticInline(item){
+  const d=item&&item.forecast_diagnostic;
+  if(!d)return '';
+  const flags=Array.isArray(d.flags)?d.flags:[];
+  if(d.conflict_severity!=='MATERIAL'&&d.conflict_severity!=='DIRECTIONAL'&&!flags.includes('LOW_POSITIVE_ANALOGUE_RATE'))return '';
+  return '<small class="forecast-conflict-flag">Forecast evidence: '+escapeHtml(d.conflict_severity||'UNKNOWN')+'; review conflicting or weak short-term signals.</small>';
+}
 function forecastDiagnosticHtml(item){
   const d=item&&item.forecast_diagnostic;
   if(!d||typeof d!=='object')return '';
