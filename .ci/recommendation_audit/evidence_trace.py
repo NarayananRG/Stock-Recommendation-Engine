@@ -39,12 +39,12 @@ def inspect(payload):
                     try:
                         magnitude=abs(float(value))
                         if not math.isfinite(magnitude):raise ValueError
-                        band="LT_5" if magnitude<5 else "LT_20" if magnitude<20 else "GTE_20"
+                        band="LT_0_05" if magnitude<0.05 else "LT_0_20" if magnitude<0.20 else "GTE_0_20"
                     except (TypeError,ValueError):band="MISSING"
                     summary[(group+"_abs_symmetric_change_band",band)]+=1
     return {"schema":"SRE_EVIDENCE_TRACE_V1","run_id":run["run_id"],"market_session":run["market_session"],"stocks":len(seen),
       "counts":[{"dimension":key,"value":value,"count":count} for (key,value),count in sorted(summary.items())],
-      "limitations":["Change magnitude is descriptive, not a calibrated decision threshold","Magnitude counts are per feature-event, not per stock","Evidence lists may be absent in serialized adapter","Final snapshot alone cannot reveal canonical filing mapping failure codes"],
+      "limitations":["Symmetric change is a fraction (2*(current-previous)/(abs(current)+abs(previous))), not percent; bands 0.05 and 0.20 are descriptive","Magnitude counts are per feature-event, not per stock","Evidence lists may be absent in serialized adapter","Final snapshot alone cannot reveal canonical filing mapping failure codes"],
       "production_changed":False,"promotion_authorized":False}
 
 if __name__=="__main__":
