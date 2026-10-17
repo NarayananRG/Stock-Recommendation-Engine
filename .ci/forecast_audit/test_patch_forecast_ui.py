@@ -10,7 +10,7 @@ class UiIntegrationTests(unittest.TestCase):
 function escapeHtml(s){return String(s);}
 function liveEvidenceHtml(x){return String(x);}
 function sample(item,i){
- return \`\${liveEvidenceHtml(item.live_decision||item)} \${liveEvidenceHtml(i.live_decision||i)}\`;
+ return `${liveEvidenceHtml(item.live_decision||item)} ${liveEvidenceHtml(i.live_decision||i)}`;
 }
 """)
    env=dict(os.environ,SRE_ENGINE_ROOT=temp)
