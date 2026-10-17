@@ -15,6 +15,9 @@ class InstalledRunLineageContract(unittest.TestCase):
         self.assertNotIn('if ([string]$dash.active_run.run_id -ne $installedRunId)',stage)
         self.assertNotIn('if ([string]$stockPhase.active_run.run_id -ne $installedRunId)',stage)
         self.assertIn('Duplicate daily flow duplicated a decision, order, fill, or snapshot',stage)
+        self.assertEqual(SOURCE.count('$dashboardRunId | Set-Content "$env:RUNNER_TEMP\\installed-phase2-run.txt"'), 1)
+        self.assertNotIn('$installedRunId | Set-Content "$env:RUNNER_TEMP\\installed-phase2-run.txt"', SOURCE)
+        self.assertIn('Same-session restart regenerated active Run ID',SOURCE)
 
 if __name__ == "__main__":
     unittest.main()
