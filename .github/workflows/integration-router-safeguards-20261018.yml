@@ -1,0 +1,24 @@
+name: Integration router safeguards and recovery baseline
+on:
+  push:
+    branches:
+      - integration-router-safeguards-20261018
+  workflow_dispatch:
+jobs:
+  integrated-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify integrated router and safety tests
+        run: |
+          python .ci/native140/test_live_decision_v1.py
+          python .ci/recommendation_audit/test_fundamental_pit_gate.py
+          python .ci/recommendation_audit/test_technical_price_sanity.py
+          python .ci/recommendation_audit/test_router_batch_sanity.py
+          python .ci/recommendation_audit/test_technical_batch.py
+          python .ci/recommendation_audit/test_thesis_session_consistency.py
+          python .ci/recommendation_audit/test_paper_monitor_batch.py
+          python .ci/recommendation_audit/test_rank_plan_batch.py
