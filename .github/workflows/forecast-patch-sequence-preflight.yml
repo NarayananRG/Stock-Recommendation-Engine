@@ -1,0 +1,28 @@
+name: SRE Forecast Patch Sequence Preflight
+on:
+  push:
+    branches: [fix-forecast-patch-sequence-20261017]
+    paths:
+      - ".ci/native152/patch152_missing_evidence.py"
+      - ".ci/forecast_audit/**"
+      - ".github/workflows/forecast-patch-sequence-preflight.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Original and modified patch-order regression
+        run: python .ci/forecast_audit/test_patch_sequence_regression.py -v
+      - name: Forecast diagnostic integration tests
+        run: python .ci/forecast_audit/test_runtime_diagnostic_wiring.py -v
+      - name: Forecast classification regression tests
+        run: python .ci/forecast_audit/test_forecast_conflict_diagnostic.py -v
+      - name: Original LIVE_DECISION_V1 router regression
+        run: python .ci/native140/test_live_decision_v1.py -v
