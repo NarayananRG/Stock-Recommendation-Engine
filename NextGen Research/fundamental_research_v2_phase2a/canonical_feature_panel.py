@@ -35,8 +35,11 @@ def numeric_or_none(value):
     if value in (None, ""):
         return None
     try:
-        return format(Decimal(str(value)), "f")
-    except InvalidOperation:
+        parsed = Decimal(str(value))
+        # NaN and infinities are not usable company fundamentals.
+        # Keep missing evidence missing; never let non-finite figures into the panel.
+        return format(parsed, "f") if parsed.is_finite() else None
+    except (InvalidOperation, ValueError):
         return None
 
 
