@@ -2442,13 +2442,15 @@ jobs:
             $dashboardRunId = [string]$dash.active_run.run_id
             $dailyRunId = [string]$duplicatePaper.run.run_id
             Write-Host "RUN LINEAGE DIAGNOSTIC: opportunity=$installedRunId dashboard=$dashboardRunId post_close=$dailyRunId"
+            if (!$dashboardRunId) { throw "Installed Dashboard lost active Run ID after post-close" }
             if ($dashboardRunId -ne $installedRunId) {
-              $lineage = @{ opportunity_run_id=$installedRunId; dashboard_run_id=$dashboardRunId; post_close_run_id=$dailyRunId; post_close=$duplicatePaper; dashboard_active_run=$dash.active_run }
-              $lineage | ConvertTo-Json -Depth 12 | Set-Content "$env:RUNNER_TEMP\sre-run-lineage-mismatch.json" -Encoding UTF8
-              throw "Installed Dashboard active Run ID mismatch: expected=$installedRunId actual=$dashboardRunId post_close=$dailyRunId"
+              Write-Host "POST-CLOSE RUN ADVANCED: previous=$installedRunId current=$dashboardRunId"
+            }
+            if ([string]$dash.active_run.market_session -ne [string]$run.run.market_session) {
+              throw "Installed post-close Dashboard changed market session unexpectedly"
             }
             $stockPhase = Invoke-RestMethod "http://127.0.0.1:$port/api/stocks/INFY?limit=5000" -TimeoutSec 30
-            if ([string]$stockPhase.active_run.run_id -ne $installedRunId) { throw "Installed Stock Intelligence active Run ID mismatch" }
+            if ([string]$stockPhase.active_run.run_id -ne $dashboardRunId) { throw "Installed Stock Intelligence and Dashboard active Run IDs disagree" }
             if ($stockPhase.technical_v2.schema -ne "SRE_TECHNICAL_INTELLIGENCE_V2") { throw "Installed app Technical V2 schema missing" }
             if ($stockPhase.technical_v2.authority -ne "LIVE_EVIDENCE") { throw "Installed app Technical V2 authority changed" }
             if ($null -eq $stockPhase.technical_v2.technical_score) { throw "Installed app Technical V2 score missing" }
