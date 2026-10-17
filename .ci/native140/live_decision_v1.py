@@ -286,7 +286,19 @@ def monitor(position, decision):
     if "RECOVERY" in style and decision.get("valuation_state") in ("FULL", "EXPENSIVE"):
         return "EXIT", "Recovery valuation advantage has disappeared."
     review = (position.get("entry_thesis") or position).get("review_after_sessions", 60 if "RECOVERY" in style else 20)
-    if position.get("sessions_held") is not None and int(position["sessions_held"]) >= int(review):
+    held = position.get("sessions_held")
+    # Persisted portfolio metadata may be malformed; never crash monitoring or
+    # use negative, fractional, non-finite, or boolean values as session counts.
+    def whole_nonnegative(value):
+        if isinstance(value, bool):
+            return None
+        parsed = number(value)
+        return int(parsed) if parsed is not None and parsed >= 0 and parsed.is_integer() else None
+    review_count = whole_nonnegative(review)
+    held_count = whole_nonnegative(held)
+    if review_count is None or review_count == 0 or (held is not None and held_count is None):
+        return "WEAKENING", "Invalid holding-period metadata; explicit review is required."
+    if held_count is not None and held_count >= review_count:
         return "WEAKENING", "Original holding-period review policy has been reached; review the investment thesis."
     if "RECOVERY" in style:
         if decision.get("technical_state") == "BREAKDOWN":
