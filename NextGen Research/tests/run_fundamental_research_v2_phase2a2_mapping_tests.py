@@ -9,6 +9,7 @@ sys.path.insert(0,str(ROOT))
 
 from fundamental_research_v2_phase2a.canonical_mapping_audit import (  # noqa: E402
     audit_documents,
+    classify_domain,
     classify_context,
     deterministic_candidate_status,
     enrich_candidate_facts,
@@ -21,6 +22,13 @@ def case(cat,name,fn):
     try: fn(); s,d='PASS',''
     except Exception as exc: s,d='FAIL',f'{type(exc).__name__}: {exc}'
     RESULTS.append({'category':cat,'test':name,'status':s,'detail':d})
+
+case('DOMAIN','life insurance archive classified',lambda: require(
+ classify_domain('https://nsearchives.nseindia.com/corporate/xbrl/INTEGRATED_FILING_LI_1_WEB.xml')=='LIFE_INSURANCE'
+))
+case('DOMAIN','general insurance archive classified',lambda: require(
+ classify_domain('https://nsearchives.nseindia.com/corporate/xbrl/INTEGRATED_FILING_GI_1_WEB.xml')=='GENERAL_INSURANCE'
+))
 
 quarter_ctx={'context_id':'Q','start_date':'2026-04-01','end_date':'2026-06-30','instant':None,'dimensions':[]}
 annual_ctx={'context_id':'Y','start_date':'2025-04-01','end_date':'2026-03-31','instant':None,'dimensions':[]}

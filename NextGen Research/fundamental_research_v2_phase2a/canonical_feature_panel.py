@@ -35,8 +35,11 @@ def numeric_or_none(value):
     if value in (None, ""):
         return None
     try:
-        return format(Decimal(str(value)), "f")
-    except InvalidOperation:
+        parsed = Decimal(str(value))
+        # NaN and infinities are not usable company fundamentals.
+        # Keep missing evidence missing; never let non-finite figures into the panel.
+        return format(parsed, "f") if parsed.is_finite() else None
+    except (InvalidOperation, ValueError):
         return None
 
 
@@ -67,7 +70,15 @@ def build_panel_rows(events: Iterable[dict], documents: Iterable[dict], terminal
         if doc is not None and terminal:
             raise ValueError(f"TERMINAL_GAP_HAS_COMPACT_DOCUMENT:{event_id}")
         if doc is not None and doc.get("hard_failures"):
-            raise ValueError(f"SEMANTIC_HARD_FAILURE_IN_PANEL_INPUT:{event_id}")
+            failures=doc.get("hard_failures") or []
+            unsupported_domain=(
+                bool(failures)
+                and all(x.get("code")=="NO_FROZEN_MAPPING_FOR_DOMAIN" for x in failures)
+            )
+            # Preserve a valid official document and its domain without
+            # inventing mappings for a newly observed taxonomy family.
+            if not unsupported_domain:
+                raise ValueError(f"SEMANTIC_HARD_FAILURE_IN_PANEL_INPUT:{event_id}")
 
         row={
             "symbol":event.get("symbol"),
@@ -199,6 +210,28 @@ def continuity_audit(rows: Iterable[dict]) -> dict:
         for feature in FEATURES:
             status_counts[row.get(f"{feature}__status")]+=1
 
+    # Debt/equity provenance is tracked independently of general feature coverage.
+    # This reports original canonical statuses, not inferred/imputed ratios.
+    debt_status_counts=Counter()
+    debt_domain_status_counts=Counter()
+    for row in items:
+        status=str(row.get("DEBT_EQUITY_RATIO__status") or "ABSENT")
+        value=row.get("DEBT_EQUITY_RATIO__value")
+        if row.get("archive_gap"):
+            category="SOURCE_DOCUMENT_UNAVAILABLE"
+        elif status in {"SELECTED","SELECTED_EQUIVALENT_DUPLICATES"}:
+            category="AVAILABLE" if numeric_or_none(value) is not None else "SELECTED_VALUE_MISSING"
+        elif status=="NOT_MAPPED_FOR_DOMAIN" or status=="ABSENT":
+            category="MAPPING_NOT_AVAILABLE"
+        elif "AMBIGUOUS" in status or "CONFLICT" in status:
+            category="AMBIGUOUS_FACTS"
+        elif status in {"MISSING","NO_ALIGNED_UNDIMENSIONED_CANDIDATE"}:
+            category="NO_ELIGIBLE_FACT"
+        else:
+            category="UNRESOLVED_STATUS"
+        debt_status_counts[category]+=1
+        debt_domain_status_counts[(str(row.get("domain") or "UNKNOWN"),category)]+=1
+
     return {
         "artifact_type":"FUNDAMENTAL_RESEARCH_V2_PHASE2A4_CONTINUITY_AUDIT_V1",
         "authority":"SHADOW_ONLY",
@@ -206,6 +239,8 @@ def continuity_audit(rows: Iterable[dict]) -> dict:
         "history_count":len(by_history),
         "archive_gap_row_count":archive_count,
         "feature_status_counts":dict(status_counts),
+        "debt_equity_source_gap_counts":dict(sorted(debt_status_counts.items())),
+        "debt_equity_domain_gap_counts":[{"domain":domain,"category":category,"count":count} for (domain,category),count in sorted(debt_domain_status_counts.items())],
         "feature_summary":feature_summary,
         "history_summary":history_summary,
         "production_model_changed":False,

@@ -1,0 +1,37 @@
+name: Official financial recovery quality gates
+
+on:
+  push:
+    branches:
+      - fix-official-financial-recovery-20261018
+  pull_request:
+
+jobs:
+  recovery-quality-gates:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install test dependencies
+        run: python -m pip install numpy pandas requests
+      - name: Current-universe recovery tests
+        run: python "NextGen Research/tests/run_current_universe_recovery_tests.py"
+      - name: Mixed-event shadow tests
+        run: python "NextGen Research/tests/run_mixed_event_shadow_tests.py"
+      - name: Phase 2A mapping and panel tests
+        shell: pwsh
+        run: |
+          python "NextGen Research/tests/run_fundamental_research_v2_phase2a2_mapping_tests.py"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python "NextGen Research/tests/run_fundamental_research_v2_phase2a4_continuity_review_tests.py"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python "NextGen Research/tests/run_fundamental_research_v2_phase2a4_feature_panel_tests.py"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Numeric, source-gap, and technical quality tests
+        run: python -m unittest discover .ci/recommendation_audit -p "test_*.py"
+      - name: Recommendation consistency tests
+        run: python .ci/native140/test_live_decision_v1.py

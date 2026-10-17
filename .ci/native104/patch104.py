@@ -21,6 +21,9 @@ ANALOGUE_K = 20
 
 
 def _finite(value: Any) -> float | None:
+    # bool is an int subclass in Python, but it is not numeric market evidence.
+    if isinstance(value, (bool, np.bool_)):
+        return None
     try:
         value = float(value)
     except (TypeError, ValueError):
@@ -160,9 +163,20 @@ def _completed_weekly_features(data: pd.DataFrame) -> pd.DataFrame:
     weekly["WeeklyMACD"] = ema12 - ema26
     weekly["WeeklyMACDSignal"] = weekly["WeeklyMACD"].ewm(span=9, adjust=False, min_periods=9).mean()
     weekly["WeeklyMACDHist"] = weekly["WeeklyMACD"] - weekly["WeeklyMACDSignal"]
-    # Conservative point-in-time mapping: only a fully completed prior week is used.
-    weekly = weekly[["WeeklyEMA20", "WeeklyEMA50", "WeeklyRSI14", "WeeklyMACD", "WeeklyMACDSignal", "WeeklyMACDHist"]].shift(1)
-    return weekly.reindex(data.index.union(weekly.index)).sort_index().ffill().reindex(data.index)
+    # Conservative point-in-time mapping: use the latest weekly row whose Friday
+    # is strictly earlier than the daily session.  A blanket shift is incorrect
+    # on Monday-Thursday because resample labels the partial current week with a
+    # future Friday, causing the last completed week to be shifted out twice.
+    weekly = weekly[["WeeklyEMA20", "WeeklyEMA50", "WeeklyRSI14", "WeeklyMACD", "WeeklyMACDSignal", "WeeklyMACDHist"]]
+    daily_index = pd.DataFrame(index=data.index)
+    return pd.merge_asof(
+        daily_index.sort_index(),
+        weekly.sort_index(),
+        left_index=True,
+        right_index=True,
+        direction="backward",
+        allow_exact_matches=False,
+    )
 
 
 def compute_features(frame: pd.DataFrame, benchmark: pd.DataFrame | None = None) -> pd.DataFrame:

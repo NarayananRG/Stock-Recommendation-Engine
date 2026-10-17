@@ -1,0 +1,49 @@
+import sys
+import unittest
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+from fundamental_research_v2_phase2a.current_universe_recovery import (  # noqa: E402
+    acquisition_gap,
+    recovery_summary,
+    symbols_from_live_snapshot,
+)
+
+
+def event(symbol, event_id):
+    return {
+        "symbol": symbol,
+        "event_id": event_id,
+        "quarter_end": "2026-06-30",
+        "submission_type": "ORIGINAL",
+        "reporting_basis": "CONSOLIDATED",
+        "publication_ts": "2026-07-20T10:00:00+05:30",
+        "availability_ts": "2026-07-20T10:00:00+05:30",
+        "source_exchange": "NSE",
+    }
+
+
+class CurrentUniverseRecoveryTests(unittest.TestCase):
+    def test_uses_actual_snapshot_universe(self):
+        snapshot = {"candidates": [{"symbol": "AAA"}, {"symbol": "M&M"}]}
+        self.assertEqual(symbols_from_live_snapshot(snapshot), ["AAA", "M&M"])
+
+    def test_rejects_duplicate_snapshot_symbols(self):
+        with self.assertRaisesRegex(ValueError, "DUPLICATE"):
+            symbols_from_live_snapshot({"candidates": [{"symbol": "AAA"}, {"symbol": "aaa"}]})
+
+    def test_reports_incremental_official_recovery(self):
+        before = [event("AAA", "a")]
+        recovered = [event("BBB", "b")]
+        self.assertEqual(acquisition_gap(["AAA", "BBB"], before), ["BBB"])
+        report = recovery_summary(symbols=["AAA", "BBB"], existing=before, recovered=recovered)
+        self.assertEqual(report["covered_before"], 1)
+        self.assertEqual(report["covered_after"], 2)
+        self.assertEqual(report["recovered_symbols"], ["BBB"])
+        self.assertFalse(report["automatic_yfinance_fallback"])
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -148,6 +148,15 @@ def reconcile(raw, displayed):
         return None
     return {"normalization":best[2],"normalized_value":best[3],"absolute_error":best[1]}
 
+def valid_corporate_debt_equity(value):
+    if isinstance(value,bool):
+        return False
+    try:
+        value=float(value)
+    except (TypeError,ValueError):
+        return False
+    return math.isfinite(value) and 0.0<=value<=100.0
+
 def process(event):
     xurl=event.get("xbrl_url")
     ixurl=event.get("ixbrl_url")
@@ -202,6 +211,13 @@ def process(event):
     order={"RAW":0,"RAW_X100":1,"RAW_DIV100":2}
     matches.sort(key=lambda x:(order[x[1]["normalization"]],x[1]["absolute_error"],x[0]))
     display_value,rec=matches[0]
+    if not valid_corporate_debt_equity(display_value):
+        return {
+            "symbol":event.get("symbol"),"domain":domain,
+            "status":"OUT_OF_POLICY_DISPLAY_VALUE",
+            "raw":raw_values[0],"displayed":display_value,
+            "normalization":rec["normalization"],
+        }
     availability=effective_availability_ts(event)
     return {
         "schema":"SRE_PIT_SAFETY_SUPPLEMENT_ROW_V1",

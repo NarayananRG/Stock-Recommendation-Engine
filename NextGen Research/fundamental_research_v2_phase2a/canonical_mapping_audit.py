@@ -25,6 +25,12 @@ FEATURE_CANDIDATES = {
 
 def classify_domain(source_url: str | None) -> str:
     text = str(source_url or "").upper()
+    # NSE archive filenames encode insurance families as LI/GI tokens.  They
+    # must not be routed through generic corporate leverage rules.
+    if "INTEGRATED_FILING_LI_" in text:
+        return "LIFE_INSURANCE"
+    if "INTEGRATED_FILING_GI_" in text:
+        return "GENERAL_INSURANCE"
     if "NBFC" in text:
         return "NBFC"
     if "BANK" in text:

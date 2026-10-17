@@ -53,8 +53,7 @@ def _numeric(value: str | None) -> bool:
     if not cleaned or cleaned in {"-", "—"}:
         return False
     try:
-        Decimal(cleaned)
-        return True
+        return Decimal(cleaned).is_finite()
     except InvalidOperation:
         return False
 
