@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - integration-router-safeguards-20261018
+      - overnight-safety-batch-20261018
   workflow_dispatch:
 jobs:
   integrated-regression:
@@ -35,3 +36,4 @@ jobs:
           python .ci/recommendation_audit/test_thesis_session_consistency.py
           python .ci/recommendation_audit/test_paper_monitor_batch.py
           python .ci/recommendation_audit/test_rank_plan_batch.py
+          python .ci/recommendation_audit/test_position_metadata_batch.py
