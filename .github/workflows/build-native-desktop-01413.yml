@@ -1,8 +1,8 @@
-name: Build SRE 0.14.13 Paper Trading Repair
+name: Build SRE 0.14.13 Forecast Diagnostics Candidate
 
 on:
   push:
-    branches: [validation-v2-rebuild, fix-paper-trading-root-causes-20261016]
+    branches: [feat-recommendation-conflict-diagnostics-20261017]
     paths:
       - ".ci/native098/**"
       - ".ci/native099/**"
@@ -26,6 +26,7 @@ on:
       - ".ci/native151/**"
       - ".ci/native152/**"
       - ".ci/native154/**"
+      - ".ci/forecast_audit/**"
       - ".gitignore"
       - ".gitattributes"
       - "Stage 6/runtime/**"
@@ -57,7 +58,7 @@ permissions:
   actions: read
 
 concurrency:
-  group: sre-native-01413-final
+  group: sre-native-01413-forecast-diagnostic-candidate
   cancel-in-progress: true
 
 jobs:
@@ -1896,6 +1897,12 @@ jobs:
           if ($routerValidationBefore -ne $routerValidationAfter) { throw "LIVE_DECISION_V1 router changed during Validation V2 work" }
           python ".ci\native154\test_validation_v2.py"
           if ($LASTEXITCODE -ne 0) { throw "0.14.13 Paper Trading Repair deterministic regression failed" }
+          python ".ci\forecast_audit\patch_forecast_ui.py"
+          if ($LASTEXITCODE -ne 0) { throw "Forecast diagnostic UI integration failed" }
+          python ".ci\forecast_audit\test_runtime_diagnostic_wiring.py"
+          if ($LASTEXITCODE -ne 0) { throw "Forecast diagnostic snapshot contract failed" }
+          python ".ci\forecast_audit\test_patch_forecast_ui.py"
+          if ($LASTEXITCODE -ne 0) { throw "Forecast diagnostic UI regression failed" }
           python -m compileall -q "$env:SRE_ENGINE_ROOT\stock_app" "$env:SRE_ENGINE_ROOT\modern_ui"
           if ($LASTEXITCODE -ne 0) { throw "Backend compilation failed" }
           node --check "$env:SRE_ENGINE_ROOT\modern_ui\frontend\app.js"
