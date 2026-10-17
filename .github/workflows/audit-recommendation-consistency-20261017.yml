@@ -18,6 +18,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Validate ranking and capital plan batch
+        run: python .ci/recommendation_audit/test_rank_plan_batch.py -v
       - name: Validate paper allocation and monitoring batch
         run: python .ci/recommendation_audit/test_paper_monitor_batch.py -v
       - name: Validate stale-session thesis and weekly confirmation batch
