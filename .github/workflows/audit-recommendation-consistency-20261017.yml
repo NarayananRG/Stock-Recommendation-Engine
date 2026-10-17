@@ -18,6 +18,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Validate gate-level restrictiveness reporter
+        run: python .ci/recommendation_audit/test_gate_restrictiveness.py -v
       - name: Validate full-universe evidence reporter
         run: python .ci/recommendation_audit/test_full_universe.py -v
       - name: Verify production LIVE_DECISION_V1 router regression
