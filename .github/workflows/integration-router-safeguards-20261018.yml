@@ -26,6 +26,8 @@ jobs:
         run: |
           cd .ci/recommendation_audit
           python -m unittest test_technical_v2_formulas test_technical_evidence_audit -v
+      - name: Verify global macro-event shadow register
+        run: python .ci/global_event_research/test_global_register.py -v
       - name: Verify integrated router and safety tests
         run: |
           python .ci/native140/test_live_decision_v1.py
