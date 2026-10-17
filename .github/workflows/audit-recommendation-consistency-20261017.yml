@@ -66,7 +66,7 @@ jobs:
           rankings = router.split("def rank_candidates(",1)[1].split("def monitor(",1)[0]
           requirements = {
               "router has current-session execution gate": "official_current" in route and "executable=" in route,
-              "recovery buy accepts independent fundamental thesis": "elif official_current and recovery_valid:" in route,
+              "recovery buy accepts independent fundamental thesis": ("elif official_current and recovery_valid:" in route or "elif official_current is True and recovery_valid:" in route),
               "router does not consume displayed forecast": "expected_return" not in route,
               "rank does not consume displayed forecast": "expected_return" not in rankings,
               "materialization preserves legacy expected return": '"expected_return":None' in patch and '"legacy_opportunity_status"' in patch,
