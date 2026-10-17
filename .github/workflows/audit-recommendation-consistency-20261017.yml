@@ -18,6 +18,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Validate quantitative evidence type safeguards
+        run: python .ci/recommendation_audit/test_boolean_numeric_evidence.py -v
       - name: Validate official XBRL numeric extraction
         run: python .ci/recommendation_audit/test_xbrl_numeric_hygiene.py -v
       - name: Validate canonical debt source-gap integration
