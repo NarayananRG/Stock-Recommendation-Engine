@@ -1,0 +1,79 @@
+name: SRE Forecast Reliability and Decision Alignment Audit
+on:
+  push:
+    branches: [audit-forecast-reliability-20261017]
+    paths:
+      - ".github/workflows/audit-forecast-reliability-20261017.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  forecast-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run frozen LIVE_DECISION regression tests
+        run: python .ci/native140/test_live_decision_v1.py -v
+      - name: Audit forecast provenance, horizon, authority and evidence
+        shell: bash
+        run: |
+          python - <<'PY'
+          import csv,json,re,hashlib
+          from pathlib import Path
+          patch=Path(".ci/native140/patch140.py").read_text()
+          router=Path(".ci/native140/live_decision_v1.py").read_text()
+          ranking=router.split("def rank_candidates(",1)[1].split("def monitor(",1)[0]
+          routing=router.split("def route(",1)[1].split("def lane_counts(",1)[0]
+          paths=[
+            Path(".ci/native140/patch140.py"),
+            Path(".ci/native140/live_decision_v1.py"),
+            Path("Stage 4A.3/stage4a3/model_scoring.py"),
+            Path("Stage 4A.3/models/frozen_2026/model_bundle_manifest.json"),
+          ]
+          findings={
+            "legacy_expected_return_carried_to_current_rows": '"expected_return":None' in patch and '{**row, "legacy_opportunity_status"' in patch,
+            "live_decision_router_does_not_use_expected_return": "expected_return" not in routing,
+            "live_decision_ranking_does_not_use_expected_return": "expected_return" not in ranking,
+            "horizon_sessions_passed_to_technical_context": 'int(run.get("horizon_sessions") or 20)' in patch,
+            "live_decision_executable_has_current_official_gate": "official_current" in routing and "executable=" in routing,
+          }
+          for key,passed in findings.items():
+            print(("PASS" if passed else "FAIL")+": "+key)
+          if not all(findings.values()): raise SystemExit("Source contract changed. Review before proceeding.")
+          metadata=[]
+          for p in paths:
+            raw=p.read_bytes()
+            metadata.append({"path":str(p),"sha256":hashlib.sha256(raw).hexdigest(),"bytes":len(raw)})
+          # Catalog only; NEVER infer calibration from unrelated historical or synthetic artifacts.
+          candidates=[p for p in Path(".").rglob("*") if p.is_file() and p.stat().st_size < 1000000
+             and re.search(r"(calibrat|expected.return|forecast|prediction.contract)",p.name,re.I)
+             and (str(p).startswith("Stage 4A.") or str(p).startswith("Stage 2B."))]
+          historical=[str(p) for p in candidates[:70]]
+          report={
+            "schema":"SRE_FORECAST_RELIABILITY_AUDIT_V1",
+            "authority":"READ_ONLY_SOURCE_AUDIT_NOT_STRATEGY_PROMOTION",
+            "source_contracts":findings,
+            "source_fingerprints":metadata,
+            "legacy_forecast_vs_new_live_decision":"SEPARATE_AUTHORITY_CONFIRMED",
+            "actual_forecast_horizon":"NOT_VERIFIED_FROM_2026_10_16_LOCAL_RUN",
+            "same_horizon_comparability":"NOT_ESTABLISHED",
+            "actual_GODREJCP_and_HINDZINC_evidence":"LOCAL_RUN_SNAPSHOT_REQUIRED",
+            "forecast_calibration":"NOT_VALIDATED_WITH_POINT_IN_TIME_OOS_RETURNS",
+            "candidate_evidence_files":historical,
+            "recommended_action":"OBTAIN_EXACT_LOCAL_RUN_SNAPSHOT_AND_FORECAST_LINEAGE; DO_NOT_CHANGE_BUY_GATES",
+            "production_modified":False
+          }
+          Path("forecast-audit-report.json").write_text(json.dumps(report,indent=2)+"\n")
+          print("FORECAST AUDIT PASS: authority separated; horizon/calibration explicitly unverified.")
+          print("EVIDENCE FILES CATALOGED:",len(historical))
+          PY
+      - name: Upload read-only audit report
+        uses: actions/upload-artifact@v4
+        with:
+          name: SRE-Forecast-Reliability-Read-Only-Audit
+          path: forecast-audit-report.json
+          retention-days: 7
