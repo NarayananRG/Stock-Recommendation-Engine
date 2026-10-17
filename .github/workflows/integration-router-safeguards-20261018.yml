@@ -12,6 +12,19 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Install recovery and technical test dependencies
+        run: python -m pip install numpy pandas requests
+      - name: Verify recovered filing pipeline and mixed-event behavior
+        run: |
+          python "NextGen Research/tests/run_current_universe_recovery_tests.py"
+          python "NextGen Research/tests/run_mixed_event_shadow_tests.py"
+          python "NextGen Research/tests/run_fundamental_research_v2_phase2a2_mapping_tests.py"
+          python "NextGen Research/tests/run_fundamental_research_v2_phase2a4_continuity_review_tests.py"
+          python "NextGen Research/tests/run_fundamental_research_v2_phase2a4_feature_panel_tests.py"
+      - name: Verify technical formula parity and evidence constraints
+        run: |
+          cd .ci/recommendation_audit
+          python -m unittest test_technical_v2_formulas test_technical_evidence_audit -v
       - name: Verify integrated router and safety tests
         run: |
           python .ci/native140/test_live_decision_v1.py
