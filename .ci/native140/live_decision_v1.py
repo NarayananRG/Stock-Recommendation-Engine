@@ -48,8 +48,8 @@ def interpret(f: dict[str, Any]) -> dict[str, Any]:
                else "CAUTION" if debt > 1.5 or (finance is not None and finance > 30)
                else "HEALTHY" if debt <= 1 else "ACCEPTABLE")
     event = f.get("risk_event") or {}
-    event_state = ("UNAVAILABLE" if not event.get("available") else "DETERIORATING"
-                   if event.get("strong_deterioration_transition") or event.get("event_profile") == "PURE_DETERIORATION"
+    event_state = ("UNAVAILABLE" if event.get("available") is not True else "DETERIORATING"
+                   if event.get("strong_deterioration_transition") is True or event.get("event_profile") == "PURE_DETERIORATION"
                    else "IMPROVING" if event.get("event_profile") == "PURE_IMPROVEMENT"
                    else "MIXED" if event.get("event_profile") == "MIXED_DIRECTIONAL" else "STABLE")
     margin = number((f.get("profitability") or {}).get("pat_margin_pct"))
@@ -111,31 +111,31 @@ def route(symbol: str, market_session: str, technical: dict, fundamental: dict,
     support = number(price_context.get("prior_support"))
     drawdown = number(price_context.get("drawdown_from_126_high_pct"))
     # Evidence of a dislocation needs a usable historical price context.
-    depressed = drawdown is not None and drawdown <= -15
+    depressed = drawdown is not None and -100 <= drawdown <= -15
     breakdown = (close is not None and close > 0 and support is not None and support > 0
                  and close < support * .97 and roc is not None and roc < -10)
     strong = (technical.get("status") == "READY" and None not in (close, ema50, slope, roc, rs, flow, macd)
               and close > 0 and ema50 > 0 and close > ema50 and slope > 0 and roc > 0 and rs > 0 and flow > 0 and macd > 0
               and (technical.get("multi_timeframe") or {}).get("weekly_trend_confirmed") is True)
-    stabilising = not breakdown and roc is not None and roc >= -3 and flow is not None and flow >= 0
+    stabilising = not breakdown and close is not None and close > 0 and roc is not None and roc >= -3 and flow is not None and flow >= 0
     tech_state = "BREAKDOWN" if breakdown else "STRONG" if strong else "STABILISING" if stabilising else "WEAK"
     s.update(technical_state=tech_state, price_condition="DEPRESSED" if depressed else
-             "EXTENDED" if close and ema50 and close > ema50 * 1.15 else "NORMAL")
+             "EXTENDED" if close is not None and close > 0 and ema50 is not None and ema50 > 0 and close > ema50 * 1.15 else "NORMAL")
     safety = s["fundamental_data_quality"] == "AVAILABLE" and not s["structural_deterioration"]
     fundamental_ready = (s["business_health"] in ("HEALTHY", "STRONG") and s["earnings_direction"] in ("STABLE", "IMPROVING")
                          and s["fundamental_event_state"] in ("STABLE", "IMPROVING"))
     balance_ready = s["balance_sheet_state"] in ("HEALTHY", "ACCEPTABLE")
     cash_ready = s["cash_flow_state"] in ("SUPPORTIVE", "ADEQUATE")
-    downside_controlled = (not breakdown and atr is not None and atr <= 6
-                           and close is not None and support is not None and support > 0 and close >= support * .97)
+    downside_controlled = (not breakdown and atr is not None and 0 <= atr <= 6
+                           and close is not None and close > 0 and support is not None and support > 0 and close >= support * .97)
     regime = (technical.get("market_context") or {}).get("nifty_regime")
-    momentum_valid = (strong and safety and fundamental_ready and atr is not None and atr <= 6 and
+    momentum_valid = (strong and safety and fundamental_ready and atr is not None and 0 <= atr <= 6 and
                       (s["financial_domain"] or (balance_ready and cash_ready)) and regime in ("BULL", "MIXED"))
     # Weak trend, RSI, MACD and EMA location are deliberately absent here.
     recovery_valid = (depressed and safety and fundamental_ready and cash_ready and balance_ready
                       and not s["financial_domain"] and downside_controlled
                       and s["valuation_state"] in ("ATTRACTIVE", "REASONABLE"))
-    if not official_current: reasons.append("OFFICIAL_SESSION_NOT_CURRENT")
+    if official_current is not True: reasons.append("OFFICIAL_SESSION_NOT_CURRENT")
     if s["fundamental_data_quality"] != "AVAILABLE": reasons.append("FUNDAMENTALS_" + s["fundamental_data_quality"])
     if not fundamental_ready: reasons.append("BUSINESS_EARNINGS_OR_EVENT_EVIDENCE_INSUFFICIENT")
     if s["financial_domain"]: reasons.append("BANKING_SPECIFIC_PIT_METRICS_UNAVAILABLE_FOR_RECOVERY")
@@ -148,11 +148,11 @@ def route(symbol: str, market_session: str, technical: dict, fundamental: dict,
         action = "AVOID - VALUE TRAP RISK" if depressed else "AVOID - FUNDAMENTAL DETERIORATION"
     elif breakdown:
         action = "AVOID - TECHNICAL BREAKDOWN"
-    elif official_current and momentum_valid and recovery_valid:
+    elif official_current is True and momentum_valid and recovery_valid:
         action = "MOMENTUM + RECOVERY BUY"
-    elif official_current and momentum_valid:
+    elif official_current is True and momentum_valid:
         action = "MOMENTUM BUY"
-    elif official_current and recovery_valid:
+    elif official_current is True and recovery_valid:
         action = "RECOVERY BUY"
     elif strong and depressed:
         action = "WATCH - MIXED"
@@ -184,7 +184,7 @@ def route(symbol: str, market_session: str, technical: dict, fundamental: dict,
                 recovery_reason=recovery_reason, fundamental_narrative=narrative, thesis=narrative + " " + thesis,
                 invalidation="Material business deterioration, uncontrolled downside or loss of the original thesis; recovery also requires review when valuation advantage disappears.",
                 confidence=confidence, priority="HIGH" if confidence == "HIGH" else "MEDIUM" if action in BUY_ACTIONS else "LOW",
-                executable=action in BUY_ACTIONS and official_current and close is not None and close > 0,
+                executable=action in BUY_ACTIONS and official_current is True and close is not None and close > 0,
                 review_after_sessions=60 if primary == "RECOVERY" else 20,
                 reason_codes=reasons, target_used_in_score=False, **s,
                 evidence=dict(technical=technical, fundamental=fundamental, price_context=price_context,
