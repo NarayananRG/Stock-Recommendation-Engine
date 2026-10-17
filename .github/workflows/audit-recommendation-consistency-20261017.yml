@@ -18,6 +18,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Validate raw decision-state evidence audit
+        run: python .ci/recommendation_audit/test_raw_state_enums.py -v
       - name: Validate component diagnostics without changing recommendations
         run: python .ci/recommendation_audit/test_component_diagnostics.py -v
       - name: Validate gate-level restrictiveness reporter
