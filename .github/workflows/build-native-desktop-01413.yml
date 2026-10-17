@@ -188,6 +188,14 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Restore pip package download cache
+        uses: actions/cache@v4
+        with:
+          path: ~\\AppData\\Local\\pip\\Cache
+          key: ${{ runner.os }}-sre01413-pip-py312-v1-${{ hashFiles('.github/workflows/build-native-desktop-01413.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-sre01413-pip-py312-v1-
+
       - name: Apply 0.9.4 fast data-source hotfix
         shell: pwsh
         run: |
@@ -1914,6 +1922,14 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "22"
+
+      - name: Restore npm and Playwright downloads
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~\\AppData\\Local\\npm-cache
+            ~\\AppData\\Local\\ms-playwright
+          key: ${{ runner.os }}-sre01413-node22-playwright1561-v1
 
       - name: Install Playwright managed Chromium
         shell: pwsh
