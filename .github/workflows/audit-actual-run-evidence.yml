@@ -1,0 +1,23 @@
+name: SRE Actual Run Evidence Extractor Gate
+on:
+  push:
+    branches: [audit-actual-run-evidence-extractor-20261017]
+    paths:
+      - ".ci/forecast_audit/**"
+      - ".github/workflows/audit-actual-run-evidence.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  extractor-validation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run evidence extraction safety and consistency tests
+        run: python .ci/forecast_audit/test_extract_run_evidence.py -v
+      - name: Verify existing LIVE_DECISION router is unchanged
+        run: python .ci/native140/test_live_decision_v1.py -v
