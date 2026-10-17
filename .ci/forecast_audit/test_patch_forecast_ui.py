@@ -10,14 +10,15 @@ class UiIntegrationTests(unittest.TestCase):
 function escapeHtml(s){return String(s);}
 function liveEvidenceHtml(x){return String(x);}
 function sample(item,i){
- return `${liveEvidenceHtml(item.live_decision||item)} ${liveEvidenceHtml(i.live_decision||i)}`;
+ return `<small>${escapeHtml(decisionBasisText(x))}</small>`;
 }
 """)
    env=dict(os.environ,SRE_ENGINE_ROOT=temp)
    subprocess.run([sys.executable,str(PATCH)],env=env,check=True)
    s=(root/"app.js").read_text()
-   self.assertIn("forecastDiagnosticHtml(item)",s)
-   self.assertIn("forecastDiagnosticHtml(i)",s)
+   self.assertIn("forecastDiagnosticInline(i)",s)
+   self.assertIn("function forecastDiagnosticInline(item)",s)
+   self.assertIn("function forecastDiagnosticHtml(item)",s)
    self.assertIn("Diagnostic only",s)
    self.assertNotIn("final_action=",s)
    self.assertNotIn("executable=",s)
