@@ -21,6 +21,8 @@ jobs:
           python-version: '3.12'
       - name: Windows embedded Python syntax gate
         run: python .ci/forecast_audit/test_installed_acceptance_heredoc.py -v
+      - name: Installed active-run lineage regression
+        run: python .ci/forecast_audit/test_installed_run_lineage_contract.py -v
       - name: Original and modified patch-order regression
         run: python .ci/forecast_audit/test_patch_sequence_regression.py -v
       - name: Forecast diagnostic integration tests
