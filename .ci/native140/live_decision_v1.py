@@ -48,8 +48,8 @@ def interpret(f: dict[str, Any]) -> dict[str, Any]:
                else "CAUTION" if debt > 1.5 or (finance is not None and finance > 30)
                else "HEALTHY" if debt <= 1 else "ACCEPTABLE")
     event = f.get("risk_event") or {}
-    event_state = ("UNAVAILABLE" if not event.get("available") else "DETERIORATING"
-                   if event.get("strong_deterioration_transition") or event.get("event_profile") == "PURE_DETERIORATION"
+    event_state = ("UNAVAILABLE" if event.get("available") is not True else "DETERIORATING"
+                   if event.get("strong_deterioration_transition") is True or event.get("event_profile") == "PURE_DETERIORATION"
                    else "IMPROVING" if event.get("event_profile") == "PURE_IMPROVEMENT"
                    else "MIXED" if event.get("event_profile") == "MIXED_DIRECTIONAL" else "STABLE")
     margin = number((f.get("profitability") or {}).get("pat_margin_pct"))
@@ -68,7 +68,7 @@ def interpret(f: dict[str, Any]) -> dict[str, Any]:
     if pe is not None and pe > 0 and reference is not None and reference > 0:
         ratio = pe / reference
         valuation_state = "ATTRACTIVE" if ratio <= .8 else "REASONABLE" if ratio <= 1 else "FULL" if ratio <= 1.2 else "EXPENSIVE"
-    quality = "STALE" if f.get("filing_freshness") == "STALE" else "AVAILABLE" if f.get("available") and f.get("point_in_time_safe") else "UNAVAILABLE"
+    quality = "STALE" if f.get("filing_freshness") == "STALE" else "AVAILABLE" if f.get("available") is True and f.get("point_in_time_safe") is True else "UNAVAILABLE"
     return dict(business_health=health, earnings_direction=earnings, cash_flow_state=cash_state,
                 balance_sheet_state=balance, valuation_state=valuation_state,
                 fundamental_event_state=event_state, structural_deterioration=bool(damaged),
@@ -110,32 +110,40 @@ def route(symbol: str, market_session: str, technical: dict, fundamental: dict,
     atr = number((technical.get("volatility") or {}).get("atr_pct"))
     support = number(price_context.get("prior_support"))
     drawdown = number(price_context.get("drawdown_from_126_high_pct"))
+    # Guard impossible indicator values while keeping strategy thresholds unchanged.
+    # CMF is bounded [-1, 1]; ROC percent cannot fall below -100 for positive prices.
+    if flow is not None and not -1 <= flow <= 1:
+        flow = None
+    if roc is not None and roc < -100:
+        roc = None
+    if atr is not None and atr < 0:
+        atr = None
     # Evidence of a dislocation needs a usable historical price context.
-    depressed = drawdown is not None and drawdown <= -15
-    breakdown = (close is not None and support is not None and close < support * .97
-                 and roc is not None and roc < -10)
+    depressed = drawdown is not None and -100 <= drawdown <= -15
+    breakdown = (close is not None and close > 0 and support is not None and support > 0
+                 and close < support * .97 and roc is not None and roc < -10)
     strong = (technical.get("status") == "READY" and None not in (close, ema50, slope, roc, rs, flow, macd)
-              and close > ema50 and slope > 0 and roc > 0 and rs > 0 and flow > 0 and macd > 0
+              and close > 0 and ema50 > 0 and close > ema50 and slope > 0 and roc > 0 and rs > 0 and flow > 0 and macd > 0
               and (technical.get("multi_timeframe") or {}).get("weekly_trend_confirmed") is True)
-    stabilising = not breakdown and roc is not None and roc >= -3 and flow is not None and flow >= 0
+    stabilising = not breakdown and close is not None and close > 0 and roc is not None and roc >= -3 and flow is not None and flow >= 0
     tech_state = "BREAKDOWN" if breakdown else "STRONG" if strong else "STABILISING" if stabilising else "WEAK"
     s.update(technical_state=tech_state, price_condition="DEPRESSED" if depressed else
-             "EXTENDED" if close and ema50 and close > ema50 * 1.15 else "NORMAL")
+             "EXTENDED" if close is not None and close > 0 and ema50 is not None and ema50 > 0 and close > ema50 * 1.15 else "NORMAL")
     safety = s["fundamental_data_quality"] == "AVAILABLE" and not s["structural_deterioration"]
     fundamental_ready = (s["business_health"] in ("HEALTHY", "STRONG") and s["earnings_direction"] in ("STABLE", "IMPROVING")
                          and s["fundamental_event_state"] in ("STABLE", "IMPROVING"))
     balance_ready = s["balance_sheet_state"] in ("HEALTHY", "ACCEPTABLE")
     cash_ready = s["cash_flow_state"] in ("SUPPORTIVE", "ADEQUATE")
-    downside_controlled = (not breakdown and atr is not None and atr <= 6
-                           and close is not None and support is not None and support > 0 and close >= support * .97)
+    downside_controlled = (not breakdown and atr is not None and 0 <= atr <= 6
+                           and close is not None and close > 0 and support is not None and support > 0 and close >= support * .97)
     regime = (technical.get("market_context") or {}).get("nifty_regime")
-    momentum_valid = (strong and safety and fundamental_ready and atr is not None and atr <= 6 and
+    momentum_valid = (strong and safety and fundamental_ready and atr is not None and 0 <= atr <= 6 and
                       (s["financial_domain"] or (balance_ready and cash_ready)) and regime in ("BULL", "MIXED"))
     # Weak trend, RSI, MACD and EMA location are deliberately absent here.
     recovery_valid = (depressed and safety and fundamental_ready and cash_ready and balance_ready
                       and not s["financial_domain"] and downside_controlled
                       and s["valuation_state"] in ("ATTRACTIVE", "REASONABLE"))
-    if not official_current: reasons.append("OFFICIAL_SESSION_NOT_CURRENT")
+    if official_current is not True: reasons.append("OFFICIAL_SESSION_NOT_CURRENT")
     if s["fundamental_data_quality"] != "AVAILABLE": reasons.append("FUNDAMENTALS_" + s["fundamental_data_quality"])
     if not fundamental_ready: reasons.append("BUSINESS_EARNINGS_OR_EVENT_EVIDENCE_INSUFFICIENT")
     if s["financial_domain"]: reasons.append("BANKING_SPECIFIC_PIT_METRICS_UNAVAILABLE_FOR_RECOVERY")
@@ -144,15 +152,19 @@ def route(symbol: str, market_session: str, technical: dict, fundamental: dict,
     if s["valuation_state"] == "UNAVAILABLE": reasons.append("PIT_RELATIVE_VALUATION_UNAVAILABLE")
     if depressed and not downside_controlled: reasons.append("DOWNSIDE_UNCONTROLLED_OR_UNAVAILABLE")
     if not strong: reasons.append("MOMENTUM_CONFIRMATION_INCOMPLETE")
+    if technical.get("status") != "READY": reasons.append("TECHNICAL_DATA_NOT_READY")
+    if (technical.get("multi_timeframe") or {}).get("weekly_trend_confirmed") is not True: reasons.append("WEEKLY_CONFIRMATION_MISSING_OR_FALSE")
+    if flow is None: reasons.append("CMF_MISSING_OR_INVALID")
+    if roc is None: reasons.append("ROC_MISSING_OR_INVALID")
     if s["structural_deterioration"]:
         action = "AVOID - VALUE TRAP RISK" if depressed else "AVOID - FUNDAMENTAL DETERIORATION"
     elif breakdown:
         action = "AVOID - TECHNICAL BREAKDOWN"
-    elif official_current and momentum_valid and recovery_valid:
+    elif official_current is True and momentum_valid and recovery_valid:
         action = "MOMENTUM + RECOVERY BUY"
-    elif official_current and momentum_valid:
+    elif official_current is True and momentum_valid:
         action = "MOMENTUM BUY"
-    elif official_current and recovery_valid:
+    elif official_current is True and recovery_valid:
         action = "RECOVERY BUY"
     elif strong and depressed:
         action = "WATCH - MIXED"
@@ -162,8 +174,8 @@ def route(symbol: str, market_session: str, technical: dict, fundamental: dict,
         action = "WATCH - MOMENTUM"
     else:
         action = "NO OPPORTUNITY"
-    m = "VALID" if momentum_valid else "REJECT" if s["structural_deterioration"] or breakdown else "WATCH"
-    r = "VALID" if recovery_valid else "REJECT" if s["structural_deterioration"] or breakdown else "WATCH"
+    m = "VALID" if momentum_valid and official_current is True else "REJECT" if s["structural_deterioration"] or breakdown else "WATCH"
+    r = "VALID" if recovery_valid and official_current is True else "REJECT" if s["structural_deterioration"] or breakdown else "WATCH"
     momentum_reason = "Trend, relative strength, volume and completed weekly confirmation support continuation; fundamentals show no material deterioration." if m == "VALID" else "Momentum confirmation or fundamental safety is incomplete. " + ", ".join(reasons)
     recovery_reason = ("Price is depressed while business, earnings, cash flow and PIT valuation evidence support recovery. Weak technical momentum increases entry risk without invalidating this thesis. The cause of the decline is not established by these data."
                        if r == "VALID" else "A price decline alone is insufficient. " + ", ".join(reasons))
@@ -184,7 +196,7 @@ def route(symbol: str, market_session: str, technical: dict, fundamental: dict,
                 recovery_reason=recovery_reason, fundamental_narrative=narrative, thesis=narrative + " " + thesis,
                 invalidation="Material business deterioration, uncontrolled downside or loss of the original thesis; recovery also requires review when valuation advantage disappears.",
                 confidence=confidence, priority="HIGH" if confidence == "HIGH" else "MEDIUM" if action in BUY_ACTIONS else "LOW",
-                executable=action in BUY_ACTIONS and official_current and close is not None and close > 0,
+                executable=action in BUY_ACTIONS and official_current is True and close is not None and close > 0,
                 review_after_sessions=60 if primary == "RECOVERY" else 20,
                 reason_codes=reasons, target_used_in_score=False, **s,
                 evidence=dict(technical=technical, fundamental=fundamental, price_context=price_context,
@@ -209,7 +221,22 @@ def next_official_open(stock_bars, index_bars, signal_session, observed_session)
 
 
 def paper_entry_rows(rows, plan):
-    allocated = {r["symbol"] for r in plan.get("new_buys", []) if int(r.get("shares") or 0) > 0}
+    # Only positive whole-number allocations qualify; booleans and decimals
+    # must never turn a malformed plan into an executable paper order.
+    def positive_whole_shares(value):
+        if isinstance(value, bool):
+            return False
+        try:
+            shares = float(value)
+            return math.isfinite(shares) and shares > 0 and shares.is_integer()
+        except (TypeError, ValueError, OverflowError):
+            return False
+    orders = plan.get("new_buys") or []
+    if not isinstance(orders, list):
+        orders = []
+    allocated = {r["symbol"] for r in orders
+                 if isinstance(r, dict) and isinstance(r.get("symbol"), str)
+                 and r["symbol"].strip() and positive_whole_shares(r.get("shares"))}
     return [{**row, "executable": row.get("symbol") in allocated and
              (row.get("live_decision") or {}).get("executable") is True and
              (row.get("live_decision") or {}).get("final_action") in BUY_ACTIONS,
@@ -222,7 +249,9 @@ def rank_candidates(rows):
     quality = {"STRONG":0, "HEALTHY":1, "MIXED":2, "WEAK":3, "DETERIORATING":4, "UNAVAILABLE":5}
     lane_ranks = {}
     for lane in ("MOMENTUM", "RECOVERY"):
-        members = [row for row in rows if row["live_decision"][lane.lower() + "_thesis"] == "VALID"]
+        members = [row for row in rows if row["live_decision"].get("executable") is True
+                   and row["live_decision"].get("final_action") in BUY_ACTIONS
+                   and row["live_decision"].get(lane.lower() + "_thesis") == "VALID"]
         def key(row):
             d = row["live_decision"]
             t = d["evidence"]["technical"]
@@ -230,17 +259,18 @@ def rank_candidates(rows):
             if lane == "MOMENTUM":
                 rs = number((t.get("relative_strength") or {}).get("rs20_vs_nifty"))
                 adx = number((t.get("momentum") or {}).get("adx14"))
-                return (quality[d["business_health"]], risk if risk is not None else 100,
+                return (quality.get(d.get("business_health"), 6), risk if risk is not None and risk >= 0 else 100,
                         -(rs if rs is not None else -100), -(adx if adx is not None else 0), row["symbol"])
-            return (quality[d["business_health"]], d["earnings_direction"] != "IMPROVING",
+            return (quality.get(d.get("business_health"), 6), d.get("earnings_direction") != "IMPROVING",
                     d["cash_flow_state"] != "SUPPORTIVE", d["valuation_state"] != "ATTRACTIVE",
-                    risk if risk is not None else 100, d["technical_state"] == "WEAK", row["symbol"])
+                    risk if risk is not None and risk >= 0 else 100, d.get("technical_state") == "WEAK", row["symbol"])
         for rank, row in enumerate(sorted(members,key=key),1):
             lane_ranks.setdefault(row["symbol"], {})[lane] = rank
     for row in rows:
         row["live_decision"]["lane_ranks"] = lane_ranks.get(row["symbol"], {})
     confidence = {"HIGH":0,"MEDIUM":1,"LOW":2}
-    rows.sort(key=lambda row: (not row["live_decision"]["executable"], confidence[row["live_decision"]["confidence"]],
+    rows.sort(key=lambda row: (row["live_decision"].get("executable") is not True,
+                               confidence.get(row["live_decision"].get("confidence"), 3),
                               min(lane_ranks.get(row["symbol"], {}).values(),default=len(rows)+1), row["symbol"]))
     for rank,row in enumerate(rows,1):row["rank"] = rank
     return rows
@@ -249,7 +279,7 @@ def rank_candidates(rows):
 def monitor(position, decision):
     """Use persisted entry style. Never exit Recovery merely for weak momentum."""
     style = position.get("primary_style") or position.get("strategy_style") or ""
-    if decision.get("structural_deterioration"):
+    if decision.get("structural_deterioration") is True:
         return "EXIT", "Original business safety thesis invalidated by material deterioration."
     if decision.get("technical_state") == "BREAKDOWN" and style:
         return "EXIT", "Original " + style.lower() + " thesis breached its downside-risk protection."
