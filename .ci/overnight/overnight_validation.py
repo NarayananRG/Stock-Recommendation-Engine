@@ -29,19 +29,26 @@ results=[]
 for name,path in CASES:
  file=ROOT/path
  if not file.is_file():
-  results.append({"test":name,"path":path,"status":"MISSING","exit_code":None})
+  results.append({"test":name,"path":path,"status":"MISSING","exit_code":None,"diagnosis":"TEST_FILE_ABSENT"})
   continue
  try:
   run=subprocess.run([sys.executable,str(file)],cwd=ROOT,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True,timeout=180)
   (REPORT/(name+".log")).write_text(run.stdout[-300000:],encoding="utf-8")
-  results.append({"test":name,"path":path,"status":"PASS" if run.returncode==0 else "FAIL","exit_code":run.returncode})
+  lines=run.stdout.splitlines()
+  markers=[line.strip()[:350] for line in lines if any(word in line.lower() for word in ("traceback", "assertionerror", "modulenotfounderror", "failed", "error:", "fatal:", "missing", "not found"))]
+  results.append({"test":name,"path":path,"status":"PASS" if run.returncode==0 else "FAIL","exit_code":run.returncode,"diagnosis":markers[-12:] if run.returncode else []})
  except subprocess.TimeoutExpired as exc:
-  results.append({"test":name,"path":path,"status":"TIMEOUT","exit_code":None})
-excepted={}
+  partial=exc.stdout or b""
+  if isinstance(partial,bytes): partial=partial.decode("utf-8",errors="replace")
+  (REPORT/(name+".log")).write_text(str(partial)[-300000:],encoding="utf-8")
+  results.append({"test":name,"path":path,"status":"TIMEOUT","exit_code":None,"diagnosis":"TEST_EXCEEDED_180_SECONDS"})
 summary={"schema":"SRE_OVERNIGHT_READ_ONLY_AUDIT_V1","generated_utc":datetime.now(timezone.utc).isoformat(),"git_ref":os.environ.get("GITHUB_SHA",""),"authority":"AUDIT_ONLY","production_modified":False,"results":results}
 (REPORT/"summary.json").write_text(json.dumps(summary,indent=2)+"\n",encoding="utf-8")
 with (REPORT/"summary.md").open("w",encoding="utf-8") as f:
  f.write("# SRE overnight validation\n\nNo production write or trading authority.\n\n| Check | Status |\n|---|---|\n")
  for x in results:f.write(f"| {x['test']} | {x['status']} |\n")
+ f.write("\\n## Failure triage\\n\\n")
+ for x in results:
+  if x["status"]!="PASS":f.write(f"- **{x['test']}**: {x.get('diagnosis')}; see {x['test']}.log\\n")
 print(json.dumps(summary,indent=2))
 sys.exit(0 if all(x["status"]=="PASS" for x in results) else 1)
