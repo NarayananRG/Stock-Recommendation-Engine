@@ -15,6 +15,9 @@ BUY_ACTIONS = ("MOMENTUM BUY", "RECOVERY BUY", "MOMENTUM + RECOVERY BUY")
 
 
 def number(value):
+    # Boolean flags are not numeric market or filing evidence.
+    if isinstance(value, bool):
+        return None
     try:
         result = float(value)
         return result if math.isfinite(result) else None
