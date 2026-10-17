@@ -231,8 +231,12 @@ def paper_entry_rows(rows, plan):
             return math.isfinite(shares) and shares > 0 and shares.is_integer()
         except (TypeError, ValueError, OverflowError):
             return False
-    allocated = {r["symbol"] for r in plan.get("new_buys", [])
-                 if isinstance(r, dict) and r.get("symbol") and positive_whole_shares(r.get("shares"))}
+    orders = plan.get("new_buys") or []
+    if not isinstance(orders, list):
+        orders = []
+    allocated = {r["symbol"] for r in orders
+                 if isinstance(r, dict) and isinstance(r.get("symbol"), str)
+                 and r["symbol"].strip() and positive_whole_shares(r.get("shares"))}
     return [{**row, "executable": row.get("symbol") in allocated and
              (row.get("live_decision") or {}).get("executable") is True and
              (row.get("live_decision") or {}).get("final_action") in BUY_ACTIONS,
@@ -245,7 +249,9 @@ def rank_candidates(rows):
     quality = {"STRONG":0, "HEALTHY":1, "MIXED":2, "WEAK":3, "DETERIORATING":4, "UNAVAILABLE":5}
     lane_ranks = {}
     for lane in ("MOMENTUM", "RECOVERY"):
-        members = [row for row in rows if row["live_decision"][lane.lower() + "_thesis"] == "VALID"]
+        members = [row for row in rows if row["live_decision"].get("executable") is True
+                   and row["live_decision"].get("final_action") in BUY_ACTIONS
+                   and row["live_decision"].get(lane.lower() + "_thesis") == "VALID"]
         def key(row):
             d = row["live_decision"]
             t = d["evidence"]["technical"]
@@ -253,17 +259,18 @@ def rank_candidates(rows):
             if lane == "MOMENTUM":
                 rs = number((t.get("relative_strength") or {}).get("rs20_vs_nifty"))
                 adx = number((t.get("momentum") or {}).get("adx14"))
-                return (quality[d["business_health"]], risk if risk is not None else 100,
+                return (quality.get(d.get("business_health"), 6), risk if risk is not None and risk >= 0 else 100,
                         -(rs if rs is not None else -100), -(adx if adx is not None else 0), row["symbol"])
-            return (quality[d["business_health"]], d["earnings_direction"] != "IMPROVING",
+            return (quality.get(d.get("business_health"), 6), d.get("earnings_direction") != "IMPROVING",
                     d["cash_flow_state"] != "SUPPORTIVE", d["valuation_state"] != "ATTRACTIVE",
-                    risk if risk is not None else 100, d["technical_state"] == "WEAK", row["symbol"])
+                    risk if risk is not None and risk >= 0 else 100, d.get("technical_state") == "WEAK", row["symbol"])
         for rank, row in enumerate(sorted(members,key=key),1):
             lane_ranks.setdefault(row["symbol"], {})[lane] = rank
     for row in rows:
         row["live_decision"]["lane_ranks"] = lane_ranks.get(row["symbol"], {})
     confidence = {"HIGH":0,"MEDIUM":1,"LOW":2}
-    rows.sort(key=lambda row: (not row["live_decision"]["executable"], confidence[row["live_decision"]["confidence"]],
+    rows.sort(key=lambda row: (row["live_decision"].get("executable") is not True,
+                               confidence.get(row["live_decision"].get("confidence"), 3),
                               min(lane_ranks.get(row["symbol"], {}).values(),default=len(rows)+1), row["symbol"]))
     for rank,row in enumerate(rows,1):row["rank"] = rank
     return rows
