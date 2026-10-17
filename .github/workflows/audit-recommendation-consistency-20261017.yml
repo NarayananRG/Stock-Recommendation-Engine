@@ -1,0 +1,47 @@
+name: SRE Recommendation Consistency Read-Only Audit
+on:
+  push:
+    branches: [audit-recommendation-consistency-20261017]
+    paths:
+      - ".github/workflows/audit-recommendation-consistency-20261017.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  recommendation-consistency:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify production LIVE_DECISION_V1 router regression
+        run: python .ci/native140/test_live_decision_v1.py -v
+      - name: Trace decision/forecast separation and freshness contracts
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          router = Path(".ci/native140/live_decision_v1.py").read_text(encoding="utf-8")
+          patch = Path(".ci/native140/patch140.py").read_text(encoding="utf-8")
+          analysis = Path(".ci/native148/patch148_analysis_refresh.py").read_text(encoding="utf-8")
+          refresh = Path(".ci/native146/official_daily_refresh_v3.py").read_text(encoding="utf-8")
+          route = router.split("def route(",1)[1].split("def lane_counts(",1)[0]
+          rankings = router.split("def rank_candidates(",1)[1].split("def monitor(",1)[0]
+          requirements = {
+              "router has current-session execution gate": "official_current" in route and "executable=" in route,
+              "recovery buy accepts independent fundamental thesis": "elif official_current and recovery_valid:" in route,
+              "router does not consume displayed forecast": "expected_return" not in route,
+              "rank does not consume displayed forecast": "expected_return" not in rankings,
+              "materialization preserves legacy expected return": '"expected_return":None' in patch and '"legacy_opportunity_status"' in patch,
+              "freshness distinguishes stale analysis": "ANALYSIS REFRESH REQUIRED" in analysis,
+              "official refresh checks expected session": "LOCAL_CACHE_LATEST_MISMATCH" in refresh,
+          }
+          for name, passed in requirements.items():
+              print(("PASS" if passed else "FAIL")+": "+name)
+          if not all(requirements.values()):
+              raise SystemExit("Audit code contract changed; manual investigation required")
+          print("FINDING: legacy displayed forecast and LIVE_DECISION_V1 BUY authority are separate.")
+          print("LIMITATION: This static audit cannot prove actual 2026-10-16 GODREJCP/HINDZINC run values, model calibration or forecast horizon without the local run snapshot.")
+          print("NO PRODUCTION FILES MODIFIED; NO THRESHOLDS ALTERED.")
+          PY
