@@ -68,7 +68,7 @@ def interpret(f: dict[str, Any]) -> dict[str, Any]:
     if pe is not None and pe > 0 and reference is not None and reference > 0:
         ratio = pe / reference
         valuation_state = "ATTRACTIVE" if ratio <= .8 else "REASONABLE" if ratio <= 1 else "FULL" if ratio <= 1.2 else "EXPENSIVE"
-    quality = "STALE" if f.get("filing_freshness") == "STALE" else "AVAILABLE" if f.get("available") and f.get("point_in_time_safe") else "UNAVAILABLE"
+    quality = "STALE" if f.get("filing_freshness") == "STALE" else "AVAILABLE" if f.get("available") is True and f.get("point_in_time_safe") is True else "UNAVAILABLE"
     return dict(business_health=health, earnings_direction=earnings, cash_flow_state=cash_state,
                 balance_sheet_state=balance, valuation_state=valuation_state,
                 fundamental_event_state=event_state, structural_deterioration=bool(damaged),
