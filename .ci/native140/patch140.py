@@ -5,6 +5,7 @@ import shutil
 root = Path(os.environ['SRE_ENGINE_ROOT'])
 here = Path(__file__).parent
 shutil.copyfile(here / 'live_decision_v1.py', root / 'stock_app/live_decision_v1.py')
+shutil.copyfile(here.parent / 'forecast_audit' / 'forecast_conflict_diagnostic.py', root / 'stock_app/forecast_conflict_diagnostic.py')
 
 def edit(relative, old, new):
     path = root / relative
@@ -151,7 +152,9 @@ methods = '''    def _live_file(self, run_id: str) -> Path:
                        "prior_support": min(lows) if len(lows) == 20 else None}
             live = route(symbol, session, technical, fundamental, price_context=context,
                          official_current=current and bool(bars) and str(bars[-1].get("date"))[:10] == session, legacy=dict(row))
-            rows.append({**row, "legacy_opportunity_status": row.get("opportunity_status"), "live_decision": live,
+            from stock_app.forecast_conflict_diagnostic import classify as classify_forecast_conflict
+            diagnostic = classify_forecast_conflict({**row, "live_decision": live}, run)
+            rows.append({**row, "forecast_diagnostic": diagnostic, "legacy_opportunity_status": row.get("opportunity_status"), "live_decision": live,
                          "opportunity_status": live["final_action"], "confidence_label": live["confidence"],
                          "final_action": live["final_action"], "strategy_style": live["strategy_style"],
                          "latest_close": price, "target_used_in_score": False})
