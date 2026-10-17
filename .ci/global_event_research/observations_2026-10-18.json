@@ -1,0 +1,38 @@
+{
+  "schema": "SRE_GLOBAL_EVENT_RESEARCH_SHADOW_V1",
+  "as_of": "2026-10-18",
+  "authority": "SHADOW_ONLY",
+  "production_decision_eligible": false,
+  "observations": [
+    {
+      "id": "GE-20261018-001",
+      "event_type": "OTHER",
+      "published_on": "2026-10-13",
+      "source": "IMF",
+      "url": "https://www.imf.org/en/publications/weo/issues/2026/10/13/world-economic-outlook-october-2026",
+      "claim": "IMF global growth baseline 3.1 percent in 2026 and 3.4 percent in 2027; global inflation 4.7 percent in 2026.",
+      "causality_status": "NOT_ESTABLISHED",
+      "candidate_event": false
+    },
+    {
+      "id": "GE-20261018-002",
+      "event_type": "OIL_SHOCK",
+      "published_on": "2026-10-14",
+      "source": "IEA",
+      "url": "https://www.iea.org/reports/oil-market-report-october-2026",
+      "claim": "IEA reports disruptions to refined product supplies and forecasts an oil demand decline for 2026.",
+      "causality_status": "NOT_ESTABLISHED",
+      "candidate_event": true
+    },
+    {
+      "id": "GE-20261018-003",
+      "event_type": "OTHER",
+      "published_on": "2026-10-13",
+      "source": "IMF",
+      "url": "https://www.imf.org/en/publications/weo/issues/2026/10/13/world-economic-outlook-october-2026",
+      "claim": "IMF highlights AI-investment resilience and possible repricing of AI expectations.",
+      "causality_status": "NOT_ESTABLISHED",
+      "candidate_event": false
+    }
+  ]
+}
