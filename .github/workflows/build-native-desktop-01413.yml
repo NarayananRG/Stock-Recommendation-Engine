@@ -2,7 +2,7 @@ name: Build SRE 0.14.13 Forecast Diagnostics Candidate
 
 on:
   push:
-    branches: [feat-recommendation-conflict-diagnostics-20261017]
+    branches: [fix-forecast-patch-sequence-20261017]
     paths:
       - ".ci/native098/**"
       - ".ci/native099/**"
