@@ -1,0 +1,23 @@
+name: SRE Forecast Disagreement and Horizon Gate
+on:
+  push:
+    branches: [audit-forecast-conflict-horizon-20261017]
+    paths:
+      - ".ci/forecast_audit/**"
+      - ".github/workflows/audit-forecast-conflict-horizon.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  conflict-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Forecast conflict and horizon tests
+        run: python .ci/forecast_audit/test_forecast_conflict_diagnostic.py -v
+      - name: Existing recommendation router regressions
+        run: python .ci/native140/test_live_decision_v1.py -v
