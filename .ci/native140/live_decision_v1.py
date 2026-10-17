@@ -110,6 +110,14 @@ def route(symbol: str, market_session: str, technical: dict, fundamental: dict,
     atr = number((technical.get("volatility") or {}).get("atr_pct"))
     support = number(price_context.get("prior_support"))
     drawdown = number(price_context.get("drawdown_from_126_high_pct"))
+    # Guard impossible indicator values while keeping strategy thresholds unchanged.
+    # CMF is bounded [-1, 1]; ROC percent cannot fall below -100 for positive prices.
+    if flow is not None and not -1 <= flow <= 1:
+        flow = None
+    if roc is not None and roc < -100:
+        roc = None
+    if atr is not None and atr < 0:
+        atr = None
     # Evidence of a dislocation needs a usable historical price context.
     depressed = drawdown is not None and -100 <= drawdown <= -15
     breakdown = (close is not None and close > 0 and support is not None and support > 0
@@ -144,6 +152,10 @@ def route(symbol: str, market_session: str, technical: dict, fundamental: dict,
     if s["valuation_state"] == "UNAVAILABLE": reasons.append("PIT_RELATIVE_VALUATION_UNAVAILABLE")
     if depressed and not downside_controlled: reasons.append("DOWNSIDE_UNCONTROLLED_OR_UNAVAILABLE")
     if not strong: reasons.append("MOMENTUM_CONFIRMATION_INCOMPLETE")
+    if technical.get("status") != "READY": reasons.append("TECHNICAL_DATA_NOT_READY")
+    if (technical.get("multi_timeframe") or {}).get("weekly_trend_confirmed") is not True: reasons.append("WEEKLY_CONFIRMATION_MISSING_OR_FALSE")
+    if flow is None: reasons.append("CMF_MISSING_OR_INVALID")
+    if roc is None: reasons.append("ROC_MISSING_OR_INVALID")
     if s["structural_deterioration"]:
         action = "AVOID - VALUE TRAP RISK" if depressed else "AVOID - FUNDAMENTAL DETERIORATION"
     elif breakdown:
