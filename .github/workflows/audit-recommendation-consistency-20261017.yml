@@ -18,6 +18,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Validate fundamental panel numeric hygiene
+        run: python .ci/recommendation_audit/test_panel_numeric_quality.py -v
       - name: Validate evidence trace audit
         run: python .ci/recommendation_audit/test_evidence_trace.py -v
       - name: Verify source contracts for event severity and debt mapping
