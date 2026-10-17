@@ -112,10 +112,10 @@ def route(symbol: str, market_session: str, technical: dict, fundamental: dict,
     drawdown = number(price_context.get("drawdown_from_126_high_pct"))
     # Evidence of a dislocation needs a usable historical price context.
     depressed = drawdown is not None and drawdown <= -15
-    breakdown = (close is not None and support is not None and close < support * .97
-                 and roc is not None and roc < -10)
+    breakdown = (close is not None and close > 0 and support is not None and support > 0
+                 and close < support * .97 and roc is not None and roc < -10)
     strong = (technical.get("status") == "READY" and None not in (close, ema50, slope, roc, rs, flow, macd)
-              and close > ema50 and slope > 0 and roc > 0 and rs > 0 and flow > 0 and macd > 0
+              and close > 0 and ema50 > 0 and close > ema50 and slope > 0 and roc > 0 and rs > 0 and flow > 0 and macd > 0
               and (technical.get("multi_timeframe") or {}).get("weekly_trend_confirmed") is True)
     stabilising = not breakdown and roc is not None and roc >= -3 and flow is not None and flow >= 0
     tech_state = "BREAKDOWN" if breakdown else "STRONG" if strong else "STABILISING" if stabilising else "WEAK"
