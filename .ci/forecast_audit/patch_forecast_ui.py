@@ -1,0 +1,33 @@
+import os
+from pathlib import Path
+root=Path(os.environ["SRE_ENGINE_ROOT"])/"modern_ui/frontend"
+app=root/"app.js"
+s=app.read_text(encoding="utf-8")
+if "function forecastDiagnosticHtml(item){" in s: raise RuntimeError("Diagnostic already applied")
+for old in ("liveEvidenceHtml(item.live_decision||item)","liveEvidenceHtml(i.live_decision||i)"):
+    if old not in s: raise RuntimeError("Missing UI anchor: "+old)
+    s=s.replace(old,old+"+forecastDiagnosticHtml("+("item" if "item." in old else "i")+")",1)
+s+="""
+
+function forecastDiagnosticHtml(item){
+  const d=item&&item.forecast_diagnostic;
+  if(!d||typeof d!=='object')return '';
+  const flags=Array.isArray(d.flags)?d.flags:[];
+  const severity=String(d.conflict_severity||'UNKNOWN');
+  const serious=severity==='MATERIAL'||flags.includes('LOW_POSITIVE_ANALOGUE_RATE');
+  const pct=x=>typeof x==='number'&&Number.isFinite(x)?(x*100).toFixed(2)+'%':'not verified';
+  const note=serious?'Conflicting or weak short-term evidence; review before relying on this BUY label.':
+    severity==='DIRECTIONAL'?'Forecast direction differs between two methods. Review evidence.':
+    'The legacy forecast and technical analogues use different models.';
+  const review=flags.includes('RECOMMENDATION_REVIEW_HORIZON_DIFFERS_FROM_FORECAST');
+  return '<section role="note" class="forecast-disagreement" style="border:1px solid #999;border-radius:8px;padding:10px;margin:10px 0">'+
+    '<strong>Forecast evidence: '+escapeHtml(severity)+'</strong>'+
+    '<p>Legacy forecast: '+escapeHtml(pct(d.legacy_expected_return_fraction))+
+    '; technical analogue median: '+escapeHtml(pct(d.technical_analogue_median_fraction))+'.</p>'+
+    '<p>'+escapeHtml(note)+'</p>'+
+    (review?'<small>Review horizon differs from forecast horizon.</small>':'')+
+    '<small>Diagnostic only. Does not change BUY rules. Forecast calibration is not established.</small></section>';
+}
+"""
+app.write_text(s,encoding="utf-8")
+print("FORECAST DIAGNOSTIC UI APPLIED")
