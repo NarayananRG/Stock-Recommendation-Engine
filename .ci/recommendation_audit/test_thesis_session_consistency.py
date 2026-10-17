@@ -23,7 +23,7 @@ class Tests(unittest.TestCase):
   self.assertIn("OFFICIAL_SESSION_NOT_CURRENT",d["reason_codes"])
  def test_stale_recovery_not_valid(self):
   t=technical();t["momentum"]["roc20_pct"]=-2
-  d=check(t,current=False,{"prior_support":90,"drawdown_from_126_high_pct":-20})
+  d=check(t,current=False,price={"prior_support":90,"drawdown_from_126_high_pct":-20})
   self.assertNotEqual(d["recovery_thesis"],"VALID")
   self.assertFalse(d["executable"])
  def test_truthy_weekly_not_confirmed(self):
