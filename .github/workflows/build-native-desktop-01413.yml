@@ -2481,6 +2481,45 @@ jobs:
             }
           }
 
+      - name: Verify unchanged-session restart preserves analysis identity
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $expected = (Get-Content "$env:RUNNER_TEMP\installed-phase2-run.txt" -Raw).Trim()
+          $appData = Join-Path $env:LOCALAPPDATA "StockRecommendationEngine"
+          $ready = Join-Path $appData "runtime-ready.txt"
+          $portFile = Join-Path $appData "runtime-port.txt"
+          $appExe = Get-ChildItem "$env:RUNNER_TEMP\SRE01413Installed" -Recurse -Filter "StockRecommendationEngine.exe" |
+            Select-Object -First 1
+          if (!$appExe) { throw "Installed app missing for unchanged-session restart" }
+          Remove-Item $ready,$portFile -Force -ErrorAction SilentlyContinue
+          $env:STOCK_REAL_DATA_REPO_ROOT = "$env:RUNNER_TEMP\sre01413-paper-official"
+          $env:SRE_EXPECTED_SESSION_NOW = "2025-11-28T19:00:00+05:30"
+          $desktop = Start-Process -FilePath $appExe.FullName -PassThru
+          try {
+            $alive=$false
+            for($i=0;$i -lt 120;$i++){
+              Start-Sleep -Milliseconds 500
+              $desktop.Refresh()
+              if($desktop.HasExited){throw "Same-session restart exited early"}
+              if(Test-Path $ready){$alive=$true;break}
+            }
+            if(!$alive){throw "Same-session restart never became ready"}
+            $readyLines=Get-Content $ready
+            $port=[int]$readyLines[1]
+            $dash=Invoke-RestMethod "http://127.0.0.1:$port/api/dashboard" -TimeoutSec 10
+            $opps=Invoke-RestMethod "http://127.0.0.1:$port/api/opportunities" -TimeoutSec 10
+            Write-Host "SAME-SESSION PERSISTENCE: expected=$expected dashboard=$($dash.active_run.run_id) opportunities=$($opps.run.run_id) session=$($dash.active_run.market_session)"
+            if([string]$dash.active_run.market_session -ne "2025-11-28"){throw "Same-session restart unexpectedly changed market session"}
+            if([string]$dash.active_run.run_id -ne $expected){throw "Same-session restart regenerated active Run ID"}
+            if([string]$opps.run.run_id -ne $expected){throw "Same-session restart changed opportunity Run ID"}
+            Write-Host "SAME-SESSION RESTART IDENTITY PASS"
+          } finally {
+            if(!$desktop.HasExited){Stop-Process -Id $desktop.Id -Force -ErrorAction SilentlyContinue}
+            Start-Sleep -Seconds 1
+            Remove-Item $ready,$portFile -Force -ErrorAction SilentlyContinue
+          }
+
       - name: Reopen installed app and verify persistent Run ID
         shell: pwsh
         run: |
