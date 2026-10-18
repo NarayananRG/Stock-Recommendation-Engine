@@ -22,8 +22,18 @@ class GapTriageTests(unittest.TestCase):
  def test_component_mapping_is_review_not_ratio(self):
   self.write({"AAA":("MISSING_IN_SOURCE","AVAILABLE_BUT_NOT_MAPPED","AVAILABLE_BUT_NOT_MAPPED")})
   r=m.triage(self.p,1,3)
-  self.assertEqual(r["triage_counts"]["COMPONENT_MAPPING_REVIEW"],1)
+  self.assertEqual(r["triage_counts"]["COMPONENT_CONCEPTS_OBSERVED_UNVERIFIED"],1)
   self.assertEqual(r["ratios_derived"],0)
+  self.assertTrue(r["findings"][0]["component_context_matches"])
+  self.assertFalse(r["findings"][0]["safe_to_derive_debt_equity"])
+ def test_unmatched_component_periods_never_confirm_mapping(self):
+  self.write({"AAA":("MISSING_IN_SOURCE","AVAILABLE_BUT_NOT_MAPPED","AVAILABLE_BUT_NOT_MAPPED")})
+  rows=list(csv.DictReader(self.p.open()))
+  rows[1]["quarter_end"]="2026-03-31"
+  with self.p.open("w",newline="") as f:
+   writer=csv.DictWriter(f,fieldnames=rows[0].keys());writer.writeheader();writer.writerows(rows)
+  r=m.triage(self.p,1,3)
+  self.assertFalse(r["findings"][0]["component_context_matches"])
   self.assertFalse(r["findings"][0]["safe_to_derive_debt_equity"])
  def test_verified_and_financial_inapplicable_not_missing(self):
   self.write({"AAA":("AVAILABLE_VERIFIED","MISSING_IN_SOURCE","MISSING_IN_SOURCE"),
