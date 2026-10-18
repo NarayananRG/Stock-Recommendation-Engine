@@ -67,6 +67,13 @@ def main() -> int:
     from stock_app import fundamental_v3  # type: ignore
     router = load_module("recovered_live_decision_v1", args.router)
     snapshot = json.loads(args.snapshot.read_text(encoding="utf-8"))
+    if not isinstance(snapshot, dict) or not isinstance(snapshot.get("run"), dict) or not isinstance(snapshot.get("candidates"), list) or not snapshot["candidates"]:
+        raise ValueError("ACTUAL_NONEMPTY_RUN_SNAPSHOT_REQUIRED")
+    if len(snapshot["candidates"]) != 200:
+        raise ValueError("EXPECTED_200_SYMBOLS_FOR_RECOVERY_COMPARISON")
+    symbols = [str(row.get("symbol") or "").upper().removesuffix(".NS") for row in snapshot["candidates"]]
+    if any(not sym for sym in symbols) or len(set(symbols)) != 200:
+        raise ValueError("UNIQUE_200_SYMBOLS_REQUIRED")
     run = snapshot.get("run") or {}
     session = date.fromisoformat(run["market_session"])
     decision_ts = datetime.combine(
@@ -92,7 +99,7 @@ def main() -> int:
         )
         route_args = dict(
             price_context=price_context,
-            official_current=bool(((before.get("evidence") or {}).get("official_current", True))),
+            official_current=((before.get("evidence") or {}).get("official_current") is True),
             legacy=legacy,
         )
         control = router.route(
