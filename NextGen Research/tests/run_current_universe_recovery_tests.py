@@ -44,6 +44,46 @@ class CurrentUniverseRecoveryTests(unittest.TestCase):
         self.assertEqual(report["covered_after"], 1)
         self.assertEqual(report["missing_after"], ["BBB", "CCC"])
 
+    def test_rejects_non_dict_event_from_coverage(self):
+        invalid = None
+        self.assertEqual(acquisition_gap(["AAA", "BBB"], [event("AAA", "a"), invalid]), ["BBB"])
+
+    def test_rejects_unsupported_source_from_coverage(self):
+        invalid = dict(event("BBB", "b"), source_exchange="YFINANCE")
+        self.assertEqual(acquisition_gap(["AAA", "BBB"], [event("AAA", "a"), invalid]), ["BBB"])
+
+    def test_rejects_missing_quarter_from_coverage(self):
+        invalid = dict(event("BBB", "b"), quarter_end=None)
+        self.assertEqual(acquisition_gap(["AAA", "BBB"], [event("AAA", "a"), invalid]), ["BBB"])
+
+    def test_rejects_bad_quarter_from_coverage(self):
+        invalid = dict(event("BBB", "b"), quarter_end="2026-99-99")
+        self.assertEqual(acquisition_gap(["AAA", "BBB"], [event("AAA", "a"), invalid]), ["BBB"])
+
+    def test_rejects_invalid_basis_from_coverage(self):
+        invalid = dict(event("BBB", "b"), reporting_basis="UNKNOWN")
+        self.assertEqual(acquisition_gap(["AAA", "BBB"], [event("AAA", "a"), invalid]), ["BBB"])
+
+    def test_rejects_invalid_submission_from_coverage(self):
+        invalid = dict(event("BBB", "b"), submission_type="DRAFT")
+        self.assertEqual(acquisition_gap(["AAA", "BBB"], [event("AAA", "a"), invalid]), ["BBB"])
+
+    def test_rejects_naive_publication_from_coverage(self):
+        invalid = dict(event("BBB", "b"), publication_ts="2026-07-20T10:00:00")
+        self.assertEqual(acquisition_gap(["AAA", "BBB"], [event("AAA", "a"), invalid]), ["BBB"])
+
+    def test_rejects_invalid_availability_from_coverage(self):
+        invalid = dict(event("BBB", "b"), availability_ts="not-a-date")
+        self.assertEqual(acquisition_gap(["AAA", "BBB"], [event("AAA", "a"), invalid]), ["BBB"])
+
+    def test_rejects_availability_before_publication_from_coverage(self):
+        invalid = dict(event("BBB", "b"), availability_ts="2026-07-19T10:00:00+05:30")
+        self.assertEqual(acquisition_gap(["AAA", "BBB"], [event("AAA", "a"), invalid]), ["BBB"])
+
+    def test_rejects_empty_symbol_from_coverage(self):
+        invalid = dict(event("BBB", "b"), symbol="")
+        self.assertEqual(acquisition_gap(["AAA", "BBB"], [event("AAA", "a"), invalid]), ["BBB"])
+
     def test_reports_incremental_official_recovery(self):
         before = [event("AAA", "a")]
         recovered = [event("BBB", "b")]
