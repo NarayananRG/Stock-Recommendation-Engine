@@ -4,6 +4,7 @@ import json
 import os
 import subprocess
 import sys
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -29,25 +30,29 @@ results=[]
 for name,path in CASES:
  file=ROOT/path
  if not file.is_file():
-  results.append({"test":name,"path":path,"status":"MISSING","exit_code":None,"diagnosis":"TEST_FILE_ABSENT"})
+  (REPORT/(name+".log")).write_text("TEST_FILE_ABSENT: "+path+"\n",encoding="utf-8")
+  results.append({"test":name,"path":path,"status":"MISSING","exit_code":None,"diagnosis":"TEST_FILE_ABSENT","duration_seconds":0})
   continue
+ started=time.monotonic()
  try:
   run=subprocess.run([sys.executable,str(file)],cwd=ROOT,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True,timeout=180)
   (REPORT/(name+".log")).write_text(run.stdout[-300000:],encoding="utf-8")
   lines=run.stdout.splitlines()
   markers=[line.strip()[:350] for line in lines if any(word in line.lower() for word in ("traceback", "assertionerror", "modulenotfounderror", "failed", "error:", "fatal:", "missing", "not found"))]
-  results.append({"test":name,"path":path,"status":"PASS" if run.returncode==0 else "FAIL","exit_code":run.returncode,"diagnosis":markers[-12:] if run.returncode else []})
+  results.append({"test":name,"path":path,"status":"PASS" if run.returncode==0 else "FAIL","exit_code":run.returncode,"diagnosis":markers[-12:] if run.returncode else [],"duration_seconds":round(time.monotonic()-started,2)})
  except subprocess.TimeoutExpired as exc:
   partial=exc.stdout or b""
   if isinstance(partial,bytes): partial=partial.decode("utf-8",errors="replace")
   (REPORT/(name+".log")).write_text(str(partial)[-300000:],encoding="utf-8")
-  results.append({"test":name,"path":path,"status":"TIMEOUT","exit_code":None,"diagnosis":"TEST_EXCEEDED_180_SECONDS"})
+  results.append({"test":name,"path":path,"status":"TIMEOUT","exit_code":None,"diagnosis":"TEST_EXCEEDED_180_SECONDS","duration_seconds":round(time.monotonic()-started,2)})
+counts={status:sum(r["status"]==status for r in results) for status in ("PASS","FAIL","MISSING","TIMEOUT")}
 source_sha=subprocess.check_output(["git","rev-parse","HEAD"],cwd=ROOT,text=True).strip()
-summary={"schema":"SRE_OVERNIGHT_READ_ONLY_AUDIT_V1","generated_utc":datetime.now(timezone.utc).isoformat(),"git_ref":source_sha,"workflow_trigger_sha":os.environ.get("GITHUB_SHA",""),"authority":"AUDIT_ONLY","production_modified":False,"results":results}
+summary={"schema":"SRE_OVERNIGHT_READ_ONLY_AUDIT_V1","generated_utc":datetime.now(timezone.utc).isoformat(),"git_ref":source_sha,"workflow_trigger_sha":os.environ.get("GITHUB_SHA",""),"authority":"AUDIT_ONLY","production_modified":False,"counts":counts,"results":results}
 (REPORT/"summary.json").write_text(json.dumps(summary,indent=2)+"\n",encoding="utf-8")
 with (REPORT/"summary.md").open("w",encoding="utf-8") as f:
  f.write("# SRE overnight validation\n\nNo production write or trading authority.\n\n| Check | Status |\n|---|---|\n")
  for x in results:f.write(f"| {x['test']} | {x['status']} |\n")
+ f.write(f"\nTotals: {counts}. Audited checkout: `{source_sha}`. Workflow trigger: `{os.environ.get('GITHUB_SHA','')}`.\n")
  f.write("\n## Failure triage\n\n")
  for x in results:
   if x["status"]!="PASS":f.write(f"- **{x['test']}**: {x.get('diagnosis')}; see {x['test']}.log\n")
