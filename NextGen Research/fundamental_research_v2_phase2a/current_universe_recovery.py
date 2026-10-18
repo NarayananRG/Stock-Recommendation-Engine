@@ -14,6 +14,8 @@ from .core import dedupe_events, normalize_symbol
 
 
 def symbols_from_live_snapshot(snapshot: dict) -> list[str]:
+    if not isinstance(snapshot, dict):
+        raise ValueError("LIVE_SNAPSHOT_INVALID")
     candidates = snapshot.get("candidates")
     if not isinstance(candidates, list) or not candidates:
         raise ValueError("LIVE_SNAPSHOT_CANDIDATES_REQUIRED")
@@ -21,7 +23,10 @@ def symbols_from_live_snapshot(snapshot: dict) -> list[str]:
     for candidate in candidates:
         if not isinstance(candidate, dict):
             raise ValueError("LIVE_SNAPSHOT_CANDIDATE_INVALID")
-        symbols.append(normalize_symbol(candidate.get("symbol")))
+        symbol = candidate.get("symbol")
+        if not isinstance(symbol, str) or not symbol.strip():
+            raise ValueError("LIVE_SNAPSHOT_SYMBOL_REQUIRED")
+        symbols.append(normalize_symbol(symbol))
     if len(symbols) != len(set(symbols)):
         raise ValueError("LIVE_SNAPSHOT_DUPLICATE_SYMBOL")
     return symbols
@@ -83,7 +88,7 @@ def recovery_summary(*, symbols: Iterable[str], existing: Iterable[dict], recove
     before = symbols_with_events(old)
     after = symbols_with_events(merged)
     recovered_symbols = sorted((after - before) & set(requested))
-    event_sources = Counter(str(row.get("source_exchange") or "UNKNOWN") for row in new)
+    event_sources = Counter(str(row.get("source_exchange") or "UNKNOWN") if isinstance(row, dict) else "INVALID_EVENT" for row in new)
     return {
         "artifact_type": "CURRENT_LIVE_UNIVERSE_OFFICIAL_FILING_RECOVERY_V1",
         "authority": "SHADOW_ONLY",
