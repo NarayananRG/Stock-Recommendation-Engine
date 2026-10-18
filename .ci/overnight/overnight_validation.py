@@ -35,7 +35,7 @@ for name,path in CASES:
   continue
  started=time.monotonic()
  try:
-  run=subprocess.run([sys.executable,str(file)],cwd=ROOT,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True,timeout=180)
+  run=subprocess.run([sys.executable,str(file)],cwd=ROOT,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True,encoding="utf-8",errors="replace",timeout=120)
   (REPORT/(name+".log")).write_text(run.stdout[-300000:],encoding="utf-8")
   lines=run.stdout.splitlines()
   markers=[line.strip()[:350] for line in lines if any(word in line.lower() for word in ("traceback", "assertionerror", "modulenotfounderror", "failed", "error:", "fatal:", "missing", "not found"))]
@@ -44,7 +44,11 @@ for name,path in CASES:
   partial=exc.stdout or b""
   if isinstance(partial,bytes): partial=partial.decode("utf-8",errors="replace")
   (REPORT/(name+".log")).write_text(str(partial)[-300000:],encoding="utf-8")
-  results.append({"test":name,"path":path,"status":"TIMEOUT","exit_code":None,"diagnosis":"TEST_EXCEEDED_180_SECONDS","duration_seconds":round(time.monotonic()-started,2)})
+  results.append({"test":name,"path":path,"status":"TIMEOUT","exit_code":None,"diagnosis":"TEST_EXCEEDED_120_SECONDS","duration_seconds":round(time.monotonic()-started,2)})
+ except Exception as exc:
+  diagnosis=f"{type(exc).__name__}: {exc}"
+  (REPORT/(name+".log")).write_text(diagnosis+"\n",encoding="utf-8")
+  results.append({"test":name,"path":path,"status":"FAIL","exit_code":None,"diagnosis":[diagnosis],"duration_seconds":round(time.monotonic()-started,2)})
 counts={status:sum(r["status"]==status for r in results) for status in ("PASS","FAIL","MISSING","TIMEOUT")}
 source_sha=subprocess.check_output(["git","rev-parse","HEAD"],cwd=ROOT,text=True).strip()
 summary={"schema":"SRE_OVERNIGHT_READ_ONLY_AUDIT_V1","generated_utc":datetime.now(timezone.utc).isoformat(),"git_ref":source_sha,"workflow_trigger_sha":os.environ.get("GITHUB_SHA",""),"authority":"AUDIT_ONLY","production_modified":False,"counts":counts,"results":results}
