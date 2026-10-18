@@ -2,7 +2,7 @@ name: Build SRE 0.14.13 Paper Trading Repair
 
 on:
   push:
-    branches: [validation-v2-rebuild, fix-paper-trading-root-causes-20261016]
+    branches: [validation-v2-rebuild, fix-paper-trading-root-causes-20261016, automation-overnight-validation-20261018]
     paths:
       - ".ci/native098/**"
       - ".ci/native099/**"
@@ -1946,6 +1946,18 @@ jobs:
           $ErrorActionPreference = "Stop"
           node ".ci\native151\presentation_consistency.mjs"
           if ($LASTEXITCODE -ne 0) { throw "0.14.10 presentation browser regression failed" }
+
+      - name: Gate A count-writer repair and no-trading invariant test
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          python ".ci/gate_a/patch_count_writer_01413.py"
+          if ($LASTEXITCODE -ne 0) { throw "Gate A count-writer patch failed" }
+          python -m compileall -q "$env:SRE_ENGINE_ROOT/modern_ui"
+          if ($LASTEXITCODE -ne 0) { throw "Gate A patched backend compile failed" }
+          $api = Get-Content "$env:SRE_ENGINE_ROOT/modern_ui/api.py" -Raw
+          if ($api -notmatch 'x.get\("live_decision"\) or') { throw "Gate A live action gate not wired" }
+          if ($api -match 'len\(\[x for x in rows if x.get\("executable"\)\]\)') { throw "Legacy executable count persists" }
 
       - name: Package native application
         shell: pwsh
