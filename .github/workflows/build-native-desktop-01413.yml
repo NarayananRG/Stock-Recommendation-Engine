@@ -26,6 +26,7 @@ on:
       - ".ci/native151/**"
       - ".ci/native152/**"
       - ".ci/native154/**"
+      - ".ci/gate_a/**"
       - ".gitignore"
       - ".gitattributes"
       - "Stage 6/runtime/**"
