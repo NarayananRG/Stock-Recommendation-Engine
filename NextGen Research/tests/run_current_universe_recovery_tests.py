@@ -213,6 +213,10 @@ class CurrentUniverseRecoveryTests(unittest.TestCase):
         compact = dict(event("BBB", "b"), quarter_end="20260630")
         self.assertEqual(acquisition_gap(["BBB"], [compact]), ["BBB"])
 
+    def test_numeric_filing_symbol_is_not_coverage(self):
+        numeric = dict(event("BBB", "b"), symbol=123)
+        self.assertEqual(acquisition_gap(["BBB"], [numeric]), ["BBB"])
+
     def test_reports_incremental_official_recovery(self):
         before = [event("AAA", "a")]
         recovered = [event("BBB", "b")]
