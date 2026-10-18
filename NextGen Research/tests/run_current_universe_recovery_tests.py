@@ -84,6 +84,107 @@ class CurrentUniverseRecoveryTests(unittest.TestCase):
         invalid = dict(event("BBB", "b"), symbol="")
         self.assertEqual(acquisition_gap(["AAA", "BBB"], [event("AAA", "a"), invalid]), ["BBB"])
 
+    # Batch of 25 independently named coverage eligibility checks.
+    def test_bundle25_missing_publication(self):
+        candidate = dict(event('BBB','b'),publication_ts=None)
+        self.assertEqual(acquisition_gap(['AAA', 'BBB'], [event('AAA','a'), candidate]), ['BBB'])
+
+    def test_bundle25_invalid_publication(self):
+        candidate = dict(event('BBB','b'),publication_ts='invalid')
+        self.assertEqual(acquisition_gap(['AAA', 'BBB'], [event('AAA','a'), candidate]), ['BBB'])
+
+    def test_bundle25_naive_availability(self):
+        candidate = dict(event('BBB','b'),availability_ts='2026-07-20T10:00:00')
+        self.assertEqual(acquisition_gap(['AAA', 'BBB'], [event('AAA','a'), candidate]), ['BBB'])
+
+    def test_bundle25_empty_availability(self):
+        candidate = dict(event('BBB','b'),availability_ts='')
+        self.assertEqual(acquisition_gap(['AAA', 'BBB'], [event('AAA','a'), candidate]), ['BBB'])
+
+    def test_bundle25_wrong_exchange(self):
+        candidate = dict(event('BBB','b'),source_exchange='OTHER')
+        self.assertEqual(acquisition_gap(['AAA', 'BBB'], [event('AAA','a'), candidate]), ['BBB'])
+
+    def test_bundle25_non_string_exchange(self):
+        candidate = dict(event('BBB','b'),source_exchange=123)
+        self.assertEqual(acquisition_gap(['AAA', 'BBB'], [event('AAA','a'), candidate]), ['BBB'])
+
+    def test_bundle25_invalid_basis_number(self):
+        candidate = dict(event('BBB','b'),reporting_basis=99)
+        self.assertEqual(acquisition_gap(['AAA', 'BBB'], [event('AAA','a'), candidate]), ['BBB'])
+
+    def test_bundle25_invalid_submission_number(self):
+        candidate = dict(event('BBB','b'),submission_type=99)
+        self.assertEqual(acquisition_gap(['AAA', 'BBB'], [event('AAA','a'), candidate]), ['BBB'])
+
+    def test_bundle25_missing_reporting_basis(self):
+        candidate = dict(event('BBB','b'),reporting_basis=None)
+        self.assertEqual(acquisition_gap(['AAA', 'BBB'], [event('AAA','a'), candidate]), ['BBB'])
+
+    def test_bundle25_missing_submission_type(self):
+        candidate = dict(event('BBB','b'),submission_type=None)
+        self.assertEqual(acquisition_gap(['AAA', 'BBB'], [event('AAA','a'), candidate]), ['BBB'])
+
+    def test_bundle25_invalid_quarter_text(self):
+        candidate = dict(event('BBB','b'),quarter_end='tomorrow')
+        self.assertEqual(acquisition_gap(['AAA', 'BBB'], [event('AAA','a'), candidate]), ['BBB'])
+
+    def test_bundle25_impossible_leap_day(self):
+        candidate = dict(event('BBB','b'),quarter_end='2025-02-29')
+        self.assertEqual(acquisition_gap(['AAA', 'BBB'], [event('AAA','a'), candidate]), ['BBB'])
+
+    def test_bundle25_invalid_date_type(self):
+        candidate = dict(event('BBB','b'),quarter_end=20260630)
+        self.assertEqual(acquisition_gap(['AAA', 'BBB'], [event('AAA','a'), candidate]), ['BBB'])
+
+    def test_bundle25_timestamp_missing_offset(self):
+        candidate = dict(event('BBB','b'),publication_ts='2026-07-20T10:00:00')
+        self.assertEqual(acquisition_gap(['AAA', 'BBB'], [event('AAA','a'), candidate]), ['BBB'])
+
+    def test_bundle25_publication_after_availability_different_offset(self):
+        candidate = dict(event('BBB','b'),publication_ts='2026-07-20T11:00:00+05:30',availability_ts='2026-07-20T04:00:00+00:00')
+        self.assertEqual(acquisition_gap(['AAA', 'BBB'], [event('AAA','a'), candidate]), ['BBB'])
+
+    def test_bundle25_valid_bse(self):
+        candidate = dict(event('BBB','b'),source_exchange='BSE')
+        self.assertEqual(acquisition_gap(['AAA', 'BBB'], [event('AAA','a'), candidate]), [])
+
+    def test_bundle25_valid_revised(self):
+        candidate = dict(event('BBB','b'),submission_type='REVISED')
+        self.assertEqual(acquisition_gap(['AAA', 'BBB'], [event('AAA','a'), candidate]), [])
+
+    def test_bundle25_valid_standalone(self):
+        candidate = dict(event('BBB','b'),reporting_basis='STANDALONE')
+        self.assertEqual(acquisition_gap(['AAA', 'BBB'], [event('AAA','a'), candidate]), [])
+
+    def test_bundle25_valid_utc(self):
+        candidate = dict(event('BBB','b'),publication_ts='2026-07-20T04:30:00Z',availability_ts='2026-07-20T04:30:00Z')
+        self.assertEqual(acquisition_gap(['AAA', 'BBB'], [event('AAA','a'), candidate]), [])
+
+    def test_bundle25_valid_later_availability(self):
+        candidate = dict(event('BBB','b'),availability_ts='2026-07-21T10:00:00+05:30')
+        self.assertEqual(acquisition_gap(['AAA', 'BBB'], [event('AAA','a'), candidate]), [])
+
+    def test_bundle25_valid_lowercase_exchange(self):
+        candidate = dict(event('BBB','b'),source_exchange='bse')
+        self.assertEqual(acquisition_gap(['AAA', 'BBB'], [event('AAA','a'), candidate]), [])
+
+    def test_bundle25_valid_exchange_whitespace(self):
+        candidate = dict(event('BBB','b'),source_exchange=' NSE ')
+        self.assertEqual(acquisition_gap(['AAA', 'BBB'], [event('AAA','a'), candidate]), [])
+
+    def test_bundle25_valid_symbol_alias(self):
+        candidate = dict(event('MANDM','b'))
+        self.assertEqual(acquisition_gap(['AAA', 'M&M'], [event('AAA','a'), candidate]), ['M&M'])
+
+    def test_bundle25_valid_symbol_case(self):
+        candidate = dict(event('bbb','b'))
+        self.assertEqual(acquisition_gap(['AAA', 'BBB'], [event('AAA','a'), candidate]), [])
+
+    def test_bundle25_valid_duplicate_events(self):
+        candidate = dict(event('BBB','b'))
+        self.assertEqual(acquisition_gap(['AAA', 'BBB'], [event('AAA','a'), candidate, candidate]), [])
+
     def test_reports_incremental_official_recovery(self):
         before = [event("AAA", "a")]
         recovered = [event("BBB", "b")]
