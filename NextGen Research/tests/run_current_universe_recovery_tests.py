@@ -175,7 +175,7 @@ class CurrentUniverseRecoveryTests(unittest.TestCase):
 
     def test_bundle25_valid_symbol_alias(self):
         candidate = dict(event('MANDM','b'))
-        self.assertEqual(acquisition_gap(['AAA', 'M&M'], [event('AAA','a'), candidate]), ['M&M'])
+        self.assertEqual(acquisition_gap(['AAA', 'M&M'], [event('AAA','a'), candidate]), [])
 
     def test_bundle25_valid_symbol_case(self):
         candidate = dict(event('bbb','b'))
