@@ -217,6 +217,13 @@ class CurrentUniverseRecoveryTests(unittest.TestCase):
         numeric = dict(event("BBB", "b"), symbol=123)
         self.assertEqual(acquisition_gap(["BBB"], [numeric]), ["BBB"])
 
+    def test_canonical_revision_from_phase2a_counts_as_covered(self):
+        revised = dict(event("BBB", "b"), submission_type="REVISION")
+        self.assertEqual(acquisition_gap(["BBB"], [revised]), [])
+        report = recovery_summary(symbols=["BBB"], existing=[], recovered=[revised])
+        self.assertEqual(report["covered_after"], 1)
+        self.assertEqual(report["recovered_symbols"], ["BBB"])
+
     def test_reports_incremental_official_recovery(self):
         before = [event("AAA", "a")]
         recovered = [event("BBB", "b")]
