@@ -208,7 +208,14 @@ def process(event):
         return {"symbol":event.get("symbol"),"domain":domain,"status":"DISPLAY_XBRL_MISMATCH",
                 "raw":raw_values[0],"displayed":displayed[:6]}
 
-    # Deterministic preference: exact RAW, then X100, then DIV100; numeric tie.
+    # Different displayed values may represent current/prior columns or
+    # competing scale interpretations. Without a column-context proof, never
+    # silently pick one as the current-period filing value.
+    unique_display={round(float(value),8) for value,rec in matches}
+    if len(unique_display)!=1:
+        return {"symbol":event.get("symbol"),"domain":domain,
+                "status":"AMBIGUOUS_DISPLAY_PERIOD_OR_SCALE",
+                "raw":raw_values[0],"displayed_candidates":sorted(unique_display)}
     order={"RAW":0,"RAW_X100":1,"RAW_DIV100":2}
     matches.sort(key=lambda x:(order[x[1]["normalization"]],x[1]["absolute_error"],x[0]))
     display_value,rec=matches[0]
