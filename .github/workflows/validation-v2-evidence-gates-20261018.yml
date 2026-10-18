@@ -1,0 +1,32 @@
+name: V2 actual-evidence readiness bundle
+on:
+  push:
+    branches: [validation-v2-evidence-gates-20261018]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  evidence-gates:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install coverage validation dependencies
+        run: python -m pip install numpy pandas requests
+      - name: Validate actual-snapshot comparator and fail-closed evidence
+        run: |
+          python .ci/recommendation_audit/test_actual_snapshot_compare_v2.py -v
+          python .ci/recommendation_audit/test_full_universe.py -v
+      - name: Validate V2 recovery and production decision invariants
+        run: |
+          python "NextGen Research/tests/run_complete_financial_coverage_v2_tests.py"
+          python "NextGen Research/tests/run_mixed_event_shadow_tests.py"
+          python .ci/native140/test_live_decision_v1.py
+          python .ci/recommendation_audit/test_position_metadata_batch.py
+          python .ci/recommendation_audit/test_thesis_session_consistency.py
