@@ -47,8 +47,8 @@ summary={"schema":"SRE_OVERNIGHT_READ_ONLY_AUDIT_V1","generated_utc":datetime.no
 with (REPORT/"summary.md").open("w",encoding="utf-8") as f:
  f.write("# SRE overnight validation\n\nNo production write or trading authority.\n\n| Check | Status |\n|---|---|\n")
  for x in results:f.write(f"| {x['test']} | {x['status']} |\n")
- f.write("\\n## Failure triage\\n\\n")
+ f.write("\n## Failure triage\n\n")
  for x in results:
-  if x["status"]!="PASS":f.write(f"- **{x['test']}**: {x.get('diagnosis')}; see {x['test']}.log\\n")
+  if x["status"]!="PASS":f.write(f"- **{x['test']}**: {x.get('diagnosis')}; see {x['test']}.log\n")
 print(json.dumps(summary,indent=2))
 sys.exit(0 if all(x["status"]=="PASS" for x in results) else 1)
