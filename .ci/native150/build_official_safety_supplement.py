@@ -1,5 +1,6 @@
 from __future__ import annotations
 import html
+from datetime import date, datetime
 import json
 import math
 import os
@@ -158,6 +159,19 @@ def valid_corporate_debt_equity(value):
         return False
     return math.isfinite(value) and 0.0<=value<=100.0
 
+def pit_availability_is_valid(availability, quarter_end):
+    """Official filing cannot be PIT-safe without dated, offset-aware availability."""
+    try:
+        period = date.fromisoformat(str(quarter_end))
+        if isinstance(availability, datetime):
+            moment = availability
+        else:
+            moment = datetime.fromisoformat(str(availability).replace("Z", "+00:00"))
+        return moment.tzinfo is not None and moment.utcoffset() is not None and moment.date() >= period
+    except (ValueError, TypeError, OverflowError):
+        return False
+
+
 def process(event):
     xurl=event.get("xbrl_url")
     ixurl=event.get("ixbrl_url")
@@ -220,6 +234,9 @@ def process(event):
             "normalization":rec["normalization"],
         }
     availability=effective_availability_ts(event)
+    if not pit_availability_is_valid(availability, event.get("quarter_end")):
+        return {"symbol":event.get("symbol"),"domain":domain,
+                "status":"UNVERIFIABLE_PIT_PUBLICATION_TIMESTAMP"}
     return {
         "schema":"SRE_PIT_SAFETY_SUPPLEMENT_ROW_V1",
         "symbol":event.get("symbol"),
