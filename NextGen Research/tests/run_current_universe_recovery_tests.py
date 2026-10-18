@@ -34,6 +34,16 @@ class CurrentUniverseRecoveryTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "DUPLICATE"):
             symbols_from_live_snapshot({"candidates": [{"symbol": "AAA"}, {"symbol": "aaa"}]})
 
+    def test_unverified_events_do_not_count_as_official_coverage(self):
+        valid = event("AAA", "a")
+        missing_source = dict(event("BBB", "b"), source_exchange=None)
+        missing_timestamp = dict(event("CCC", "c"), availability_ts=None)
+        self.assertEqual(acquisition_gap(["AAA", "BBB", "CCC"], [valid, missing_source, missing_timestamp]), ["BBB", "CCC"])
+        report = recovery_summary(symbols=["AAA", "BBB", "CCC"], existing=[valid, missing_source], recovered=[missing_timestamp])
+        self.assertEqual(report["covered_before"], 1)
+        self.assertEqual(report["covered_after"], 1)
+        self.assertEqual(report["missing_after"], ["BBB", "CCC"])
+
     def test_reports_incremental_official_recovery(self):
         before = [event("AAA", "a")]
         recovered = [event("BBB", "b")]
