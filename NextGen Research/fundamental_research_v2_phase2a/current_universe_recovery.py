@@ -29,7 +29,16 @@ def symbols_from_live_snapshot(snapshot: dict) -> list[str]:
 def symbols_with_events(events: Iterable[dict]) -> set[str]:
     result = set()
     for event in events:
-        result.add(normalize_symbol(event.get("symbol")))
+        if not isinstance(event, dict):
+            continue
+        if str(event.get("source_exchange") or "").upper() not in {"NSE", "BSE"}:
+            continue
+        if not event.get("publication_ts") or not event.get("availability_ts"):
+            continue
+        try:
+            result.add(normalize_symbol(event.get("symbol")))
+        except (ValueError, TypeError):
+            continue
     return result
 
 
