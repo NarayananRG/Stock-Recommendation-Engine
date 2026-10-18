@@ -49,7 +49,7 @@ def _valid_official_event(event: object) -> bool:
         date.fromisoformat(quarter)
         if str(event.get("reporting_basis") or "").strip().upper() not in {"STANDALONE", "CONSOLIDATED"}:
             return False
-        if str(event.get("submission_type") or "").strip().upper() not in {"ORIGINAL", "REVISED"}:
+        if str(event.get("submission_type") or "").strip().upper() not in {"ORIGINAL", "REVISED", "REVISION"}:
             return False
         timestamps = []
         for field in ("publication_ts", "availability_ts"):
