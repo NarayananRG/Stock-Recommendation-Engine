@@ -51,7 +51,14 @@ def run_tests():
     assert result["historical_validation"]["forward_outcome_evidence_supplied"] is False
     assert "No independently verified" in result["promotion_blocker"]
     # Elapsed weekdays do not prove that any 20-session outcome is available.
-    long_calendar = MODULE.evaluate_snapshots([MemoryPath()], date(2027, 3, 1))
+    class LaterSession(MemoryPath):
+        name = "two.json"
+        def read_text(self, encoding="utf-8"):
+            later = json.loads(super().read_text(encoding=encoding))
+            later["run"]["market_session"] = "2027-02-26"
+            later["run"]["run_id"] = "r2"
+            return json.dumps(later)
+    long_calendar = MODULE.evaluate_snapshots([MemoryPath(), LaterSession()], date(2027, 3, 1))
     assert long_calendar["historical_validation"]["calendar_weekdays_elapsed_upper_bound"] > 20
     assert long_calendar["historical_validation"]["matured_out_of_sample_cohorts"] == 0
     assert long_calendar["historical_validation"]["outcome_quality_comparison_available"] is False
