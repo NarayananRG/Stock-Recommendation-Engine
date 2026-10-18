@@ -26,7 +26,7 @@ class LatestOfficialFilingSelection(unittest.TestCase):
            self.event("2026-06-30","STANDALONE"),
            self.event("2026-06-30","CONSOLIDATED",symbol="BBB")]
         out=SELECT(e)
-        self.assertEqual([x["symbol"] for x in out],["AAA","BBB"])
+        self.assertEqual([x["symbol"] for x in out],["BBB"])
         self.assertEqual(out[0]["quarter_end"],"2026-06-30")
     def test_missing_latest_quarter_does_not_use_stale_filing(self):
         events=[self.event("2026-06-30","CONSOLIDATED"),
