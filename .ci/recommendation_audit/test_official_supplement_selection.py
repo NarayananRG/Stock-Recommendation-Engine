@@ -28,6 +28,17 @@ class LatestOfficialFilingSelection(unittest.TestCase):
         out=SELECT(e)
         self.assertEqual([x["symbol"] for x in out],["AAA","BBB"])
         self.assertEqual(out[0]["quarter_end"],"2026-06-30")
+    def test_missing_latest_quarter_does_not_use_stale_filing(self):
+        events=[self.event("2026-06-30","CONSOLIDATED"),
+                self.event("2026-09-30","CONSOLIDATED",url="")]
+        self.assertEqual(SELECT(events),[])
+    def test_latest_quarter_can_use_valid_standalone(self):
+        events=[self.event("2026-06-30","CONSOLIDATED"),
+                self.event("2026-09-30","CONSOLIDATED",url=""),
+                self.event("2026-09-30","STANDALONE")]
+        chosen=SELECT(events)[0]
+        self.assertEqual(chosen["quarter_end"],"2026-09-30")
+        self.assertEqual(chosen["reporting_basis"],"STANDALONE")
     def test_does_not_generate_missing_filing(self):
         self.assertEqual(SELECT([self.event("2026-06-30","STANDALONE",url="")]),[])
 if __name__=="__main__":unittest.main()
