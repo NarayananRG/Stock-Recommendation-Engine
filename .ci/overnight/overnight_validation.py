@@ -42,7 +42,8 @@ for name,path in CASES:
   if isinstance(partial,bytes): partial=partial.decode("utf-8",errors="replace")
   (REPORT/(name+".log")).write_text(str(partial)[-300000:],encoding="utf-8")
   results.append({"test":name,"path":path,"status":"TIMEOUT","exit_code":None,"diagnosis":"TEST_EXCEEDED_180_SECONDS"})
-summary={"schema":"SRE_OVERNIGHT_READ_ONLY_AUDIT_V1","generated_utc":datetime.now(timezone.utc).isoformat(),"git_ref":os.environ.get("GITHUB_SHA",""),"authority":"AUDIT_ONLY","production_modified":False,"results":results}
+source_sha=subprocess.check_output(["git","rev-parse","HEAD"],cwd=ROOT,text=True).strip()
+summary={"schema":"SRE_OVERNIGHT_READ_ONLY_AUDIT_V1","generated_utc":datetime.now(timezone.utc).isoformat(),"git_ref":source_sha,"workflow_trigger_sha":os.environ.get("GITHUB_SHA",""),"authority":"AUDIT_ONLY","production_modified":False,"results":results}
 (REPORT/"summary.json").write_text(json.dumps(summary,indent=2)+"\n",encoding="utf-8")
 with (REPORT/"summary.md").open("w",encoding="utf-8") as f:
  f.write("# SRE overnight validation\n\nNo production write or trading authority.\n\n| Check | Status |\n|---|---|\n")
