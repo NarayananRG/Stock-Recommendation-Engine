@@ -199,6 +199,20 @@ class CurrentUniverseRecoveryTests(unittest.TestCase):
         report = recovery_summary(symbols=["AAA"], existing=[event("AAA", "a")], recovered=[None])
         self.assertEqual(report["recovered_event_source_counts"], {"INVALID_EVENT": 1})
 
+    def test_invalid_existing_rows_do_not_crash_recovery(self):
+        valid = event("AAA", "a")
+        invalid = dict(event("BBB", "b"), quarter_end="20260630")
+        report = recovery_summary(
+            symbols=["AAA", "BBB"], existing=[valid, invalid, None], recovered=[]
+        )
+        self.assertEqual(report["covered_before"], 1)
+        self.assertEqual(report["covered_after"], 1)
+        self.assertEqual(report["missing_after"], ["BBB"])
+
+    def test_compact_quarter_date_is_not_canonical(self):
+        compact = dict(event("BBB", "b"), quarter_end="20260630")
+        self.assertEqual(acquisition_gap(["BBB"], [compact]), ["BBB"])
+
     def test_reports_incremental_official_recovery(self):
         before = [event("AAA", "a")]
         recovered = [event("BBB", "b")]
