@@ -20,8 +20,12 @@ class Readiness(unittest.TestCase):
   d=m.assess(f,tech());self.assertIn("debt_equity",d["missing_recovery_evidence"]);self.assertTrue(d["momentum_evidence_ready"])
   f["balance_sheet"]["debt_equity_ratio"]=-0.5
   self.assertNotIn("debt_equity",m.assess(f,tech())["missing_recovery_evidence"])
+  self.assertTrue(m.assess(f,tech())["negative_equity_or_ratio_warning"])
+  self.assertFalse(m.assess(f,tech())["recovery_evidence_ready"])
  def test_fails_closed_for_stale_and_adverse(self):
   f=profile();f["point_in_time_safe"]=False
+  self.assertFalse(m.assess(f,tech())["momentum_evidence_ready"])
+  f=profile();f["filing_freshness"]=None
   self.assertFalse(m.assess(f,tech())["momentum_evidence_ready"])
   f=profile();f["risk_event"]["strong_deterioration_transition"]=True
   self.assertFalse(m.assess(f,tech())["recovery_evidence_ready"])
