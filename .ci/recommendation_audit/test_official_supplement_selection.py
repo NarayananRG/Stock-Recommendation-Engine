@@ -8,7 +8,7 @@ import unittest
 SOURCE=Path(__file__).resolve().parents[1]/"native150"/"build_official_safety_supplement.py"
 TREE=ast.parse(SOURCE.read_text(encoding="utf-8"))
 FN=next(n for n in TREE.body if isinstance(n,ast.FunctionDef) and n.name=="selected_latest_symbol_events")
-ns={"latest_event_groups":lambda events:events,"defaultdict":defaultdict,"sorted":sorted,"str":str}
+ns={"latest_event_groups":lambda events:events,"defaultdict":defaultdict,"sorted":sorted,"str":str,"official":lambda url:url.startswith("https://nsearchives.nseindia.com/")}
 exec(compile(ast.Module(body=[FN],type_ignores=[]),str(SOURCE),"exec"),ns)
 SELECT=ns["selected_latest_symbol_events"]
 
@@ -28,6 +28,10 @@ class LatestOfficialFilingSelection(unittest.TestCase):
         out=SELECT(e)
         self.assertEqual([x["symbol"] for x in out],["AAA","BBB"])
         self.assertEqual(out[0]["quarter_end"],"2026-06-30")
+    def test_nonofficial_and_incomplete_events_excluded(self):
+        events=[self.event("2026-09-30","CONSOLIDATED",url="https://example.com/report.xml"),self.event("2026-06-30","STANDALONE"),self.event("2026-09-30","UNKNOWN")]
+        chosen=SELECT(events)
+        self.assertEqual(chosen[0]["quarter_end"],"2026-06-30")
     def test_does_not_generate_missing_filing(self):
         self.assertEqual(SELECT([self.event("2026-06-30","STANDALONE",url="")]),[])
 if __name__=="__main__":unittest.main()
