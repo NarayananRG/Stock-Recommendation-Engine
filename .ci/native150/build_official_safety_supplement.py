@@ -72,7 +72,7 @@ def selected_latest_symbol_events(events):
         by[str(e.get("symbol"))].append(e)
     result=[]
     for symbol,items in sorted(by.items()):
-        with_url=[e for e in items if e.get("xbrl_url")]
+        with_url=[e for e in items if e.get("xbrl_url") and official(e.get("xbrl_url")) and e.get("quarter_end") and e.get("reporting_basis") in {"CONSOLIDATED","STANDALONE"}]
         if not with_url:
             continue
         with_url.sort(key=lambda e:(str(e.get("quarter_end") or ""), e.get("reporting_basis")=="CONSOLIDATED"),reverse=True)
