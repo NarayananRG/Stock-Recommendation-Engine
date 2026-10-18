@@ -76,7 +76,8 @@ def selected_latest_symbol_events(events):
         if not with_url:
             continue
         with_url.sort(key=lambda e:(str(e.get("quarter_end") or ""), e.get("reporting_basis")=="CONSOLIDATED"),reverse=True)
-        chosen=next((e for e in with_url if e.get("reporting_basis")=="CONSOLIDATED"),with_url[0])
+        # Choose the latest quarter first; consolidated is preferred only within that quarter.
+        chosen=with_url[0]
         result.append(chosen)
     return result
 
