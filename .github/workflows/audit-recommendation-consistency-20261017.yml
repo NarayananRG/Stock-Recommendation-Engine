@@ -1,0 +1,91 @@
+name: SRE Recommendation Consistency Read-Only Audit
+on:
+  push:
+    branches: [audit-recommendation-consistency-20261017]
+    paths:
+      - ".github/workflows/audit-recommendation-consistency-20261017.yml"
+      - ".ci/forecast_audit/real_evidence_audit.py"
+      - ".ci/recommendation_audit/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  recommendation-consistency:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate ranking and capital plan batch
+        run: python .ci/recommendation_audit/test_rank_plan_batch.py -v
+      - name: Validate paper allocation and monitoring batch
+        run: python .ci/recommendation_audit/test_paper_monitor_batch.py -v
+      - name: Validate stale-session thesis and weekly confirmation batch
+        run: python .ci/recommendation_audit/test_thesis_session_consistency.py -v
+      - name: Validate indicator and weekly technical batch
+        run: python .ci/recommendation_audit/test_technical_batch.py -v
+      - name: Validate batched recommendation router safeguards
+        run: python .ci/recommendation_audit/test_router_batch_sanity.py -v
+      - name: Validate technical price sanity
+        run: python .ci/recommendation_audit/test_technical_price_sanity.py -v
+      - name: Validate strict fundamental PIT availability gate
+        run: python .ci/recommendation_audit/test_fundamental_pit_gate.py -v
+      - name: Validate quantitative evidence type safeguards
+        run: python .ci/recommendation_audit/test_boolean_numeric_evidence.py -v
+      - name: Validate official XBRL numeric extraction
+        run: python .ci/recommendation_audit/test_xbrl_numeric_hygiene.py -v
+      - name: Validate canonical debt source-gap integration
+        run: python .ci/recommendation_audit/test_panel_gap_integration.py -v
+      - name: Validate missing-field source taxonomy
+        run: python .ci/recommendation_audit/test_missing_field_taxonomy.py -v
+      - name: Validate fundamental panel numeric hygiene
+        run: python .ci/recommendation_audit/test_panel_numeric_quality.py -v
+      - name: Validate evidence trace audit
+        run: python .ci/recommendation_audit/test_evidence_trace.py -v
+      - name: Verify source contracts for event severity and debt mapping
+        run: python .ci/recommendation_audit/source_contract_trace.py
+      - name: Validate event severity and debt provenance audit
+        run: python .ci/recommendation_audit/test_severity_debt.py -v
+      - name: Validate raw decision-state evidence audit
+        run: python .ci/recommendation_audit/test_raw_state_enums.py -v
+      - name: Validate component diagnostics without changing recommendations
+        run: python .ci/recommendation_audit/test_component_diagnostics.py -v
+      - name: Validate gate-level restrictiveness reporter
+        run: python .ci/recommendation_audit/test_gate_restrictiveness.py -v
+      - name: Validate full-universe evidence reporter
+        run: python .ci/recommendation_audit/test_full_universe.py -v
+      - name: Verify production LIVE_DECISION_V1 router regression
+        run: python .ci/native140/test_live_decision_v1.py -v
+      - name: Validate official daily-market refresh with deterministic test cases
+        run: python .ci/native146/test_official_refresh.py -v
+      - name: Audit model calibration provenance without promotion
+        run: python .ci/forecast_audit/real_evidence_audit.py
+      - name: Trace decision/forecast separation and freshness contracts
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          router = Path(".ci/native140/live_decision_v1.py").read_text(encoding="utf-8")
+          patch = Path(".ci/native140/patch140.py").read_text(encoding="utf-8")
+          analysis = Path(".ci/native148/patch148_analysis_refresh.py").read_text(encoding="utf-8")
+          refresh = Path(".ci/native146/official_daily_refresh_v3.py").read_text(encoding="utf-8")
+          route = router.split("def route(",1)[1].split("def lane_counts(",1)[0]
+          rankings = router.split("def rank_candidates(",1)[1].split("def monitor(",1)[0]
+          requirements = {
+              "router has current-session execution gate": "official_current" in route and "executable=" in route,
+              "recovery buy accepts independent fundamental thesis": ("elif official_current and recovery_valid:" in route or "elif official_current is True and recovery_valid:" in route),
+              "router does not consume displayed forecast": "expected_return" not in route,
+              "rank does not consume displayed forecast": "expected_return" not in rankings,
+              "materialization preserves legacy expected return": '"expected_return":None' in patch and '"legacy_opportunity_status"' in patch,
+              "freshness distinguishes stale analysis": "ANALYSIS REFRESH REQUIRED" in analysis,
+              "official refresh checks expected session": "LOCAL_CACHE_LATEST_MISMATCH" in refresh,
+          }
+          for name, passed in requirements.items():
+              print(("PASS" if passed else "FAIL")+": "+name)
+          if not all(requirements.values()):
+              raise SystemExit("Audit code contract changed; manual investigation required")
+          print("FINDING: legacy displayed forecast and LIVE_DECISION_V1 BUY authority are separate.")
+          print("LIMITATION: This static audit cannot prove actual 2026-10-16 GODREJCP/HINDZINC run values, model calibration or forecast horizon without the local run snapshot.")
+          print("NO PRODUCTION FILES MODIFIED; NO THRESHOLDS ALTERED.")
+          PY

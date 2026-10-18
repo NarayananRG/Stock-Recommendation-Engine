@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - fix-official-financial-recovery-20261018
+      - fix-complete-financial-recovery-v2-20261018
   pull_request:
 
 jobs:
@@ -20,6 +21,9 @@ jobs:
         run: python -m pip install numpy pandas requests
       - name: Current-universe recovery tests
         run: python "NextGen Research/tests/run_current_universe_recovery_tests.py"
+
+      - name: Complete financial coverage V2 contract tests
+        run: python "NextGen Research/tests/run_complete_financial_coverage_v2_tests.py"
       - name: Mixed-event shadow tests
         run: python "NextGen Research/tests/run_mixed_event_shadow_tests.py"
       - name: Phase 2A mapping and panel tests
@@ -35,3 +39,9 @@ jobs:
         run: python -m unittest discover .ci/recommendation_audit -p "test_*.py"
       - name: Recommendation consistency tests
         run: python .ci/native140/test_live_decision_v1.py
+      - name: Official refresh and forecast-provenance safeguards
+        shell: pwsh
+        run: |
+          python .ci/native146/test_official_refresh.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python .ci/forecast_audit/real_evidence_audit.py
