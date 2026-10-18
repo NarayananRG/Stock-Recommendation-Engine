@@ -155,10 +155,10 @@ edit("stock_app/live_decision_v1.py", '''    if states["financial_domain"]:
         if missing:
             parts.append("Missing financial-domain evidence: " + ", ".join(missing) + ".")
 ''')
-edit("stock_app/live_decision_v1.py", '''    momentum_valid = (strong and safety and fundamental_ready and atr is not None and atr <= 6 and
+edit("stock_app/live_decision_v1.py", '''    momentum_valid = (strong and safety and fundamental_ready and atr is not None and 0 <= atr <= 6 and
                       (s["financial_domain"] or (balance_ready and cash_ready)) and regime in ("BULL", "MIXED"))
 ''', '''    domain_safety_ready = s["financial_domain_ready"] if s["financial_domain"] else (balance_ready and cash_ready)
-    momentum_valid = (strong and safety and fundamental_ready and atr is not None and atr <= 6 and
+    momentum_valid = (strong and safety and fundamental_ready and atr is not None and 0 <= atr <= 6 and
                       domain_safety_ready and regime in ("BULL", "MIXED"))
 ''')
 edit("stock_app/live_decision_v1.py", '''    recovery_valid = (depressed and safety and fundamental_ready and cash_ready and balance_ready
