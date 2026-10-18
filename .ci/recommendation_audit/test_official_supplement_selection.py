@@ -8,7 +8,7 @@ import unittest
 SOURCE=Path(__file__).resolve().parents[1]/"native150"/"build_official_safety_supplement.py"
 TREE=ast.parse(SOURCE.read_text(encoding="utf-8"))
 FN=next(n for n in TREE.body if isinstance(n,ast.FunctionDef) and n.name=="selected_latest_symbol_events")
-ns={"latest_event_groups":lambda events:events,"defaultdict":defaultdict,"sorted":sorted,"str":str}
+ns={"latest_event_groups":lambda events:events,"defaultdict":defaultdict,"sorted":sorted,"str":str,"effective_availability_ts":lambda e:e.get("availability_ts")}
 exec(compile(ast.Module(body=[FN],type_ignores=[]),str(SOURCE),"exec"),ns)
 SELECT=ns["selected_latest_symbol_events"]
 
@@ -28,6 +28,18 @@ class LatestOfficialFilingSelection(unittest.TestCase):
         out=SELECT(e)
         self.assertEqual([x["symbol"] for x in out],["AAA","BBB"])
         self.assertEqual(out[0]["quarter_end"],"2026-06-30")
+    def test_historical_cutoff_excludes_future_publications(self):
+        old=self.event("2026-03-31","CONSOLIDATED")
+        old["availability_ts"]="2026-05-10T10:00:00+05:30"
+        future=self.event("2026-06-30","STANDALONE")
+        future["availability_ts"]="2026-08-12T10:00:00+05:30"
+        selected=SELECT([old,future],"2026-07-15T17:00:00+05:30")
+        self.assertEqual(selected[0]["quarter_end"],"2026-03-31")
+    def test_no_timestamp_fails_closed_under_cutoff(self):
+        self.assertEqual(SELECT([self.event("2026-06-30","STANDALONE")],"2026-10-01T17:00:00+05:30"),[])
+    def test_naive_cutoff_is_rejected(self):
+        with self.assertRaisesRegex(ValueError,"TIMEZONE_REQUIRED"):
+            SELECT([self.event("2026-06-30","STANDALONE")],"2026-10-01")
     def test_does_not_generate_missing_filing(self):
         self.assertEqual(SELECT([self.event("2026-06-30","STANDALONE",url="")]),[])
 if __name__=="__main__":unittest.main()
