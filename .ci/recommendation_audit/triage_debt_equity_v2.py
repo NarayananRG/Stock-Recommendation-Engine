@@ -43,13 +43,14 @@ def triage(matrix_path:Path,expected_symbols:int=200,expected_metrics:int=34)->d
         elif status in {"PERIOD_MISMATCH","REPORTING_BASIS_MISMATCH"}:
             classification="PERIOD_OR_BASIS_MISMATCH"
         elif all(components.values()) and all((r["after_status"]=="AVAILABLE_BUT_NOT_MAPPED") for r in components.values()):
-            classification="COMPONENT_MAPPING_REVIEW"
+            classification="COMPONENT_CONCEPTS_OBSERVED_UNVERIFIED"
         elif any(r and r["after_status"]=="AVAILABLE_BUT_NOT_MAPPED" for r in components.values()):
-            classification="PARTIAL_COMPONENT_MAPPING_REVIEW"
+            classification="PARTIAL_COMPONENT_CONCEPTS_OBSERVED_UNVERIFIED"
         else:
             classification="OFFICIAL_COMPONENTS_NOT_VERIFIED"
+        same_context=all(r is not None and all(r.get(k)==de.get(k) and bool(de.get(k)) for k in ("quarter_end","reporting_basis","publication_ts","event_id")) for r in components.values())
         record={"symbol":sym,"domain":de["domain"],"de_status":status,
-                "classification":classification,"quarter_end":de["quarter_end"],
+                "classification":classification,"component_context_matches":same_context,"quarter_end":de["quarter_end"],
                 "reporting_basis":de["reporting_basis"],"publication_ts":de["publication_ts"],
                 "source_url":de["source_url"],"event_id":de["event_id"],
                 "component_statuses":{key:(r["after_status"] if r else "NO_MATRIX_ROW") for key,r in components.items()},
