@@ -185,6 +185,20 @@ class CurrentUniverseRecoveryTests(unittest.TestCase):
         candidate = dict(event('BBB','b'))
         self.assertEqual(acquisition_gap(['AAA', 'BBB'], [event('AAA','a'), candidate, candidate]), [])
 
+    def test_rejects_non_mapping_live_snapshot(self):
+        for snapshot in (None, [], "invalid"):
+            with self.subTest(snapshot=snapshot), self.assertRaisesRegex(ValueError, "LIVE_SNAPSHOT_INVALID"):
+                symbols_from_live_snapshot(snapshot)
+
+    def test_rejects_missing_or_nonstring_live_symbol(self):
+        for symbol in (None, 42, "", "  "):
+            with self.subTest(symbol=symbol), self.assertRaisesRegex(ValueError, "LIVE_SNAPSHOT_SYMBOL_REQUIRED"):
+                symbols_from_live_snapshot({"candidates": [{"symbol": symbol}]})
+
+    def test_source_summary_handles_malformed_recovery_event(self):
+        report = recovery_summary(symbols=["AAA"], existing=[event("AAA", "a")], recovered=[None])
+        self.assertEqual(report["recovered_event_source_counts"], {"INVALID_EVENT": 1})
+
     def test_reports_incremental_official_recovery(self):
         before = [event("AAA", "a")]
         recovered = [event("BBB", "b")]
