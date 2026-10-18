@@ -1,0 +1,32 @@
+name: Debt Equity XBRL Instant Context Validation
+on:
+  push:
+    branches: [fix-de-context-instant-oct18]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: XBRL context and recovery selection boundaries
+        run: |
+          python .ci/recommendation_audit/test_debt_equity_xbrl_instant.py -v
+          python .ci/recommendation_audit/test_official_supplement_selection.py -v
+          python .ci/recommendation_audit/test_supplement_numeric_policy.py -v
+          python .ci/recommendation_audit/test_triage_debt_equity_v2.py -v
+      - name: Install recovery dependencies
+        run: python -m pip install numpy pandas requests
+      - name: V2 financial and live decision regression
+        run: |
+          python "NextGen Research/tests/run_complete_financial_coverage_v2_tests.py"
+          python "NextGen Research/tests/run_current_universe_recovery_tests.py"
+          python .ci/native140/test_live_decision_v1.py
