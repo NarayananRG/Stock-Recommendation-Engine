@@ -1,0 +1,29 @@
+name: SRE recovery branch validation
+on:
+  push:
+    branches:
+      - automation-overnight-validation-20261018
+    paths:
+      - 'NextGen Research/fundamental_research_v2_phase2a/**'
+      - 'NextGen Research/tests/run_current_universe_recovery_tests.py'
+      - '.github/workflows/sre-recovery-validation-branch.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  recovery-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile recovery source and tests
+        run: |
+          python -m py_compile 'NextGen Research/fundamental_research_v2_phase2a/current_universe_recovery.py'
+          python -m py_compile 'NextGen Research/tests/run_current_universe_recovery_tests.py'
+      - name: Execute recovery regression suite
+        run: python 'NextGen Research/tests/run_current_universe_recovery_tests.py' -v
