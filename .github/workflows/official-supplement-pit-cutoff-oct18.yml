@@ -1,0 +1,32 @@
+name: Official debt equity recovery selection regression
+on:
+  push:
+    branches: [official-supplement-pit-cutoff-oct18]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify official filing period selection without network
+        run: |
+          python .ci/recommendation_audit/test_official_supplement_selection.py -v
+          python .ci/recommendation_audit/test_supplement_numeric_policy.py -v
+          python .ci/recommendation_audit/test_triage_debt_equity_v2.py -v
+          python .ci/recommendation_audit/test_sector_evidence_readiness.py -v
+      - name: Install financial regression dependencies
+        run: python -m pip install numpy pandas requests
+      - name: Verify V2 recovery and recommendation invariants
+        run: |
+          python "NextGen Research/tests/run_complete_financial_coverage_v2_tests.py"
+          python "NextGen Research/tests/run_current_universe_recovery_tests.py"
+          python .ci/native140/test_live_decision_v1.py
