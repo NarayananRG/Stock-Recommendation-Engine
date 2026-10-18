@@ -46,7 +46,8 @@ def session():
     return s
 
 def official(url):
-    return (urlparse(str(url or "")).hostname or "").lower()==OFFICIAL_HOST
+    parsed=urlparse(str(url or ""))
+    return parsed.scheme=="https" and (parsed.hostname or "").lower()==OFFICIAL_HOST and not parsed.username and not parsed.password
 
 def fetch(url):
     if not official(url):
