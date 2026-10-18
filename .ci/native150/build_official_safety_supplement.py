@@ -72,11 +72,14 @@ def selected_latest_symbol_events(events):
         by[str(e.get("symbol"))].append(e)
     result=[]
     for symbol,items in sorted(by.items()):
-        with_url=[e for e in items if e.get("xbrl_url")]
+        # Do not use an older filing merely because the current/latest quarter
+        # is missing an XBRL document. Keep the gap visible for official recovery.
+        newest=max(str(e.get("quarter_end") or "") for e in items)
+        same_quarter=[e for e in items if str(e.get("quarter_end") or "")==newest]
+        with_url=[e for e in same_quarter if e.get("xbrl_url")]
         if not with_url:
             continue
-        with_url.sort(key=lambda e:(str(e.get("quarter_end") or ""), e.get("reporting_basis")=="CONSOLIDATED"),reverse=True)
-        # Choose the latest quarter first; consolidated is preferred only within that quarter.
+        with_url.sort(key=lambda e:e.get("reporting_basis")=="CONSOLIDATED",reverse=True)
         chosen=with_url[0]
         result.append(chosen)
     return result
