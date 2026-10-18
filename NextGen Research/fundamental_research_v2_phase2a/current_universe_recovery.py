@@ -39,7 +39,10 @@ def _valid_official_event(event: object) -> bool:
     if str(event.get("source_exchange") or "").strip().upper() not in {"NSE", "BSE"}:
         return False
     try:
-        normalize_symbol(event.get("symbol"))
+        symbol = event.get("symbol")
+        if not isinstance(symbol, str) or not symbol.strip():
+            return False
+        normalize_symbol(symbol)
         quarter = event.get("quarter_end")
         if not isinstance(quarter, str) or len(quarter) != 10 or quarter[4] != "-" or quarter[7] != "-":
             return False
