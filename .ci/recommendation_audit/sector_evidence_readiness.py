@@ -18,11 +18,11 @@ def assess(f,t):
         if not valid((f.get("balance_sheet") or {}).get("debt_equity_ratio")):recovery.append("debt_equity")
         if not valid((f.get("cash_flow") or {}).get("latest_operating_cash_flow")):recovery.append("operating_cash_flow")
     if (f.get("valuation") or {}).get("pit_comparison_available") is not True:recovery.append("pit_relative_valuation")
-    safe=f.get("available") is True and f.get("point_in_time_safe") is True and f.get("filing_freshness")!="STALE"
-    adverse=(f.get("risk_event") or {}).get("strong_deterioration_transition") is True
+    safe=f.get("available") is True and f.get("point_in_time_safe") is True and f.get("filing_freshness") in ("CURRENT_FOR_DECISION_TIME","CURRENT")
+    adverse=(f.get("risk_event") or {}).get("strong_deterioration_transition") is True\n    # A negative industrial debt/equity ratio can indicate negative equity; it is not missing data, but must not certify readiness.\n    abnormal_equity=(not fin and valid((f.get("balance_sheet") or {}).get("debt_equity_ratio")) and (f.get("balance_sheet") or {})["debt_equity_ratio"]<0)
     return {"financial_domain":fin,"inapplicable_industrial_metrics":["debt_equity","operating_cash_flow"] if fin else [],
-            "missing_growth_metrics":missing,"missing_recovery_evidence":recovery,"adverse_transition":adverse,
-            "momentum_evidence_ready":safe and not missing and t.get("status")=="READY" and (t.get("multi_timeframe") or {}).get("weekly_trend_confirmed") is True and not adverse,
+            "missing_growth_metrics":missing,"missing_recovery_evidence":recovery,"adverse_transition":adverse,"negative_equity_or_ratio_warning":abnormal_equity,
+            "momentum_evidence_ready":safe and not missing and t.get("status")=="READY" and (t.get("multi_timeframe") or {}).get("weekly_trend_confirmed") is True and not adverse and not abnormal_equity,
             "recovery_evidence_ready":safe and not recovery and not adverse}
 def inventory(payload):
     rows=payload.get("candidates") if isinstance(payload,dict) else None
