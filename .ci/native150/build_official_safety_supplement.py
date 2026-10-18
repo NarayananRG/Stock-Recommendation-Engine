@@ -46,7 +46,8 @@ def session():
     return s
 
 def official(url):
-    return (urlparse(str(url or "")).hostname or "").lower()==OFFICIAL_HOST
+    parsed=urlparse(str(url or ""))
+    return parsed.scheme=="https" and (parsed.hostname or "").lower()==OFFICIAL_HOST and not parsed.username and not parsed.password
 
 def fetch(url):
     if not official(url):
@@ -82,6 +83,8 @@ def selected_latest_symbol_events(events):
     return result
 
 def numeric(value):
+    if isinstance(value,bool):
+        return None
     try:
         v=float(str(value).replace(",","").strip())
         return v if math.isfinite(v) else None
