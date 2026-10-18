@@ -62,6 +62,8 @@ def _valid_official_event(event: object) -> bool:
             timestamps.append(ts)
         if timestamps[1] < timestamps[0]:
             return False
+        if timestamps[0].date() < date.fromisoformat(quarter):
+            return False
     except (ValueError, TypeError, OverflowError):
         return False
     return True
