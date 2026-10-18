@@ -224,6 +224,10 @@ class CurrentUniverseRecoveryTests(unittest.TestCase):
         self.assertEqual(report["covered_after"], 1)
         self.assertEqual(report["recovered_symbols"], ["BBB"])
 
+    def test_publication_before_quarter_end_cannot_count_as_coverage(self):
+        premature = dict(event("BBB", "b"), publication_ts="2026-06-01T10:00:00+05:30", availability_ts="2026-06-01T10:00:00+05:30")
+        self.assertEqual(acquisition_gap(["BBB"], [premature]), ["BBB"])
+
     def test_reports_incremental_official_recovery(self):
         before = [event("AAA", "a")]
         recovered = [event("BBB", "b")]
