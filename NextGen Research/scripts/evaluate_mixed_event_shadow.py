@@ -45,8 +45,8 @@ def classify_mixed_event(fundamental: dict[str, Any]) -> dict[str, Any]:
     balance = normalized_positive - normalized_negative
     freshness = fundamental.get("filing_freshness")
     hard_block = bool(
-        risk.get("strong_deterioration_transition")
-        or fundamental.get("structural_deterioration")
+        risk.get("strong_deterioration_transition") is True
+        or fundamental.get("structural_deterioration") is True
         or freshness not in {"CURRENT_FOR_DECISION_TIME", "CURRENT"}
         or fundamental.get("point_in_time_safe") is not True
     )
@@ -67,7 +67,7 @@ def classify_mixed_event(fundamental: dict[str, Any]) -> dict[str, Any]:
         "negative_weighted_evidence": round(normalized_negative, 8),
         "net_evidence_balance": round(balance, 8),
         "covered_feature_weight": round(covered_weight, 8),
-        "strong_deterioration_transition": bool(risk.get("strong_deterioration_transition")),
+        "strong_deterioration_transition": risk.get("strong_deterioration_transition") is True,
         "filing_freshness": freshness,
         "contributions": contributions,
         "production_action_changed": False,
@@ -151,16 +151,16 @@ def evaluate_snapshots(paths: list[Path], as_of: date) -> dict[str, Any]:
         "historical_validation": {
             "required_forward_sessions": HORIZON_SESSIONS,
             "available_session_span": maturity,
-            "matured_out_of_sample_cohorts": 0 if maturity < HORIZON_SESSIONS else 1,
-            "outcome_quality_comparison_available": maturity >= HORIZON_SESSIONS,
+            "matured_out_of_sample_cohorts": 0,
+            "outcome_quality_comparison_available": False,
+            "calendar_weekdays_elapsed_upper_bound": maturity,
+            "forward_outcome_evidence_supplied": False,
         },
         "production_action_changes": 0,
         "production_rank_changes": 0,
         "promotion_allowed": False,
         "promotion_blocker": (
-            "No snapshot cohort has a mature 20-session forward outcome as of the evaluation date."
-            if maturity < HORIZON_SESSIONS
-            else "Shadow logic requires an independently approved promotion decision."
+            "No independently verified per-symbol 20-session forward price outcomes were supplied; calendar weekdays are not evidence of exchange sessions or performance."
         ),
     }
 
