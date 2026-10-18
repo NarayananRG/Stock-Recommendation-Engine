@@ -65,7 +65,13 @@ def fetch(url):
             time.sleep(.8*(attempt+1))
     raise last or RuntimeError("FETCH_FAILED")
 
-def selected_latest_symbol_events(events):
+def selected_latest_symbol_events(events, decision_asof=None):
+    # Historical replay must select only filings available by the decision cutoff.
+    # No inferred timestamp or quarter-end substitution is allowed.
+    if decision_asof is not None:
+        from datetime import datetime
+        cutoff=datetime.fromisoformat(decision_asof.replace("Z","+00:00"))
+        if cutoff.tzinfo is None: raise ValueError("DECISION_ASOF_TIMEZONE_REQUIRED")
     groups=latest_event_groups(events)
     by=defaultdict(list)
     for e in groups:
@@ -73,6 +79,15 @@ def selected_latest_symbol_events(events):
     result=[]
     for symbol,items in sorted(by.items()):
         with_url=[e for e in items if e.get("xbrl_url")]
+        if decision_asof is not None:
+            eligible=[]
+            for e in with_url:
+                availability=effective_availability_ts(e)
+                if not availability: continue
+                observed=datetime.fromisoformat(str(availability).replace("Z","+00:00"))
+                if observed.tzinfo is None: continue
+                if observed <= cutoff: eligible.append(e)
+            with_url=eligible
         if not with_url:
             continue
         with_url.sort(key=lambda e:(str(e.get("quarter_end") or ""), e.get("reporting_basis")=="CONSOLIDATED"),reverse=True)
@@ -242,7 +257,7 @@ def process(event):
     }
 
 events=json.loads(EVENTS.read_text(encoding="utf-8"))
-selected=selected_latest_symbol_events(events)
+selected=selected_latest_symbol_events(events,os.environ.get("SRE_DECISION_ASOF") or None)
 rows=[]; diagnostics=[]
 with ThreadPoolExecutor(max_workers=6) as pool:
     futures={pool.submit(process,e):e for e in selected}
