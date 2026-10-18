@@ -1,0 +1,32 @@
+name: Official supplement PIT evidence gate
+on:
+  push:
+    branches: [fix-official-supplement-pit-oct18]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test official filing timestamp and selection contracts
+        run: |
+          python .ci/recommendation_audit/test_official_supplement_pit.py -v
+          python .ci/recommendation_audit/test_official_supplement_selection.py -v
+          python .ci/recommendation_audit/test_supplement_numeric_policy.py -v
+          python .ci/recommendation_audit/test_triage_debt_equity_v2.py -v
+      - name: Install financial regression dependencies
+        run: python -m pip install numpy pandas requests
+      - name: Validate V2 fundamental recovery and recommendation router
+        run: |
+          python "NextGen Research/tests/run_complete_financial_coverage_v2_tests.py"
+          python "NextGen Research/tests/run_current_universe_recovery_tests.py"
+          python .ci/native140/test_live_decision_v1.py
