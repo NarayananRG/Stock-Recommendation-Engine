@@ -47,6 +47,19 @@ def run_tests():
     assert result["production_action_changes"] == 0
     assert result["production_rank_changes"] == 0
     assert result["historical_validation"]["matured_out_of_sample_cohorts"] == 0
+    assert result["historical_validation"]["outcome_quality_comparison_available"] is False
+    assert result["historical_validation"]["forward_outcome_evidence_supplied"] is False
+    assert "No independently verified" in result["promotion_blocker"]
+    # Elapsed weekdays do not prove that any 20-session outcome is available.
+    long_calendar = MODULE.evaluate_snapshots([MemoryPath()], date(2027, 3, 1))
+    assert long_calendar["historical_validation"]["calendar_weekdays_elapsed_upper_bound"] > 20
+    assert long_calendar["historical_validation"]["matured_out_of_sample_cohorts"] == 0
+    assert long_calendar["historical_validation"]["outcome_quality_comparison_available"] is False
+    malformed = fundamental(strong="False")
+    assert MODULE.classify_mixed_event(malformed)["classification"] == "MIXED_POSITIVE_BALANCE"
+    assert MODULE.classify_mixed_event(malformed)["strong_deterioration_transition"] is False
+    malformed["structural_deterioration"] = "False"
+    assert MODULE.classify_mixed_event(malformed)["classification"] == "MIXED_POSITIVE_BALANCE"
     assert result["promotion_allowed"] is False
     print("mixed-event shadow tests: PASS")
 
