@@ -1,0 +1,33 @@
+name: Sector evidence readiness audit bundle
+on:
+  push:
+    branches: [evidence-readiness-bundle-oct18]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test dependencies
+        run: python -m pip install numpy pandas requests
+      - name: Audit sector-specific evidence requirements
+        run: |
+          python .ci/recommendation_audit/test_sector_evidence_readiness.py -v
+          python .ci/recommendation_audit/test_ingest_v2_local_comparison.py -v
+          python .ci/recommendation_audit/test_actual_snapshot_compare_v2.py -v
+      - name: Financial recovery and strategy regression
+        run: |
+          python "NextGen Research/tests/run_complete_financial_coverage_v2_tests.py"
+          python "NextGen Research/tests/run_current_universe_recovery_tests.py"
+          python "NextGen Research/tests/run_mixed_event_shadow_tests.py"
+          python .ci/native140/test_live_decision_v1.py
+          python .ci/recommendation_audit/test_position_metadata_batch.py
