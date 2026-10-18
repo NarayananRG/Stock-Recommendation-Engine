@@ -20,6 +20,23 @@ def load_module(name: str, path: Path):
     return module
 
 
+def verified_official_current(decision: dict) -> bool:
+    evidence = decision.get("evidence") or {}
+    return isinstance(evidence, dict) and evidence.get("official_current") is True
+
+
+def validate_recovery_snapshot(snapshot: dict) -> None:
+    if not isinstance(snapshot, dict) or not isinstance(snapshot.get("run"), dict) or not isinstance(snapshot.get("candidates"), list) or not snapshot["candidates"]:
+        raise ValueError("ACTUAL_NONEMPTY_RUN_SNAPSHOT_REQUIRED")
+    if len(snapshot["candidates"]) != 200:
+        raise ValueError("EXPECTED_200_SYMBOLS_FOR_RECOVERY_COMPARISON")
+    if any(not isinstance(row, dict) for row in snapshot["candidates"]):
+        raise ValueError("INVALID_CANDIDATE")
+    symbols = [str(row.get("symbol") or "").upper().removesuffix(".NS") for row in snapshot["candidates"]]
+    if any(not sym for sym in symbols) or len(set(symbols)) != 200:
+        raise ValueError("UNIQUE_200_SYMBOLS_REQUIRED")
+
+
 def metric_rows(items: list[dict]) -> dict:
     return {
         "stocks_analyzed": len(items),
@@ -67,13 +84,7 @@ def main() -> int:
     from stock_app import fundamental_v3  # type: ignore
     router = load_module("recovered_live_decision_v1", args.router)
     snapshot = json.loads(args.snapshot.read_text(encoding="utf-8"))
-    if not isinstance(snapshot, dict) or not isinstance(snapshot.get("run"), dict) or not isinstance(snapshot.get("candidates"), list) or not snapshot["candidates"]:
-        raise ValueError("ACTUAL_NONEMPTY_RUN_SNAPSHOT_REQUIRED")
-    if len(snapshot["candidates"]) != 200:
-        raise ValueError("EXPECTED_200_SYMBOLS_FOR_RECOVERY_COMPARISON")
-    symbols = [str(row.get("symbol") or "").upper().removesuffix(".NS") for row in snapshot["candidates"]]
-    if any(not sym for sym in symbols) or len(set(symbols)) != 200:
-        raise ValueError("UNIQUE_200_SYMBOLS_REQUIRED")
+    validate_recovery_snapshot(snapshot)
     run = snapshot.get("run") or {}
     session = date.fromisoformat(run["market_session"])
     decision_ts = datetime.combine(
@@ -99,7 +110,7 @@ def main() -> int:
         )
         route_args = dict(
             price_context=price_context,
-            official_current=((before.get("evidence") or {}).get("official_current") is True),
+            official_current=verified_official_current(before),
             legacy=legacy,
         )
         control = router.route(
