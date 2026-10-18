@@ -98,7 +98,8 @@ def eligible_debt_facts(document,event):
         ctx=contexts.get(fact.get("context_ref")) or {}
         if ctx.get("dimensions"):
             continue
-        aligned=(ctx.get("instant")==quarter or ctx.get("end_date")==quarter)
+        # Debt/equity is a point-in-time balance; duration contexts cannot establish it.
+        aligned=(ctx.get("instant")==quarter and not ctx.get("start_date") and not ctx.get("end_date"))
         if not aligned:
             continue
         raw=numeric(fact.get("raw_value"))
