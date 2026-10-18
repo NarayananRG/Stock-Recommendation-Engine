@@ -1,0 +1,25 @@
+name: Mixed event shadow maturity verification
+on:
+  push:
+    branches: [shadow-evidence-validation-20261018]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Mixed event shadow regression
+        run: python "NextGen Research/tests/run_mixed_event_shadow_tests.py"
+      - name: Full integrated fundamental and technical regression
+        run: |
+          python .ci/native140/test_live_decision_v1.py
+          python .ci/recommendation_audit/test_technical_batch.py
+          python .ci/recommendation_audit/test_thesis_session_consistency.py
