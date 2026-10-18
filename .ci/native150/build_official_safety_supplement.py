@@ -149,6 +149,23 @@ def reconcile(raw, displayed):
         return None
     return {"normalization":best[2],"normalized_value":best[3],"absolute_error":best[1]}
 
+def resolve_display_matches(matches):
+    """Return a unique displayed ratio, never guess between distinct report cells.
+
+    Multiple iXBRL table cells can represent different periods. Matching any
+    one of them by adjusting scale is insufficient to identify the current
+    period. Repeated equivalent cells are acceptable; different matched
+    values must be reviewed against period-labelled source evidence.
+    """
+    if not matches:
+        return None
+    values={round(float(value),8) for value,rec in matches}
+    if len(values)!=1:
+        return None
+    order={"RAW":0,"RAW_X100":1,"RAW_DIV100":2}
+    return min(matches,key=lambda x:(order[x[1]["normalization"]],x[1]["absolute_error"],x[0]))
+
+
 def valid_corporate_debt_equity(value):
     if isinstance(value,bool):
         return False
@@ -208,10 +225,14 @@ def process(event):
         return {"symbol":event.get("symbol"),"domain":domain,"status":"DISPLAY_XBRL_MISMATCH",
                 "raw":raw_values[0],"displayed":displayed[:6]}
 
-    # Deterministic preference: exact RAW, then X100, then DIV100; numeric tie.
-    order={"RAW":0,"RAW_X100":1,"RAW_DIV100":2}
-    matches.sort(key=lambda x:(order[x[1]["normalization"]],x[1]["absolute_error"],x[0]))
-    display_value,rec=matches[0]
+    # Do not silently choose a prior-period display if two distinct values
+    # reconcile through different scale interpretations.
+    selected=resolve_display_matches(matches)
+    if selected is None:
+        return {"symbol":event.get("symbol"),"domain":domain,
+                "status":"AMBIGUOUS_DISPLAY_PERIOD_OR_SCALE",
+                "matched_display_values":sorted({float(x[0]) for x in matches})}
+    display_value,rec=selected
     if not valid_corporate_debt_equity(display_value):
         return {
             "symbol":event.get("symbol"),"domain":domain,
