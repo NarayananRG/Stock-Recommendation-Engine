@@ -96,6 +96,7 @@ status_block = r'''    def post_close_daily_status(self) -> dict[str, Any]:
             "recommendation_scope": "ACTIVE_LIVE_UNIVERSE",
             "recommendation_session": session_state.get("analysis_session"),
             "executable_count": executable,
+            "executable_count_basis": "CURRENT_ACTIVE_LIVE_DECISION_ROWS",
             "shadow_analysis_status": "Technical V2 and Fundamental V3: LIVE_EVIDENCE; Combined V2: DIAGNOSTIC_ONLY",
             "validation_snapshot_status": "SUPPORTED_WHEN_MONITORING_ROWS_EXIST",
             "last_successful_daily_run": latest_success,
