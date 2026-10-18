@@ -7,6 +7,7 @@ actual live snapshot without rewriting that frozen research contract.
 from __future__ import annotations
 
 from collections import Counter
+from datetime import date, datetime
 from typing import Iterable
 
 from .core import dedupe_events, normalize_symbol
@@ -26,19 +27,40 @@ def symbols_from_live_snapshot(snapshot: dict) -> list[str]:
     return symbols
 
 
+def _valid_official_event(event: object) -> bool:
+    """Conservative eligibility for *coverage counts*, not filing authentication."""
+    if not isinstance(event, dict):
+        return False
+    if str(event.get("source_exchange") or "").strip().upper() not in {"NSE", "BSE"}:
+        return False
+    try:
+        normalize_symbol(event.get("symbol"))
+        date.fromisoformat(str(event.get("quarter_end") or ""))
+        if str(event.get("reporting_basis") or "").strip().upper() not in {"STANDALONE", "CONSOLIDATED"}:
+            return False
+        if str(event.get("submission_type") or "").strip().upper() not in {"ORIGINAL", "REVISED"}:
+            return False
+        timestamps = []
+        for field in ("publication_ts", "availability_ts"):
+            raw = event.get(field)
+            if not isinstance(raw, str):
+                return False
+            ts = datetime.fromisoformat(raw.replace("Z", "+00:00"))
+            if ts.tzinfo is None or ts.utcoffset() is None:
+                return False
+            timestamps.append(ts)
+        if timestamps[1] < timestamps[0]:
+            return False
+    except (ValueError, TypeError, OverflowError):
+        return False
+    return True
+
+
 def symbols_with_events(events: Iterable[dict]) -> set[str]:
     result = set()
     for event in events:
-        if not isinstance(event, dict):
-            continue
-        if str(event.get("source_exchange") or "").upper() not in {"NSE", "BSE"}:
-            continue
-        if not event.get("publication_ts") or not event.get("availability_ts"):
-            continue
-        try:
-            result.add(normalize_symbol(event.get("symbol")))
-        except (ValueError, TypeError):
-            continue
+        if _valid_official_event(event):
+            result.add(normalize_symbol(event["symbol"]))
     return result
 
 
