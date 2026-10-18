@@ -40,7 +40,10 @@ def _valid_official_event(event: object) -> bool:
         return False
     try:
         normalize_symbol(event.get("symbol"))
-        date.fromisoformat(str(event.get("quarter_end") or ""))
+        quarter = event.get("quarter_end")
+        if not isinstance(quarter, str) or len(quarter) != 10 or quarter[4] != "-" or quarter[7] != "-":
+            return False
+        date.fromisoformat(quarter)
         if str(event.get("reporting_basis") or "").strip().upper() not in {"STANDALONE", "CONSOLIDATED"}:
             return False
         if str(event.get("submission_type") or "").strip().upper() not in {"ORIGINAL", "REVISED"}:
@@ -87,7 +90,7 @@ def recovery_summary(*, symbols: Iterable[str], existing: Iterable[dict], recove
     # The raw recovered feed can include malformed rows; exclude them from
     # reconciliation without discarding their presence from source diagnostics.
     mergeable = [row for row in new if _valid_official_event(row)]
-    merged = merge_official_events(old, mergeable)
+    merged = merge_official_events([row for row in old if _valid_official_event(row)], mergeable)
     before = symbols_with_events(old)
     after = symbols_with_events(merged)
     recovered_symbols = sorted((after - before) & set(requested))
