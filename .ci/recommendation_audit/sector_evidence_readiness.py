@@ -25,7 +25,7 @@ def assess(f,t):
     return {"financial_domain":fin,"inapplicable_industrial_metrics":["debt_equity","operating_cash_flow"] if fin else [],
             "missing_growth_metrics":missing,"missing_recovery_evidence":recovery,"adverse_transition":adverse,"negative_equity_or_ratio_warning":abnormal_equity,
             "momentum_evidence_ready":safe and not missing and t.get("status")=="READY" and (t.get("multi_timeframe") or {}).get("weekly_trend_confirmed") is True and not adverse and not abnormal_equity,
-            "recovery_evidence_ready":safe and not recovery and not adverse}
+            "recovery_evidence_ready":safe and not recovery and not adverse and not abnormal_equity}
 def inventory(payload):
     rows=payload.get("candidates") if isinstance(payload,dict) else None
     if not isinstance(rows,list) or len(rows)!=200:raise ValueError("ACTUAL_200_STOCK_EXPORT_REQUIRED")
