@@ -84,7 +84,10 @@ def recovery_summary(*, symbols: Iterable[str], existing: Iterable[dict], recove
     requested = sorted({normalize_symbol(symbol) for symbol in symbols})
     old = list(existing)
     new = list(recovered)
-    merged = merge_official_events(old, new)
+    # The raw recovered feed can include malformed rows; exclude them from
+    # reconciliation without discarding their presence from source diagnostics.
+    mergeable = [row for row in new if _valid_official_event(row)]
+    merged = merge_official_events(old, mergeable)
     before = symbols_with_events(old)
     after = symbols_with_events(merged)
     recovered_symbols = sorted((after - before) & set(requested))
