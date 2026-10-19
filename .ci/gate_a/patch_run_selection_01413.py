@@ -14,10 +14,13 @@ end=src.find("\n    def ",begin+8)
 if end<0: raise RuntimeError("GATE_A_ACTIVE_RUN_END_MISSING")
 original=src[begin:end]
 if "GATE_A_OFFICIAL_RUN_RECOVERY" in original: raise RuntimeError("GATE_A_RUN_RECOVERY_ALREADY_PRESENT")
-if "self._saved_active_run_id()" not in original or "self._prediction_run_by_id(" not in original:
+if "self._saved_active_run_id()" not in original or "self._live_file(" not in original:
     raise RuntimeError("GATE_A_UNEXPECTED_ACTIVE_RUN_CONTRACT")
 replacement='''    def active_prediction_run(self) -> dict[str, Any] | None:
-        saved = self._prediction_run_by_id(self._saved_active_run_id())
+        import json
+        selected_id = self._saved_active_run_id()
+        selected_path = self._live_file(selected_id) if selected_id else None
+        saved = json.loads(selected_path.read_text(encoding="utf-8")) if selected_path and selected_path.exists() else None
         # GATE_A_OFFICIAL_RUN_RECOVERY: a restored selection must not silently
         # supersede a newer verified daily decision. Never override an explicit
         # selection made in this application session.
@@ -31,13 +34,17 @@ replacement='''    def active_prediction_run(self) -> dict[str, Any] | None:
                 compatible = latest.get("model_version") == APP_VERSION
                 if (last_id and compatible and last_session and
                     (saved is None or (old_session and last_session > old_session))):
-                    candidate = self._prediction_run_by_id(last_id)
+                    last_path = self._live_file(last_id)
+                    candidate = json.loads(last_path.read_text(encoding="utf-8")) if last_path.exists() else None
                     if candidate and str((candidate.get("run") or {}).get("run_id") or "") == last_id:
                         if str((candidate.get("run") or {}).get("market_session") or "") == last_session:
-                            selected = self._set_active_run(last_id, target_explicit=False,
-                                                            target_origin="NONE")
-                            if selected:
-                                return selected
+                            self.active_analysis_file.write_text(
+                                json.dumps({"run_id": last_id, "app_version": APP_VERSION,
+                                            "updated_at": __import__("datetime").datetime.now().isoformat(timespec="seconds"),
+                                            "target_explicit": False, "target_origin": "NONE"}, indent=2),
+                                encoding="utf-8",
+                            )
+                            return candidate
             except (OSError, ValueError, TypeError, AttributeError, KeyError):
                 pass  # Retain the saved run; never manufacture a replacement.
         return saved
