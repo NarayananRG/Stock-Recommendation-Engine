@@ -85,7 +85,7 @@ class PitSafetyEvidenceRepairTests(unittest.TestCase):
             "debt > 2.5",
             "debt > 1.5",
             "atr <= 6",
-            "drawdown is not None and drawdown <= -15",
+            "drawdown is not None and -100 <= drawdown <= -15",
             "regime in (\"BULL\", \"MIXED\")",
         ):
             self.assertIn(token,self.router)
