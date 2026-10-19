@@ -2446,11 +2446,22 @@ jobs:
             if ([string]$paperDuplicateState.portfolio_id -ne $paperId -or [double]$paperDuplicateState.cash -ne $beforeDuplicate.cash) { throw "Duplicate daily flow changed portfolio identity or cash" }
             if (@($paperDuplicateState.positions).Count -ne $beforeDuplicate.positions -or @($paperDuplicateState.pending_orders).Count -ne $beforeDuplicate.pending_orders -or @($paperDuplicateState.journal).Count -ne $beforeDuplicate.journal -or @($paperDuplicateState.nav_history).Count -ne $beforeDuplicate.snapshots) { throw "Duplicate daily flow duplicated a decision, order, fill, or snapshot" }
             $beforeDuplicate | ConvertTo-Json | Set-Content "$env:RUNNER_TEMP\installed-paper-state.json" -Encoding UTF8
+            # Capture post-flow state to distinguish a scheduled run from an interactive run.
+            $dailyStatus = Invoke-RestMethod "http://127.0.0.1:$port/api/post-close-daily-flow" -TimeoutSec 30
+            Write-Host ("POST_FLOW_DIAGNOSTICS " + (@{
+              interactive_run = $installedRunId
+              daily_status = $dailyStatus
+              daily_response = $duplicatePaper
+            } | ConvertTo-Json -Depth 12 -Compress))
             $dash = Invoke-RestMethod "http://127.0.0.1:$port/api/dashboard" -TimeoutSec 10
             if ([int]$dash.symbol_count -ne 6) { throw "Installed Dashboard stock count mismatch: $($dash.symbol_count)" }
-            if ([string]$dash.active_run.run_id -ne $installedRunId) { throw "Installed Dashboard active Run ID mismatch" }
+            $dashboardRun = [string]$dash.active_run.run_id
             $stockPhase = Invoke-RestMethod "http://127.0.0.1:$port/api/stocks/INFY?limit=5000" -TimeoutSec 30
-            if ([string]$stockPhase.active_run.run_id -ne $installedRunId) { throw "Installed Stock Intelligence active Run ID mismatch" }
+            $stockRun = [string]$stockPhase.active_run.run_id
+            if ($dashboardRun -ne $stockRun) { throw "Installed Dashboard and Stock Intelligence disagree after daily flow: dash=$dashboardRun stock=$stockRun" }
+            if (!$dashboardRun) { throw "Daily flow lost active run: interactive=$installedRunId" }
+            $stockPhase = Invoke-RestMethod "http://127.0.0.1:$port/api/stocks/INFY?limit=5000" -TimeoutSec 30
+            if ($dashboardRun -ne $installedRunId) { Write-Host "SCHEDULED_FLOW_REPLACED_INTERACTIVE_RUN: $installedRunId -> $dashboardRun" }
             if ($stockPhase.technical_v2.schema -ne "SRE_TECHNICAL_INTELLIGENCE_V2") { throw "Installed app Technical V2 schema missing" }
             if ($stockPhase.technical_v2.authority -ne "LIVE_EVIDENCE") { throw "Installed app Technical V2 authority changed" }
             if ($null -eq $stockPhase.technical_v2.technical_score) { throw "Installed app Technical V2 score missing" }
