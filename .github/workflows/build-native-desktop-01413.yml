@@ -1251,6 +1251,16 @@ jobs:
           if ($manifestJson.synthetic_data) { throw "Synthetic fundamental data must not be in release bundle" }
 
           "SRE_PHASE5_REAL_FUNDAMENTAL_RUN_ID=$runId" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          # The financial-domain audit consumes raw PIT filing-event metadata already
+          # included inside the verified official Phase 5 fundamentals bundle.
+          # Do not depend on the separately retained, optional diagnostic artifact.
+          $diag = Join-Path $env:SRE_ENGINE_ROOT "NextGen Research\results"
+          $targetEvents = Join-Path $diag "fundamental_v2_phase2a1_scaled\all_target_events.json"
+          if (!(Test-Path -LiteralPath $targetEvents)) { throw "Official Phase 5 bundle missing target filing events" }
+          $rawEvents = Get-Content -LiteralPath $targetEvents -Raw | ConvertFrom-Json
+          if (@($rawEvents).Count -lt 2000) { throw "Official Phase 5 filing event metadata unexpectedly incomplete: $(@($rawEvents).Count)" }
+          "SRE_PHASE5_DIAGNOSTICS_ROOT=$diag" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          Write-Host "Official Phase 5 PIT event metadata validated: $(@($rawEvents).Count)"
           Write-Host "REAL OFFICIAL FUNDAMENTALS BUNDLED: run=$runId panel=$panelRows events=$eventRows"
 
       - name: Real official Fundamental V3 API regression
