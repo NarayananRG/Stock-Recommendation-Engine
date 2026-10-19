@@ -66,6 +66,17 @@ class GateARunRestoration(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             h=Harness(d,new_session="2026-10-15")
             self.assertEqual(h.active_prediction_run()["run"]["run_id"],OLD)
+    def test_newer_active_analysis_not_replaced_by_old_daily_success(self):
+        # Real-data regression: a 2026-10-19 analysis can legitimately be
+        # newer than the last successful post-close flow (2026-10-16).
+        # Run restoration must never downgrade this active decision.
+        with tempfile.TemporaryDirectory() as d:
+            h=Harness(d,old_session="2026-10-19",new_session="2026-10-16")
+            current=h.active_prediction_run()
+            self.assertEqual(current["run"]["run_id"],OLD)
+            self.assertEqual(current["run"]["market_session"],"2026-10-19")
+            self.assertFalse(h.active_analysis_file.exists())
+
     def test_no_ledger_mutations(self):
         self.assertNotIn("paper_",replacement)
         self.assertNotIn("DELETE FROM",replacement)
