@@ -2469,7 +2469,7 @@ jobs:
             if ($stockPhase.combined_v2.schema -ne "SRE_COMBINED_PREDICTION_V2") { throw "Installed app Combined V2 schema missing" }
             if ($stockPhase.combined_v2.authority -ne "DIAGNOSTIC_ONLY" -or $stockPhase.combined_v2.promotion_allowed) { throw "Installed app Combined V2 authority violation" }
             if ($stockPhase.combined_v2.target_used_in_score) { throw "Installed app target leaked into Combined V2" }
-            $installedRunId | Set-Content "$env:RUNNER_TEMP\installed-phase2-run.txt" -Encoding ASCII
+            $dashboardRun | Set-Content "$env:RUNNER_TEMP\installed-phase2-run.txt" -Encoding ASCII
 
             $root = Invoke-WebRequest "http://127.0.0.1:$port/" -TimeoutSec 10
             if ($root.StatusCode -ne 200) { throw "Installed app UI root did not return HTTP 200" }
