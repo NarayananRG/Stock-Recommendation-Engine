@@ -2,7 +2,7 @@ name: Build SRE 0.14.13 Paper Trading Repair
 
 on:
   push:
-    branches: [validation-v2-rebuild, fix-paper-trading-root-causes-20261016]
+    branches: [validation-v2-rebuild, fix-paper-trading-root-causes-20261016, fix-gate-a-fundamental-data-stale-20261020]
     paths:
       - ".ci/native098/**"
       - ".ci/native099/**"
