@@ -2447,10 +2447,8 @@ jobs:
             if (@($paperDuplicateState.positions).Count -ne $beforeDuplicate.positions -or @($paperDuplicateState.pending_orders).Count -ne $beforeDuplicate.pending_orders -or @($paperDuplicateState.journal).Count -ne $beforeDuplicate.journal -or @($paperDuplicateState.nav_history).Count -ne $beforeDuplicate.snapshots) { throw "Duplicate daily flow duplicated a decision, order, fill, or snapshot" }
             $beforeDuplicate | ConvertTo-Json | Set-Content "$env:RUNNER_TEMP\installed-paper-state.json" -Encoding UTF8
             # Capture post-flow state to distinguish a scheduled run from an interactive run.
-            $dailyStatus = Invoke-RestMethod "http://127.0.0.1:$port/api/post-close-daily-flow" -TimeoutSec 30
             Write-Host ("POST_FLOW_DIAGNOSTICS " + (@{
               interactive_run = $installedRunId
-              daily_status = $dailyStatus
               daily_response = $duplicatePaper
             } | ConvertTo-Json -Depth 12 -Compress))
             $dash = Invoke-RestMethod "http://127.0.0.1:$port/api/dashboard" -TimeoutSec 10
