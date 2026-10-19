@@ -2369,56 +2369,56 @@ jobs:
             $env:SRE_ACCEPTANCE_RUN_ID = $installedRunId
             $env:SRE_ACCEPTANCE_SEED_RESULT = $seedResultPath
           @'
-            import json
-            import os
-            import sys
-            from pathlib import Path
+          import json
+          import os
+          import sys
+          from pathlib import Path
 
-            engine = Path(os.environ["SRE_ACCEPTANCE_ENGINE"])
-            sys.path.insert(0, str(engine))
-            from stock_app.validation_v2 import ExecutionAssumptions, process_paper_session
+          engine = Path(os.environ["SRE_ACCEPTANCE_ENGINE"])
+          sys.path.insert(0, str(engine))
+          from stock_app.validation_v2 import ExecutionAssumptions, process_paper_session
 
-            session = "2025-11-28"
-            candidate = {
-                "symbol": "INFY",
-                "market_session": session,
-                "live_decision": {
-                    "final_action": "RECOVERY BUY",
-                    "executable": True,
-                    "strategy_style": "RECOVERY",
-                    "confidence": "HIGH",
-                    "recovery_thesis": "CI installed-lifecycle acceptance order",
-                    "invalidation": "CI acceptance only",
-                    "evidence": {"source": "INSTALLED_LIFECYCLE_ACCEPTANCE", "session": session},
-                },
-            }
-            result = process_paper_session(
-                Path(os.environ["SRE_ACCEPTANCE_DB"]),
-                portfolio_id=os.environ["SRE_ACCEPTANCE_PORTFOLIO_ID"],
-                expected_session=session,
-                latest_official_session=session,
-                official_freshness="PASS",
-                production_session=session,
-                production_run_id=os.environ["SRE_ACCEPTANCE_RUN_ID"],
-                app_version="0.14.13-paper-trading-repair",
-                production_model_version="LIVE_DECISION_V1",
-                evidence_pipeline_version="0.14.13-paper-trading-repair",
-                candidates=[candidate],
-                allocation_plan={"new_buys": [{"symbol": "INFY", "estimated_cost": 10000.0}]},
-                official_opens={},
-                official_closes={},
-                available_sessions=[session],
-                official_opens_by_session={},
-                monitoring={},
-                assumptions=ExecutionAssumptions(),
-            )
-            if len(result.get("new_orders") or []) != 1:
-                raise RuntimeError(f"CI lifecycle seed did not create exactly one pending order: {result}")
-            Path(os.environ["SRE_ACCEPTANCE_SEED_RESULT"]).write_text(
-                json.dumps(result, sort_keys=True),
-                encoding="utf-8",
-            )
-            print("INSTALLED PACKAGED V2 DETERMINISTIC PENDING SEED PASS")
+          session = "2025-11-28"
+          candidate = {
+              "symbol": "INFY",
+              "market_session": session,
+              "live_decision": {
+                  "final_action": "RECOVERY BUY",
+                  "executable": True,
+                  "strategy_style": "RECOVERY",
+                  "confidence": "HIGH",
+                  "recovery_thesis": "CI installed-lifecycle acceptance order",
+                  "invalidation": "CI acceptance only",
+                  "evidence": {"source": "INSTALLED_LIFECYCLE_ACCEPTANCE", "session": session},
+              },
+          }
+          result = process_paper_session(
+              Path(os.environ["SRE_ACCEPTANCE_DB"]),
+              portfolio_id=os.environ["SRE_ACCEPTANCE_PORTFOLIO_ID"],
+              expected_session=session,
+              latest_official_session=session,
+              official_freshness="PASS",
+              production_session=session,
+              production_run_id=os.environ["SRE_ACCEPTANCE_RUN_ID"],
+              app_version="0.14.13-paper-trading-repair",
+              production_model_version="LIVE_DECISION_V1",
+              evidence_pipeline_version="0.14.13-paper-trading-repair",
+              candidates=[candidate],
+              allocation_plan={"new_buys": [{"symbol": "INFY", "estimated_cost": 10000.0}]},
+              official_opens={},
+              official_closes={},
+              available_sessions=[session],
+              official_opens_by_session={},
+              monitoring={},
+              assumptions=ExecutionAssumptions(),
+          )
+          if len(result.get("new_orders") or []) != 1:
+              raise RuntimeError(f"CI lifecycle seed did not create exactly one pending order: {result}")
+          Path(os.environ["SRE_ACCEPTANCE_SEED_RESULT"]).write_text(
+              json.dumps(result, sort_keys=True),
+              encoding="utf-8",
+          )
+          print("INSTALLED PACKAGED V2 DETERMINISTIC PENDING SEED PASS")
           '@ | python -
             if ($LASTEXITCODE -ne 0) { throw "Unable to seed deterministic installed PAPER_TRADING_V2 pending order" }
 
