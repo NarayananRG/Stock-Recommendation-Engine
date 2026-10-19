@@ -26,6 +26,7 @@ on:
       - ".ci/native151/**"
       - ".ci/native152/**"
       - ".ci/native154/**"
+      - ".ci/native155/**"
       - ".gitignore"
       - ".gitattributes"
       - "Stage 6/runtime/**"
@@ -1896,6 +1897,15 @@ jobs:
           if ($routerValidationBefore -ne $routerValidationAfter) { throw "LIVE_DECISION_V1 router changed during Validation V2 work" }
           python ".ci\native154\test_validation_v2.py"
           if ($LASTEXITCODE -ne 0) { throw "0.14.13 Paper Trading Repair deterministic regression failed" }
+          $routerFreshnessBefore = (Get-FileHash "$env:SRE_ENGINE_ROOT\stock_app\live_decision_v1.py" -Algorithm SHA256).Hash
+          python ".ci\native155\patch155_gate_a_fundamental_freshness.py"
+          if ($LASTEXITCODE -ne 0) { throw "Gate A fundamental freshness integration failed" }
+          $routerFreshnessAfter = (Get-FileHash "$env:SRE_ENGINE_ROOT\stock_app\live_decision_v1.py" -Algorithm SHA256).Hash
+          if ($routerFreshnessBefore -ne $routerFreshnessAfter) { throw "LIVE_DECISION_V1 router changed during Gate A freshness repair" }
+          $env:SRE_GATE_A_AUDIT_OUT = "$env:RUNNER_TEMP\gate-a-fundamental-freshness-audit.json"
+          $env:SRE_TEST_TEMP_ROOT = "$env:RUNNER_TEMP\gate-a-fundamental-tests"
+          python ".ci\native155\test_gate_a_fundamental_freshness.py"
+          if ($LASTEXITCODE -ne 0) { throw "Gate A fundamental freshness regression failed" }
           python -m compileall -q "$env:SRE_ENGINE_ROOT\stock_app" "$env:SRE_ENGINE_ROOT\modern_ui"
           if ($LASTEXITCODE -ne 0) { throw "Backend compilation failed" }
           node --check "$env:SRE_ENGINE_ROOT\modern_ui\frontend\app.js"

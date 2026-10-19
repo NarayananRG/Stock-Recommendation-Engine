@@ -1,2 +1,3 @@
 # Runtime state is generated locally and must never be versioned.
 /Stage 6/runtime/
+__pycache__/
