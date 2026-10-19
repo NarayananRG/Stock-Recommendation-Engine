@@ -1251,13 +1251,6 @@ jobs:
           if ($manifestJson.synthetic_data) { throw "Synthetic fundamental data must not be in release bundle" }
 
           "SRE_PHASE5_REAL_FUNDAMENTAL_RUN_ID=$runId" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
-          $diag = "$env:RUNNER_TEMP\phase5-diagnostics"
-          New-Item -ItemType Directory -Force -Path $diag | Out-Null
-          # The financial-domain evidence audit below consumes this governed set.
-          gh run download 38163955223 --repo "$env:GITHUB_REPOSITORY" --name "SRE-Phase5-Fundamental-Pipeline-Diagnostics" --dir $diag
-          if ($LASTEXITCODE -ne 0) { throw "Unable to download governed Phase 5 diagnostic artifact" }
-          if (!(Test-Path (Join-Path $diag "fundamental_v2_phase2a1_scaled\all_target_events.json"))) { throw "Phase 5 event diagnostics missing" }
-          "SRE_PHASE5_DIAGNOSTICS_ROOT=$diag" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
           Write-Host "REAL OFFICIAL FUNDAMENTALS BUNDLED: run=$runId panel=$panelRows events=$eventRows"
 
       - name: Real official Fundamental V3 API regression
