@@ -1956,6 +1956,8 @@ jobs:
         run: |
           $ErrorActionPreference = "Stop"
           python ".ci/gate_a/patch_count_writer_01413.py"
+          python ".ci/gate_a/test_run_recovery_contract.py"
+          if ($LASTEXITCODE -ne 0) { throw "Gate A restored run regression suite failed" }
           python ".ci/gate_a/patch_run_selection_01413.py"
           if ($LASTEXITCODE -ne 0) { throw "Gate A restored run reconciliation patch failed" }
           if ($LASTEXITCODE -ne 0) { throw "Gate A count-writer patch failed" }
