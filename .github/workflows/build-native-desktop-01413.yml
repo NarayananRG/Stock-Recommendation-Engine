@@ -27,6 +27,7 @@ on:
       - ".ci/native152/**"
       - ".ci/native154/**"
       - ".ci/native155/**"
+      - ".ci/native156/**"
       - ".gitignore"
       - ".gitattributes"
       - "Stage 6/runtime/**"
@@ -1901,6 +1902,10 @@ jobs:
           $env:SRE_TEST_TEMP_ROOT = "$env:RUNNER_TEMP\gate-a-fundamental-tests"
           python ".ci\native155\test_gate_a_fundamental_freshness.py"
           if ($LASTEXITCODE -ne 0) { throw "Gate A fundamental freshness regression failed" }
+          python ".ci\native156\patch156_position_check_fill_date.py"
+          if ($LASTEXITCODE -ne 0) { throw "Position check fill-date patch failed" }
+          python ".ci\native156\test_position_check_fill_date.py"
+          if ($LASTEXITCODE -ne 0) { throw "Position check fill-date regression failed" }
           python -m compileall -q "$env:SRE_ENGINE_ROOT\stock_app" "$env:SRE_ENGINE_ROOT\modern_ui"
           if ($LASTEXITCODE -ne 0) { throw "Backend compilation failed" }
           node --check "$env:SRE_ENGINE_ROOT\modern_ui\frontend\app.js"
