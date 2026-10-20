@@ -2435,11 +2435,13 @@ jobs:
             if ([string]$paperDuplicateState.portfolio_id -ne $paperId -or [double]$paperDuplicateState.cash -ne $beforeDuplicate.cash) { throw "Duplicate daily flow changed portfolio identity or cash" }
             if (@($paperDuplicateState.positions).Count -ne $beforeDuplicate.positions -or @($paperDuplicateState.pending_orders).Count -ne $beforeDuplicate.pending_orders -or @($paperDuplicateState.journal).Count -ne $beforeDuplicate.journal -or @($paperDuplicateState.nav_history).Count -ne $beforeDuplicate.snapshots) { throw "Duplicate daily flow duplicated a decision, order, fill, or snapshot" }
             $beforeDuplicate | ConvertTo-Json | Set-Content "$env:RUNNER_TEMP\installed-paper-state.json" -Encoding UTF8
+            $acceptedActiveRunId = [string]$duplicatePaper.last_successful_daily_run.run_id
+            if (!$acceptedActiveRunId) { $acceptedActiveRunId = $installedRunId }
             $dash = Invoke-RestMethod "http://127.0.0.1:$port/api/dashboard" -TimeoutSec 10
             if ([int]$dash.symbol_count -ne 6) { throw "Installed Dashboard stock count mismatch: $($dash.symbol_count)" }
-            if ([string]$dash.active_run.run_id -ne $installedRunId) { throw "Installed Dashboard active Run ID mismatch" }
+            if ([string]$dash.active_run.run_id -ne $acceptedActiveRunId) { throw "Installed Dashboard active Run ID mismatch" }
             $stockPhase = Invoke-RestMethod "http://127.0.0.1:$port/api/stocks/INFY?limit=5000" -TimeoutSec 30
-            if ([string]$stockPhase.active_run.run_id -ne $installedRunId) { throw "Installed Stock Intelligence active Run ID mismatch" }
+            if ([string]$stockPhase.active_run.run_id -ne $acceptedActiveRunId) { throw "Installed Stock Intelligence active Run ID mismatch" }
             if ($stockPhase.technical_v2.schema -ne "SRE_TECHNICAL_INTELLIGENCE_V2") { throw "Installed app Technical V2 schema missing" }
             if ($stockPhase.technical_v2.authority -ne "LIVE_EVIDENCE") { throw "Installed app Technical V2 authority changed" }
             if ($null -eq $stockPhase.technical_v2.technical_score) { throw "Installed app Technical V2 score missing" }
@@ -2449,7 +2451,7 @@ jobs:
             if ($stockPhase.combined_v2.schema -ne "SRE_COMBINED_PREDICTION_V2") { throw "Installed app Combined V2 schema missing" }
             if ($stockPhase.combined_v2.authority -ne "DIAGNOSTIC_ONLY" -or $stockPhase.combined_v2.promotion_allowed) { throw "Installed app Combined V2 authority violation" }
             if ($stockPhase.combined_v2.target_used_in_score) { throw "Installed app target leaked into Combined V2" }
-            $installedRunId | Set-Content "$env:RUNNER_TEMP\installed-phase2-run.txt" -Encoding ASCII
+            $acceptedActiveRunId | Set-Content "$env:RUNNER_TEMP\installed-phase2-run.txt" -Encoding ASCII
 
             $root = Invoke-WebRequest "http://127.0.0.1:$port/" -TimeoutSec 10
             if ($root.StatusCode -ne 200) { throw "Installed app UI root did not return HTTP 200" }
