@@ -27,7 +27,7 @@ jobs:
           import base64,hashlib,io,zipfile
           from pathlib import Path
           payload=base64.b64decode(Path('.ci/sre-v10-validation/source.b64').read_text())
-          assert hashlib.sha256(payload).hexdigest()=='1c0ea9bbc2be273b27ae56b9fe0e91071a0da412036e9fc5056a757f29af2665'
+          assert hashlib.sha256(payload).hexdigest()=='7ecd752c050c2f8cd9ae274016d9d725b17ff2c7408451dd4461f3ea649e3c38'
           zipfile.ZipFile(io.BytesIO(payload)).extractall('.')
       - name: Install native test dependencies
         run: python -m pip install --disable-pip-version-check numpy pandas "polars>=1.32,<3" "pyarrow>=20,<30" fastapi pytest httpx uvicorn
