@@ -1235,10 +1235,11 @@ jobs:
           Expand-Archive -LiteralPath $bundle -DestinationPath "$env:SRE_ENGINE_ROOT" -Force
 
           $panel = Join-Path $env:SRE_ENGINE_ROOT "NextGen Research\results\fundamental_v2_phase2a4_feature_panel\canonical_feature_panel.csv"
+          $targetEvents = Join-Path $env:SRE_ENGINE_ROOT "NextGen Research\results\fundamental_v2_phase2a1_scaled\all_target_events.json"
           $events = Join-Path $env:SRE_ENGINE_ROOT "NextGen Research\results\fundamental_v2_phase2a5_derived_event_transforms\derived_events.jsonl"
           $risk = Join-Path $env:SRE_ENGINE_ROOT "NextGen Research\results\fundamental_v2_phase2a7_risk_events\risk_event_profiles.jsonl"
           $manifest = Join-Path $env:SRE_ENGINE_ROOT "NextGen Research\phase5_real_fundamental_manifest.json"
-          foreach ($p in @($panel,$events,$risk,$manifest)) { if (!(Test-Path $p)) { throw "Bundled Phase 5 data file missing: $p" } }
+          foreach ($p in @($panel,$targetEvents,$events,$risk,$manifest)) { if (!(Test-Path $p)) { throw "Bundled Phase 5 data file missing: $p" } }
 
           $panelRows = (Get-Content $panel | Measure-Object -Line).Lines - 1
           if ($panelRows -ne 2181) { throw "Real fundamental panel row count mismatch: $panelRows" }
@@ -1251,6 +1252,7 @@ jobs:
           if ($manifestJson.synthetic_data) { throw "Synthetic fundamental data must not be in release bundle" }
 
           "SRE_PHASE5_REAL_FUNDAMENTAL_RUN_ID=$runId" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          "SRE_PHASE5_DIAGNOSTICS_ROOT=$env:SRE_ENGINE_ROOT\NextGen Research\results" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
           Write-Host "REAL OFFICIAL FUNDAMENTALS BUNDLED: run=$runId panel=$panelRows events=$eventRows"
 
       - name: Real official Fundamental V3 API regression
