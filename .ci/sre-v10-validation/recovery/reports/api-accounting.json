@@ -1,0 +1,69 @@
+{
+  "status": "PASS",
+  "unchanged_tables": {
+    "phase81_validation.sqlite3": [
+      "schema_meta",
+      "replay_runs",
+      "replay_sessions",
+      "replay_trades",
+      "paper_portfolios",
+      "paper_positions",
+      "paper_orders",
+      "paper_journal",
+      "paper_nav",
+      "validation_schema_meta_v2",
+      "paper_v2_portfolios",
+      "paper_v2_positions",
+      "paper_v2_orders",
+      "paper_v2_journal",
+      "paper_v2_nav",
+      "paper_v2_session_commits",
+      "paper_v2_fills",
+      "paper_v2_migrations"
+    ],
+    "validation_v2.sqlite3": [
+      "v2_meta",
+      "v2_portfolios",
+      "v2_orders",
+      "v2_positions",
+      "v2_journal",
+      "v2_nav",
+      "v2_replays"
+    ],
+    "stock_recommendation_engine.sqlite3": [
+      "schema_migrations",
+      "app_metadata",
+      "settings",
+      "portfolio_positions",
+      "analysis_runs",
+      "recommendation_snapshots",
+      "app_events",
+      "prediction_runs",
+      "prediction_candidates",
+      "prediction_evidence_summary",
+      "recommendation_lifecycle",
+      "position_links",
+      "daily_position_assessments",
+      "state_transitions",
+      "position_exit_records",
+      "fundamental_snapshot_metadata",
+      "fundamental_app_events",
+      "fundamental_source_status",
+      "leg7_daily_monitoring",
+      "leg8_operational_runs",
+      "live_pilot_snapshots",
+      "live_pilot_execution",
+      "live_pilot_monitoring",
+      "live_pilot_reproducibility",
+      "live_position_theses"
+    ]
+  },
+  "http_checks": [
+    "/api/health",
+    "/api/validation/authority",
+    "/api/validation/historical-evidence/summary",
+    "/api/validation/historical-evidence",
+    "/"
+  ],
+  "shadow_evidence_count": 1
+}

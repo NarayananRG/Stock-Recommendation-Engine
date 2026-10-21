@@ -1,0 +1,25 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "date": "2024-10-01",
+      "stocks": 200,
+      "status": "PASS"
+    },
+    {
+      "date": "2025-10-03",
+      "stocks": 200,
+      "status": "PASS"
+    },
+    {
+      "date": "2026-06-15",
+      "stocks": 200,
+      "status": "PASS"
+    },
+    {
+      "date": "2026-10-19",
+      "stocks": 200,
+      "status": "PASS"
+    }
+  ]
+}

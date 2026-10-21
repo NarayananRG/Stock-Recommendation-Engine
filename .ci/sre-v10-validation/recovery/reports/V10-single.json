@@ -1,0 +1,123 @@
+{
+  "schema": "SRE_POINT_IN_TIME_HISTORICAL_REPLAY_V2",
+  "label": "POINT-IN-TIME HISTORICAL SIMULATION",
+  "requested_period": "CUSTOM",
+  "requested_range": {
+    "start": "2026-10-19",
+    "end": "2026-10-19"
+  },
+  "trustworthy_replayable_range": {
+    "start": "2026-10-19",
+    "end": "2026-10-19"
+  },
+  "sessions_replayed": 1,
+  "sessions_excluded": 0,
+  "pit_completeness": "COMPLETE",
+  "survivorship_bias_warning": true,
+  "execution_assumptions": {
+    "starting_capital": 100000.0,
+    "slippage_bps": 10.0,
+    "transaction_cost_bps": 5.0,
+    "whole_shares": true,
+    "entry": "NEXT_OFFICIAL_OPEN",
+    "exit": "NEXT_OFFICIAL_OPEN",
+    "broker_execution": false
+  },
+  "coverage": [
+    {
+      "date": "2026-10-19",
+      "market_data_status": "PASS",
+      "fundamental_pit_status": "PASS",
+      "valuation_pit_status": "PASS",
+      "universe_status": "CURRENT_UNIVERSE_SURVIVORSHIP_BIAS",
+      "live_decision_v1_run_status": "PASS",
+      "replayability": "FULL_PIT_VALID"
+    }
+  ],
+  "series": [
+    {
+      "date": "2026-10-19",
+      "portfolio_nav": 100000.0,
+      "benchmark_nav": 100000.0,
+      "cash": 100000.0,
+      "invested_value": 0,
+      "realized_pnl": 0.0,
+      "unrealized_pnl": 0,
+      "exposure": 0.0
+    }
+  ],
+  "trades": [],
+  "metrics": {
+    "start_nav": 100000.0,
+    "end_nav": 100000.0,
+    "portfolio_return": 0.0,
+    "benchmark_return": 0.0,
+    "excess_return": 0.0,
+    "max_drawdown": 0.0,
+    "buy_signals": 2,
+    "filled_entries": 0,
+    "exits": 0,
+    "closed_trades": 0,
+    "realized_pnl": 0.0,
+    "unrealized_pnl": 0,
+    "cash": 100000.0,
+    "exposure": 0.0,
+    "win_rate": null,
+    "longest_cash_only_period": 1,
+    "buy_frequency": 2.0
+  },
+  "benchmark_status": "ACTUAL_NIFTY_50",
+  "replay_input_cache_stats": {
+    "price_misses": 204,
+    "price_hits": 1397,
+    "fundamental_misses": 0,
+    "fundamental_hits": 0,
+    "disk_hits": 0,
+    "disk_writes": 0,
+    "price_disk_hits": 0,
+    "price_disk_writes": 0,
+    "price_parquet_writes": 0,
+    "technical_hits": 0,
+    "technical_disk_hits": 0,
+    "technical_misses": 0,
+    "pit_index_builds": 201,
+    "pit_index_hits": 200,
+    "v10_timeline_builds": 404,
+    "v10_timeline_disk_hits": 0,
+    "v10_score_hits": 0,
+    "v10_score_misses": 2971,
+    "v10_parquet_writes": 405,
+    "v10_invalid_objects": 0,
+    "v10_score_disk_hits": 0
+  },
+  "v10": {
+    "schema": "SRE_REPLAY_V10_1",
+    "authority": "RESEARCH_ONLY",
+    "affects_live_decisions": false
+  },
+  "replay_context_signature": "50ea935bf32af31986e7883fad64586602974940c809ae37c73e5a0d844ed3e7",
+  "replay_market_content_signature": "11a6285588df75db4597745fcac6f3f6690172d488ead8040c561c688526ddeb",
+  "replay_fundamental_source_fingerprint": "b1bf6b8668a15d67e83f5efd70a398b861b9890c73ae53704539e70249c94c4e",
+  "authority": {
+    "schema": "SRE_PHASE81_PRODUCTION_AUTHORITY_TRACE_V2",
+    "phase": "PHASE_8_1_HISTORICAL_REPLAY_AND_PAPER_PORTFOLIO",
+    "production_recommendation_authority": "LIVE_DECISION_V1",
+    "production_rank_authority_changed": false,
+    "production_action_authority_changed": false,
+    "technical_v2_authority": "LIVE_EVIDENCE",
+    "fundamental_v3_authority": "LIVE_EVIDENCE",
+    "combined_v2_authority": "DIAGNOSTIC_ONLY",
+    "combined_v2_target_used_in_score": false,
+    "combined_v2_promotion_allowed": false,
+    "watch_is_executable": false,
+    "broker_execution": false,
+    "automatic_yfinance_fallback": false,
+    "backend_version": "0.14.13-paper-trading-repair",
+    "validation_version": "V2",
+    "production_router_sha256": "ae1814b9709b064f2ebffbe7a4daa9de589e74295cd894e5013a4043f79e30b8"
+  },
+  "automatic_yfinance_fallback": false,
+  "broker_execution": false,
+  "replay_id": "SREVR2_4acf0d54a2ce00b7aacceb14",
+  "replay_cache_status": "NEW_COMPUTATION"
+}

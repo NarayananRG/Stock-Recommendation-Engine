@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "universe": 200,
+  "available_sessions": 504,
+  "counts": {
+    "technical_full_frames": 200,
+    "technical_prefixes": 2315,
+    "technical_outputs": 2315,
+    "fundamental_outputs": 2400,
+    "filing_selections": 14400,
+    "leakage_queries": 302400,
+    "selected_rows_checked": 3201910,
+    "future_data_violations": 0
+  },
+  "elapsed_seconds": 408.6901454810013,
+  "source_signature": "b1bf6b8668a15d67e83f5efd70a398b861b9890c73ae53704539e70249c94c4e"
+}

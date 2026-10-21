@@ -1,0 +1,7 @@
+{
+  "status": "PASS",
+  "timestamp": "effective_availability_ts",
+  "queries": 302400,
+  "selected_rows_checked": 2761123,
+  "future_data_violations": 0
+}
