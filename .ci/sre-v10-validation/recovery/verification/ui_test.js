@@ -1,0 +1,9 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert');
+const source=fs.readFileSync('v10work/modern_ui/frontend/app.js','utf8');
+const fn=source.slice(source.indexOf('async function runHistoricalReplay(){'),source.indexOf('\nfunction renderValidationReplay'));
+const evidence=source.slice(0,source.indexOf('\nconst $ ='));
+const nodes={'#validationPeriod':{value:'Custom'},'#validationCapital':{value:'100000'},'#validationSlippage':{value:'10'},'#validationCost':{value:'5'},'#validationBenchmark':{value:'NIFTY 50'},'#validationStartDate':{value:'2026-10-12'},'#validationEndDate':{value:'2026-10-19'},'#oppRunStatus':{textContent:'Ready'}};
+let requests=[];const context={URLSearchParams,performance,Number,window:{alert:m=>{throw Error(m)}},$:s=>nodes[s],busy:()=>{},api:async(url,opts)=>{requests.push({url,opts});return {}},renderValidationReplay:()=>{},validationError:(s,e)=>{throw e}};
+vm.createContext(context);vm.runInContext(fn+'\n'+evidence,context);
+(async()=>{for(const period of ['Custom','1W','1M','3M','6M','12M','24M']){nodes['#validationPeriod'].value=period;await context.runHistoricalReplay();const r=requests.at(-1),p=new URL(r.url,'http://localhost').searchParams;assert.equal(p.get('period'),period==='Custom'?'CUSTOM':period);assert.equal(r.opts.method,'POST');if(period==='Custom'){assert.equal(p.get('start_date'),'2026-10-12');assert.equal(p.get('end_date'),'2026-10-19')}else assert.equal(p.has('start_date'),false);if(period!=='Custom')assert(source.includes('value="'+period+'"'));}
+context.showReplayEvidenceV4({complete_replays:1,results:[{period:'1W',replayed_sessions:5,pit_completeness:'COMPLETE',metrics:{portfolio_return:.01}}]});assert(nodes['#oppRunStatus'].textContent.includes('research only, not a BUY score'));assert(nodes['#oppRunStatus'].textContent.includes('1W: 5 sessions'));console.log('PASS: all seven period requests, exact Custom dates, presets and research-only UI evidence');})();

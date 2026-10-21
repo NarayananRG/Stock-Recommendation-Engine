@@ -1,0 +1,103 @@
+{
+  "runs": [
+    {
+      "version": "V9",
+      "case": "cold_one_session",
+      "elapsed_seconds": 21.99991957400016,
+      "replayed_sessions": 1,
+      "cache_status": "NEW_COMPUTATION",
+      "stats": {
+        "price_misses": 204,
+        "price_hits": 1197,
+        "fundamental_misses": 400,
+        "fundamental_hits": 0,
+        "disk_hits": 0,
+        "disk_writes": 400,
+        "price_disk_hits": 0,
+        "price_disk_writes": 204,
+        "price_parquet_writes": 201,
+        "technical_hits": 0,
+        "technical_disk_hits": 0,
+        "technical_misses": 200,
+        "pit_index_builds": 201,
+        "pit_index_hits": 200,
+        "rolling_builds_v7": 200
+      }
+    },
+    {
+      "version": "V9",
+      "case": "warm_identical_result",
+      "elapsed_seconds": 0.02146145400001842,
+      "replayed_sessions": 1,
+      "cache_status": "COMPLETE_RESULT_REUSED",
+      "stats": {
+        "price_misses": 204,
+        "price_hits": 1197,
+        "fundamental_misses": 400,
+        "fundamental_hits": 0,
+        "disk_hits": 0,
+        "disk_writes": 400,
+        "price_disk_hits": 0,
+        "price_disk_writes": 204,
+        "price_parquet_writes": 201,
+        "technical_hits": 0,
+        "technical_disk_hits": 0,
+        "technical_misses": 200,
+        "pit_index_builds": 201,
+        "pit_index_hits": 200,
+        "rolling_builds_v7": 200
+      }
+    },
+    {
+      "version": "V9",
+      "case": "overlap_plus_uncomputed_date",
+      "elapsed_seconds": 23.238394378999146,
+      "replayed_sessions": 2,
+      "cache_status": "NEW_COMPUTATION",
+      "stats": {
+        "price_misses": 0,
+        "price_hits": 2398,
+        "fundamental_misses": 390,
+        "fundamental_hits": 10,
+        "disk_hits": 400,
+        "disk_writes": 390,
+        "price_disk_hits": 204,
+        "price_disk_writes": 0,
+        "price_parquet_writes": 0,
+        "technical_hits": 0,
+        "technical_disk_hits": 200,
+        "technical_misses": 200,
+        "pit_index_builds": 201,
+        "pit_index_hits": 601,
+        "rolling_builds_v7": 200,
+        "rolling_hits_v7": 200
+      }
+    },
+    {
+      "version": "V9",
+      "case": "1W_overlapping",
+      "elapsed_seconds": 3.1574814960004005,
+      "replayed_sessions": 2,
+      "cache_status": "NEW_COMPUTATION",
+      "stats": {
+        "price_misses": 0,
+        "price_hits": 2398,
+        "fundamental_misses": 0,
+        "fundamental_hits": 10,
+        "disk_hits": 790,
+        "disk_writes": 0,
+        "price_disk_hits": 204,
+        "price_disk_writes": 0,
+        "price_parquet_writes": 0,
+        "technical_hits": 0,
+        "technical_disk_hits": 400,
+        "technical_misses": 0,
+        "pit_index_builds": 201,
+        "pit_index_hits": 601,
+        "rolling_builds_v7": 200,
+        "rolling_hits_v7": 200
+      }
+    }
+  ],
+  "state_directory": "/workspace/scratch/5feebf5aeaba/verification/state-V9"
+}

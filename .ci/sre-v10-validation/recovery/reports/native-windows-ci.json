@@ -1,0 +1,201 @@
+{
+  "status": "PASS",
+  "commit": "5a7f511f0ba3b40f5ef4affe9e926802ea16aa65",
+  "run_id": 39506303909,
+  "url": "https://github.com/NarayananRG/Stock-Recommendation-Engine/actions/runs/39506303909",
+  "tests_per_runtime": 17,
+  "jobs": [
+    {
+      "id": 118915969903,
+      "name": "native (3.14)",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-10-20T22:11:55Z",
+          "completed_at": "2026-10-20T22:11:57Z"
+        },
+        {
+          "name": "Run actions/checkout@v6",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-10-20T22:11:57Z",
+          "completed_at": "2026-10-20T22:12:03Z"
+        },
+        {
+          "name": "Run actions/setup-python@v6",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-10-20T22:12:03Z",
+          "completed_at": "2026-10-20T22:12:03Z"
+        },
+        {
+          "name": "Restore code-only validation fixture",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-10-20T22:12:03Z",
+          "completed_at": "2026-10-20T22:12:05Z"
+        },
+        {
+          "name": "Install native test dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-10-20T22:12:05Z",
+          "completed_at": "2026-10-20T22:12:50Z"
+        },
+        {
+          "name": "Verify native source, persistence, recovery and rollback",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-10-20T22:12:50Z",
+          "completed_at": "2026-10-20T22:13:01Z"
+        },
+        {
+          "name": "Record native runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-10-20T22:13:01Z",
+          "completed_at": "2026-10-20T22:13:02Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-10-20T22:13:02Z",
+          "completed_at": "2026-10-20T22:13:03Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v6",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-10-20T22:13:03Z",
+          "completed_at": "2026-10-20T22:13:03Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v6",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16,
+          "started_at": "2026-10-20T22:13:03Z",
+          "completed_at": "2026-10-20T22:13:06Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 17,
+          "started_at": "2026-10-20T22:13:06Z",
+          "completed_at": "2026-10-20T22:13:06Z"
+        }
+      ]
+    },
+    {
+      "id": 118915970077,
+      "name": "native (3.12)",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-10-20T22:11:54Z",
+          "completed_at": "2026-10-20T22:11:55Z"
+        },
+        {
+          "name": "Run actions/checkout@v6",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-10-20T22:11:55Z",
+          "completed_at": "2026-10-20T22:12:01Z"
+        },
+        {
+          "name": "Run actions/setup-python@v6",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-10-20T22:12:01Z",
+          "completed_at": "2026-10-20T22:12:01Z"
+        },
+        {
+          "name": "Restore code-only validation fixture",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-10-20T22:12:01Z",
+          "completed_at": "2026-10-20T22:12:03Z"
+        },
+        {
+          "name": "Install native test dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-10-20T22:12:03Z",
+          "completed_at": "2026-10-20T22:12:45Z"
+        },
+        {
+          "name": "Verify native source, persistence, recovery and rollback",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-10-20T22:12:45Z",
+          "completed_at": "2026-10-20T22:12:53Z"
+        },
+        {
+          "name": "Record native runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-10-20T22:12:53Z",
+          "completed_at": "2026-10-20T22:12:54Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-10-20T22:12:54Z",
+          "completed_at": "2026-10-20T22:12:55Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v6",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-10-20T22:12:55Z",
+          "completed_at": "2026-10-20T22:12:55Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v6",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16,
+          "started_at": "2026-10-20T22:12:55Z",
+          "completed_at": "2026-10-20T22:12:57Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 17,
+          "started_at": "2026-10-20T22:12:57Z",
+          "completed_at": "2026-10-20T22:12:57Z"
+        }
+      ]
+    }
+  ],
+  "native_windows_backend_tested": true,
+  "interactive_desktop_manually_tested": false
+}
