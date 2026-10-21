@@ -1,4 +1,4 @@
-name: SRE V10 native Windows validation only
+name: Final SRE V10 performance correction native acceptance
 on:
   push:
     branches: [perf/sre-v10-native-validation-20261021]
@@ -21,37 +21,38 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python }}
-      - name: Restore code-only validation fixture
+      - name: Restore code-only fixture
         shell: python
         run: |
-          import base64,hashlib,io,zipfile
           from pathlib import Path
+          import base64,hashlib,zipfile,io
           payload=base64.b64decode(Path('.ci/sre-v10-validation/source.b64').read_text())
-          assert hashlib.sha256(payload).hexdigest()=='7ecd752c050c2f8cd9ae274016d9d725b17ff2c7408451dd4461f3ea649e3c38'
+          assert hashlib.sha256(payload).hexdigest()=="842298d327880471e3cd9afd52091f06b96c811f9fb9cb62c7b49178fa99cae5"
           zipfile.ZipFile(io.BytesIO(payload)).extractall('.')
       - name: Install native test dependencies
-        run: python -m pip install --disable-pip-version-check numpy pandas "polars>=1.32,<3" "pyarrow>=20,<30" fastapi pytest httpx uvicorn
-      - name: Verify native source, persistence, recovery and rollback
+        run: python -m pip install --disable-pip-version-check numpy pandas polars==2.0.0 pyarrow==26.0.0 fastapi pytest httpx uvicorn
+      - name: Test parity, restart reuse, invalidation, recovery and installation
         env:
-          PYTHONPATH: v10work
+          PYTHONPATH: v10-final
           PYTHONWARNINGS: ignore
-        run: python -m pytest -q v10bundle/tests --basetemp "$env:RUNNER_TEMP/sv10-unit" --junitxml native-windows-tests.xml
-      - name: Record native runtime
+        run: python -m pytest -q v10-final-bundle/tests --basetemp "$env:RUNNER_TEMP/sv10-final" --junitxml native-windows-tests.xml
+      - name: Record actual Windows runtime
         if: always()
         env:
-          PYTHONPATH: v10work
+          PYTHONPATH: v10-final
         shell: python
         run: |
-          import json,platform,sys,os
+          import os,platform,json
           from stock_app.replay_v10 import RUNTIME
           assert os.name=='nt'
-          report={'platform':platform.platform(),'runtime':RUNTIME,'windows_native_execution':True}
-          open('native-windows-runtime.json','w').write(json.dumps(report,indent=2))
-          print(json.dumps(report))
+          r={'platform':platform.platform(),'runtime':RUNTIME,'native_windows':True}
+          Path=__import__('pathlib').Path
+          Path('native-windows-runtime.json').write_text(json.dumps(r,indent=2))
+          print(json.dumps(r))
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: sre-v10-windows-${{ matrix.python }}
+          name: sre-v10-final-windows-${{ matrix.python }}
           path: |
             native-windows-tests.xml
             native-windows-runtime.json
