@@ -1,0 +1,7 @@
+{
+  "status": "PASS",
+  "completed_before_interruption": 9,
+  "resumed": true,
+  "final_coverage_rows": 504,
+  "duplicate_coverage_rows": 0
+}
