@@ -40,6 +40,10 @@ function Test-SreSqliteFile([string]$Path) {
 }
 function Assert-SreStopped([string]$DataRoot, [string]$InstallRoot) {
     # Fail closed if the process inventory cannot be read. Do not kill anything.
+    $aliases=@($InstallRoot,$DataRoot)
+    $fso=New-Object -ComObject Scripting.FileSystemObject
+    try { foreach($r in @($InstallRoot,$DataRoot)) { $f=$fso.GetFolder($r); try { $aliases+=@([string]$f.ShortPath,[string]$f.Path) } finally { [void][Runtime.InteropServices.Marshal]::FinalReleaseComObject($f) } } }
+    finally { [void][Runtime.InteropServices.Marshal]::FinalReleaseComObject($fso) }
     $processes = @(Get-CimInstance Win32_Process -ErrorAction Stop)
     foreach ($p in $processes) {
         if ($p.ProcessId -eq $PID) { continue }
@@ -51,7 +55,7 @@ function Assert-SreStopped([string]$DataRoot, [string]$InstallRoot) {
         $namedApp = $name -match '^(StockRecommendationEngine|stock-recommendation-engine|stock_app_launcher|stock_app_ops_launcher|sre)\.exe$'
         $backend = $name -match '^(python[^\/ ]*|uvicorn)(\.exe)?$' -and
             ($cmd -match '(run_modern_ui|stock_app_launcher|stock_app_ops_launcher|modern_ui[./\\:]|uvicorn.+modern_ui)' -or
-             ($cmd -and $cmd.IndexOf($InstallRoot, [StringComparison]::OrdinalIgnoreCase) -ge 0))
+             (@($aliases | Where-Object { $cmd -and $cmd.Replace('/','\').IndexOf($_.Replace('/','\'),[StringComparison]::OrdinalIgnoreCase) -ge 0 }).Count -gt 0))
         if (($inInstall -and -not $isShell) -or $namedApp -or $backend) {
             throw "SRE appears to be running (PID $($p.ProcessId), $name). Close SRE and rerun this script. No process was stopped."
         }
