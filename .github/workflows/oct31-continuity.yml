@@ -1,4 +1,4 @@
-name: October 31 continuity collector safety v3
+name: October 31 continuity collector safety and offline evaluator
 on:
   push:
     branches: [audit/oct31-continuity-20261022]
@@ -31,6 +31,7 @@ jobs:
           assert hashlib.sha256(b).hexdigest()=='e7bde5a817aa4007bc207e7096b1121778ea7179b5aae77e4d247753fe90aa75'
           zipfile.ZipFile(io.BytesIO(b)).extractall('.')
           shutil.copyfile('tools/continuity/COLLECT_SRE_OCT31.ps1','COLLECT_SRE_OCT31.ps1')
+          shutil.copyfile('tools/continuity/FOLLOW_UP_FORECASTS.py','.ci/oct31/FOLLOW_UP_FORECASTS.py')
       - name: Test official source allowlist and redirect refusal
         run: |
           python -m pip install --disable-pip-version-check pytest
