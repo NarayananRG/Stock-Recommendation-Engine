@@ -2,7 +2,7 @@ name: Gate A closure correction acceptance
 on:
   push:
     branches: [fix/gatea-holdings-registry-20261022]
-    paths: [.ci/gatea-closure/source.b64, .github/workflows/gatea-closure.yml]
+    paths: [.github/workflows/gatea-closure.yml]
 permissions:
   contents: read
 jobs:
