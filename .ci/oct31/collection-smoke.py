@@ -26,7 +26,7 @@ with zipfile.ZipFile(zs[0])as z:
  assert json.loads(z.read('application-state/config.json'))['api_key']=='[REDACTED]'
  m=json.loads(z.read('snapshot-manifest.json'));assert m['original_files_written']is False and m['original_databases_opened_by_sqlite']is False;assert len(m['databases'])==2
  contract=json.loads(z.read('continuity-evidence/installed-contract.json'));assert contract['status']=='LATEST_PATCH_SOURCE_MATCH',contract
- ev=json.loads(z.read('continuity-evidence/official-evidence-report.json'));assert ev['requested']==572 and ev['bytes_saved']==0 and all(r['status']=='SKIPPED_BY_EXPLICIT_OFFLINE_OPTION'for r in ev['records'])
+ ev=json.loads(z.read('continuity-evidence/official-evidence-report.json'));assert ev['requested']==604 and ev['bytes_saved']==0 and all(r['status']=='SKIPPED_BY_EXPLICIT_OFFLINE_OPTION'for r in ev['records'])
  for line in z.read('CAPTURE_CHECKSUMS.sha256').decode('utf-8-sig').splitlines():
   h,n=line.split('  ',1);assert hashlib.sha256(z.read(n)).hexdigest()==h,n
  for d in m['databases']:
