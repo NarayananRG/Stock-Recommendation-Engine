@@ -1,4 +1,4 @@
-name: October 31 continuity collector safety v2
+name: October 31 continuity collector safety v3
 on:
   push:
     branches: [audit/oct31-continuity-20261022]
