@@ -25,7 +25,7 @@ jobs:
         run: |
           import base64,hashlib,zipfile,io,pathlib
           b=base64.b64decode(pathlib.Path('.ci/gatea-holdings/source.b64').read_text())
-          assert hashlib.sha256(b).hexdigest()=='049b1375844d789464048bc49569c48990bb4706d9c7234515569512d50b816c'
+          assert hashlib.sha256(b).hexdigest()=='1ff65167bfdbaec4d509cb6df40ac2c19fc6543cd22059662df53a4a0c90d125'
           zipfile.ZipFile(io.BytesIO(b)).extractall('.')
       - name: Install isolated CI dependencies
         run: python -m pip install --disable-pip-version-check numpy pandas polars==2.0.0 pyarrow==26.0.0 fastapi pytest httpx uvicorn
