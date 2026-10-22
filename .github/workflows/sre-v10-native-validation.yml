@@ -36,6 +36,39 @@ jobs:
           PYTHONPATH: v10-final
           PYTHONWARNINGS: ignore
         run: python -m pytest -q v10-final-bundle/tests --basetemp "$env:RUNNER_TEMP/sv10-final" --junitxml native-windows-tests.xml
+      - name: Exercise actual PowerShell apply, running-process guard and rollback
+        env:
+          PYTHONPATH: v10-final
+          PY_PYTHON3: ${{ matrix.python }}
+        shell: python
+        run: |
+          import os,sys,subprocess,tempfile,shutil,hashlib,json
+          from pathlib import Path
+          selected=subprocess.check_output(['py','-3','-c','import sys;print(sys.version.split()[0])'],text=True).strip()
+          assert selected.startswith(os.environ['PY_PYTHON3']+'.'),selected
+          root=Path(tempfile.mkdtemp(prefix='v10-powershell-'))/'engine'
+          shutil.copytree('v10-current',root)
+          (root/'.replay-v10-deps').mkdir(exist_ok=True)
+          marker=root/'paper-identity.sqlite3';marker.write_bytes(b'preserve-exact-current-paper-state')
+          original={p.relative_to(root).as_posix():p.read_bytes() for p in root.rglob('*') if p.is_file() and '__pycache__' not in p.parts}
+          def run(script):
+              return subprocess.run(['powershell','-NoProfile','-ExecutionPolicy','Bypass','-File',str(Path('v10-final-bundle')/script),'-EngineRoot',str(root)],capture_output=True,text=True)
+          child=subprocess.Popen([sys.executable,'-c','import time;time.sleep(30)',str(root)])
+          try:
+              guarded=run('APPLY.ps1')
+              assert guarded.returncode!=0 and 'Close SRE completely' in guarded.stderr,guarded.stdout+guarded.stderr
+              assert not (root/'.replay-v10-final-receipt.json').exists()
+          finally:
+              child.terminate();child.wait(timeout=10)
+          applied=run('APPLY.ps1');print(applied.stdout);assert applied.returncode==0,applied.stderr
+          manifest=json.loads(Path('v10-final-bundle/manifest.json').read_text())
+          for name,value in manifest['files'].items():
+              assert hashlib.sha256((root/name).read_bytes()).hexdigest()==value['new_sha256']
+          assert marker.read_bytes()==b'preserve-exact-current-paper-state'
+          rolled=run('ROLLBACK.ps1');print(rolled.stdout);assert rolled.returncode==0,rolled.stderr
+          for name,data in original.items():assert (root/name).read_bytes()==data,name
+          assert not (root/'stock_app/replay_v10_final.py').exists()
+          print('NATIVE_POWERSHELL_APPLY_PROCESS_GUARD_AND_EXACT_ROLLBACK_PASS',selected)
       - name: Record actual Windows runtime
         if: always()
         env:
