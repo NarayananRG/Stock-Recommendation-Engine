@@ -66,7 +66,7 @@ function Get-SreFiles([string]$Root, [string]$Label, [string]$SkipRoot, $Exclude
             if ($SkipRoot -and (Test-SreInside $item.FullName $SkipRoot)) { continue }
             $why = $null
             if ($item.Attributes -band [IO.FileAttributes]::ReparsePoint) { $why = 'REPARSE_POINT_NOT_FOLLOWED' }
-            elseif ($item.PSIsContainer -and $item.Name -match '^(\.git|\.venv|venv|env|node_modules|__pycache__|\.pytest_cache|\.mypy_cache|site-packages|Scripts|Lib|Include|DLLs|tcl|\.tox|\.ruff_cache|\.cache|\.build|build|dist|target)$') { $why = 'DEPENDENCY_OR_BUILD_DIRECTORY' }
+            elseif ($item.PSIsContainer -and $item.Name -match '^(\.git|\.venv|venv|env|node_modules|__pycache__|\.pytest_cache|\.mypy_cache|site-packages|Scripts|Lib|Include|DLLs|tcl|\.tox|\.ruff_cache|\.build|build|dist|target)$') { $why = 'DEPENDENCY_OR_BUILD_DIRECTORY' }
             elseif ($Label -eq 'application-state' -and $item.PSIsContainer -and $item.Name -match '^native-engine-') { $why = 'OTHER_INSTALLED_ENGINE_VERSION' }
             elseif ($item.PSIsContainer -and $item.Name -match '(?i)(^v10[-_].*runtime$|^runtime[-_]?v10$|^private[-_]runtime$|^replay[-_](feature|input)[-_]cache|^historical_replay_(feature|input)_cache|^replay_v10_(features|cache))') { $why = 'PRIVATE_RUNTIME_OR_REPLAY_FEATURE_CACHE' }
             elseif (-not $item.PSIsContainer -and $item.Name -match '(?i)^(\.env($|\.)|credentials?($|\.)|secrets?($|\.)|tokens?($|\.)|id_rsa|id_ed25519|.*\.(pem|pfx|p12|key)$)') { $why = 'CREDENTIAL_FILE' }
@@ -264,6 +264,7 @@ function New-SreGateASnapshot([string]$DataRoot, [string]$InstallRoot, [string]$
         if ($script:CollectorPath -and (Test-Path -LiteralPath $script:CollectorPath)) { [IO.File]::Copy($script:CollectorPath,(Join-Path $payload 'COLLECTOR.ps1'),$false) }
         $checksums = @{}
         foreach ($f in Get-ChildItem -LiteralPath $payload -Recurse -File -Force) { $rel=$f.FullName.Substring($payload.Length+1).Replace('\','/'); $checksums[$rel]=Get-SreHash $f.FullName }
+        Add-Type -AssemblyName System.IO.Compression
         Add-Type -AssemblyName System.IO.Compression.FileSystem
         # .NET Framework's CreateFromDirectory uses backslashes in ZIP names.
         # Create explicit forward-slash entries for portable Work/Linux extraction.

@@ -54,6 +54,8 @@ $archive=[IO.Compression.ZipFile]::OpenRead($result.zip)
 try {Assert-Check 'ZIP uses portable forward-slash paths on both PowerShell runtimes' (@($archive.Entries|Where-Object{$_.FullName.Contains('\')}).Count -eq 0)}finally{$archive.Dispose()}
 Assert-Check 'No working copies remain after success' (@(Get-ChildItem $out -Directory).Count -eq 0)
 Assert-Rejected 'Output inside installation safely refused' {New-SreGateASnapshot $data $engine (Join-Path $data 'bad-output')}
+$child=Start-Process -FilePath (Get-Command python).Source -ArgumentList @('-c','"import time; time.sleep(30)"',('"'+$engine+'"')) -PassThru
+try{Assert-Rejected 'Running backend process refused without stopping it' {New-SreGateASnapshot $data $engine $out};Assert-Check 'Collector leaves detected backend process running' (-not $child.HasExited)}finally{if(-not $child.HasExited){Stop-Process -Id $child.Id -Force}}
 $dbPath=Join-Path $data 'phase81_validation.sqlite3'
 $lock=[IO.File]::Open($dbPath,'Open','ReadWrite','None')
 try{Assert-Rejected 'Database with an active incompatible handle safely refused' {New-SreGateASnapshot $data $engine $out}}finally{$lock.Dispose()}
