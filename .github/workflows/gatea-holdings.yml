@@ -1,0 +1,47 @@
+name: Gate A holdings monitoring acceptance
+on:
+  push:
+    branches: [fix/gatea-holdings-registry-20261022]
+    paths: [.ci/gatea-holdings/source.b64, .github/workflows/gatea-holdings.yml]
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.12', '3.14']
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          sparse-checkout: .ci/gatea-holdings
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Restore code-only fixtures
+        shell: python
+        run: |
+          import base64,hashlib,zipfile,io,pathlib
+          b=base64.b64decode(pathlib.Path('.ci/gatea-holdings/source.b64').read_text())
+          assert hashlib.sha256(b).hexdigest()=='049b1375844d789464048bc49569c48990bb4706d9c7234515569512d50b816c'
+          zipfile.ZipFile(io.BytesIO(b)).extractall('.')
+      - name: Install isolated CI dependencies
+        run: python -m pip install --disable-pip-version-check numpy pandas polars==2.0.0 pyarrow==26.0.0 fastapi pytest httpx uvicorn
+      - name: Test holdings lifecycle, missing data, PIT, idempotency and frozen rule parity
+        env:
+          PYTHONPATH: gatea-fixed
+        run: python -m pytest gatea-tests/test_holdings.py -q --junitxml=native-results.xml
+      - name: Test frontend identity and count rendering
+        run: node gatea-tests/ui-check.js
+      - name: Test guarded Windows apply and exact rollback on safe synthetic installation
+        env:
+          PYTHONPATH: gatea-fixed
+          PY_PYTHON3: ${{ matrix.python }}
+        run: python gatea-tests/install-smoke.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gatea-windows-${{ matrix.python }}
+          path: native-results.xml
