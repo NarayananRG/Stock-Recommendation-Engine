@@ -25,14 +25,14 @@ jobs:
         run: |
           import base64,hashlib,zipfile,io,pathlib
           b=base64.b64decode(pathlib.Path('.ci/gatea-closure/source.b64').read_text())
-          assert hashlib.sha256(b).hexdigest()=='494e8a6cd265fdc9040c0910e77e082d2d1bd119d14bcfe3c9db9f72bd3ce7c8'
+          assert hashlib.sha256(b).hexdigest()=='8d12ca6d8bc1a5a92915a0eaae404df24b70d318a349b267179f4b3e81170466'
           zipfile.ZipFile(io.BytesIO(b)).extractall('.')
       - name: Install isolated CI dependencies
         run: python -m pip install --disable-pip-version-check numpy pandas polars==2.0.0 pyarrow==26.0.0 fastapi pytest httpx uvicorn
       - name: Test holdings lifecycle, missing data, PIT, idempotency and frozen rule parity
         env:
           PYTHONPATH: gatea-fixed
-        run: python -m pytest gatea-tests/test_holdings.py gatea-closure/test_closure.py gatea-closure/test_legacy_corrected_fixture.py gatea-closure/test_current_contract.py gatea-tests/test_v10_core.py gatea-fixed/tests -k "not actual and not frozen_contract" -q --junitxml=native-results.xml
+        run: python -m pytest gatea-tests/test_holdings.py gatea-closure/test_closure.py gatea-closure/test_legacy_corrected_fixture.py gatea-closure/test_current_contract.py gatea-closure/test_legacy_replacement_current_fixture.py gatea-tests/test_v10_core.py gatea-fixed/tests -k "not actual and not frozen_contract" -q --junitxml=native-results.xml
       - name: Test guarded Windows apply and exact rollback on safe synthetic installation
         env:
           PYTHONPATH: gatea-fixed
