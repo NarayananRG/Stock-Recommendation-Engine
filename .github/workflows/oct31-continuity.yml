@@ -1,4 +1,4 @@
-name: October 31 continuity collector safety and offline evaluator
+name: October 31 final collection and offline evaluator
 on:
   push:
     branches: [audit/oct31-continuity-20261022]
