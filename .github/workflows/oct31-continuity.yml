@@ -1,0 +1,47 @@
+name: October 31 continuity collector safety
+on:
+  push:
+    branches: [audit/oct31-continuity-20261022]
+    paths: [.github/workflows/oct31-continuity.yml]
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.12','3.14']
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          sparse-checkout: |
+            .ci/gatea-final-contract
+            .ci/oct31
+            tools/continuity
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Restore synthetic code-only source fixture
+        shell: python
+        run: |
+          import pathlib,base64,hashlib,zipfile,io,shutil
+          b=base64.b64decode(pathlib.Path('.ci/gatea-final-contract/source.b64').read_text())
+          assert hashlib.sha256(b).hexdigest()=='e7bde5a817aa4007bc207e7096b1121778ea7179b5aae77e4d247753fe90aa75'
+          zipfile.ZipFile(io.BytesIO(b)).extractall('.')
+          shutil.copyfile('tools/continuity/COLLECT_SRE_OCT31.ps1','COLLECT_SRE_OCT31.ps1')
+      - name: Test official source allowlist and redirect refusal
+        run: |
+          python -m pip install --disable-pip-version-check pytest
+          python -m pytest .ci/oct31/tests -q --junitxml=collector-results.xml
+      - name: Test Windows capture and original-data preservation
+        env:
+          PYTHONPATH: gatea-fixed
+          PY_PYTHON3: ${{ matrix.python }}
+        run: python .ci/oct31/collection-smoke.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: oct31-collector-windows-${{ matrix.python }}
+          path: collector-results.xml
