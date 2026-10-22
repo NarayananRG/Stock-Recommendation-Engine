@@ -1,0 +1,24 @@
+name: Gate A read-only snapshot collector
+on:
+  push:
+    branches: ['test/gatea-snapshot-collector-20261022']
+    paths: ['.ci/gatea-collector/**', '.github/workflows/gatea-snapshot-collector.yml']
+permissions:
+  contents: read
+jobs:
+  native-windows:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shell: [powershell, pwsh]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run isolated Windows collector tests
+        shell: '${{ matrix.shell }}'
+        run: '& ./.ci/gatea-collector/Test-Collector.ps1'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: 'gatea-collector-${{ matrix.shell }}'
+          path: .ci/gatea-collector/test-results-*.json
