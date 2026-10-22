@@ -14,6 +14,8 @@ script=Path('COLLECT_SRE_OCT31.ps1').resolve()
 def run(output):return subprocess.run(['powershell.exe','-NoProfile','-ExecutionPolicy','Bypass','-File',str(script),'-AppDataRoot',str(app),'-OutputDirectory',str(output),'-SkipOfficialDownloads'],text=True,capture_output=True)
 child=subprocess.Popen([sys.executable,'-c','import time;time.sleep(50)',str(engine)])
 try:
+ probe=subprocess.run(['powershell.exe','-NoProfile','-Command',f'Get-CimInstance Win32_Process | Where-Object {{$_.ProcessId -eq {child.pid}}} | Select-Object Name,CommandLine,ExecutablePath | ConvertTo-Json'],text=True,capture_output=True)
+ print('Synthetic process guard probe:',probe.stdout,flush=True)
  r=run(out);assert r.returncode!=0 and 'running'in (r.stdout+r.stderr).lower(),r.stdout+r.stderr
 finally:child.terminate();child.wait()
 r=run(app/'not-allowed');assert r.returncode!=0 and 'outside'in r.stderr,r.stdout+r.stderr
