@@ -3,7 +3,7 @@ import pathlib, sqlite3, shutil, sys
 
 root = pathlib.Path(sys.argv[1])
 root.mkdir(parents=True, exist_ok=True)
-for filename in ("stock_recommendation_engine.sqlite3", "phase81_validation.sqlite3", "extra-monitoring.db"):
+for filename in ("stock_recommendation_engine.sqlite3", "phase81_validation.sqlite3", "extra-monitoring.db", "extensionless-ledger"):
     seed = root.parent / ("seed-" + filename)
     db = sqlite3.connect(seed)
     db.execute("pragma journal_mode=wal")

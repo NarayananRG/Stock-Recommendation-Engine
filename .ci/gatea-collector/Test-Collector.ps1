@@ -34,7 +34,7 @@ if($LASTEXITCODE -ne 0){throw 'Fixture seeding failed'}
 $before=@{};foreach($f in Get-ChildItem $data -Recurse -File -Force){$before[$f.FullName]=Get-SreHash $f.FullName}
 $result=New-SreGateASnapshot $data $engine $out
 Assert-Check 'Archive produced and hash reported' ((Test-Path $result.zip) -and (Get-SreHash $result.zip) -eq $result.sha256)
-Assert-Check 'All three SQLite databases detected' ($result.databases -eq 3)
+Assert-Check 'All four SQLite databases including extensionless ledger detected' ($result.databases -eq 4)
 $extract=Join-Path $base 'extract'
 [IO.Compression.ZipFile]::ExtractToDirectory($result.zip,$extract)
 $manifest=Get-Content (Join-Path $extract 'snapshot-manifest.json') -Raw|ConvertFrom-Json
@@ -49,7 +49,9 @@ Assert-Check 'Dependencies and credential file excluded' (-not (Test-Path (Join-
 $config=Get-Content (Join-Path $extract 'application-state\config.json') -Raw
 Assert-Check 'Nested credential values redacted in captured JSON only' ($config -notmatch 'DO_NOT_UPLOAD|ALSO_SECRET' -and $config -match 'REDACTED' -and $config -match 'ordinary')
 Assert-Check 'Source hashes retained for every captured original' (@($manifest.source_files|Where-Object{$_.source_sha256.Length -ne 64}).Count -eq 0)
-Assert-Check 'Source WAL accounted for but normalized out of archive' (@($manifest.source_files|Where-Object{$_.path -match '-wal$' -and -not $_.archive_included}).Count -eq 3)
+Assert-Check 'Source WAL accounted for but normalized out of archive' (@($manifest.source_files|Where-Object{$_.path -match '-wal$' -and -not $_.archive_included}).Count -eq 4)
+$archive=[IO.Compression.ZipFile]::OpenRead($result.zip)
+try {Assert-Check 'ZIP uses portable forward-slash paths on both PowerShell runtimes' (@($archive.Entries|Where-Object{$_.FullName.Contains('\')}).Count -eq 0)}finally{$archive.Dispose()}
 Assert-Check 'No working copies remain after success' (@(Get-ChildItem $out -Directory).Count -eq 0)
 Assert-Rejected 'Output inside installation safely refused' {New-SreGateASnapshot $data $engine (Join-Path $data 'bad-output')}
 $dbPath=Join-Path $data 'phase81_validation.sqlite3'

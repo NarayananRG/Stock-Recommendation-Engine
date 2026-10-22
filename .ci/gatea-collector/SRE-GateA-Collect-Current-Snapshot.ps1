@@ -26,6 +26,17 @@ function Test-SreInside([string]$Path, [string]$Parent) {
     return $Path.Equals($Parent, [StringComparison]::OrdinalIgnoreCase) -or
         $Path.StartsWith($Parent.TrimEnd('\','/') + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)
 }
+function Test-SreSqliteFile([string]$Path) {
+    if ($Path -match '(?i)\.(sqlite|sqlite3|db|db3)$') { return $true }
+    if ($Path -match '(?i)-(wal|shm|journal)$') { return $false }
+    $stream=[IO.File]::Open($Path,'Open','Read','Read')
+    try {
+        if ($stream.Length -lt 16) { return $false }
+        $header=New-Object byte[] 16
+        [void]$stream.Read($header,0,16)
+        return [Text.Encoding]::ASCII.GetString($header) -ceq "SQLite format 3`0"
+    } finally { $stream.Dispose() }
+}
 function Assert-SreStopped([string]$DataRoot, [string]$InstallRoot) {
     # Fail closed if the process inventory cannot be read. Do not kill anything.
     $processes = @(Get-CimInstance Win32_Process -ErrorAction Stop)
@@ -166,7 +177,12 @@ function New-SreGateASnapshot([string]$DataRoot, [string]$InstallRoot, [string]$
     $files = @(Get-SreFiles $InstallRoot 'engine' '' $excluded) + @(Get-SreFiles $DataRoot 'application-state' $InstallRoot $excluded)
     $fileByRelative = @{}; foreach ($f in $files) { $fileByRelative[$f.relative]=$f }
     if ($files.Count -eq 0) { throw 'No source files found.' }
-    $dbs = @($files | Where-Object { $_.source -match '(?i)\.(sqlite|sqlite3|db)$' })
+    $dbs = @($files | Where-Object { Test-SreSqliteFile $_.source })
+    $dbPaths = @{}; $sidecarPaths = @{}
+    foreach ($db in $dbs) {
+        $dbPaths[$db.source]=$true
+        foreach ($suffix in @('-wal','-shm','-journal')) { $sidecarPaths[$db.source+$suffix]=$true }
+    }
     foreach ($required in @('stock_recommendation_engine.sqlite3','phase81_validation.sqlite3')) {
         if (-not @($dbs | Where-Object { [IO.Path]::GetFileName($_.source) -eq $required }).Count) { throw "Required active database not found: $required. No partial snapshot will be accepted." }
     }
@@ -191,7 +207,7 @@ function New-SreGateASnapshot([string]$DataRoot, [string]$InstallRoot, [string]$
         [IO.Directory]::CreateDirectory($payload) | Out-Null
         # Lock ALL selected DBs and sidecars together before copying ANY data.
         foreach ($f in $files) {
-            if ($f.source -match '(?i)\.(sqlite|sqlite3|db)(-wal|-shm|-journal)?$') {
+            if ($dbPaths.ContainsKey($f.source) -or $sidecarPaths.ContainsKey($f.source)) {
                 try { $locks[$f.source] = [IO.File]::Open($f.source, 'Open', 'Read', 'Read') }
                 catch { throw "Database is in use or unreadable: $($f.relative). Close SRE and rerun. $($_.Exception.Message)" }
             }
@@ -217,12 +233,12 @@ function New-SreGateASnapshot([string]$DataRoot, [string]$InstallRoot, [string]$
         # All originals remain read-locked until the complete capture is verified.
         foreach ($handle in $locks.Values) { $handle.Dispose() }; $locks.Clear()
         foreach ($f in $files) {
-            if ($f.source -match '(?i)\.(sqlite|sqlite3|db)-(wal|shm|journal)$') { $recordByRelative[$f.relative].archive_included=$false; continue }
+            if ($sidecarPaths.ContainsKey($f.source)) { $recordByRelative[$f.relative].archive_included=$false; continue }
             $src = Join-Path $capture $f.relative
             $dest = Join-Path $payload $f.relative
             [IO.Directory]::CreateDirectory([IO.Path]::GetDirectoryName($dest)) | Out-Null
             $record = $recordByRelative[$f.relative]
-            if ($f.source -match '(?i)\.(sqlite|sqlite3|db)$') {
+            if ($dbPaths.ContainsKey($f.source)) {
                 [SreGateASnapshotSqlite]::BackupCopy($src,$dest)
                 $record.transformed=$true
                 [void]$databaseRecords.Add([ordered]@{path=$f.relative; integrity_check='ok'; sqlite_backup='WINDOWS_SQLITE_BACKUP_FROM_PRIVATE_DB_AND_SIDECARS'; tables=[SreGateASnapshotSqlite]::Query($dest,"SELECT name FROM sqlite_master WHERE type='table' ORDER BY name")})
@@ -249,7 +265,14 @@ function New-SreGateASnapshot([string]$DataRoot, [string]$InstallRoot, [string]$
         $checksums = @{}
         foreach ($f in Get-ChildItem -LiteralPath $payload -Recurse -File -Force) { $rel=$f.FullName.Substring($payload.Length+1).Replace('\','/'); $checksums[$rel]=Get-SreHash $f.FullName }
         Add-Type -AssemblyName System.IO.Compression.FileSystem
-        [IO.Compression.ZipFile]::CreateFromDirectory($payload,$partialZip,[IO.Compression.CompressionLevel]::Optimal,$false)
+        # .NET Framework's CreateFromDirectory uses backslashes in ZIP names.
+        # Create explicit forward-slash entries for portable Work/Linux extraction.
+        $writer=[IO.Compression.ZipFile]::Open($partialZip,[IO.Compression.ZipArchiveMode]::Create)
+        try {
+            foreach ($rel in $checksums.Keys) {
+                [IO.Compression.ZipFileExtensions]::CreateEntryFromFile($writer,(Join-Path $payload $rel),$rel,[IO.Compression.CompressionLevel]::Optimal) | Out-Null
+            }
+        } finally { $writer.Dispose() }
         $archive = [IO.Compression.ZipFile]::OpenRead($partialZip)
         $seen = @{}
         try {
