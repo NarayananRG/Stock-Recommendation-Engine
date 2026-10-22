@@ -39,7 +39,31 @@ function Test-SreSqliteFile([string]$Path) {
     } finally { $stream.Dispose() }
 }
 function Assert-SreStopped([string]$DataRoot, [string]$InstallRoot) {
-    # Fail closed if the process inventory cannot be read. Do not kill anything.
+    # Parse Windows argv and expand hybrid long/8.3 directory aliases before matching.
+    if(-not ('SreContinuityProcessPaths' -as [type])) {
+        Add-Type -TypeDefinition @'
+using System;
+using System.IO;
+using System.Text;
+using System.Runtime.InteropServices;
+public static class SreContinuityProcessPaths {
+ [DllImport("kernel32.dll",CharSet=CharSet.Unicode)] static extern uint GetLongPathName(string path,StringBuilder output,uint size);
+ [DllImport("shell32.dll",CharSet=CharSet.Unicode)] static extern IntPtr CommandLineToArgvW(string command,out int count);
+ [DllImport("kernel32.dll")] static extern IntPtr LocalFree(IntPtr p);
+ static string Long(string p) {var b=new StringBuilder(32768);return GetLongPathName(p,b,32768)>0?b.ToString():Path.GetFullPath(p);}
+ public static bool References(string command,string root) {
+  if(String.IsNullOrEmpty(command))return false;
+  int count;IntPtr p=CommandLineToArgvW(command,out count);if(p==IntPtr.Zero)return false;
+  try {string target=Long(root).TrimEnd('\\','/');for(int i=0;i<count;i++) {
+   string arg=Marshal.PtrToStringUni(Marshal.ReadIntPtr(p,i*IntPtr.Size));
+   if(!Directory.Exists(arg)&&!File.Exists(arg))continue;
+   string path=Long(arg);if(path.Equals(target,StringComparison.OrdinalIgnoreCase)||path.StartsWith(target+"\\",StringComparison.OrdinalIgnoreCase))return true;
+  }return false;}finally{LocalFree(p);}
+ }
+}
+'@
+    }
+    # Fail closed if process inventory cannot be read. Never terminate a process.
     $aliases=@($InstallRoot,$DataRoot)
     $fso=New-Object -ComObject Scripting.FileSystemObject
     try { foreach($r in @($InstallRoot,$DataRoot)) { $f=$fso.GetFolder($r); try { $aliases+=@([string]$f.ShortPath,[string]$f.Path) } finally { [void][Runtime.InteropServices.Marshal]::FinalReleaseComObject($f) } } }
@@ -56,7 +80,7 @@ function Assert-SreStopped([string]$DataRoot, [string]$InstallRoot) {
         $backend = $name -match '^(python[^\/ ]*|uvicorn)(\.exe)?$' -and
             ($cmd -match '(run_modern_ui|stock_app_launcher|stock_app_ops_launcher|modern_ui[./\\:]|uvicorn.+modern_ui)' -or
              (@($aliases | Where-Object { $cmd -and $cmd.Replace('/','\').IndexOf($_.Replace('/','\'),[StringComparison]::OrdinalIgnoreCase) -ge 0 }).Count -gt 0))
-        if (($inInstall -and -not $isShell) -or $namedApp -or $backend) {
+        if (($inInstall -and -not $isShell) -or $namedApp -or $backend -or ($name -match "^python" -and [SreContinuityProcessPaths]::References($cmd,$InstallRoot))) {
             throw "SRE appears to be running (PID $($p.ProcessId), $name). Close SRE and rerun this script. No process was stopped."
         }
     }
