@@ -1,10 +1,11 @@
 """Native Windows safety test; all installations and portfolios are synthetic."""
 from pathlib import Path
-import tempfile,shutil,subprocess,sys,json,sqlite3,hashlib,zipfile
+import tempfile,shutil,subprocess,sys,json,sqlite3,hashlib,zipfile,gc
 from stock_app.storage import AppDatabase
 from stock_app.validation_v2 import create_portfolio
 root=Path(tempfile.mkdtemp(prefix='SRE continuity safe '));app=root/'app';engine=app/'native-engine-0.14.13';out=root/'output';shutil.copytree('gatea-fixed',engine)
 AppDatabase(app/'stock_recommendation_engine.sqlite3').initialize();create_portfolio(app/'phase81_validation.sqlite3',starting_session='2026-10-22',starting_run_id='fixture',app_version='test',production_model_version='LIVE_DECISION_V1',evidence_pipeline_version='test',router_sha256='test')
+gc.collect()  # AppDatabase's context manager commits; release synthetic idle handles.
 (engine/'scripts').mkdir(exist_ok=True);(engine/'scripts/keep.ps1').write_text("Write-Host 'source retained'")
 meta=engine/'.replay-v10-deps/fake.dist-info';meta.mkdir(parents=True);(meta/'METADATA').write_text('Name: test-runtime\nVersion: 1.0\n')
 (app/'config.json').write_text('{"api_key":"SYNTHETIC_TEST_ONLY","preserve":true}')
