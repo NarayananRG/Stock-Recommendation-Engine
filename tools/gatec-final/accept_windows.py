@@ -42,7 +42,7 @@ def filemap(root,skip=()):
  for p in Path(root).rglob('*'):
   if not p.is_file() or p.is_symlink():continue
   rel=p.relative_to(root)
-  if any(x in skip or x.startswith(('.oct31-current-backups','.gatea-','native-engine-')) for x in rel.parts):continue
+  if any(x in skip or x.startswith(('.oct31-current-backups','.gatea-backups','native-engine-')) for x in rel.parts):continue
   out[rel.as_posix()]=sha(p)
  return out
 def guarded_copy(root,dest,skip=()):
