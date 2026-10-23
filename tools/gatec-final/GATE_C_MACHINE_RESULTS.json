@@ -1,0 +1,15 @@
+{
+  "schema": "SRE_GATE_C_FINAL_ACCEPTANCE_V1",
+  "gate_c": "BLOCKED",
+  "expected_holdings": {
+    "SYNTHETIC_A": 1,
+    "SYNTHETIC_B": 2
+  },
+  "checks": {
+    "synthetic_template": {
+      "status": "BLOCKED",
+      "evidence": "Synthetic fixture only"
+    }
+  },
+  "stage_history": []
+}
