@@ -8,6 +8,8 @@ AppDatabase(app/'stock_recommendation_engine.sqlite3').initialize();create_portf
 gc.collect()  # AppDatabase's context manager commits; release synthetic idle handles.
 (engine/'scripts').mkdir(exist_ok=True);(engine/'scripts/keep.ps1').write_text("Write-Host 'source retained'")
 meta=engine/'.replay-v10-deps/fake.dist-info';meta.mkdir(parents=True);(meta/'METADATA').write_text('Name: test-runtime\nVersion: 1.0\n')
+(meta.parent/'fake.dll').write_bytes(b'SYNTHETIC BINARY INVENTORY ONLY')
+(meta.parent/'LICENSE.txt').write_text('Synthetic fixture license')
 (app/'config.json').write_text('{"api_key":"SYNTHETIC_TEST_ONLY","preserve":true}')
 # All replay objects are synthetic. Preserve 12 old records across 3 sessions.
 import zlib
@@ -44,6 +46,7 @@ with zipfile.ZipFile(zs[0])as z:
  assert replay['distinct_historically_complete_single_sessions']==['2026-10-09','2026-10-15','2026-10-19']
  fingerprint=json.loads(z.read('gatebc-evidence/NATIVE_FINGERPRINTS.json'));assert fingerprint['status']=='VERIFIED_PURE_MODULE_FINGERPRINTS',fingerprint
  assert json.loads(z.read('gatebc-evidence/SUMMARY.json'))['no_replay_executed']
+ runtime=json.loads(z.read('gatebc-evidence/RUNTIME_PORTABILITY.json'));assert any(x['path'].endswith('fake.dll')for x in runtime['binary_files']);assert runtime['binary_payload_included']is False
  for line in z.read('CAPTURE_CHECKSUMS.sha256').decode('utf-8-sig').splitlines():
   h,n=line.split('  ',1);assert hashlib.sha256(z.read(n)).hexdigest()==h,n
  for d in m['databases']:
