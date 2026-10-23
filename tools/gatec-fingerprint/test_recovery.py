@@ -24,7 +24,7 @@ class RecoveryTests(unittest.TestCase):
    for n,v in [('source-preimage.json',['schema',{},source]),('market-preimage.json',['schema',{},[[str(market.resolve()),w.sha(market)]]]),('EXACT_FINGERPRINT_REPRODUCTION.json',{'cases':{'3.14.3':{'source':'current-source','market':'current-market'}}})]:(tool/n).write_text(json.dumps(v))
    ns={'Path':Path,'json':json,'math':__import__('math'),'digest':w.digest,'VERSION':'SRE_V10_PERFORMANCE_CORRECTION_1'};exec(native,ns)
    current={'source':'current-source','market':'current-market','context':'50ea935bf32af31986e7883fad64586602974940c809ae37c73e5a0d844ed3e7'}
-   db=app/'phase81_validation.sqlite3';con=sqlite3.connect(db);con.execute('create table replay_v2_runs(replay_id text primary key, value text)');con.execute('create table replay_v2_sessions(replay_id text, value text)')
+   (app/'stock_recommendation_engine.sqlite3').write_bytes(b'SYNTHETIC PRODUCTION DATABASE PRESERVE');db=app/'phase81_validation.sqlite3';con=sqlite3.connect(db);con.execute('create table replay_v2_runs(replay_id text primary key, value text)');con.execute('create table replay_v2_sessions(replay_id text, value text)')
    for i in range(13):con.execute('create table paper_'+str(i)+'(value text)');con.execute('insert into paper_'+str(i)+' values (?)',('preserve',))
    con.commit();con.close()
    def result(day,old=False):
