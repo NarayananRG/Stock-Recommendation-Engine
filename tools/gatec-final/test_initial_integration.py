@@ -9,7 +9,7 @@ class NativeCollectorIntegration(unittest.TestCase):
    (engine/'stock_app/official_daily_refresh.py').write_bytes((base/'source_fixture_official_refresh.py').read_bytes());(engine/'modern_ui/api.py').write_text('# synthetic identity guard')
    package=root/'package';package.mkdir();w.write(package/'source-guard.json',{n:w.sha(engine/n) for n in ['stock_app/official_daily_refresh.py','modern_ui/api.py']});template=json.loads((base/'GATE_C_MACHINE_RESULTS.json').read_text());template['expected_holdings']={'SYNTHETIC_A':1,'SYNTHETIC_B':2};w.write(package/'GATE_C_MACHINE_RESULTS.json',template)
    for name in ['stock_recommendation_engine.sqlite3','phase81_validation.sqlite3']:
-    c=sqlite3.connect(app/name);c.execute('create table paper_v2_portfolios(portfolio_id text,status text,state_json text)');c.execute('insert into paper_v2_portfolios values (?,?,?)',('immutable','ACTIVE',json.dumps({'nav':12345.67,'cash':6789.01})));c.execute('create table paper_v2_positions(position_id text,portfolio_id text,symbol text,state text,qty integer,entry_price real,position_json text)')
+    c=sqlite3.connect(app/name);c.execute('create table paper_v2_portfolios(portfolio_id text,status text,state_json text)');c.execute('insert into paper_v2_portfolios values (?,?,?)',('immutable','ACTIVE',json.dumps({'nav':12345.67,'cash':6789.01,'invested_value':5556.66})));c.execute('create table paper_v2_positions(position_id text,portfolio_id text,symbol text,state text,qty integer,entry_price real,position_json text)')
     for s,q in [('SYNTHETIC_A',1),('SYNTHETIC_B',2)]:c.execute('insert into paper_v2_positions values (?,?,?,?,?,?,?)',(s,'immutable',s,'OPEN',q,100,'{}'))
     c.commit();c.close()
    evidence=app/'historical_replay_checkpoints_v2';evidence.mkdir()
