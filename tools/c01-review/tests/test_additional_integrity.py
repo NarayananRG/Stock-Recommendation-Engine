@@ -10,7 +10,7 @@ class AdditionalIntegrityTests(unittest.TestCase):
   def injected(path,data):
    nonlocal count
    orig(path,data)
-   if Path(path).parent==self.root and Path(path).suffix=='.csv':
+   if Path(path).parent.resolve()==self.root.resolve() and Path(path).suffix=='.csv':
     count+=1
     if count==2:pause.set();release.wait(20)
   f.g._durable_write=injected;prices=OfficialPriceService(self.root.parent);prices.cache_roots=[self.root]

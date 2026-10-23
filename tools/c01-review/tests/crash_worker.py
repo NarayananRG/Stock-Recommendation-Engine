@@ -9,7 +9,7 @@ if mode=='mid':
  def injected(path,data):
   global writes
   original(path,data)
-  if Path(path).parent==root and Path(path).suffix=='.csv':
+  if Path(path).parent.resolve()==root.resolve() and Path(path).suffix=='.csv':
    writes+=1
    if writes==2:os._exit(73)
  f.g._durable_write=injected

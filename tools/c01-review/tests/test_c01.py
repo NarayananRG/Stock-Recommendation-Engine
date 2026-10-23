@@ -132,7 +132,7 @@ class C01Tests(unittest.TestCase):
  def test_exception_mid_batch_rolls_back_all_original_csv_and_manifest(self):
   orig=g._durable_write;calls=[]
   def injected(path,data):
-   if Path(path).parent==self.root and str(path).endswith('.csv'):
+   if Path(path).parent.resolve()==self.root.resolve() and str(path).endswith('.csv'):
     calls.append(str(path))
     if len(calls)==3:raise OSError('SYNTHETIC third file failed')
    return orig(path,data)
