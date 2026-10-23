@@ -1,6 +1,6 @@
 """Gate C acceptance runner. Never sends POST, starts SRE, edits installation or restores live DBs."""
 from pathlib import Path
-import argparse,ast,collections,csv,hashlib,importlib.util,json,os,shutil,socket,sqlite3,subprocess,sys,time,urllib.request,zipfile
+import argparse,ast,collections,csv,math,hashlib,importlib.util,json,os,shutil,socket,sqlite3,subprocess,sys,time,urllib.request,zipfile
 from datetime import datetime,timedelta,timezone
 sys.dont_write_bytecode=True
 BASE=Path(__file__).resolve().parent
@@ -70,6 +70,13 @@ def paper_summary(db):
   positions=[{'position_id':r[0],'portfolio_id':r[1],'symbol':r[2],'state':r[3],'qty':r[4],'entry_price':r[5],'entry_evidence_digest':digest(json.loads(r[6]))} for r in c.execute('select position_id,portfolio_id,symbol,state,qty,entry_price,position_json from paper_v2_positions order by position_id')]
   return {'portfolios':portfolios,'positions':positions}
  finally:c.close()
+def check_accounting(summary):
+ for p in summary['portfolios']:
+  state=p['state'];values=[float(state[k]) for k in ('nav','cash','invested_value')]
+  require(all(math.isfinite(v) for v in values),'Nonfinite paper accounting')
+  require(abs(values[0]-values[1]-values[2])<=.021,'Paper NAV does not reconcile to cash plus invested value')
+ return True
+
 def runtime_inventory(exe,engine,run):
  require(Path(exe).is_file(),'GUI runtime executable unavailable')
  code="import sys,json,importlib.metadata as m;sys.path.insert(0,sys.argv[1]);names=['numpy','pandas','polars','pyarrow','fastapi','uvicorn','pydantic'];print(json.dumps({'executable':sys.executable,'python':sys.version,'prefix':sys.prefix,'packages':{n:m.version(n) for n in names}}))"
@@ -131,7 +138,7 @@ def main():
   record(report,'readonly_navigation','PASS','Whitelisted health/data-source/evidence GETs leave all DB rows unchanged; Paper GET deliberately excluded')
   if args.stage=='Initial':
    require(not (run/'baseline.json').exists(),'Initial already captured; reuse this directory with later stages')
-   summary=paper_summary(app/'phase81_validation.sqlite3');write(run/'PRIVATE_PAPER_BASELINE.json',summary)
+   summary=paper_summary(app/'phase81_validation.sqlite3');check_accounting(summary);write(run/'PRIVATE_PAPER_BASELINE.json',summary)
    active=[p for p in summary['positions'] if p['state']!='CLOSED'];require({p['symbol']:p['qty'] for p in active}==report['expected_holdings'],'Unexpected existing holdings; stop without mutation')
    baseline={'databases':state,'evidence':evidence,'pid':args.pid,'source_guard':guard,'paper_digest':digest(summary)};write(run/'baseline.json',baseline)
    backup=run/'PRIVATE_BACKUP';backup.mkdir(exist_ok=False)
@@ -150,6 +157,7 @@ def main():
    require(filemap(restored/'engine')==source_files and filemap(restored/'app-state')==app_files,'Restored source/evidence differs')
    record(report,'restore_accounting','PASS','Separate restore matches all DB tables, position identities, journals, NAV, cash and captured source/state files')
    record(report,'evidence_backup','PASS','All18 current/stale completed files preserved; research/cache copied without deletion')
+   record(report,'paper_accounting','PASS','NAV equals cash plus invested value to accounting tolerance; all entry/ledger rows preserved')
    record(report,'holdings_preserved','PASS','Expected holdings, identities and every database row preserved; private baseline retained')
    try:
     meta=runtime_inventory(args.runtime,engine,run);record(report,'runtime_inventory','PASS','Actual listening-process executable/version/package metadata/native DLL hashes recorded; no dependency reinstall')
