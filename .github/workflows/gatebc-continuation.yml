@@ -1,0 +1,47 @@
+name: SRE guarded Windows continuation acceptance
+on:
+  push:
+    branches: [audit/gatebc-continuation-20261023]
+    paths: [.github/workflows/gatebc-continuation.yml]
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 12
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.12', '3.14']
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          sparse-checkout: |
+            .ci/oct31-current
+            .ci/gatebc-continuation
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Restore pinned public code-only fixture
+        shell: python
+        run: |
+          import pathlib,base64,hashlib,zipfile,io,shutil
+          text=''.join(pathlib.Path('.ci/oct31-current/source-part'+str(i)+'.b64').read_text().strip() for i in [1,2])
+          data=base64.b64decode(text)
+          assert hashlib.sha256(data).hexdigest()=='d7c8ea6d8874a0ee6971b2e67a3648cfe94a4817285739218720c8e62d35712f'
+          zipfile.ZipFile(io.BytesIO(data)).extractall('.')
+          shutil.copytree('.ci/gatebc-continuation','continuation')
+      - name: Install CI-only dependencies
+        run: python -m pip install --disable-pip-version-check pytest numpy pandas polars==2.0.0 pyarrow==26.0.0 fastapi uvicorn httpx
+      - name: Native publication and rollback safeguards
+        run: python -m pytest continuation/test_worker.py -q --junitxml=continuation-unit.xml
+      - name: Actual PowerShell safeguards and truthful blocked-data result
+        env:
+          PYTHONPATH: native-fixed
+          PY_PYTHON3: ${{ matrix.python }}
+        run: python continuation/windows-smoke.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: continuation-windows-${{ matrix.python }}
+          path: continuation-unit.xml
