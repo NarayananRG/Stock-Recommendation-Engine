@@ -2,7 +2,7 @@ name: Gate C bounded GUI recovery synthetic portability
 on:
   push:
     branches: [audit/gatec-fingerprint-rootcause-20261023]
-    paths: [.github/workflows/gatec-fingerprint-recovery.yml]
+    paths: [.github/workflows/gatec-fingerprint-recovery.yml, tools/gatec-fingerprint/**]
   workflow_dispatch:
 jobs:
   portability:
