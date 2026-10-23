@@ -14,6 +14,8 @@ class AcceptanceTests(unittest.TestCase):
    p=Path(t)/'existing';p.write_bytes(b'preserve')
    with self.assertRaises(w.InvariantError):w.backup_db(p,p)
    self.assertEqual(p.read_bytes(),b'preserve')
+ def test_bad_nav_rejected(self):
+  with self.assertRaises(w.InvariantError):w.check_accounting({'portfolios':[{'state':{'nav':100,'cash':50,'invested_value':60}}],'positions':[]})
  def test_only_three_readonly_routes(self):
   with self.assertRaises(w.InvariantError):w.get(1,'/api/validation/paper-portfolio')
   with self.assertRaises(w.InvariantError):w.get(1,'/api/validation/historical-replay')
