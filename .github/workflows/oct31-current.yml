@@ -1,0 +1,47 @@
+name: October 31 current installed evidence correction acceptance
+on:
+  push:
+    branches: [audit/oct31-current-20261023]
+    paths: [.github/workflows/oct31-current.yml]
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.12','3.14']
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          sparse-checkout: .ci/oct31-current
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Restore current source and synthetic acceptance inputs
+        shell: python
+        run: |
+          import pathlib,base64,hashlib,zipfile,io
+          text=''.join(pathlib.Path('.ci/oct31-current/source-part'+str(i)+'.b64').read_text().strip() for i in [1,2])
+          data=base64.b64decode(text)
+          assert hashlib.sha256(data).hexdigest()=='5e3bd6c22ca1b54a0c3189352b2bd9feebf744f274727ba269bf4351227128cb'
+          zipfile.ZipFile(io.BytesIO(data)).extractall('.')
+      - name: Install isolated CI dependencies
+        run: python -m pip install --disable-pip-version-check pytest numpy pandas fastapi uvicorn httpx opentelemetry-api polars==2.0.0 pyarrow==26.0.0
+      - name: Current contracts PIT holdings V10 official calendar regression
+        env:
+          PYTHONPATH: native-fixed
+          SRE_SOURCE: native-fixed
+        run: python -m pytest suite regression native-fixed/tests/test_leg6_portfolio_allocator.py native-fixed/tests/test_leg7_monitoring_replacement.py native-fixed/tests/test_leg3_progressive_lifecycle.py native-fixed/tests/test_leg7_integration_fix_v2.py -q --junitxml=native-regression.xml
+      - name: Guarded install rollback interrupted recovery and data preservation
+        env:
+          PYTHONPATH: native-fixed
+          PY_PYTHON3: ${{ matrix.python }}
+        run: python native_smoke.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: oct31-current-windows-${{ matrix.python }}
+          path: native-regression.xml
