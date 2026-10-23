@@ -1,0 +1,24 @@
+name: GUI replay identity read-only safeguards
+on:
+  push:
+    branches: [audit/gatec-gui-identity-20261023]
+    paths: [.github/workflows/gui-identity.yml]
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 6
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.12', '3.14']
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          sparse-checkout: .ci/gui-identity
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Native PowerShell GET-only identity and preservation test
+        run: python .ci/gui-identity/windows_smoke.py
