@@ -48,7 +48,9 @@ def main():
   reproduction=json.loads((BASE/'EXACT_FINGERPRINT_REPRODUCTION.json').read_text());current={**reproduction['cases']['3.14.3'],'context':'50ea935bf32af31986e7883fad64586602974940c809ae37c73e5a0d844ed3e7'}
   health=call('/api/health');dump(out/'health.json',health)
   require(Path(health['code_root']).resolve()==engine.resolve(),'Unexpected GUI source root')
-  db=Path(health['database']);require(db.resolve().parent==app.resolve(),'Unexpected GUI database')
+  health_db=Path(health['database']);require(health_db.resolve().parent==app.resolve(),'Unexpected GUI database')
+  # Inspected AppContext._phase81_db_path: research and Paper V2 use a separate database.
+  db=app/'phase81_validation.sqlite3';require(db.is_file(),'Missing actual Phase81 research/Paper V2 database')
   # Verify every byte used in both reconstructed fingerprints. Extra market/source modules also stop execution.
   source=json.loads((BASE/'source-preimage.json').read_text())[2];market=json.loads((BASE/'market-preimage.json').read_text())[2]
   for name,h in list(source.items())+market:
