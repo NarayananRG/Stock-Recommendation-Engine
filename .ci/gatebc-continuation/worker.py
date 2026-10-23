@@ -134,7 +134,7 @@ def run(a):
    write(out/(kind+'.json'),seq[kind]);assert paper(target/'phase81_validation.sqlite3')==before
   fields=['metrics','series','trades','coverage','execution_assumptions','sessions_replayed','sessions_excluded']
   checks={f:seq['continuous'][f]==seq['interrupted'][f] for f in fields};assert all(checks.values()) and seq['interrupted']['replay_cache_status']=='RESUMED'
-  checkpoint={'status':'PASS','checks':checks,'scope':'Native Windows controlled exception on isolated copies, not forced OS kill'}
+  checkpoint={'status':'PASS','checks':checks,'scope':sys.platform+' native controlled exception on isolated copies, not forced OS kill'}
  except Exception as e:checkpoint={'status':'BLOCKED' if 'INTERRUPTION_NOT_EXERCISED' in str(e) else 'FAIL','reason':str(e)}
  write(out/'checkpoint-test.json',checkpoint)
  # Restore rehearsal on a new copy. No active state restoration.
@@ -142,12 +142,18 @@ def run(a):
  restore={'status':'PASS','scope':'Private copy restore/application-context initialization and paper-content comparison; no GUI/installer claim'};write(out/'restore.json',restore)
  operational={}
  for name,fn in [('daily_status',ctx.post_close_daily_status),('holdings',ctx.live_today_summary),('paper',ctx.phase81_paper_status)]:
-  try:operational[name]={'status':'PASS','value':fn()}
+  try:
+   value=fn();ok=True
+   if name=='daily_status':ok=value.get('run_status')=='READY' and value.get('recommendation_count')==200 and 0<=int(value.get('executable_count',-1))<=int(value.get('signal_eligible_count',-1))
+   if name=='holdings':
+    cov=value.get('coverage',{});ok=bool(cov.get('invariant_pass')) and cov.get('monitored')==cov.get('total_open') and cov.get('blocked')==0 and cov.get('missing')==0
+   if name=='paper':ok=abs(float(value.get('cash',0))+float(value.get('invested_value',0))-float(value.get('nav',0)))<0.011
+   operational[name]={'status':'PASS' if ok else 'BLOCKED','value':value}
   except Exception as e:operational[name]={'status':'BLOCKED','error':str(e)}
  # Same-session processing can require fresh data. Offline refusal is not fabricated success.
  try:
   one=ctx.run_post_close_daily_flow(force=False);mid=paper(state/'phase81_validation.sqlite3');two=ctx.run_post_close_daily_flow(force=False);after=paper(state/'phase81_validation.sqlite3')
-  operational['duplicate_workflow']={'status':'PASS' if mid==after else 'FAIL','first':one,'second':two,'paper_tables_same_on_repeat':mid==after}
+  operational['duplicate_workflow']={'status':'FAIL' if mid!=after else 'PASS' if one.get('ok') is True and two.get('ok') is True and two.get('duplicate') is True else 'BLOCKED','first':one,'second':two,'paper_tables_same_on_repeat':mid==after}
  except Exception as e:operational['duplicate_workflow']={'status':'BLOCKED','reason':str(e)}
  write(out/'operational.json',operational)
  # Read-only metric coverage from current native context; unavailable values stay unavailable.
@@ -158,7 +164,7 @@ def run(a):
   if not bars:continue
   f=ctx.fundamental_v3_context(symbol,float(bars[-1]['close']),bars[-1]['date']);status=f.get('status');profile_counts[status]=profile_counts.get(status,0)+1
   for metric,val in f.get('feature_coverage',{}).items():
-   value=val.get('value');metric_rows.append({'symbol':symbol,'session':bars[-1]['date'],'metric':metric,'value':json.dumps(value),'profile_status':status,'classification':'AVAILABLE_AND_VERIFIED' if value not in (None,'',{}) else 'PIT_BLOCKED' if status=='NO_PRIOR_FUNDAMENTALS_BY_CUTOFF' else 'STALE_OR_INSUFFICIENT_EVIDENCE','scope':'Existing accepted panel; no original filing retrieval or new mapping fix'})
+   value=val.get('value');metric_rows.append({'symbol':symbol,'session':bars[-1]['date'],'metric':metric,'value':json.dumps(value),'profile_status':status,'classification':'AVAILABLE_AND_VERIFIED' if value not in (None,'',{}) and not (metric=='Filing freshness' and value=='STALE') else 'PIT_BLOCKED' if status=='NO_PRIOR_FUNDAMENTALS_BY_CUTOFF' else 'STALE_OR_INSUFFICIENT_EVIDENCE','scope':'Existing accepted panel; no original filing retrieval or new mapping fix'})
  if metric_rows:
   with (out/'NATIVE_FEATURE_COVERAGE.csv').open('w',newline='',encoding='utf-8') as h:w=csv.DictWriter(h,fieldnames=metric_rows[0]);w.writeheader();w.writerows(metric_rows)
  write(out/'fundamental-summary.json',{'profile_counts':profile_counts,'profile_taxonomy_not_prior_gate_a_readiness':True,'numerical_changes':0,'verified_mapping_defects_corrected':0,'new_filing_retrieval':'NOT_PERFORMED'})
@@ -185,6 +191,12 @@ def run(a):
  return final
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('--mode',choices=['run','restart','rollback'],default='run');p.add_argument('--engine',required=True);p.add_argument('--app',required=True);p.add_argument('--output',required=True);p.add_argument('--guard',required=True);p.add_argument('--capture');a=p.parse_args()
+ # Bound the complete native phase to 20 minutes; only copied states are computed.
+ import threading
+ def deadline():
+  write(Path(a.output)/'ACCEPTANCE_ERROR.json',{'status':'BLOCKED','error':'TWENTY_MINUTE_NATIVE_BUDGET_EXCEEDED','checkpoint':'Retained; no automatic retry or historical expansion'})
+  os._exit(124)
+ timer=threading.Timer(1200,deadline);timer.daemon=True;timer.start()
  try:run(a)
  except Exception as e:
   write(Path(a.output)/'ACCEPTANCE_ERROR.json',{'status':'BLOCKED','error':str(e),'traceback':traceback.format_exc(),'not_claimed':'No full Gate C or profitability acceptance'})
