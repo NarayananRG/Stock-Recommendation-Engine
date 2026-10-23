@@ -143,7 +143,7 @@ class C01Tests(unittest.TestCase):
  def test_concurrent_refreshes_do_not_duplicate_or_mix(self):
   with provider(equity(NEW_DAY),index(NEW_DAY)):
    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:r=list(pool.map(lambda _:m.refresh_official_session([str(self.root)],NEW_DAY),range(2)))
-  self.assertEqual(sorted(x['status'] for x in r),['ALREADY_CURRENT','REFRESHED_AND_VERIFIED'])
+  self.assertEqual(sorted(x['status'] for x in r),['ALREADY_CURRENT','REFRESHED_AND_VERIFIED'],r)
   for p in self.root.glob('*.csv'):self.assertEqual(len(list(csv.DictReader(io.StringIO(p.read_text())))),2)
  def test_all_target_databases_and_saved_replays_unchanged(self):
   outside=self.root.parent/'state';outside.mkdir();db=outside/'synthetic.sqlite3';c=sqlite3.connect(db)
