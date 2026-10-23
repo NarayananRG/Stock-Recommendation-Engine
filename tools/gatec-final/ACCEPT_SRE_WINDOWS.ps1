@@ -30,7 +30,10 @@ if ($Stage -ne 'Stopped' -and (Test-Path -LiteralPath $portFile)) {
  }
 }
 $worker=Join-Path $here 'accept_windows.py'
-$argsList=@('-B',$worker,'--stage',$Stage,'--run',$RunDirectory,'--runtime',$runtimeExe,'--pid',$processIdentity)
+$argsList=@('-B',$worker,'--stage',$Stage,'--run',$RunDirectory)
+# Windows PowerShell5 drops empty native-command arguments; omit absent optional values.
+if ($runtimeExe) { $argsList+=@('--runtime',$runtimeExe) }
+if ($processIdentity) { $argsList+=@('--pid',$processIdentity) }
 if ($ApproveManualLifecycle) { $argsList+='--approve-manual-lifecycle' }
 if ($ApproveManualOffline) { $argsList+='--approve-manual-offline' }
 if ($GuiReviewed) { $argsList+='--gui-reviewed' }
