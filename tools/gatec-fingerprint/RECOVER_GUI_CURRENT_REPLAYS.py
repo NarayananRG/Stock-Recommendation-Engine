@@ -86,6 +86,9 @@ def main():
   require(len(anchor)==1 and anchor[0]['pit_completeness']=='COMPLETE','Current Oct9 anchor missing/ambiguous')
   require(anchor[0]['v10_acceptance']['contract']['runtime']['python']=='3.14.3','GUI runtime changed')
   oldfiles={p.name:sha(p) for p in directory.glob('*.complete.zlib')};before_rows=db_rows(db)
+  def other_financial_files():
+   return {p.name:sha(p) for p in app.iterdir() if p.is_file() and any(x in p.name.lower() for x in ('.sqlite','.db')) and not p.name.startswith('phase81_validation.sqlite3')}
+  other_before=other_financial_files();dump(out/'other-financial-file-hashes.json',other_before)
   # Private consistent SQLite backup, never included in a report ZIP automatically.
   con=sqlite3.connect(db.resolve().as_uri()+'?mode=ro',uri=True);dest=sqlite3.connect(out/'PRIVATE-BEFORE.sqlite3')
   try:con.backup(dest)
@@ -112,13 +115,13 @@ def main():
    require(result.get('replay_id')==run_id,'Unexpected persisted run identity')
    report['requests'].append({'day':day,'seconds':time.perf_counter()-started,'cache_status':result.get('replay_cache_status'),'replay_id':run_id})
    require(all((directory/n).is_file() and sha(directory/n)==h for n,h in oldfiles.items()),'Original evidence changed')
-   preserved(before_rows,db_rows(db));dump(out/'RECOVERY_STATUS.json',report)
+   preserved(before_rows,db_rows(db));require(other_financial_files()==other_before,'Other financial database files changed');dump(out/'RECOVERY_STATUS.json',report)
   after=anchored();dump(out/'evidence-after.json',after)
   dates={r['requested_range']['start'] for r in after['results'] if r['requested_range']['start']==r['requested_range']['end'] and r['pit_completeness']=='COMPLETE' and r.get('replay_integrity_checked')}
   require(set(DAYS)<=dates,'Three distinct sessions not recognized')
   require(after['stale_replays']==before['stale_replays'] and after['invalid_replays']==0,'Old stale count changed')
-  preserved(before_rows,db_rows(db));require(all(sha(directory/n)==h for n,h in oldfiles.items()),'Original replay modified')
-  report.update(status='PASS_THREE_CURRENT_SESSIONS',recognized_sessions=sorted(set(DAYS)&dates),old_files_preserved=len(oldfiles),nonresearch_tables_unchanged=True,old_research_rows_preserved=True,source_patch=False,gate_c='REPLAY_DISCREPANCY_RESOLVED_ONLY; OTHER_GATE_C_CHECKS_RETAIN_THEIR_EXISTING_STATUS')
+  preserved(before_rows,db_rows(db));require(other_financial_files()==other_before,'Other financial database files changed');require(all(sha(directory/n)==h for n,h in oldfiles.items()),'Original replay modified')
+  report.update(status='PASS_THREE_CURRENT_SESSIONS',recognized_sessions=sorted(set(DAYS)&dates),old_files_preserved=len(oldfiles),nonresearch_tables_unchanged=True,old_research_rows_preserved=True,other_financial_files_unchanged=True,source_patch=False,gate_c='REPLAY_DISCREPANCY_RESOLVED_ONLY; OTHER_GATE_C_CHECKS_RETAIN_THEIR_EXISTING_STATUS')
  except Exception as e:
   report['error']=str(e);report['next_step']='Stop. Do not retry blindly or restore the private database over a running GUI. Preserve this directory.'
   raise
