@@ -45,3 +45,5 @@ jobs:
         with:
           name: continuation-windows-${{ matrix.python }}
           path: continuation-unit.xml
+
+# Verify final bounded worker and semantic status checks.
