@@ -143,7 +143,13 @@ class C01Tests(unittest.TestCase):
  def test_concurrent_refreshes_do_not_duplicate_or_mix(self):
   with provider(equity(NEW_DAY),index(NEW_DAY)):
    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:r=list(pool.map(lambda _:m.refresh_official_session([str(self.root)],NEW_DAY),range(2)))
-  self.assertEqual(sorted(x['status'] for x in r),['ALREADY_CURRENT','REFRESHED_AND_VERIFIED'],r)
+  statuses=sorted(x['status'] for x in r)
+  if statuses==['LOCAL_PERSISTENCE_FAILED','REFRESHED_AND_VERIFIED']:
+   busy=next(x for x in r if x['status']=='LOCAL_PERSISTENCE_FAILED')
+   self.assertEqual(busy['reason_detail'],'C01_CACHE_BUSY',r)
+   self.assertFalse(busy['persisted'],r)
+   self.assertEqual(self.run_refresh(NEW_DAY)['status'],'ALREADY_CURRENT')
+  else:self.assertEqual(statuses,['ALREADY_CURRENT','REFRESHED_AND_VERIFIED'],r)
   for p in self.root.glob('*.csv'):self.assertEqual(len(list(csv.DictReader(io.StringIO(p.read_text())))),2)
  def test_all_target_databases_and_saved_replays_unchanged(self):
   outside=self.root.parent/'state';outside.mkdir();db=outside/'synthetic.sqlite3';c=sqlite3.connect(db)
@@ -152,3 +158,18 @@ class C01Tests(unittest.TestCase):
   c.commit();c.close();evidence=outside/'research.complete.zlib';evidence.write_bytes(b'SYNTHETIC NEVER PROMOTE');before={p.name:g.file_hash(p) for p in outside.iterdir()}
   self.run_refresh(NEW_DAY);self.assertEqual({p.name:g.file_hash(p) for p in outside.iterdir()},before)
 if __name__=='__main__':unittest.main(verbosity=2)
+
+class LockTimeoutTests(unittest.TestCase):
+ def test_bounded_lock_timeout_preserves_cache_and_retry_succeeds(self):
+  with tempfile.TemporaryDirectory() as td:
+   root=Path(td)/'market';seed(root);before=files(root);ready=threading.Event();release=threading.Event()
+   def holder():
+    with g.cache_guard(root):ready.set();release.wait(5)
+   with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+    worker=pool.submit(holder);self.assertTrue(ready.wait(5))
+    try:
+     with self.assertRaisesRegex(RuntimeError,'C01_CACHE_BUSY'):
+      with g.cache_guard(root,timeout=.05):self.fail('second thread entered held guard')
+     self.assertEqual(files(root),before)
+    finally:release.set();worker.result(timeout=5)
+   with g.cache_guard(root):self.assertEqual(files(root),before)
