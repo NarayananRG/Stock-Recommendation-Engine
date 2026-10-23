@@ -1,0 +1,48 @@
+name: Gate B C read-only installed evidence collection
+on:
+  push:
+    branches: [audit/gatebc-readonly-20261023]
+    paths: [.github/workflows/gatebc-readonly.yml]
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 12
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.12','3.14']
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          sparse-checkout: |
+            .ci/oct31-current
+            .ci/gatebc
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Restore code-only fixture and collector
+        shell: python
+        run: |
+          import pathlib,base64,hashlib,zipfile,io,shutil
+          text=''.join(pathlib.Path('.ci/oct31-current/source-part'+str(i)+'.b64').read_text().strip() for i in [1,2])
+          data=base64.b64decode(text)
+          assert hashlib.sha256(data).hexdigest()=='d7c8ea6d8874a0ee6971b2e67a3648cfe94a4817285739218720c8e62d35712f'
+          zipfile.ZipFile(io.BytesIO(data)).extractall('.')
+          shutil.copytree('.ci/gatebc','capture-suite')
+          for n in ['COLLECT_SRE_GATE_BC.ps1','collection-smoke.py']: shutil.copyfile('.ci/gatebc/'+n,n)
+      - name: Install isolated CI test dependencies
+        run: python -m pip install --disable-pip-version-check pytest numpy pandas polars==2.0.0 pyarrow==26.0.0
+      - name: Test bounded integrity parsing and read-only behavior
+        run: python -m pytest capture-suite/tests -q --junitxml=gatebc-unit.xml
+      - name: Native collection preserves databases and all twelve replay objects
+        env:
+          PYTHONPATH: native-fixed
+          PY_PYTHON3: ${{ matrix.python }}
+        run: python collection-smoke.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gatebc-collector-windows-${{ matrix.python }}
+          path: gatebc-unit.xml
