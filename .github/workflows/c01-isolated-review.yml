@@ -1,0 +1,20 @@
+name: C01 isolated official refresh integrity review
+on:
+  push:
+    branches: [review/c01-isolated-20261023]
+    paths: [.github/workflows/c01-isolated-review.yml, tools/c01-review/**]
+  workflow_dispatch:
+jobs:
+  isolated:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        python: ['3.12', '3.14']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Synthetic refresh, authentication, hard process exit and cache-reader tests
+        working-directory: tools/c01-review
+        run: python -B run_regressions.py

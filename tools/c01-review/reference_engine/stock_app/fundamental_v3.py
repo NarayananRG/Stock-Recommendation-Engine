@@ -1,0 +1,851 @@
+from __future__ import annotations
+
+import csv
+from datetime import datetime, timezone
+import json
+import math
+from pathlib import Path
+from typing import Any, Iterable
+
+
+SCHEMA_VERSION = "SRE_FUNDAMENTAL_INTELLIGENCE_V3"
+AUTHORITY = "LIVE_EVIDENCE"
+MIN_READY_SCORE_COVERAGE = 0.60
+STALE_FILING_DAYS = 220
+
+CORE_FEATURES = (
+    "REVENUE",
+    "PAT",
+    "PBT",
+    "EPS",
+    "OPERATING_CASH_FLOW",
+    "CASH_AND_EQUIVALENTS",
+    "TOTAL_ASSETS",
+    "FINANCE_COST",
+    "DEBT_EQUITY_RATIO",
+)
+
+EXTENDED_FEATURES = (
+    "EBITDA",
+    "EBIT",
+    "TOTAL_EQUITY",
+    "CURRENT_ASSETS",
+    "CURRENT_LIABILITIES",
+    "FREE_CASH_FLOW",
+    "ROE",
+    "ROCE",
+    "ROIC",
+    "PE_RATIO",
+    "PB_RATIO",
+    "EV_EBITDA",
+)
+
+PRESENT_STATUSES = {"SELECTED", "SELECTED_EQUIVALENT_DUPLICATES"}
+
+
+def _symbol(value: Any) -> str:
+    text = str(value or "").strip().upper()
+    for suffix in (".NS", ".BO"):
+        if text.endswith(suffix):
+            text = text[:-3]
+    return text
+
+
+from functools import lru_cache
+
+@lru_cache(maxsize=65536)
+def _parse_timestamp(text: str) -> datetime | None:
+    """Reuse exact original timestamp parsing; immutable, bounded cache."""
+    if not text:
+        return None
+    try:
+        parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
+    except ValueError:
+        try:
+            parsed = datetime.fromisoformat(text[:10] + "T00:00:00")
+        except ValueError:
+            return None
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed
+
+
+def _dt(value: Any) -> datetime | None:
+    return _parse_timestamp(str(value or "").strip())
+
+
+def _num(value: Any) -> float | None:
+    if value in (None, ""):
+        return None
+    try:
+        result = float(value)
+    except (TypeError, ValueError):
+        return None
+    return result if math.isfinite(result) else None
+
+
+def _round(value: float | None, digits: int = 4) -> float | None:
+    return None if value is None else round(float(value), digits)
+
+
+def _candidate_roots(root: Path) -> list[Path]:
+    roots = [root.resolve()]
+    if root.parent != root:
+        roots.append(root.parent.resolve())
+    output = []
+    for item in roots:
+        if item not in output:
+            output.append(item)
+    return output
+
+
+def discover_sources(root: Path) -> dict[str, Path | None]:
+    panel_candidates = []
+    event_candidates = []
+    risk_candidates = []
+    validation_candidates = []
+    for base in _candidate_roots(root):
+        research = base / "NextGen Research" / "results"
+        panel_candidates.extend([
+            research / "fundamental_v2_phase2a4_feature_panel" / "canonical_feature_panel.csv",
+            research / "fundamental_v2_phase2a4_feature_panel" / "canonical_feature_panel.jsonl",
+        ])
+        event_candidates.append(
+            research / "fundamental_v2_phase2a5_derived_event_transforms" / "derived_events.jsonl"
+        )
+        risk_candidates.append(
+            research / "fundamental_v2_phase2a7_risk_events" / "risk_event_profiles.jsonl"
+        )
+        validation_candidates.extend([
+            research / "fundamental_v2_phase2a9_final_validation" / "fundamental_v2_final_decision.json",
+            research / "fundamental_v2_phase2a9_independent_validation" / "final_decision.json",
+        ])
+
+    def newest(paths: Iterable[Path]) -> Path | None:
+        existing = [p for p in paths if p.exists() and p.is_file()]
+        return max(existing, key=lambda p: (p.stat().st_mtime_ns, str(p))) if existing else None
+
+    return {
+        "canonical_panel": newest(panel_candidates),
+        "derived_events": newest(event_candidates),
+        "risk_profiles": newest(risk_candidates),
+        "independent_validation": newest(validation_candidates),
+    }
+
+
+from functools import lru_cache
+
+def _read_rows(path: Path | None) -> list[dict[str, Any]]:
+    if path is None or not path.exists():
+        return []
+    stat = path.stat()
+    return _cached_read_rows(path, stat.st_mtime_ns, stat.st_size)
+
+@lru_cache(maxsize=16)
+def _cached_read_rows(path: Path, modified: int, size: int) -> list[dict[str, Any]]:
+    if path is None:
+        return []
+    if path.suffix.lower() == ".csv":
+        with path.open("r", encoding="utf-8-sig", newline="") as handle:
+            return [dict(row) for row in csv.DictReader(handle)]
+    rows = []
+    with path.open("r", encoding="utf-8") as handle:
+        for line in handle:
+            if line.strip():
+                rows.append(json.loads(line))
+    return rows
+
+
+
+@lru_cache(maxsize=12)
+def _cached_symbol_index(path: Path, modified: int, size: int) -> dict[str, list[dict[str, Any]]]:
+    """Group immutable canonical source rows once per source version.
+
+    Preserves source row order and exact per-symbol row values. The existing
+    PIT date / reporting-basis filters still run on every historical cutoff.
+    """
+    grouped: dict[str, list[dict[str, Any]]] = {}
+    for row in _cached_read_rows(path, modified, size):
+        grouped.setdefault(_symbol(row.get("symbol")), []).append(row)
+    return grouped
+
+
+def _symbol_rows(path: Path | None, symbol: str) -> list[dict[str, Any]]:
+    provider = _RESEARCH_TIMELINE_PROVIDER.get()
+    if provider is not None and path is not None:
+        return provider.symbol_rows(path, symbol)
+    if path is None or not path.exists():
+        return []
+    stat = path.stat()
+    return _cached_symbol_index(path, stat.st_mtime_ns, stat.st_size).get(_symbol(symbol), [])
+
+# Replay-optimized, immutable PIT timeline. Index is keyed by the actual input file
+# fingerprint, so an updated filing cannot reuse an older timeline. Each entry
+# retains the source row unchanged, and original per-query selection rules remain
+# authoritative (including basis fallback and stable tie behavior).
+from bisect import bisect_right
+from contextvars import ContextVar
+_RESEARCH_TIMELINE_PROVIDER = ContextVar("sre_research_timeline_provider", default=None)
+
+@lru_cache(maxsize=12)
+def _cached_timeline(path: Path, modified: int, size: int, timestamp_key: str):
+    grouped = _cached_symbol_index(path, modified, size)
+    out = {}
+    for sym, rows in grouped.items():
+        dated = []
+        for ix, row in enumerate(rows):
+            when = _dt(row.get(timestamp_key) or (
+                row.get("effective_availability_ts") if timestamp_key == "availability_ts" else None))
+            if when is not None:
+                dated.append((when, ix, row))
+        dated.sort(key=lambda x: (x[0], x[1]))
+        out[sym] = (tuple(x[0] for x in dated), tuple(x[2] for x in dated))
+    return out
+
+
+def _timeline_rows(path: Path | None, symbol: str, cutoff: datetime,
+                   timestamp_key: str) -> list[dict[str, Any]]:
+    provider = _RESEARCH_TIMELINE_PROVIDER.get()
+    if provider is not None and path is not None:
+        return provider.timeline_rows(path, symbol, cutoff, timestamp_key)
+    if path is None or not path.is_file():
+        return []
+    stat = path.stat()
+    entry = _cached_timeline(path, stat.st_mtime_ns, stat.st_size, timestamp_key).get(_symbol(symbol))
+    if not entry:
+        return []
+    times, rows = entry
+    return list(rows[:bisect_right(times, cutoff)])
+
+
+def _pit_rows_timeline(path: Path | None, symbol: str, cutoff: datetime,
+                       basis_preference: str = "CONSOLIDATED"):
+    # _pit_rows sorts rows itself and does not depend on incoming source order.
+    return _pit_rows(_timeline_rows(path, symbol, cutoff, "availability_ts"),
+                     symbol, cutoff, basis_preference)
+
+
+def _latest_events_timeline(path: Path | None, symbol: str, cutoff: datetime, basis: str | None):
+    # Preserve _latest_events tie semantics by processing rows in ORIGINAL source order.
+    rows = _timeline_rows(path, symbol, cutoff, "effective_availability_ts")
+    if path is not None and rows:
+        all_rows = _symbol_rows(path, symbol)
+        indexes = {id(r) for r in rows}
+        rows = [r for r in all_rows if id(r) in indexes]
+    return _latest_events(rows, symbol, cutoff, basis)
+
+
+def _latest_risk_timeline(path: Path | None, symbol: str, cutoff: datetime, basis: str | None):
+    return _latest_risk(_timeline_rows(path, symbol, cutoff, "effective_availability_ts"),
+                        symbol, cutoff, basis)
+
+
+def _usable_feature(row: dict[str, Any], feature: str) -> float | None:
+    direct = _num(row.get(feature))
+    if direct is not None:
+        return direct
+    value = _num(row.get(f"{feature}__value"))
+    status = str(row.get(f"{feature}__status") or "")
+    if value is None:
+        return None
+    if status and status not in PRESENT_STATUSES:
+        return None
+    return value
+
+
+def _cutoff(decision_timestamp: Any) -> datetime:
+    raw = str(decision_timestamp or "").strip()
+    parsed = _dt(decision_timestamp)
+    if parsed is None:
+        return datetime.now(timezone.utc)
+    # Active analysis sessions are stored as YYYY-MM-DD. Treat that as market-session
+    # end-of-day so filings timestamped earlier on that same session are eligible,
+    # while future sessions remain strictly excluded.
+    if len(raw) == 10 and raw[4:5] == "-" and raw[7:8] == "-":
+        return parsed.replace(hour=23, minute=59, second=59, microsecond=999999)
+    return parsed
+
+
+def _pit_rows(
+    rows: Iterable[dict[str, Any]],
+    symbol: str,
+    cutoff: datetime,
+    basis_preference: str = "CONSOLIDATED",
+) -> tuple[list[dict[str, Any]], str | None]:
+    wanted = _symbol(symbol)
+    candidates = []
+    for row in rows:
+        if _symbol(row.get("symbol")) != wanted:
+            continue
+        available = _dt(row.get("availability_ts") or row.get("effective_availability_ts"))
+        if available is None or available > cutoff:
+            continue
+        candidates.append(row)
+
+    if not candidates:
+        return [], None
+
+    bases = {str(x.get("reporting_basis") or "").upper() for x in candidates}
+    basis = basis_preference if basis_preference in bases else sorted(bases)[0]
+    selected = [x for x in candidates if str(x.get("reporting_basis") or "").upper() == basis]
+    selected.sort(key=lambda x: (
+        str(x.get("quarter_end") or x.get("current_quarter_end") or ""),
+        str(x.get("availability_ts") or x.get("effective_availability_ts") or ""),
+    ))
+    return selected, basis
+
+
+def _latest_events(
+    rows: Iterable[dict[str, Any]],
+    symbol: str,
+    cutoff: datetime,
+    basis: str | None,
+) -> dict[tuple[str, str], dict[str, Any]]:
+    result = {}
+    for row in rows:
+        if _symbol(row.get("symbol")) != _symbol(symbol):
+            continue
+        if basis and str(row.get("reporting_basis") or "").upper() != basis:
+            continue
+        available = _dt(row.get("effective_availability_ts"))
+        if available is None or available > cutoff:
+            continue
+        feature = str(row.get("feature") or "").upper()
+        comparison = str(row.get("comparison") or "").upper()
+        if not feature or not comparison:
+            continue
+        key = (feature, comparison)
+        prior = result.get(key)
+        if prior is None or str(row.get("current_quarter_end") or "") > str(prior.get("current_quarter_end") or ""):
+            result[key] = row
+    return result
+
+
+def _latest_risk(
+    rows: Iterable[dict[str, Any]],
+    symbol: str,
+    cutoff: datetime,
+    basis: str | None,
+) -> dict[str, Any] | None:
+    candidates = []
+    for row in rows:
+        if _symbol(row.get("symbol")) != _symbol(symbol):
+            continue
+        if basis and str(row.get("reporting_basis") or "").upper() != basis:
+            continue
+        available = _dt(row.get("effective_availability_ts"))
+        if available is None or available > cutoff:
+            continue
+        candidates.append(row)
+    if not candidates:
+        return None
+    return max(candidates, key=lambda x: (
+        str(x.get("current_quarter_end") or ""),
+        str(x.get("effective_availability_ts") or ""),
+    ))
+
+
+def _symmetric_pct(event: dict[str, Any] | None) -> float | None:
+    if not event:
+        return None
+    value = _num(event.get("symmetric_change"))
+    return None if value is None else value * 100.0
+
+
+def _latest_pit_feature(rows: list[dict[str, Any]], feature: str, cutoff: datetime) -> tuple[float | None, dict[str, Any]]:
+    for row in reversed(rows):
+        value = _usable_feature(row, feature)
+        available = _dt(row.get("availability_ts") or row.get("effective_availability_ts"))
+        if value is None or available is None or available > cutoff:
+            continue
+        age = max(0, (cutoff.date() - available.date()).days)
+        if age > STALE_FILING_DAYS:
+            return None, {"status": "STALE", "as_of": available.isoformat(), "age_days": age}
+        return value, {"status": "AVAILABLE", "as_of": available.isoformat(), "age_days": age,
+                       "quarter_end": row.get("quarter_end") or row.get("current_quarter_end"),
+                       "concept": row.get(f"{feature}__concept")}
+    return None, {"status": "MISSING", "as_of": None, "age_days": None}
+
+
+def _ttm(rows: list[dict[str, Any]], feature: str) -> float | None:
+    values = []
+    for row in rows[-4:]:
+        value = _usable_feature(row, feature)
+        if value is None:
+            return None
+        values.append(value)
+    return sum(values) if len(values) == 4 else None
+
+
+def _ratio(numerator: float | None, denominator: float | None, scale: float = 1.0) -> float | None:
+    if numerator is None or denominator is None or denominator == 0:
+        return None
+    return numerator / denominator * scale
+
+
+def _direction_score(value: float | None, good_scale: float = 20.0) -> float | None:
+    if value is None:
+        return None
+    return max(-1.0, min(1.0, value / good_scale))
+
+
+def _level_score(value: float | None, target: float, floor: float = 0.0) -> float | None:
+    if value is None:
+        return None
+    if value <= floor:
+        return -1.0
+    return max(-1.0, min(1.0, (value - floor) / max(1e-9, target - floor)))
+
+
+def _score(
+    latest: dict[str, Any],
+    history: list[dict[str, Any]],
+    events: dict[tuple[str, str], dict[str, Any]],
+    risk: dict[str, Any] | None,
+    price: float | None,
+    cutoff: datetime,
+) -> dict[str, Any]:
+    ttm_revenue = _ttm(history, "REVENUE")
+    ttm_pat = _ttm(history, "PAT")
+    ttm_pbt = _ttm(history, "PBT")
+    ttm_eps = _ttm(history, "EPS")
+    pat_margin = _ratio(ttm_pat, ttm_revenue, 100.0)
+    pbt_margin = _ratio(ttm_pbt, ttm_revenue, 100.0)
+    pe = None if ttm_eps is None or ttm_eps <= 0 or price is None else price / ttm_eps
+
+    latest_ocf, ocf_source = _latest_pit_feature(history, "OPERATING_CASH_FLOW", cutoff)
+    latest_cash, cash_source = _latest_pit_feature(history, "CASH_AND_EQUIVALENTS", cutoff)
+    latest_assets, assets_source = _latest_pit_feature(history, "TOTAL_ASSETS", cutoff)
+    debt_equity, debt_source = _latest_pit_feature(history, "DEBT_EQUITY_RATIO", cutoff)
+    cash_assets = _ratio(latest_cash, latest_assets, 100.0)
+
+    components: dict[str, dict[str, Any]] = {}
+
+    def add(name: str, value: float | None, weight: float, evidence: Any):
+        components[name] = {"signal": value, "weight": weight, "evidence": evidence}
+
+    revenue_yoy = _symmetric_pct(events.get(("REVENUE", "YOY")))
+    pat_yoy = _symmetric_pct(events.get(("PAT", "YOY")))
+    eps_yoy = _symmetric_pct(events.get(("EPS", "YOY")))
+    ocf_yoy = _symmetric_pct(events.get(("OPERATING_CASH_FLOW", "YOY_SAME_QUARTER_ONLY")))
+    cash_yoy = _symmetric_pct(events.get(("CASH_AND_EQUIVALENTS", "YOY_SAME_QUARTER_ONLY")))
+    finance_qoq = _symmetric_pct(events.get(("FINANCE_COST", "QOQ")))
+
+    add("revenue_growth", _direction_score(revenue_yoy, 25.0), 0.12, revenue_yoy)
+    add("pat_growth", _direction_score(pat_yoy, 30.0), 0.12, pat_yoy)
+    add("eps_growth", _direction_score(eps_yoy, 30.0), 0.08, eps_yoy)
+    add("pat_margin", _level_score(pat_margin, 18.0, 0.0), 0.10, pat_margin)
+    add("pbt_margin", _level_score(pbt_margin, 22.0, 0.0), 0.08, pbt_margin)
+    add("ocf_direction", _direction_score(ocf_yoy, 30.0), 0.12, ocf_yoy)
+    add("ocf_sign", None if latest_ocf is None else (1.0 if latest_ocf > 0 else -1.0), 0.07, latest_ocf)
+    add("cash_direction", _direction_score(cash_yoy, 30.0), 0.05, cash_yoy)
+    add("cash_assets", _level_score(cash_assets, 12.0, 0.0), 0.04, cash_assets)
+    add("finance_cost", None if finance_qoq is None else -_direction_score(finance_qoq, 25.0), 0.05, finance_qoq)
+    add("leverage", None if debt_equity is None else max(-1.0, min(1.0, (1.5 - debt_equity) / 1.5)), 0.04, debt_equity)
+
+    risk_signal = None
+    profile = str((risk or {}).get("event_profile") or "")
+    if profile == "PURE_IMPROVEMENT":
+        risk_signal = 1.0
+    elif profile == "PURE_DETERIORATION":
+        risk_signal = -1.0
+    elif profile == "MIXED_DIRECTIONAL":
+        risk_signal = -0.1
+    elif profile == "NO_DIRECTIONAL_EVIDENCE":
+        risk_signal = 0.0
+    if risk and risk.get("strong_deterioration_transition"):
+        risk_signal = min(risk_signal if risk_signal is not None else 0.0, -1.0)
+    if risk and risk.get("strong_improvement_transition"):
+        risk_signal = max(risk_signal if risk_signal is not None else 0.0, 1.0)
+    add("risk_event_profile", risk_signal, 0.13, profile or None)
+
+    total_weight = sum(float(x["weight"]) for x in components.values())
+    used = [x for x in components.values() if x["signal"] is not None]
+    used_weight = sum(float(x["weight"]) for x in used)
+    weighted = sum(float(x["signal"]) * float(x["weight"]) for x in used)
+    coverage = used_weight / total_weight if total_weight else 0.0
+    normalized = weighted / used_weight if used_weight else None
+    score = None if normalized is None else max(0.0, min(100.0, 50.0 + 50.0 * normalized))
+
+    if score is None:
+        label = "UNAVAILABLE"
+    elif coverage < MIN_READY_SCORE_COVERAGE:
+        label = "LIMITED_COVERAGE"
+    elif score >= 72:
+        label = "STRONG"
+    elif score >= 58:
+        label = "POSITIVE"
+    elif score >= 42:
+        label = "NEUTRAL"
+    elif score >= 28:
+        label = "WEAK"
+    else:
+        label = "DETERIORATING"
+
+    return {
+        "score": _round(score, 2),
+        "label": label,
+        "score_component_coverage": _round(coverage, 4),
+        "components": components,
+        "ttm": {
+            "revenue": _round(ttm_revenue, 2),
+            "pat": _round(ttm_pat, 2),
+            "pbt": _round(ttm_pbt, 2),
+            "eps": _round(ttm_eps, 4),
+            "pat_margin_pct": _round(pat_margin, 4),
+            "pbt_margin_pct": _round(pbt_margin, 4),
+        },
+        "valuation": {
+            "implied_pe_from_ttm_eps": _round(pe, 4),
+            "basis": "PRICE_DIVIDED_BY_PIT_TTM_EPS" if pe is not None else "UNAVAILABLE",
+            "peer_relative_valuation_available": False,
+        },
+        "growth": {
+            "revenue_yoy_symmetric_pct": _round(revenue_yoy, 4),
+            "pat_yoy_symmetric_pct": _round(pat_yoy, 4),
+            "eps_yoy_symmetric_pct": _round(eps_yoy, 4),
+        },
+        "cash_flow": {
+            "latest_operating_cash_flow": _round(latest_ocf, 2),
+            "ocf_yoy_symmetric_pct": _round(ocf_yoy, 4),
+            "source": ocf_source,
+        },
+        "balance_sheet": {
+            "cash_and_equivalents": _round(latest_cash, 2),
+            "total_assets": _round(latest_assets, 2),
+            "cash_to_assets_pct": _round(cash_assets, 4),
+            "debt_equity_ratio": _round(debt_equity, 4),
+            "sources": {"cash_and_equivalents": cash_source, "total_assets": assets_source,
+                        "debt_equity_ratio": debt_source},
+        },
+    }
+
+
+
+def _pit_safety_supplement_path(root: Path) -> Path | None:
+    candidates=[]
+    for base in _candidate_roots(root):
+        candidates.append(
+            base / "NextGen Research" / "results" / "pit_safety_supplement_v1" / "pit_safety_supplement.jsonl"
+        )
+    existing=[p for p in candidates if p.exists() and p.is_file()]
+    return max(existing,key=lambda p:(p.stat().st_mtime_ns,str(p))) if existing else None
+
+
+def _merge_pit_safety_supplement(
+    root: Path,
+    symbol: str,
+    cutoff: datetime,
+    basis: str | None,
+    history: list[dict[str, Any]],
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    path=_pit_safety_supplement_path(root)
+    meta={
+        "authority":"OFFICIAL_PIT_EVIDENCE_SUPPLEMENT",
+        "status":"SUPPLEMENT_NOT_PRESENT" if path is None else "NO_ELIGIBLE_ROW",
+        "path":str(path) if path else None,
+        "feature":"DEBT_EQUITY_RATIO",
+        "applied":False,
+    }
+    if path is None:
+        return [dict(x) for x in history],meta
+
+    wanted=_symbol(symbol)
+    eligible=[]
+    for row in _symbol_rows(path, wanted):
+        if _symbol(row.get("symbol"))!=wanted:
+            continue
+        if row.get("feature")!="DEBT_EQUITY_RATIO":
+            continue
+        if row.get("domain")!="IND_AS_CORPORATE":
+            continue
+        if row.get("source_host")!="nsearchives.nseindia.com":
+            continue
+        if row.get("display_validated") is not True or row.get("point_in_time_safe") is not True:
+            continue
+        if basis and str(row.get("reporting_basis") or "").upper()!=str(basis).upper():
+            continue
+        available=_dt(row.get("availability_ts"))
+        if available is None or available>cutoff:
+            continue
+        value=_num(row.get("value"))
+        if value is None or value<0 or value>100:
+            continue
+        eligible.append(row)
+
+    if not eligible:
+        return [dict(x) for x in history],meta
+
+    selected=max(
+        eligible,
+        key=lambda x:(str(x.get("quarter_end") or ""),str(x.get("availability_ts") or "")),
+    )
+    output=[dict(x) for x in history]
+    target_index=None
+    for index,row in enumerate(output):
+        if (
+            str(row.get("quarter_end") or row.get("current_quarter_end") or "")==str(selected.get("quarter_end") or "")
+            and (not basis or str(row.get("reporting_basis") or "").upper()==str(basis).upper())
+        ):
+            target_index=index
+    if target_index is None:
+        meta.update({
+            "status":"NO_MATCHING_CANONICAL_QUARTER",
+            "selected_quarter_end":selected.get("quarter_end"),
+            "selected_availability_ts":selected.get("availability_ts"),
+        })
+        return output,meta
+
+    target=dict(output[target_index])
+    existing=_usable_feature(target,"DEBT_EQUITY_RATIO")
+    if existing is not None:
+        meta.update({
+            "status":"CANONICAL_ALREADY_AVAILABLE",
+            "applied":False,
+            "value":existing,
+        })
+        return output,meta
+
+    value=float(selected["value"])
+    target["DEBT_EQUITY_RATIO"]=value
+    target["DEBT_EQUITY_RATIO__value"]=value
+    target["DEBT_EQUITY_RATIO__status"]="SELECTED"
+    target["DEBT_EQUITY_RATIO__concept"]="DebtEquityRatio"
+    target["DEBT_EQUITY_RATIO__source"]="OFFICIAL_PIT_EVIDENCE_SUPPLEMENT"
+    output[target_index]=target
+    meta.update({
+        "status":"APPLIED",
+        "applied":True,
+        "value":value,
+        "quarter_end":selected.get("quarter_end"),
+        "availability_ts":selected.get("availability_ts"),
+        "concept":selected.get("concept"),
+        "normalization":selected.get("normalization"),
+        "xbrl_raw_value":selected.get("xbrl_raw_value"),
+        "display_validated":True,
+        "source_host":selected.get("source_host"),
+    })
+    return output,meta
+
+
+def analyze(
+    repo_root: Path,
+    symbol: str,
+    *,
+    decision_timestamp: Any,
+    latest_price: float | None = None,
+    basis_preference: str = "CONSOLIDATED",
+) -> dict[str, Any]:
+    root = Path(repo_root).resolve()
+    cutoff = _cutoff(decision_timestamp)
+    sources = discover_sources(root)
+
+    panel_rows = _symbol_rows(sources["canonical_panel"], symbol)
+    if not panel_rows:
+        return {
+            "schema": SCHEMA_VERSION,
+            "authority": AUTHORITY,
+            "status": "NO_PIT_FUNDAMENTAL_DATA",
+            "available": False,
+            "symbol": _symbol(symbol),
+            "decision_timestamp": cutoff.isoformat(),
+            "reason": "Canonical official fundamental panel is not present in the connected engine source.",
+            "missing_core_features": list(CORE_FEATURES),
+            "missing_extended_features": list(EXTENDED_FEATURES),
+            "score_component_coverage": 0.0,
+            "promotion_allowed": False,
+            "production_action_changed": False,
+            "production_rank_changed": False,
+            "point_in_time_safe": True,
+            "sources": {k: str(v) if v else None for k, v in sources.items()},
+        }
+
+    history, basis = _pit_rows_timeline(sources["canonical_panel"], symbol, cutoff, basis_preference)
+    if not history:
+        return {
+            "schema": SCHEMA_VERSION,
+            "authority": AUTHORITY,
+            "status": "NO_PIT_SAFE_PROFILE_BY_DECISION_TIME",
+            "available": False,
+            "symbol": _symbol(symbol),
+            "decision_timestamp": cutoff.isoformat(),
+            "reason": "Fundamental records exist, but no filing for this stock was available by the active analysis timestamp.",
+            "missing_core_features": list(CORE_FEATURES),
+            "missing_extended_features": list(EXTENDED_FEATURES),
+            "score_component_coverage": 0.0,
+            "promotion_allowed": False,
+            "production_action_changed": False,
+            "production_rank_changed": False,
+            "point_in_time_safe": True,
+            "sources": {k: str(v) if v else None for k, v in sources.items()},
+        }
+
+    history, safety_supplement = _merge_pit_safety_supplement(root, symbol, cutoff, basis, history)
+    latest = history[-1]
+    event_rows = _symbol_rows(sources["derived_events"], symbol)
+    risk_rows = _symbol_rows(sources["risk_profiles"], symbol)
+    events = _latest_events_timeline(sources["derived_events"], symbol, cutoff, basis)
+    risk = _latest_risk_timeline(sources["risk_profiles"], symbol, cutoff, basis)
+
+    core_present = [feature for feature in CORE_FEATURES if _usable_feature(latest, feature) is not None]
+    extended_present = [feature for feature in EXTENDED_FEATURES if _usable_feature(latest, feature) is not None]
+    missing_core = [feature for feature in CORE_FEATURES if feature not in core_present]
+    missing_extended = [feature for feature in EXTENDED_FEATURES if feature not in extended_present]
+
+    scored = _score(latest, history, events, risk, _num(latest_price), cutoff)
+    available_ts = _dt(latest.get("availability_ts"))
+    filing_age = None if available_ts is None else max(0, (cutoff.date() - available_ts.date()).days)
+    freshness = "UNAVAILABLE" if filing_age is None else ("STALE" if filing_age > STALE_FILING_DAYS else "CURRENT_FOR_DECISION_TIME")
+
+    domain = str(latest.get("domain") or "UNKNOWN")
+    financial_domain = any(token in domain.upper() for token in ("BANK", "FINANC", "INSUR", "NBFC"))
+    sector_profile = "FINANCIAL_DOMAIN_CONSERVATIVE" if financial_domain else "GENERAL_CORPORATE"
+
+    feature_values = {
+        "Revenue": scored["ttm"].get("revenue"), "PAT": scored["ttm"].get("pat"),
+        "PBT": scored["ttm"].get("pbt"), "EPS": scored["ttm"].get("eps"),
+        "Margins": scored["ttm"].get("pat_margin_pct"),
+        "Operating Cash Flow": scored["cash_flow"].get("latest_operating_cash_flow"),
+        "Cash": scored["balance_sheet"].get("cash_and_equivalents"),
+        "Debt/Leverage": scored["balance_sheet"].get("debt_equity_ratio"),
+        "Finance Cost": _usable_feature(latest, "FINANCE_COST"),
+        "ROE": _usable_feature(latest, "ROE"), "ROCE": _usable_feature(latest, "ROCE"),
+        "ROIC": _usable_feature(latest, "ROIC"), "Free Cash Flow": _usable_feature(latest, "FREE_CASH_FLOW"),
+        "PE": scored["valuation"].get("implied_pe_from_ttm_eps"),
+        "PB": _usable_feature(latest, "PB_RATIO"), "EV/EBITDA": _usable_feature(latest, "EV_EBITDA"),
+        "PIT relative valuation reference": None,
+        "Risk-event profile": (risk or {}).get("event_profile"),
+        "Filing freshness": freshness, "Sector/domain classification": domain or None,
+    }
+    feature_coverage = {}
+    for name, value in feature_values.items():
+        stale = name == "Filing freshness" and freshness == "STALE"
+        feature_coverage[name] = {"status": "STALE" if stale else "AVAILABLE" if value not in (None, "") else "MISSING",
+                                  "value": value}
+    bank_required = {
+        "Asset quality": ("GNPA", "NNPA"), "Capital adequacy": ("CAPITAL_ADEQUACY_RATIO",),
+        "Funding/liquidity": ("LOAN_DEPOSIT_RATIO",), "Credit cost/provisioning": ("CREDIT_COST", "PROVISION_COVERAGE_RATIO"),
+        "NIM/spread": ("NIM",), "ROA": ("ROA",), "ROE": ("ROE",),
+    }
+    financial_metrics = {}
+    for group, names in bank_required.items():
+        values = {name: _usable_feature(latest, name) for name in names}
+        financial_metrics[group] = {"status": "AVAILABLE" if any(v is not None for v in values.values()) else "MISSING",
+                                    "values": {k: v for k, v in values.items() if v is not None}}
+    financial_missing = [name for name, item in financial_metrics.items() if item["status"] != "AVAILABLE"]
+    financial_adapter = {
+        "domain": domain, "applicable": financial_domain, "metrics": financial_metrics,
+        "missing_required_groups": financial_missing,
+        "safety_ready": False,
+        "status": "POLICY_NOT_VALIDATED" if financial_domain else "NOT_APPLICABLE",
+        "observed_group_coverage_complete": bool(financial_domain and not financial_missing),
+        "industrial_cashflow_or_leverage_used": False,
+    }
+    scored["valuation"]["implied_pb"] = _usable_feature(latest, "PB_RATIO")
+    scored["valuation"]["pb_basis"] = "PIT_REPORTED_PB" if scored["valuation"]["implied_pb"] is not None else "UNAVAILABLE"
+
+    independent_validation = None
+    path = sources["independent_validation"]
+    if path is not None:
+        try:
+            independent_validation = json.loads(path.read_text(encoding="utf-8"))
+        except Exception:
+            independent_validation = None
+
+    status = "READY" if scored["score_component_coverage"] >= MIN_READY_SCORE_COVERAGE else "LIMITED_COVERAGE"
+    return {
+        "schema": SCHEMA_VERSION,
+        "authority": AUTHORITY,
+        "status": status,
+        "available": True,
+        "symbol": _symbol(symbol),
+        "decision_timestamp": cutoff.isoformat(),
+        "reporting_basis": basis,
+        "domain": domain,
+        "sector_profile": sector_profile,
+        "quarter_end": latest.get("quarter_end"),
+        "effective_availability_ts": latest.get("availability_ts"),
+        "filing_age_days_at_decision": filing_age,
+        "filing_freshness": freshness,
+        "fundamental_score": scored["score"],
+        "fundamental_label": scored["label"],
+        "score_component_coverage": scored["score_component_coverage"],
+        "canonical_core_feature_coverage": _round(len(core_present) / len(CORE_FEATURES), 4),
+        "extended_feature_coverage": _round(len(extended_present) / len(EXTENDED_FEATURES), 4),
+        "present_core_features": core_present,
+        "missing_core_features": missing_core,
+        "present_extended_features": extended_present,
+        "missing_extended_features": missing_extended,
+        "growth": scored["growth"],
+        "profitability": scored["ttm"],
+        "cash_flow": scored["cash_flow"],
+        "balance_sheet": scored["balance_sheet"],
+        "pit_safety_supplement": safety_supplement,
+        "valuation": scored["valuation"],
+        "feature_coverage": feature_coverage,
+        "financial_domain_adapter": financial_adapter,
+        "risk_event": {
+            "available": risk is not None,
+            "event_profile": (risk or {}).get("event_profile"),
+            "deterioration_evidence_count": (risk or {}).get("deterioration_evidence_count"),
+            "improvement_evidence_count": (risk or {}).get("improvement_evidence_count"),
+            "strong_deterioration_transition": bool((risk or {}).get("strong_deterioration_transition")),
+            "strong_improvement_transition": bool((risk or {}).get("strong_improvement_transition")),
+        },
+        "score_components": scored["components"],
+        "independent_validation": {
+            "available": independent_validation is not None,
+            "decision": (independent_validation or {}).get("decision"),
+            "promotion_authorized": bool((independent_validation or {}).get("promotion_authorized", False)),
+        },
+        "coverage_explanation": (
+            "Fundamental score uses only point-in-time evidence available by the active analysis timestamp. "
+            "Missing ROE/ROCE/ROIC/FCF/working-capital/peer-valuation fields remain explicitly unavailable until supported by the official canonical mapping."
+        ),
+        "promotion_allowed": False,
+        "production_action_changed": False,
+        "production_rank_changed": False,
+        "point_in_time_safe": True,
+        "sources": {k: str(v) if v else None for k, v in sources.items()},
+    }
+
+
+def point_in_time_leakage_audit(
+    repo_root: Path,
+    symbol: str,
+    decision_timestamps: Iterable[Any],
+    latest_price: float | None = None,
+) -> dict[str, Any]:
+    results = []
+    previous_availability = None
+    failures = []
+    for value in decision_timestamps:
+        cutoff = _cutoff(value)
+        result = analyze(repo_root, symbol, decision_timestamp=cutoff, latest_price=latest_price)
+        available = _dt(result.get("effective_availability_ts"))
+        if available is not None and available > cutoff:
+            failures.append({
+                "decision_timestamp": cutoff.isoformat(),
+                "effective_availability_ts": available.isoformat(),
+                "reason": "FUTURE_FILING_LEAKAGE",
+            })
+        if previous_availability is not None and available is not None and available < previous_availability:
+            failures.append({
+                "decision_timestamp": cutoff.isoformat(),
+                "effective_availability_ts": available.isoformat(),
+                "reason": "NON_MONOTONIC_PIT_SELECTION",
+            })
+        if available is not None:
+            previous_availability = available
+        results.append({
+            "decision_timestamp": cutoff.isoformat(),
+            "selected_availability_ts": result.get("effective_availability_ts"),
+            "quarter_end": result.get("quarter_end"),
+            "status": result.get("status"),
+        })
+    return {
+        "status": "PASS" if not failures else "FAIL",
+        "checks": len(results),
+        "failures": failures,
+        "selections": results,
+    }
