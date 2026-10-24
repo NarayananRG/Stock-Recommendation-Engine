@@ -1,6 +1,6 @@
 """Synthetic staging guard tests; no private source/data/runtime and no live application."""
 from pathlib import Path
-import contextlib,hashlib,json,os,shutil,sqlite3,subprocess,sys,tempfile,unittest
+import contextlib,hashlib,json,os,shutil,sqlite3,subprocess,sys,tempfile,unittest,types
 from unittest.mock import patch
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'package'))
 import source_transaction as t
@@ -110,4 +110,19 @@ class StagingTests(unittest.TestCase):
   with patch.object(host.subprocess,'Popen',Fake):host.run('offline',payload,output,parent,Path('WindowsSandbox.exe'),1)
   import xml.etree.ElementTree as E
   config=E.fromstring(self_config[0]);self.assertEqual(config.findtext('Networking'),'Disable');maps=config.findall('MappedFolders/MappedFolder');self.assertEqual(len(maps),3);self.assertEqual([x.findtext('ReadOnly')for x in maps],['true','true','false']);self.assertEqual(maps[1].findtext('HostFolder'),str(payload));self.assertNotIn(str(self.root),self_config[0])
+ def test_calendar_extraction_returns_installed_dictionary_contract(self):
+  api=self.root/'engine/modern_ui/api.py';api.write_text("class ModernAppContext:\n @classmethod\n def _is_nse_trading_day(cls,day):return True\n @classmethod\n def _previous_nse_session(cls,day):return day\n @classmethod\n def expected_market_session(cls):return {'expected_market_session':'2099-01-02','basis':'SYNTHETIC'}\n")
+  self.assertEqual(guest.calendar(self.root/'engine')['expected_market_session'],'2099-01-02')
+ def test_official_adapter_passes_session_string_and_retries_without_replay(self):
+  engine=self.root/'engine';cache=engine/'cache';cache.mkdir();(cache/'TEST.NS.csv').write_bytes(b'Date,Close\n2099-01-02,100\n')
+  (engine/'modern_ui/api.py').write_text("class ModernAppContext:\n @staticmethod\n def _official_cache_roots(root):return [root/'cache']\n")
+  calls=[];response={'status':'ALREADY_CURRENT','automatic_yfinance_fallback':False,'stock_files_expected':200,'stock_files_matched':200,'equity_session':'2099-01-02','index_session':'2099-01-02','provenance':{'equity':{'source_publication_time':None},'index':{'source_publication_time':None}}}
+  module=types.ModuleType('stock_app.official_daily_refresh')
+  def refresh(roots,session):calls.append((roots,session));return response
+  module.refresh_official_session=refresh;parent=types.ModuleType('stock_app');parent.__path__=[];report={'checks':{}}
+  class FakeZone:
+   def __init__(self,*a):pass
+  with patch.dict(sys.modules,{'stock_app':parent,'stock_app.official_daily_refresh':module}),patch.object(guest,'OUTPUT',self.base/'output'),patch.object(guest,'calendar',return_value={'expected_market_session':'2099-01-02'}),patch('zoneinfo.ZoneInfo',FakeZone):
+   guest.official(self.root,self.root/'private',report)
+  self.assertEqual([x[1]for x in calls],['2099-01-02','2099-01-02']);self.assertEqual(report['checks']['official_network_retrieval']['status'],'PASS');self.assertEqual(report['checks']['official_publication_time']['status'],'BLOCKED');self.private_equal()
 if __name__=='__main__':unittest.main()
