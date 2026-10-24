@@ -31,12 +31,11 @@ def safe_extract(src,dst):
 def run(phase,payload,output,root,sandbox_exe,timeout):
  """Only the new copied input and package are mapped; live/Initial paths never mapped."""
  out=output/phase;out.mkdir(exist_ok=False)
- code="& 'C:\\C01Input\\runtime\\python.exe' -I -S -B 'C:\\C01Package\\sandbox_worker.py' --phase "+phase
- code += '; shutdown.exe /l'
- xml='<Configuration><VGpu>Disable</VGpu><Networking>'+('Disable'if phase=='offline'else'Enable')+'</Networking><ClipboardRedirection>Disable</ClipboardRedirection><PrinterRedirection>Disable</PrinterRedirection><AudioInput>Disable</AudioInput><VideoInput>Disable</VideoInput><MappedFolders>'
+ code='powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\\C01Package\\sandbox_entry.ps1 -Phase '+phase
+ xml='<Configuration><vGPU>Disable</vGPU><Networking>'+('Disable'if phase=='offline'else'Enable')+'</Networking><ClipboardRedirection>Disable</ClipboardRedirection><PrinterRedirection>Disable</PrinterRedirection><AudioInput>Disable</AudioInput><VideoInput>Disable</VideoInput><MappedFolders>'
  for host,guest,ro in [(BASE,'C:\\C01Package',True),(payload,'C:\\C01Input',True),(out,'C:\\C01Output',False)]:
   xml+='<MappedFolder><HostFolder>'+escape(str(host))+'</HostFolder><SandboxFolder>'+guest+'</SandboxFolder><ReadOnly>'+str(ro).lower()+'</ReadOnly></MappedFolder>'
- xml+='</MappedFolders><LogonCommand><Command>'+escape('powershell.exe -NoProfile -ExecutionPolicy Bypass -Command '+code)+'</Command></LogonCommand></Configuration>'
+ xml+='</MappedFolders><LogonCommand><Command>'+escape(code)+'</Command></LogonCommand></Configuration>'
  config=root/(phase+'.wsb');config.write_text(xml,encoding='utf-8');p=subprocess.Popen([str(sandbox_exe),str(config)])
  deadline=time.monotonic()+timeout
  while not(out/'DONE.json').exists():
@@ -46,7 +45,7 @@ def run(phase,payload,output,root,sandbox_exe,timeout):
  require((out/'DONE.json').is_file(),'SANDBOX_DID_NOT_COMPLETE:'+phase)
  try:p.wait(timeout=60)
  except subprocess.TimeoutExpired:raise Stop('SANDBOX_NOT_CLOSED: close only staging Sandbox before any next phase')
- return json.loads((out/'DONE.json').read_text())
+ return json.loads((out/'DONE.json').read_text(encoding='utf-8-sig'))
 def main():
  ap=argparse.ArgumentParser();ap.add_argument('--initial',required=True);ap.add_argument('--workspace-parent',required=True);ap.add_argument('--runtime',default='');ap.add_argument('--timeout',type=int,default=1200);args=ap.parse_args()
  parent=check_path(args.workspace_parent);initial=check_path(args.initial)
