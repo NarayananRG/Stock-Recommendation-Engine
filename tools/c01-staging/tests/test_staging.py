@@ -137,4 +137,13 @@ class StagingTests(unittest.TestCase):
   (self.root/'engine/stock_app/frozen_6.py').write_bytes(b'DRIFT\r\n');before=t.files(ref)
   with self.assertRaisesRegex(t.Stop,'HASH_MISMATCH'):guest.stage_reference_fixtures(tests,self.root/'engine',self.guard)
   self.assertEqual(t.files(ref),before)
+ def test_reader_lock_creation_does_not_count_as_history_replacement(self):
+  data=self.root/'engine/data/cache';data.mkdir(parents=True);csv=data/'TEST.csv';csv.write_bytes(b'Date,Close\n2099-01-02,100\n');before={n:h for n,h in t.files(self.root/'engine').items()if n.startswith('data/')};(data/'.sre_official_refresh.lock').write_bytes(b'0');guest.verify_history_preservation(self.root/'engine',before)
+  csv.write_bytes(b'Date,Close\n2099-01-02,999\n')
+  with self.assertRaisesRegex(t.Stop,'OFFICIAL_HISTORY_BYTES_CHANGED'):guest.verify_history_preservation(self.root/'engine',before)
+ def test_offline_new_csv_or_noncanonical_lock_is_refused(self):
+  data=self.root/'engine/data';data.mkdir();(data/'unexpected.csv').write_bytes(b'NEW')
+  with self.assertRaisesRegex(t.Stop,'UNEXPECTED_OFFLINE_DATA_FILE'):guest.verify_history_preservation(self.root/'engine',{})
+  (data/'unexpected.csv').unlink();(data/'.sre_official_refresh.lock').write_bytes(b'ALTERED')
+  with self.assertRaisesRegex(t.Stop,'UNEXPECTED_OFFLINE_DATA_FILE'):guest.verify_history_preservation(self.root/'engine',{})
 if __name__=='__main__':unittest.main()

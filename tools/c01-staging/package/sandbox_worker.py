@@ -54,6 +54,11 @@ def stage_reference_fixtures(tests,source,guard):
  verify(source,{n:guard[n]for n in names})
  for n in names:
   target=child(reference,n);shutil.copy2(child(source,n),target);require(sha(target)==guard[n],'REFERENCE_FIXTURE_COPY_MISMATCH')
+def verify_history_preservation(engine,before):
+ after={n:h for n,h in files(engine).items()if n.startswith('data/')}
+ require(all(after.get(n)==h for n,h in before.items()),'OFFICIAL_HISTORY_BYTES_CHANGED')
+ added=set(after)-set(before)
+ require(all(Path(n).name=='.sre_official_refresh.lock'and after[n]==__import__('hashlib').sha256(b'0').hexdigest()for n in added),'UNEXPECTED_OFFLINE_DATA_FILE')
 def free_port():
  s=socket.socket();s.bind(('127.0.0.1',0));port=s.getsockname()[1];s.close();return port
 def fetch(port,path):
@@ -92,7 +97,7 @@ def lifecycle(root,data,r):
      try:proc.wait(timeout=30)
      except subprocess.TimeoutExpired:proc.terminate();proc.wait(timeout=10);raise Stop('GRACEFUL_SHUTDOWN_FAILED')
     if startup_ok:require(proc.returncode==0,'BACKEND_SHUTDOWN_NONZERO')
-  financial_equal(before,dbs(data));require({n:h for n,h in files(data).items()if n.endswith('.complete.zlib')}==evidence,'REPLAY_BYTES_CHANGED');require({n:h for n,h in files(root/'engine').items()if n.startswith('data/')}==history,'OFFICIAL_HISTORY_BYTES_CHANGED')
+  financial_equal(before,dbs(data));require({n:h for n,h in files(data).items()if n.endswith('.complete.zlib')}==evidence,'REPLAY_BYTES_CHANGED');verify_history_preservation(root/'engine',history)
  if browser and browser.poll()is None:browser.terminate()
  require(states[0]['pid']!=states[1]['pid'],'RESTART_PROCESS_NOT_DISTINCT');r['backend_cycles']=states
  record(r,'backend_lifecycle','PASS','Actual Windows Sandbox staged API started, stopped gracefully and restarted under distinct PIDs; health paths verified')
@@ -100,7 +105,7 @@ def lifecycle(root,data,r):
  record(r,'offline_gui','BLOCKED','Native desktop cached views/stale warnings require visible operator verification; served HTML is insufficient')
  record(r,'financial_preservation','PASS','Exact non-monitoring table schemas/row hashes unchanged across startup/navigation/restart; paper accounting reconciles')
  record(r,'evidence_preservation','PASS','All18 original replay payload bytes retained; source/path identity staleness reported without editing hashes or rerunning research')
- record(r,'official_history_preservation','PASS','All staged engine data files retain original bytes across offline lifecycle')
+ record(r,'official_history_preservation','PASS','All original staged engine data files retain their bytes; only the expected one-byte C01 reader lock may be added')
 def calendar(engine):
  from datetime import datetime,timedelta
  tree=ast.parse((engine/'modern_ui/api.py').read_text(encoding='utf-8'));cl=next(n for n in tree.body if isinstance(n,ast.ClassDef)and n.name=='ModernAppContext');names={'_is_nse_trading_day','_previous_nse_session','expected_market_session'};nodes=[n for n in cl.body if isinstance(n,ast.FunctionDef)and n.name in names]
@@ -140,7 +145,7 @@ def main():
   sys.path[:0]=[str(root/'engine/.replay-v10-deps'),str(Path(sys.prefix)/'Lib/site-packages')]
   import importlib.metadata as metadata
   packages={name:metadata.version(name)for name in info['package_versions']}
-  require(packages==info['package_versions'],'RUNTIME_PACKAGE_VERSION_MISMATCH');write(OUTPUT/'PRIVATE/runtime-closure.json',{'python':sys.version,'packages':packages,'runtime_files_verified':len(info['runtime_files']),'dependency_files_verified':len(info['dependency_files'])});record(r,'runtime_dependencies','PASS','Copied runtime/dependency file hashes and package versions match actual Initial inventory; no dependencies installed')
+  require(packages==info['package_versions'],'RUNTIME_PACKAGE_VERSION_MISMATCH');write(OUTPUT/'PRIVATE/runtime-closure.json',{'python':sys.version,'packages':packages,'runtime_files_verified':len(info['runtime_files']),'dependency_files_verified':len(info['dependency_files'])});record(r,'runtime_dependencies','PASS','Copied bytes match the new input snapshot; recorded native hashes and package versions match Initial inventory; no dependencies installed')
   apply(root,candidate,guard,manifest)
   if args.phase=='offline':
    tests=WORK/'regressions';shutil.copytree(BASE/'review/isolated_tests',tests);stage_reference_fixtures(tests,source,guard);env=dict(os.environ,C01_TEST_ENGINE=str(root/'engine'),PYTHONDONTWRITEBYTECODE='1');p=subprocess.run([sys.executable,'-I','-S','-B',str(tests/'run_regressions.py')],env=env,capture_output=True,text=True,timeout=600);(OUTPUT/'PRIVATE').mkdir(exist_ok=True);(OUTPUT/'PRIVATE/c01-regression.log').write_text(p.stdout+'\n'+p.stderr);require(p.returncode==0,'STAGED_C01_REGRESSION_FAILED');res=json.loads((tests/'reports/C01_REGRESSION_RESULTS.json').read_text());require(res['tests_run']==42 and res['passed']==42 and res['failures']==0 and res['errors']==0,'EXPECTED42_STAGED_TESTS');record(r,'staged_regressions','PASS','42/42 C01 integrity tests against exact staged engine in actual Windows Sandbox; synthetic test data');r['staged_test_results']=res;lifecycle(root,data,r)
