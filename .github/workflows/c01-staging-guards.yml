@@ -1,0 +1,28 @@
+name: C01 isolated staging guards
+on:
+  push:
+    branches: [review/c01-staging-20261024]
+    paths: [tools/c01-staging/**, .github/workflows/c01-staging-guards.yml]
+  workflow_dispatch:
+jobs:
+  guard-tests:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.12.10', '3.14.3']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Source install rollback isolation and interruption guards on synthetic copies
+        working-directory: tools/c01-staging
+        run: python -B run_guard_tests.py
+      - name: Parse Windows staging entry point
+        shell: pwsh
+        run: |
+          $parseErrors = $null
+          $tokens = $null
+          [System.Management.Automation.Language.Parser]::ParseFile((Join-Path $PWD 'tools/c01-staging/package/RUN_WINDOWS_STAGING.ps1'), [ref]$tokens, [ref]$parseErrors) | Out-Null
+          if ($parseErrors.Count -gt 0) { throw ($parseErrors | Out-String) }
