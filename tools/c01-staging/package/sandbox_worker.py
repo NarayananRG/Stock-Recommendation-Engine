@@ -104,7 +104,7 @@ def official(root,data,r):
  # Extract exact installed official-cache root method without constructing the GUI context.
  tree=ast.parse((root/'engine/modern_ui/api.py').read_text(encoding='utf-8'));cl=next(n for n in tree.body if isinstance(n,ast.ClassDef)and n.name=='ModernAppContext');fn=next(n for n in cl.body if isinstance(n,ast.FunctionDef)and n.name=='_official_cache_roots');ns={'Path':Path};exec(compile(ast.fix_missing_locations(ast.Module(body=[fn],type_ignores=[])),'captured-cache-contract','exec'),ns)
  expected=calendar(root/'engine');require(not os.environ.get('SRE_EXPECTED_SESSION_NOW'),'NO_CLOCK_OVERRIDE');roots=ns['_official_cache_roots'](root/'engine');before={str(p):p.read_bytes()for cache in roots for p in cache.glob('*.csv')};dbbefore=dbs(data);evidence={n:h for n,h in files(data).items()if n.endswith('.complete.zlib')}
- result=refresh_official_session([str(p)for p in roots],expected);write(OUTPUT/'PRIVATE/official-response.json',result);r['official_contract_status']=result.get('status');r['expected_session']=expected
+ result=refresh_official_session([str(p)for p in roots],expected);financial_equal(dbbefore,dbs(data));require({n:h for n,h in files(data).items()if n.endswith('.complete.zlib')}==evidence,'OFFICIAL_REFRESH_CHANGED_RESEARCH');write(OUTPUT/'PRIVATE/official-response.json',result);r['official_contract_status']=result.get('status');r['expected_session']=expected
  if result['status']not in('ALREADY_CURRENT','REFRESHED_AND_VERIFIED'):
   require(all(Path(p).read_bytes()==b for p,b in before.items()),'FAILED_OFFICIAL_REFRESH_CHANGED_ROWS');record(r,'official_network_retrieval','BLOCKED','Existing official contract returned '+str(result.get('status'))+' / '+str(result.get('reason_code'))+'; no accepted fresh session, original rows retained');return
  require(result.get('automatic_yfinance_fallback')is False,'UNAPPROVED_FALLBACK');require(result.get('stock_files_expected')==200 and result.get('stock_files_matched')==200 and result.get('equity_session')==expected and result.get('index_session')==expected,'FULL_OFFICIAL_SESSION_COVERAGE_FAILED')
@@ -128,7 +128,12 @@ def main():
   for name,expected in info['database_snapshots'].items():
    p=child(INPUT/'restore',name);require(db_snapshot(p)==expected,'INITIAL_DB_ACCOUNTING_DIGEST_MISMATCH:'+name);shutil.copy2(p,data/name)
   # Data-side absolute old configuration remains preserved. Exact explicit app/data/env roots override discovery; no live paths exist in this VM.
-  shutil.copytree(INPUT/'deps',root/'engine/.replay-v10-deps');apply(root,candidate,guard,manifest)
+  shutil.copytree(INPUT/'deps',root/'engine/.replay-v10-deps')
+  sys.path[:0]=[str(root/'engine/.replay-v10-deps'),str(Path(sys.prefix)/'Lib/site-packages')]
+  import importlib.metadata as metadata
+  packages={name:metadata.version(name)for name in info['package_versions']}
+  require(packages==info['package_versions'],'RUNTIME_PACKAGE_VERSION_MISMATCH');write(OUTPUT/'PRIVATE/runtime-closure.json',{'python':sys.version,'packages':packages,'runtime_files_verified':len(info['runtime_files']),'dependency_files_verified':len(info['dependency_files'])});record(r,'runtime_dependencies','PASS','Copied runtime/dependency file hashes and package versions match actual Initial inventory; no dependencies installed')
+  apply(root,candidate,guard,manifest)
   if args.phase=='offline':
    tests=WORK/'regressions';shutil.copytree(BASE/'review/isolated_tests',tests);env=dict(os.environ,C01_TEST_ENGINE=str(root/'engine'),PYTHONDONTWRITEBYTECODE='1');p=subprocess.run([sys.executable,'-I','-S','-B',str(tests/'run_regressions.py')],env=env,capture_output=True,text=True,timeout=600);(OUTPUT/'PRIVATE').mkdir(exist_ok=True);(OUTPUT/'PRIVATE/c01-regression.log').write_text(p.stdout+'\n'+p.stderr);require(p.returncode==0,'STAGED_C01_REGRESSION_FAILED');res=json.loads((tests/'reports/C01_REGRESSION_RESULTS.json').read_text());require(res['tests_run']==42 and res['passed']==42 and res['failures']==0 and res['errors']==0,'EXPECTED42_STAGED_TESTS');record(r,'staged_regressions','PASS','42/42 C01 integrity tests against exact staged engine in actual Windows Sandbox; synthetic test data');r['staged_test_results']=res;lifecycle(root,data,r)
   else:official(root,data,r)

@@ -5,7 +5,7 @@ from xml.sax.saxutils import escape
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 from source_transaction import Stop,require,sha,digest,write,check_path,child,files,verify
 BASE=Path(__file__).resolve().parent
-CHECKS=['original_restore','source_guard_46','runtime_identity','sandbox_isolation','source_apply','source_rollback','interrupted_install_recovery','hash_drift_refusal','staged_regressions','backend_lifecycle','static_gui_delivery','desktop_gui_acceptance','offline_backend','offline_gui','financial_preservation','evidence_preservation','official_history_preservation','official_network_retrieval','official_full_coverage','official_publication_time','clean_machine_portability','live_deployment_preparation']
+CHECKS=['original_restore','source_guard_46','runtime_identity','runtime_dependencies','sandbox_isolation','source_apply','source_rollback','interrupted_install_recovery','hash_drift_refusal','staged_regressions','backend_lifecycle','static_gui_delivery','desktop_gui_acceptance','offline_backend','offline_gui','financial_preservation','evidence_preservation','official_history_preservation','official_network_retrieval','official_full_coverage','official_publication_time','clean_machine_portability','live_deployment_preparation']
 def report():return {'schema':'SRE_C01_WINDOWS_STAGING_V1','checks':{k:{'status':'BLOCKED','evidence':'Windows staging execution not yet completed'}for k in CHECKS},'live_installation_modified':False,'historical_replays_run':0,'live_apply_authorized':False,'gate_c':'BLOCKED','strategy_profitability':'NOT_VALIDATED'}
 def mark(r,k,s,e):r['checks'][k]={'status':s,'evidence':e}
 def save(out,r):
@@ -85,7 +85,7 @@ def main():
    src=check_path(b['path'])
    if src.is_relative_to(deps):require(sha(child(payload/'deps',src.relative_to(deps).as_posix()))==b['sha256'],'DEPENDENCY_NATIVE_DRIFT')
    elif src.is_relative_to(runtime):require(sha(child(payload/'runtime',src.relative_to(runtime).as_posix()))==b['sha256'],'RUNTIME_NATIVE_DRIFT')
-  write(payload/'input.json',{'database_snapshots':baseline['databases'],'restore_files':restored_map,'runtime_files':runtime_map,'dependency_files':dep_map,'runtime_version':identity['version']})
+  write(payload/'input.json',{'database_snapshots':baseline['databases'],'restore_files':restored_map,'runtime_files':runtime_map,'dependency_files':dep_map,'runtime_version':identity['version'],'package_versions':meta['packages']})
   mark(r,'sandbox_isolation','PASS','Runner generated Sandbox mappings for copied inputs/package read-only and new report directory writable; live and original restore unmapped')
   save(out,r)
   offline=run('offline',payload,out,root,sandbox,args.timeout)
