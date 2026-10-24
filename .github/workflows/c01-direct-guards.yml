@@ -1,0 +1,30 @@
+name: C01 direct patch deployment guards
+on:
+  push:
+    branches: [review/c01-direct-patch-20261024]
+    paths: [tools/c01-direct/**, .github/workflows/c01-direct-guards.yml]
+  workflow_dispatch:
+jobs:
+  guards:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.12.10', '3.14.3']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Direct source deployment recovery, readonly accounting and Windows locks
+        working-directory: tools/c01-direct
+        run: python -B run_tests.py
+      - name: Parse PowerShell entry points and common wrapper
+        shell: powershell
+        run: |
+          $errors = $null
+          $tokens = $null
+          foreach($f in (Get-ChildItem tools/c01-direct/package/*.ps1)) {
+            [System.Management.Automation.Language.Parser]::ParseFile($f.FullName,[ref]$tokens,[ref]$errors) | Out-Null
+            if($errors.Count -gt 0){throw ($errors | Out-String)}
+          }
