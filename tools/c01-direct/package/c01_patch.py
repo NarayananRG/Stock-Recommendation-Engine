@@ -85,6 +85,15 @@ def sql_snapshot(copyroot, data, inv):
     require(result,'NO_SQLITE_DATABASE_FOUND')
     return result
 
+def required_space(data,inv,engine):
+    source=0; databases=0
+    for n,m in inv.items():
+        if n.startswith((engine.name+'/stock_app/',engine.name+'/modern_ui/')): source+=m['size']
+        path=child(data,n)
+        with path.open('rb') as f: header=f.read(16)
+        if header==b'SQLite format 3\x00' or n.endswith(('-wal','-shm','-journal')): databases+=m['size']
+    return 128*1024*1024+source*4+databases*3
+
 def begin(engine,area,package,guard,manifest,protected):
     require(not (area/'RECEIPT.json').exists(),'EXISTING_RECEIPT_USE_ROLLBACK')
     verify(engine,expected(guard,manifest,False)); candidate_checks(package,guard,manifest)
@@ -159,6 +168,7 @@ def closed(data):
 def protect_files(data,excluded):
     """Windows deny-write/delete handles on all protected files, held until operation ends."""
     require(os.name=='nt','WINDOWS_REQUIRED')
+    data=safe(data)
     from ctypes import wintypes
     k=ctypes.WinDLL('kernel32',use_last_error=True)
     k.CreateFileW.argtypes=[wintypes.LPCWSTR,wintypes.DWORD,wintypes.DWORD,ctypes.c_void_p,wintypes.DWORD,wintypes.DWORD,wintypes.HANDLE]; k.CreateFileW.restype=wintypes.HANDLE
@@ -233,7 +243,7 @@ def main():
             closed(data); before=inventory(data,excluded); write(area/('APPLY_BEFORE.json' if args.action=='apply' else 'ROLLBACK_BEFORE.json'),before)
             database_before=sql_snapshot(area/('database-before-'+uuid.uuid4().hex),data,before)
             report={'action':args.action,'live_acceptance':'NOT_TESTED_BY_AUTHOR','protected_files':len(before),'database_before':database_before,'receipt':str(area/'RECEIPT.json')}
-            require(shutil.disk_usage(area).free > max(128*1024*1024, sum(m['size'] for n,m in before.items() if not n.startswith(engine.name+'/'))*3), 'INSUFFICIENT_BACKUP_SPACE')
+            require(shutil.disk_usage(area).free > required_space(data,before,engine), 'INSUFFICIENT_BACKUP_SPACE')
             started=False
             try:
                 if args.action=='apply':
