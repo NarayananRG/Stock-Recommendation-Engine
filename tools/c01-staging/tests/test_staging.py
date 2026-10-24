@@ -125,4 +125,16 @@ class StagingTests(unittest.TestCase):
   with patch.dict(sys.modules,{'stock_app':parent,'stock_app.official_daily_refresh':module}),patch.object(guest,'OUTPUT',self.base/'output'),patch.object(guest,'calendar',return_value={'expected_market_session':'2099-01-02'}),patch('zoneinfo.ZoneInfo',FakeZone):
    guest.official(self.root,self.root/'private',report)
   self.assertEqual([x[1]for x in calls],['2099-01-02','2099-01-02']);self.assertEqual(report['checks']['official_network_retrieval']['status'],'PASS');self.assertEqual(report['checks']['official_publication_time']['status'],'BLOCKED');self.private_equal()
+ def test_reference_fixture_copy_preserves_verified_original_crlf_bytes(self):
+  tests=self.base/'tests';ref=tests/'reference_engine/stock_app';ref.mkdir(parents=True);names=[]
+  for i in range(7):
+   n=f'stock_app/frozen_{i}.py';src=self.root/'engine'/n;src.write_bytes(b'FROZEN = True\r\n');self.guard[n]=t.sha(src);(ref/src.name).write_bytes(b'FROZEN = True\n');names.append(n)
+  guest.stage_reference_fixtures(tests,self.root/'engine',self.guard)
+  for n in names:self.assertEqual((tests/'reference_engine'/n).read_bytes(),(self.root/'engine'/n).read_bytes())
+ def test_reference_fixture_drift_refused_before_any_fixture_change(self):
+  tests=self.base/'tests';ref=tests/'reference_engine/stock_app';ref.mkdir(parents=True)
+  for i in range(7):(ref/f'frozen_{i}.py').write_bytes(b'SYNTHETIC_NORMALIZED_REFERENCE\n')
+  (self.root/'engine/stock_app/frozen_6.py').write_bytes(b'DRIFT\r\n');before=t.files(ref)
+  with self.assertRaisesRegex(t.Stop,'HASH_MISMATCH'):guest.stage_reference_fixtures(tests,self.root/'engine',self.guard)
+  self.assertEqual(t.files(ref),before)
 if __name__=='__main__':unittest.main()

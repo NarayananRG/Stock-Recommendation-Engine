@@ -48,6 +48,12 @@ def rehearse(source,guard,manifest,candidate,r):
  try:rollback(e,guard,manifest);raise RuntimeError('ROLLBACK_DRIFT_NOT_REFUSED')
  except Stop:pass
  require(files(e/'engine')==before,'REFUSED_ROLLBACK_CHANGED_SOURCE')
+def stage_reference_fixtures(tests,source,guard):
+ reference=tests/'reference_engine';names=[p.relative_to(reference).as_posix()for p in reference.rglob('*.py')]
+ require(len(names)==7 and all(n in guard for n in names),'EXPECTED_SEVEN_PROTECTED_REFERENCE_FIXTURES')
+ verify(source,{n:guard[n]for n in names})
+ for n in names:
+  target=child(reference,n);shutil.copy2(child(source,n),target);require(sha(target)==guard[n],'REFERENCE_FIXTURE_COPY_MISMATCH')
 def free_port():
  s=socket.socket();s.bind(('127.0.0.1',0));port=s.getsockname()[1];s.close();return port
 def fetch(port,path):
@@ -137,7 +143,7 @@ def main():
   require(packages==info['package_versions'],'RUNTIME_PACKAGE_VERSION_MISMATCH');write(OUTPUT/'PRIVATE/runtime-closure.json',{'python':sys.version,'packages':packages,'runtime_files_verified':len(info['runtime_files']),'dependency_files_verified':len(info['dependency_files'])});record(r,'runtime_dependencies','PASS','Copied runtime/dependency file hashes and package versions match actual Initial inventory; no dependencies installed')
   apply(root,candidate,guard,manifest)
   if args.phase=='offline':
-   tests=WORK/'regressions';shutil.copytree(BASE/'review/isolated_tests',tests);env=dict(os.environ,C01_TEST_ENGINE=str(root/'engine'),PYTHONDONTWRITEBYTECODE='1');p=subprocess.run([sys.executable,'-I','-S','-B',str(tests/'run_regressions.py')],env=env,capture_output=True,text=True,timeout=600);(OUTPUT/'PRIVATE').mkdir(exist_ok=True);(OUTPUT/'PRIVATE/c01-regression.log').write_text(p.stdout+'\n'+p.stderr);require(p.returncode==0,'STAGED_C01_REGRESSION_FAILED');res=json.loads((tests/'reports/C01_REGRESSION_RESULTS.json').read_text());require(res['tests_run']==42 and res['passed']==42 and res['failures']==0 and res['errors']==0,'EXPECTED42_STAGED_TESTS');record(r,'staged_regressions','PASS','42/42 C01 integrity tests against exact staged engine in actual Windows Sandbox; synthetic test data');r['staged_test_results']=res;lifecycle(root,data,r)
+   tests=WORK/'regressions';shutil.copytree(BASE/'review/isolated_tests',tests);stage_reference_fixtures(tests,source,guard);env=dict(os.environ,C01_TEST_ENGINE=str(root/'engine'),PYTHONDONTWRITEBYTECODE='1');p=subprocess.run([sys.executable,'-I','-S','-B',str(tests/'run_regressions.py')],env=env,capture_output=True,text=True,timeout=600);(OUTPUT/'PRIVATE').mkdir(exist_ok=True);(OUTPUT/'PRIVATE/c01-regression.log').write_text(p.stdout+'\n'+p.stderr);require(p.returncode==0,'STAGED_C01_REGRESSION_FAILED');res=json.loads((tests/'reports/C01_REGRESSION_RESULTS.json').read_text());require(res['tests_run']==42 and res['passed']==42 and res['failures']==0 and res['errors']==0,'EXPECTED42_STAGED_TESTS');record(r,'staged_regressions','PASS','42/42 C01 integrity tests against exact staged engine in actual Windows Sandbox; synthetic test data');r['staged_test_results']=res;lifecycle(root,data,r)
   else:official(root,data,r)
   verify(INPUT/'restore',info['restore_files'],exact=True);r['execution_complete']=True
  except Exception as exc:
