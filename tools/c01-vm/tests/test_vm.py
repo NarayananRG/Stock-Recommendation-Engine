@@ -6,8 +6,8 @@ import vm_environment as v
 import vm_runner as runner
 from source_transaction import Stop
 HOST={'uuid':'11111111-1111-4111-8111-111111111111','machine_guid':'22222222-2222-4222-8222-222222222222'}
-GUEST={'uuid':'33333333-3333-4333-8333-333333333333','machine_guid':'44444444-4444-4444-8444-444444444444','manufacturer':'VMware, Inc.','model':'VMware Virtual Platform','caption':'Microsoft Windows 11 Home Single Language','version':'10.0.26100','architecture':'64-bit','network_up':[],'drives':[{'DeviceID':'C:','DriveType':3,'ProviderName':None}],'reachable_sharing':[]}
-SETTINGS=['clean_vm','checkpoint_created','shared_folders_disabled','host_drive_redirection_disabled','clipboard_disabled','drag_and_drop_disabled']
+GUEST={'uuid':'33333333-3333-4333-8333-333333333333','machine_guid':'44444444-4444-4444-8444-444444444444','manufacturer':'VMware, Inc.','model':'VMware Virtual Platform','caption':'Microsoft Windows 11 Home Single Language','version':'10.0.26200','architecture':'64-bit','network_up':[],'drives':[{'DeviceID':'C:','DriveType':3,'ProviderName':None}],'reachable_sharing':[]}
+SETTINGS=['supported_guest_release','clean_vm','checkpoint_created','shared_folders_disabled','host_drive_redirection_disabled','clipboard_disabled','drag_and_drop_disabled']
 def attestation():return {'schema':'SRE_C01_VM_ISOLATION_V1','vm_uuid':GUEST['uuid'],**{n:True for n in SETTINGS}}
 class VmTests(unittest.TestCase):
  def test_distinct_windows11_home_vm_is_supported_without_sandbox(self):
@@ -48,7 +48,7 @@ class VmTests(unittest.TestCase):
  def test_incompatible_guest_os_refused(self):
   for caption in ['Microsoft Windows 10 Home','Microsoft Windows Server 2025']:
    guest=copy.deepcopy(GUEST);guest['caption']=caption
-   with self.assertRaisesRegex(Stop,'WINDOWS_11_X64'):v.guest_guard(guest,HOST,attestation(),'offline')
+   with self.assertRaisesRegex(Stop,'WINDOWS_11_25H2'):v.guest_guard(guest,HOST,attestation(),'offline')
  def test_previous_offline_report_requires_real_scope_and_exact_input(self):
   report={'schema':'SRE_C01_VM_STAGING_V1','phase':'offline','input_digest':'SYNTHETIC_INPUT','actual_private_vm_execution':True,'checks':{k:{'status':'PASS'}for k in runner.REQUIRED+['vm_isolation','offline_network']}}
   runner.previous_offline(report,'SYNTHETIC_INPUT')

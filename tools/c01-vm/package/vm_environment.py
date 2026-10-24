@@ -33,9 +33,9 @@ def guest_guard(current,host,attestation,phase):
  supported=(('microsoft' in vendor and model=='virtual machine')or('vmware'in vendor and 'virtual'in model)or('virtualbox'in model)or('qemu'in vendor)or('kvm'in model)or('red hat'in vendor and 'virtual'in model)or('parallels'in vendor and 'virtual'in model))
  require(supported,'RECOGNIZED_ISOLATED_VM_HARDWARE_REQUIRED')
  version=[int(x)for x in str(current.get('version','')).split('.')]
- require('Windows 11'in current.get('caption','')and '64'in current.get('architecture','')and len(version)>=3 and version[0]==10 and version[2]>=22000,'COMPATIBLE_WINDOWS_11_X64_GUEST_REQUIRED')
+ require('Windows 11'in current.get('caption','')and '64'in current.get('architecture','')and len(version)>=3 and version[0]==10 and version[2]>=26200,'SUPPORTED_WINDOWS_11_25H2_OR_NEWER_X64_GUEST_REQUIRED')
  require(attestation.get('schema')=='SRE_C01_VM_ISOLATION_V1'and str(attestation.get('vm_uuid','')).lower()==cur['uuid'],'VM_ATTESTATION_IDENTITY_MISMATCH')
- for k in ['clean_vm','checkpoint_created','shared_folders_disabled','host_drive_redirection_disabled','clipboard_disabled','drag_and_drop_disabled']:
+ for k in ['supported_guest_release','clean_vm','checkpoint_created','shared_folders_disabled','host_drive_redirection_disabled','clipboard_disabled','drag_and_drop_disabled']:
   require(attestation.get(k)is True,'VM_OPERATOR_SETTING_REQUIRED:'+k)
  require(not current.get('reachable_sharing'),'HOST_SHARING_PROVIDER_REACHABLE')
  require(not any(int(d.get('DriveType',0))==4 or d.get('ProviderName')for d in current.get('drives',[])),'MAPPED_NETWORK_OR_HOST_DRIVE_REFUSED')
